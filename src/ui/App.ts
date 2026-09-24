@@ -2,6 +2,7 @@ import * as D from '../data/index.ts';
 import { Game } from '../game/Game.ts';
 import { draw } from '../renderer/Renderer.ts';
 import { Audio } from '../audio/Audio.ts';
+import { musicScene } from '../audio/scenes.ts';
 import type { GameMessage, Structure, Vitals } from '../core/types.ts';
 
 declare global {
@@ -147,7 +148,7 @@ $('settings-button').onclick = () => {
   const a = Audio.settings;
   $('menu-panel').classList.remove('hidden');
   $('menu-panel').innerHTML =
-    `<h2>Sound & settings</h2><label>Music <input id="music-volume" type="range" min="0" max="100" value="${Math.round(a.music * 100)}"></label><label>Effects <input id="sfx-volume" type="range" min="0" max="100" value="${Math.round(a.sfx * 100)}"></label><p>The score and effects are made live by your browser. Your volume choices are saved here.</p><button id="panel-close" class="ink-button">Close this page</button>`;
+    `<h2>Sound & settings</h2><label>Music <input id="music-volume" type="range" min="0" max="100" value="${Math.round(a.music * 100)}"></label><label>Effects <input id="sfx-volume" type="range" min="0" max="100" value="${Math.round(a.sfx * 100)}"></label><p>The score and effects are made live by your browser. Your volume choices are saved here.</p>${Audio.nowPlaying() ? `<p class="muted">Now playing: <em>${Audio.nowPlaying()}</em></p>` : ''}<button id="panel-close" class="ink-button">Close this page</button>`;
   const change = () =>
     Audio.setVolumes(
       +$<HTMLInputElement>('music-volume').value / 100,
@@ -760,24 +761,24 @@ function frame(now: number) {
     }
   }
   Audio.setScene(
-    !state.playing
-      ? 'menu'
-      : game.s.altar.activeBoss
-        ? 'boss'
-        : game.s.player.y > D.surfaceAt(game.s.player.x) + 70
-          ? 'cave'
-          : ['alpine', 'taiga', 'tundra'].includes(game.biome().id)
-            ? 'cold'
-            : ['desert', 'badlands'].includes(game.biome().id)
-              ? 'desert'
-              : game.biome().id === 'forest'
-                ? 'forest'
-                : 'meadow',
+    musicScene({
+      playing: state.playing,
+      dead: game.s.dead,
+      boss: !!game.s.altar.activeBoss,
+      depth: game.s.player.y - D.surfaceAt(game.s.player.x),
+      weather: game.s.weather,
+      biome: game.biome().id,
+      night: game.isNight(),
+    }),
   );
+  Audio.setMuffled(state.playing && state.journal);
   drawWorld();
   updateUI();
   requestAnimationFrame(frame);
 }
+// Browsers only allow sound after a gesture; the first one starts the title theme.
+for (const type of ['pointerdown', 'keydown'])
+  addEventListener(type, () => Audio.start(), { once: true, capture: true });
 addEventListener('beforeunload', () => {
   if (state.playing && !game.s.dead) game.save(localStorage, true);
 });

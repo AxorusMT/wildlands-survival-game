@@ -6,6 +6,28 @@ A standalone, offline side-view survival crafting adventure. Open `index.html` i
 
 TypeScript source is in `src/`. `src/main.ts` bundles the UI, audio, simulation, data, and renderer into `dist/wildlands.js` for the offline page. Run `npm install` once, then `npm run format`, `npm run typecheck`, `npm test`, and `npm run build` after changes. The compiler uses strict type checking. Gameplay rules are in `src/game/rules.ts`; world geometry and item data are in `src/data/`. The renderer is split into sky, terrain, resources, structures, actors, atmosphere, and drawing helpers under `src/renderer/`.
 
+## Music
+
+The soundtrack is thirteen one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
+
+| Track                     | Plays                                     |
+| ------------------------- | ----------------------------------------- |
+| Wildlands                 | Main menu                                 |
+| First Light on the Meadow | Meadow by day, and any temperate fallback |
+| Salt Wind Waltz           | Coast by day                              |
+| Under the Canopy          | Forest by day                             |
+| Lanterns Out              | Meadow, coast, and forest at night        |
+| Mire Shuffle              | Marsh                                     |
+| Hoarfrost                 | Tundra, taiga, and alpine                 |
+| Mirage Caravan            | Desert and badlands                       |
+| Squall Line               | Any surface region during a storm         |
+| Lantern Glow              | The first cave layer                      |
+| Crystal Dark              | The second and third cave layers          |
+| Direwolf                  | An active Direwolf hunt                   |
+| What the Wild Takes       | The death page                            |
+
+Surface changes wait a moment before the music follows, so walking along a border does not flip tracks. The menu, boss, and death tracks cut in straight away. Music is muffled while the journal is open over the game.
+
 ## Controls
 
 | Key / mouse                  | Action                                                          |

@@ -1,0 +1,33 @@
+import type { Track } from '../score.ts';
+import { boss } from './boss.ts';
+import { cave } from './cave.ts';
+import { coast } from './coast.ts';
+import { cold } from './cold.ts';
+import { depths } from './depths.ts';
+import { desert } from './desert.ts';
+import { fallen } from './fallen.ts';
+import { forest } from './forest.ts';
+import { marsh } from './marsh.ts';
+import { meadow } from './meadow.ts';
+import { menu } from './menu.ts';
+import { night } from './night.ts';
+import { storm } from './storm.ts';
+
+/** Every track in the score, in playlist order. Each track's id is the scene that plays it. */
+export const TRACK_LIST: Track[] = [
+  menu,
+  meadow,
+  coast,
+  forest,
+  marsh,
+  cold,
+  desert,
+  night,
+  storm,
+  cave,
+  depths,
+  boss,
+  fallen,
+];
+
+export const TRACKS: Record<string, Track> = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
