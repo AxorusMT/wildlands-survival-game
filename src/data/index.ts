@@ -1,0 +1,9 @@
+// All static game data in one place, for callers that want the whole catalogue.
+export * from './biomes.ts';
+export * from './bosses.ts';
+export * from './diseases.ts';
+export * from './items.ts';
+export * from './progression.ts';
+export * from './recipes.ts';
+export * from './resources.ts';
+export * from './world.ts';

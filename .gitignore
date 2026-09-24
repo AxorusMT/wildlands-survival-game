@@ -1,0 +1,9 @@
+node_modules/
+.claude/
+.env
+.env.*
+!.env.example
+.cache/
+coverage/
+*.log
+*.tsbuildinfo

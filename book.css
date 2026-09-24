@@ -1,0 +1,753 @@
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('assets/fonts/EBGaramond.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: url('assets/fonts/Caveat.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+:root {
+  --book-ink: #322e28;
+  --vellum: #e9dfc5;
+  --red-ink: #884e3d;
+  --book-serif: 'EB Garamond', Georgia, serif;
+  --hand: 'Caveat', cursive;
+}
+body {
+  font-family: var(--book-serif);
+}
+/* The menu is a closed, tooled leather journal seen against the live world. */
+#menu {
+  background: radial-gradient(circle at center, #09150f66, #08120dd9 82%);
+}
+.cover-spine {
+  display: none;
+}
+.cover-content {
+  height: min(820px, 92vh);
+  width: min(650px, 82vw);
+  margin: 0;
+  padding: 62px 70px 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  background:
+    radial-gradient(circle at 78% 18%, #6b51365c, transparent 35%),
+    radial-gradient(circle at 25% 80%, #23160e99, transparent 34%),
+    repeating-linear-gradient(35deg, #33271c 0 3px, #38291d 4px 7px);
+  border: 3px solid #786243;
+  outline: 1px solid #1a140e;
+  outline-offset: 7px;
+  box-shadow:
+    inset 0 0 0 13px #31251b,
+    inset 0 0 0 15px #9c8153,
+    inset 0 0 0 21px #3b2c1e,
+    16px 17px 0 #1a1611,
+    21px 24px 0 #c4b89b,
+    28px 37px 60px #030704bb;
+  color: #ebd9aa;
+}
+.cover-content:before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: -25px;
+  width: 24px;
+  background: repeating-linear-gradient(90deg, #291d15, #5e452d 6px, #241811 10px);
+  border: 2px solid #17120e;
+  box-shadow: -8px 0 8px #06090799;
+}
+.cover-content:after {
+  content: '✥     ✥     ✥';
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  color: #b39460;
+  font-size: 16px;
+  letter-spacing: 2.2em;
+  opacity: 0.65;
+}
+.cover-kicker,
+.cover-foot,
+.cover-mark {
+  font-family: var(--book-serif);
+  font-size: 14px;
+  letter-spacing: 0.17em;
+  font-weight: 600;
+  color: #d0ba86;
+}
+.cover-kicker {
+  margin: 22px 0 32px;
+}
+.cover-emblem {
+  height: 105px;
+  width: 105px;
+  margin: 0 0 22px;
+  color: #e3c98d;
+  border: 1px solid #ad9060;
+  box-shadow:
+    0 0 0 5px #3a2a1b,
+    0 0 0 6px #a48856;
+}
+.cover-content h1 {
+  font: 500 clamp(58px, 7.3vw, 92px)/0.9 var(--book-serif);
+  letter-spacing: 0.03em;
+  margin: 14px 0 28px;
+  text-shadow:
+    1px 2px 0 #130f09,
+    0 0 18px #ad895d88;
+}
+.cover-subtitle {
+  font: italic 24px/1.25 var(--book-serif);
+  color: #dfc99d;
+}
+.cover-rule {
+  width: 86%;
+  background: linear-gradient(90deg, transparent, #c0a475, transparent);
+  margin: 34px 0 18px;
+}
+.cover-action {
+  width: 85%;
+  font: 600 18px var(--book-serif);
+  letter-spacing: 0.09em;
+  border-bottom: 1px solid #ae93647c;
+  padding: 10px 7px;
+  color: #f2ddb1;
+}
+.cover-action span {
+  font-size: 24px;
+}
+.cover-action.secondary {
+  color: #ceb98e;
+}
+.cover-foot {
+  margin: auto 0 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #c8b185;
+}
+.cover-mark {
+  right: 4%;
+  bottom: 4%;
+  font-size: 12px;
+}
+/* The field overlay is written on torn slips, leaving the landscape visible. */
+.hud-header {
+  background: none;
+  border: 0;
+  padding: 18px 28px;
+  height: auto;
+  align-items: flex-start;
+}
+.hud-brand {
+  background: #26352ce8;
+  border: 1px solid #bca879;
+  padding: 8px 15px;
+  font: 600 22px var(--book-serif);
+  letter-spacing: 0.1em;
+  box-shadow: 4px 5px 0 #17241e8a;
+}
+.hud-brand small {
+  font: 12px var(--book-serif);
+  letter-spacing: 0.09em;
+}
+.hud-location {
+  background: #e9dec6ec;
+  color: #413b2e;
+  padding: 8px 16px;
+  box-shadow: 3px 5px 0 #15241e80;
+  min-width: 170px;
+  align-items: center;
+  font: 12px var(--book-serif);
+}
+.hud-location strong {
+  color: #45392d;
+  font: 600 18px var(--book-serif);
+}
+#journal-button {
+  background: #8b5c47e8;
+  color: #f4e4bd;
+  border: 1px solid #e0c799;
+  box-shadow: 4px 5px 0 #15241e80;
+  font: 600 15px var(--book-serif);
+  padding: 9px 14px;
+}
+#journal-button b {
+  font: 600 13px var(--book-serif);
+}
+.hud-left,
+.hud-right {
+  background: radial-gradient(circle at 82% 8%, #f6ead0, #ddcda9);
+  color: #3e3a2d;
+  border: 0;
+  box-shadow:
+    5px 9px 0 #24332394,
+    8px 13px 18px #101a1390;
+  clip-path: polygon(0 0, 100% 0, 100% 94%, 95% 100%, 79% 97%, 53% 100%, 25% 97%, 0 100%);
+}
+.hud-left {
+  top: 103px;
+  left: 28px;
+  width: 254px;
+  padding: 18px 19px 22px;
+  transform: rotate(-1.2deg);
+}
+.hud-right {
+  top: 103px;
+  right: 28px;
+  width: 265px;
+  padding: 22px 18px 25px;
+  transform: rotate(1.3deg);
+}
+.hud-right:before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #765b49;
+  border: 2px solid #c8ae83;
+  border-radius: 50%;
+  top: 8px;
+  left: 50%;
+  box-shadow: 1px 1px 3px #523728;
+}
+.hud-stat {
+  font: 600 12px var(--book-serif);
+  letter-spacing: 0.07em;
+  grid-template-columns: 69px 1fr 25px;
+}
+.hud-stat b {
+  font: 600 12px var(--book-serif);
+}
+.hud-track {
+  height: 3px;
+  background: #bdad8d;
+}
+.hud-track i {
+  background: #827750;
+}
+.hud-stat:first-child i {
+  background: #a66b57;
+}
+.hud-stat:nth-child(2) i {
+  background: #668992;
+}
+.hud-stat:nth-child(4) i {
+  background: #788a69;
+}
+#condition-line {
+  font: italic 15px/1.1 var(--book-serif);
+  color: #625642;
+  border-top: 1px solid #afa181;
+}
+.small-label {
+  font: 600 12px var(--book-serif);
+  letter-spacing: 0.11em;
+  color: #855741;
+}
+.hud-right strong {
+  font: 600 23px/1 var(--hand);
+  color: #4c4939;
+  margin: 9px 0;
+}
+.hud-right small {
+  font: 14px var(--book-serif);
+  color: #6d5d48;
+}
+.hud-footer {
+  background: linear-gradient(transparent, #14231dbb 42%);
+  font-family: var(--book-serif);
+}
+.hud-footer #interaction-prompt {
+  font: 21px var(--book-serif);
+}
+.hud-footer #interaction-prompt b {
+  font: 600 15px var(--book-serif);
+}
+.footer-controls {
+  font: 600 12px var(--book-serif);
+}
+.weapon-readout small {
+  font: 600 11px var(--book-serif);
+}
+.weapon-readout span {
+  font: 20px var(--book-serif);
+}
+#toast {
+  font: 24px var(--book-serif);
+}
+/* Leather boards, page stacks, grain, ink bleed, ribbon, and a turning leaf. */
+#journal {
+  background: #0c140ecc;
+  perspective: 1600px;
+}
+.book-shadow {
+  width: min(1270px, 97vw);
+  height: min(850px, 95vh);
+  filter: blur(45px);
+}
+.book {
+  width: min(1210px, 94vw);
+  height: min(790px, 92vh);
+  border: 13px solid #473126;
+  border-radius: 11px 17px 17px 11px;
+  box-shadow:
+    0 6px 0 #71543a,
+    0 10px 0 #c6ba9b,
+    0 14px 0 #55422f,
+    0 18px 0 #b0a183,
+    0 35px 70px #030603;
+  outline: 1px solid #a5885d;
+  outline-offset: -6px;
+}
+.book-spine {
+  left: calc(50% - 16px);
+  width: 32px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 18px, #b69f77 19px 21px, transparent 22px 40px),
+    linear-gradient(90deg, #b5a582, #564536 30%, #35281e 52%, #ac9d7a 81%, #f5eacf);
+  box-shadow:
+    3px 0 8px #3f3327aa,
+    -3px 0 8px #3f3327aa;
+}
+.page {
+  padding: 24px 46px 29px 50px;
+  background:
+    radial-gradient(circle at 20% 80%, #b1a07820 0 12%, transparent 25%),
+    radial-gradient(circle at 83% 15%, #bbaa8130 0 8%, transparent 19%),
+    repeating-linear-gradient(0deg, transparent 0 30px, #6f62461c 31px, transparent 32px),
+    linear-gradient(105deg, #d2c4a4, #f0e7cf 15%, #e9ddc0 91%, #c9b996);
+  color: var(--book-ink);
+}
+.right-page {
+  padding-left: 52px;
+  padding-right: 46px;
+  background:
+    radial-gradient(circle at 84% 72%, #a8986d29 0 12%, transparent 27%),
+    radial-gradient(circle at 14% 19%, #ae9c7124 0 8%, transparent 22%),
+    repeating-linear-gradient(0deg, transparent 0 30px, #6f62461a 31px, transparent 32px),
+    linear-gradient(95deg, #c4b38f, #f1e8d0 16%, #e7dbbc 94%, #c1b08c);
+}
+.page:before {
+  opacity: 0.11;
+  background-image: radial-gradient(#3c3329 0.5px, transparent 0.7px);
+  background-size: 4px 4px;
+}
+.right-page:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 62px;
+  height: 62px;
+  background: linear-gradient(135deg, transparent 48%, #c8b994 49%, #eee4c8 55%, #d5c6a4);
+  filter: drop-shadow(-2px -2px 2px #6d60404d);
+  pointer-events: none;
+  z-index: 4;
+}
+.page-top,
+.page-foot {
+  font: 600 12px var(--book-serif);
+  letter-spacing: 0.1em;
+  color: #78684f;
+  border-color: #9c8765;
+}
+.page-top {
+  padding-bottom: 7px;
+}
+.page-foot {
+  padding-top: 7px;
+}
+.page h2 {
+  font: 500 clamp(42px, 4vw, 60px)/0.92 var(--book-serif);
+  letter-spacing: -0.02em;
+  margin: 27px 0 11px;
+  color: #342d26;
+}
+.page h3 {
+  font: 700 14px var(--book-serif);
+  letter-spacing: 0.11em;
+  color: #7e513e;
+  margin: 19px 0 8px;
+}
+.page p {
+  font: 18px/1.22 var(--book-serif);
+  margin: 8px 0 14px;
+}
+.page .lede {
+  font: italic 22px/1.1 var(--book-serif);
+  color: #655544;
+  margin: 4px 0 18px;
+}
+.page .muted {
+  color: #726b58;
+}
+.page .divider {
+  background: #9f8a6c;
+}
+.page > div[id^='page-'] {
+  scrollbar-color: #9d8766 transparent;
+}
+.turning-leaf {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 50%;
+  width: 50%;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: left center;
+  background:
+    radial-gradient(circle at 75% 30%, #ac987338, transparent 30%),
+    linear-gradient(90deg, #cbb892, #efe5cc 25%, #e4d8ba);
+  box-shadow:
+    inset 14px 0 20px #9b896e55,
+    -12px 0 20px #46372744;
+}
+.book.turn .turning-leaf {
+  animation: flipLeaf 0.43s ease-in-out both;
+}
+@keyframes flipLeaf {
+  0% {
+    opacity: 0;
+    transform: rotateY(0);
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotateY(-180deg);
+  }
+}
+.bookmark-ribbon {
+  position: absolute;
+  z-index: 4;
+  top: -14px;
+  right: 87px;
+  width: 28px;
+  height: 70px;
+  background: linear-gradient(90deg, #6a2c2a, #a04839, #6c2d26);
+  box-shadow: 2px 2px 3px #3d2d24;
+}
+.bookmark-ribbon:after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 14px solid #e9ddc1;
+}
+.book-tabs {
+  right: -25px;
+  top: 75px;
+  gap: 5px;
+}
+.book-tabs button {
+  font: 600 18px var(--hand);
+  letter-spacing: 0;
+  min-height: 94px;
+  width: 37px;
+  padding: 9px 5px;
+  background: linear-gradient(90deg, #736045, #ad9270);
+  color: #f9ecd3;
+  box-shadow: 3px 4px 3px #19181078;
+  border-radius: 0 5px 6px 0;
+  transform: rotate(1deg);
+}
+.book-tabs button:nth-child(2n) {
+  background: linear-gradient(90deg, #6d6149, #9e8c6b);
+  transform: rotate(-1deg);
+}
+.book-tabs button.active {
+  background: linear-gradient(90deg, #7e3d34, #b1664c);
+  transform: translateX(7px) rotate(1deg);
+}
+#book-close {
+  font: 34px var(--book-serif);
+  color: #73513f;
+  right: 17px;
+  top: 7px;
+}
+.book-row {
+  border-color: #bca889;
+  font: 18px var(--book-serif);
+  padding: 8px 0;
+}
+.book-row strong {
+  font-weight: 500;
+}
+.book-row small {
+  font: 15px var(--book-serif);
+  color: #6d604b;
+}
+.book-row .qty {
+  font: 600 18px var(--book-serif);
+}
+.book-row button,
+.tiny-button,
+.recipe-row button {
+  font: 600 21px var(--hand);
+  letter-spacing: 0;
+  border: 0;
+  border-bottom: 1px solid #8f7157;
+  color: #764c39;
+  background: transparent;
+  padding: 0 3px;
+  white-space: nowrap;
+}
+.book-row button:after,
+.recipe-row button:after {
+  content: ' ↗';
+}
+.book-row button:hover,
+.tiny-button:hover,
+.recipe-row button:hover {
+  background: #bd9f6140;
+  color: #472e22;
+}
+.book-row button:disabled,
+.tiny-button:disabled,
+.recipe-row button:disabled {
+  opacity: 0.3;
+  background: transparent;
+}
+.recipe-row {
+  border-color: #b9a788;
+  padding: 9px 0;
+}
+.recipe-row strong {
+  font: 500 20px var(--book-serif);
+}
+.recipe-row small {
+  font: 15px/1.05 var(--book-serif);
+  color: #665b49;
+}
+.recipe-row a {
+  font: 600 18px var(--hand);
+  color: #7e5140;
+  border-color: #a08464;
+}
+.recipe-group {
+  border-color: #8f795c;
+}
+.note-block {
+  font: 17px/1.18 var(--book-serif);
+  border-color: #a36b51;
+}
+.folio-stamp {
+  font: 700 17px var(--book-serif);
+}
+.objective-list li {
+  font: 17px var(--book-serif);
+  padding: 5px 0;
+}
+.vital-row {
+  font: 16px var(--book-serif);
+}
+.disease-note {
+  font: 17px var(--book-serif);
+}
+.biome-entry strong {
+  font: 600 20px var(--book-serif);
+}
+.biome-entry small {
+  font: 16px var(--book-serif);
+}
+.book-actions button {
+  background: transparent;
+  color: #765040;
+  border: 0;
+  border-bottom: 1px solid #9f7762;
+  padding: 2px 4px;
+  font: 600 23px var(--hand);
+  letter-spacing: 0;
+}
+.book-actions button:after {
+  content: ' ↗';
+}
+.book-actions button:hover {
+  background: #b5936940;
+}
+.book-actions button:disabled {
+  opacity: 0.35;
+}
+.book-actions .quiet {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #9f7762;
+  color: #765040;
+}
+.sketch {
+  filter: sepia(0.25);
+  opacity: 0.82;
+}
+.atlas-map {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 5px double #9b8766;
+  box-shadow: inset 0 0 20px #4e3c2877;
+  transform: rotate(-1deg);
+  margin: 18px 0;
+}
+.intro-paper {
+  font-family: var(--book-serif);
+  background:
+    radial-gradient(circle at 30% 80%, #a38d6433, transparent 30%),
+    repeating-linear-gradient(0deg, transparent 0 31px, #776b5320 32px, transparent 33px), #ede3c9;
+  border: 8px solid #c8b898;
+}
+.intro-paper h2,
+.death-paper h2 {
+  font-family: var(--book-serif);
+}
+.intro-paper p:not(.eyebrow) {
+  font: 22px/1.2 var(--book-serif);
+}
+.intro-head,
+.eyebrow {
+  font: 600 13px var(--book-serif);
+}
+.ink-button {
+  font: 600 22px var(--hand);
+  letter-spacing: 0;
+  background: transparent;
+  color: #704937;
+  border: 0;
+  border-bottom: 1px solid #8c6a54;
+  padding: 2px 7px;
+}
+.ink-button:hover {
+  background: #b6a47b55;
+  color: #352d27;
+}
+@media (max-width: 800px) {
+  .cover-content {
+    width: min(600px, 86vw);
+    padding: 45px 48px;
+  }
+  .cover-content h1 {
+    font-size: 10vw;
+  }
+  .hud-left {
+    top: 82px;
+    left: 8px;
+    width: 190px;
+    padding: 10px 12px 17px;
+  }
+  .hud-right {
+    top: 82px;
+    right: 8px;
+    width: 185px;
+    padding: 13px 11px 18px;
+  }
+  .hud-right strong {
+    font-size: 20px;
+  }
+  .hud-stat {
+    font-size: 10px;
+    grid-template-columns: 59px 1fr 22px;
+  }
+  .book {
+    width: 94vw;
+    height: 90vh;
+  }
+  .page {
+    padding: 18px 24px;
+  }
+  .right-page {
+    padding-left: 32px;
+  }
+  .page h2 {
+    font-size: 42px;
+  }
+  .page p {
+    font-size: 16px;
+  }
+  .page .lede {
+    font-size: 19px;
+  }
+  .book-tabs {
+    right: -16px;
+    top: 52px;
+  }
+  .book-tabs button {
+    font-size: 15px;
+    width: 27px;
+    min-height: 76px;
+  }
+  .page-top,
+  .page-foot {
+    font-size: 10px;
+  }
+}
+@media (max-width: 590px) {
+  .cover-content {
+    width: 85vw;
+    height: 88vh;
+    padding: 35px 28px;
+  }
+  .cover-content h1 {
+    font-size: 12vw;
+  }
+  .cover-kicker {
+    font-size: 11px;
+    margin: 10px 0 18px;
+  }
+  .cover-emblem {
+    width: 80px;
+    height: 80px;
+  }
+  .cover-subtitle {
+    font-size: 19px;
+  }
+  .cover-foot {
+    font-size: 10px;
+  }
+  .book {
+    width: 90vw;
+  }
+  .right-page {
+    padding: 16px 26px 20px 22px;
+  }
+  .book-spine {
+    left: 0;
+    width: 9px;
+  }
+  .page h2 {
+    font-size: 43px;
+  }
+  .page p {
+    font-size: 18px;
+  }
+  .book-tabs {
+    right: -16px;
+  }
+  .book-tabs button {
+    font-size: 14px;
+    width: 28px;
+    min-height: 70px;
+  }
+  .hud-location {
+    display: none;
+  }
+  .hud-right {
+    top: auto;
+    bottom: 76px;
+  }
+}

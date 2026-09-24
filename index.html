@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#202820" />
+    <title>Wildlands — A Field Record</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="book.css" />
+  </head>
+  <body>
+    <canvas id="world" aria-label="Wildlands game world"></canvas>
+    <div id="vignette"></div>
+    <div id="weather"></div>
+
+    <main id="menu" class="screen">
+      <div class="cover-spine"></div>
+      <div class="cover-content">
+        <div class="cover-kicker">THE EXPEDITION JOURNAL · VOL. I</div>
+        <div class="cover-emblem" aria-hidden="true"><span>✦</span><i></i><span>✦</span></div>
+        <h1>WILDLANDS</h1>
+        <p class="cover-subtitle">
+          A record of what the wilderness takes,<br />and what it lets you make.
+        </p>
+        <div class="cover-rule"></div>
+        <button id="new-game" class="cover-action">Begin expedition <span>↗</span></button>
+        <button id="continue-game" class="cover-action secondary">
+          Continue field record <span>↗</span>
+        </button>
+        <button id="guide-button" class="cover-action secondary">
+          Expedition guide <span>↗</span>
+        </button>
+        <button id="settings-button" class="cover-action secondary">
+          Sound &amp; settings <span>↗</span>
+        </button>
+        <div id="menu-panel" class="menu-panel hidden"></div>
+        <p class="cover-foot">MOVE A / D · JUMP W / SPACE · GATHER E · STRIKE F · MINE R</p>
+      </div>
+      <div class="cover-mark">W / 01</div>
+    </main>
+
+    <section id="intro" class="screen hidden" aria-label="Field record introduction">
+      <div class="intro-paper">
+        <div class="intro-head">
+          <span>FIELD RECORD · 01</span><span id="intro-count">01 / 03</span>
+        </div>
+        <div id="intro-art" class="intro-art"></div>
+        <p id="intro-eyebrow" class="eyebrow"></p>
+        <h2 id="intro-title"></h2>
+        <p id="intro-copy"></p>
+        <button id="intro-next" class="ink-button">Turn the page <span>→</span></button>
+      </div>
+    </section>
+
+    <div id="hud" class="hidden">
+      <header class="hud-header">
+        <div class="hud-brand">
+          <span class="hud-glyph">✦</span><span>WILDLANDS</span><small>FIELD RECORD</small>
+        </div>
+        <div class="hud-location">
+          <strong id="biome-name">MEADOW</strong><span id="world-time">DAY 1 · 08:00 · CLEAR</span>
+        </div>
+        <button id="journal-button" title="Open journal (J)">JOURNAL <b>J</b></button>
+      </header>
+      <div class="hud-left">
+        <div class="hud-stat">
+          <span>HEALTH</span>
+          <div class="hud-track"><i id="health-bar"></i></div>
+          <b id="health-value">100</b>
+        </div>
+        <div class="hud-stat">
+          <span>WATER</span>
+          <div class="hud-track"><i id="hydration-bar"></i></div>
+          <b id="hydration-value">68</b>
+        </div>
+        <div class="hud-stat">
+          <span>FOOD</span>
+          <div class="hud-track"><i id="calories-bar"></i></div>
+          <b id="calories-value">70</b>
+        </div>
+        <div class="hud-stat">
+          <span>STAMINA</span>
+          <div class="hud-track"><i id="stamina-bar"></i></div>
+          <b id="stamina-value">100</b>
+        </div>
+        <p id="condition-line">Stable · the meadow gives you a little time.</p>
+      </div>
+      <div class="hud-right">
+        <span class="small-label">CURRENT FIELD TASK</span
+        ><strong id="objective-text">Gather fallen wood</strong
+        ><small id="objective-progress">0 / 3</small>
+      </div>
+      <div id="boss-hud" class="hidden">
+        <span id="boss-name"></span>
+        <div class="boss-track"><i id="boss-bar"></i></div>
+        <small id="boss-value"></small>
+      </div>
+      <div id="toast" role="status"></div>
+      <footer class="hud-footer">
+        <div id="interaction-prompt"></div>
+        <div class="footer-controls">
+          A / D MOVE <b>·</b> W / SPACE JUMP <b>·</b> E GATHER <b>·</b> F STRIKE <b>·</b> R MINE
+          <b>·</b> J JOURNAL
+        </div>
+        <div class="weapon-readout"><small>EQUIPPED</small><span id="weapon-name">Fists</span></div>
+      </footer>
+    </div>
+
+    <section id="journal" class="hidden" aria-label="Field journal">
+      <div class="book-shadow"></div>
+      <div class="book" id="book">
+        <div class="turning-leaf" aria-hidden="true"></div>
+        <div class="bookmark-ribbon" aria-hidden="true"></div>
+        <button id="book-close" title="Close journal (Esc)">×</button>
+        <div class="book-spine"></div>
+        <div class="page left-page">
+          <div class="page-top"><span>THE WILDLANDS</span><span id="page-number">01</span></div>
+          <div id="page-left"></div>
+          <div class="page-foot">
+            <span>STRANDED EXPEDITION · PERSONAL COPY</span><span>✦</span>
+          </div>
+        </div>
+        <div class="page right-page">
+          <div class="page-top">
+            <span id="right-page-heading">PACK</span><span>FIELD NOTES · VOL. I</span>
+          </div>
+          <div id="page-right"></div>
+          <div class="page-foot">
+            <span id="page-hint">A thing recorded is a thing remembered.</span><span>W / 01</span>
+          </div>
+        </div>
+        <nav class="book-tabs" aria-label="Journal pages">
+          <button data-tab="pack">PACK</button><button data-tab="recipes">RECIPES</button
+          ><button data-tab="vitals">VITALS</button><button data-tab="notes">FIELD NOTES</button
+          ><button data-tab="beasts">BEASTS</button>
+        </nav>
+      </div>
+    </section>
+
+    <section id="death" class="screen hidden" aria-label="Recovery">
+      <div class="death-paper">
+        <span class="eyebrow">FIELD RECORD · INTERRUPTED</span>
+        <h2>The wilderness kept you.</h2>
+        <p>
+          Your journal survived. You can wake in the meadow with reduced supplies, or return to the
+          last saved record.
+        </p>
+        <button id="recover" class="ink-button">Wake in the meadow →</button
+        ><button id="reload-save" class="text-button">Load last save</button>
+      </div>
+    </section>
+
+    <script src="dist/wildlands.js"></script>
+  </body>
+</html>
