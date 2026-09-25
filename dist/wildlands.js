@@ -16167,6 +16167,9 @@
       this.log = document.getElementById("dev-log");
       this.input = document.getElementById("dev-input");
       this.input.addEventListener("keydown", (e) => this.key(e));
+      this.root.addEventListener("click", (e) => {
+        if (e.target !== this.input && !window.getSelection()?.toString()) this.input.focus();
+      });
       this.print(["Type help for commands."], "ok");
     }
     get open() {
@@ -16182,7 +16185,14 @@
       for (const text of lines) {
         const row = document.createElement("div");
         row.className = text.startsWith("!") ? "err" : tone2;
-        row.textContent = text.startsWith("!") ? text.slice(1).trim() : text;
+        const cols = !text.startsWith("!") && /^\s*(\S.*?)\s{2,}(\S.*)$/.exec(text);
+        if (cols && tone2 === "ok") {
+          row.classList.add("cols");
+          const [name, about] = [document.createElement("span"), document.createElement("span")];
+          name.textContent = cols[1];
+          about.textContent = cols[2];
+          row.append(name, about);
+        } else row.textContent = text.startsWith("!") ? text.slice(1).trim() : text;
         this.log.append(row);
       }
       while (this.log.childElementCount > 200) this.log.firstElementChild?.remove();
@@ -16203,6 +16213,9 @@
         if (line === "clear") this.log.replaceChildren();
         else this.print(this.game.command(line), "ok");
         this.onRun();
+      } else if (e.key === "PageUp" || e.key === "PageDown") {
+        e.preventDefault();
+        this.log.scrollBy({ top: (e.key === "PageUp" ? -1 : 1) * this.log.clientHeight * 0.8 });
       } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
         this.cursor = Math.max(
