@@ -48,7 +48,12 @@ export class Combat extends System {
 
   // ─── Taking and dealing damage ─────────────────────────────────────────────
   /** Harms the player through armour; returns the damage actually taken. */
-  hurtPlayer(amount: number, source: string, disease?: [string, number]) {
+  hurtPlayer(
+    amount: number,
+    source: string,
+    disease?: [string, number],
+    how: 'blow' | 'fire' | 'crush' = 'blow',
+  ) {
     const s = this.game.s,
       p = s.player;
     if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
@@ -61,12 +66,14 @@ export class Combat extends System {
     p.vy = Math.min(p.vy, -160);
     this.game.sound('hurt');
     this.game.event('damage', p.x, p.y - 50, String(taken), 1);
-    if (
-      disease &&
-      this.game.rng() <
-        (disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0)) * this.game.pocket.diseaseScale()
-    )
-      this.game.contract(disease[0]);
+    const ail = this.game.ailments,
+      blight = this.game.pocket.diseaseScale();
+    if (disease && this.game.rng() < (disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0)) * blight)
+      ail.contract(disease[0], disease[0] === 'wound' || disease[0] === 'poisoning');
+    // Heavy blows open bleeding wounds or break bones; fire burns.
+    if (how === 'fire' ? this.game.rng() < 0.3 : false) ail.contract('burn', true);
+    else if (taken >= 22 && this.game.rng() < 0.18) ail.contract('bleeding', true);
+    if ((how === 'crush' || taken >= 45) && this.game.rng() < 0.12) ail.contract('fracture', true);
     this.game.say(source + ' · ' + taken + ' damage.', 'danger');
     if (s.vitals.health <= 0) this.game.survival.update(0);
     return taken;
@@ -351,7 +358,16 @@ export class Combat extends System {
           }
         }
       } else if (Math.hypot(p.x - b.x, p.y - 26 - b.y) < 20 + spec.size) {
-        this.hurtPlayer(b.damage, this.shotName(b.kind));
+        this.hurtPlayer(
+          b.damage,
+          this.shotName(b.kind),
+          undefined,
+          spec.fire
+            ? 'fire'
+            : b.kind === 'falling_rock' || b.kind === 'shockwave'
+              ? 'crush'
+              : 'blow',
+        );
         if ((spec.pierce ?? 0) < 90) spent = true;
       }
       if (spent) this.projectiles.splice(i, 1);

@@ -1,6 +1,7 @@
 import { clamp, dist } from '../../core/math.ts';
 import type { Animal } from '../../core/types.ts';
 import { BOSSES } from '../../data/bosses.ts';
+import { BITE_DISEASES } from '../../data/diseases.ts';
 import { MOBS, VOICES, isAggressive, mobName } from '../../data/mobs.ts';
 import { RANGED } from '../../data/gear.ts';
 import { LAVA_Y, TILE, caveY, regionBounds, underworldFloor } from '../../data/world.ts';
@@ -145,6 +146,12 @@ export class Wildlife extends System {
     this.stepLegacy(a, dt);
   }
 
+  /** Some bites carry worse than a wound: rabies from wolves and rats, spores, void rot. */
+  private bite(a: Animal) {
+    const carried = BITE_DISEASES[a.type];
+    if (carried && this.game.rng() < carried[1] * this.game.pocket.diseaseScale())
+      this.game.ailments.contract(carried[0]);
+  }
   /** Bleeding, burning, and poison wear a creature down; stuns and slows run out. */
   private afflict(a: Animal, dt: number) {
     const fx = a.fx,
@@ -232,6 +239,7 @@ export class Wildlife extends System {
           (boss ? 'Direwolf' : mobName(a.type)) + ' attack!',
           boss ? ['wound', 0.4] : spec?.disease,
         );
+        this.bite(a);
       }
     }
     if (a.howlCue && s.elapsed >= a.howlCue) {
@@ -411,6 +419,7 @@ export class Wildlife extends System {
       a.attackAt = t + spec.cooldown * 0.6;
       this.cry(a, 'attack');
       this.game.combat.hurtPlayer(spec.damage, mobName(a.type) + ' attack!', spec.disease);
+      this.bite(a);
     }
     if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {
       a.timers.shoot = t + spec.cooldown + this.game.rng() * 0.6;

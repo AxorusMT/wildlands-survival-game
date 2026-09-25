@@ -74,7 +74,44 @@ export interface Disease {
   name: string;
   cause: string;
   treat: string;
+  /** The treatment to reach for first. */
   item: string;
+  kind: 'illness' | 'infection' | 'exposure' | 'injury';
+  /** Seconds without symptoms before it shows; then seconds per stage as it worsens untreated. */
+  incubate: number;
+  worsen: number;
+  /** Seconds to pass off by itself while mild, if you are fed, watered, and warm. */
+  recover?: number;
+  /** What it does per second at full force (scaled by stage). Regen and speed are fractions lost. */
+  effect: {
+    hp?: number;
+    hydration?: number;
+    calories?: number;
+    protein?: number;
+    stamina?: number;
+    speed?: number;
+    regen?: number;
+  };
+  /** Treatments and how many stages each lifts. */
+  cures: Record<string, number>;
+  /** Treatments stop working once it reaches this stage. */
+  lateCure?: number;
+  /** What it may lead to while critical: ailment and chance per second. */
+  chain?: [string, number];
+  /** Seconds of immunity once it is gone. */
+  immunity?: number;
+  symptoms: [string, string, string];
+}
+/** An ailment you carry: its stage (0 incubating, 1 mild, 2 severe, 3 critical) and its clock. */
+export interface Ailment {
+  id: string;
+  stage: number;
+  /** When it next worsens (or shows, while incubating). */
+  next: number;
+  /** When it began. */
+  since: number;
+  /** Seconds spent mild in good health, toward passing off. */
+  mend?: number;
 }
 /** A field task: label, tally key, and required count. */
 export type Objective = [label: string, key: string, count: number];
@@ -178,6 +215,8 @@ export interface Structure extends Point {
   fuel: number;
   water: number;
   store: Record<string, number>;
+  /** Food kept cold in a larder (iceboxes, cellars, frost chests), each with its own freshness. */
+  larder?: InventoryEntry[];
   crop: string | null;
   plantedAt: number;
   triggeredAt: number;
@@ -224,6 +263,8 @@ export interface Vitals {
   wetness: number;
   illness: number;
   infection: number;
+  /** Fruit, greens, and preserves; run out for long and scurvy sets in. */
+  vitamins: number;
   hygiene: number;
   morale: number;
 }
@@ -244,7 +285,11 @@ export interface GameState {
   weatherNext: number;
   player: Player;
   vitals: Vitals;
+  /** The worst ailment showing symptoms (kept for the journal and older records). */
   disease: string | null;
+  /** Every ailment carried, incubating or showing, and immunities won (until game time). */
+  ailments?: Ailment[];
+  immune?: Record<string, number>;
   inventory: InventoryEntry[];
   nodes: ResourceNode[];
   animals: Animal[];

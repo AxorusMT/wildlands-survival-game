@@ -16,6 +16,7 @@ import { setActiveRealm } from '../data/realms/index.ts';
 import { biomeAt, layerAt, lavaAt, syncPocket } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
+import { Ailments } from './systems/Ailments.ts';
 import { Armoury } from './systems/Armoury.ts';
 import { Bosses } from './systems/Bosses.ts';
 import { Combat } from './systems/Combat.ts';
@@ -29,6 +30,7 @@ import { Equipment, HOTBAR_SLOTS } from './systems/Equipment.ts';
 import { Hands } from './systems/Hands.ts';
 import { Interaction } from './systems/Interaction.ts';
 import { Inventory } from './systems/Inventory.ts';
+import { Larder } from './systems/Larder.ts';
 import { Physics } from './systems/Physics.ts';
 import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
@@ -61,6 +63,8 @@ export class Game {
   readonly interaction = new Interaction(this);
   readonly consumables = new Consumables(this);
   readonly survival = new Survival(this);
+  readonly ailments = new Ailments(this);
+  readonly larder = new Larder(this);
   readonly physics = new Physics(this);
   readonly wildlife = new Wildlife(this);
   readonly effergy = new Effergy(this);
@@ -123,8 +127,11 @@ export class Game {
         infection: 0,
         hygiene: 80,
         morale: 73,
+        vitamins: 70,
       },
       disease: null,
+      ailments: [],
+      immune: {},
       inventory: [],
       nodes: [],
       animals: [],
@@ -182,6 +189,7 @@ export class Game {
     this.realms.update(dt);
     this.pocket.update(dt);
     this.town.update(dt);
+    this.ailments.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
   }
@@ -230,8 +238,7 @@ export class Game {
     return !!this.near('shelter', 130);
   }
   cooled() {
-    const ice = this.near('icebox', 135);
-    return !!(ice && ice.fuel > 0);
+    return !!this.larder.nearest();
   }
   /** The item in the player's hand: the active quick slot, else the ready weapon. */
   heldItem() {

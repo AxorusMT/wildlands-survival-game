@@ -155,6 +155,7 @@ export class Equipment extends System {
     if (fx.has('damage10')) k += 0.1;
     if (fx.has('void')) k += 0.2;
     if (fx.has('buff:wrath')) k += 0.15;
+    if (fx.has('buff:fiery') || fx.has('buff:feasted')) k += 0.1;
     if (magic && (fx.has('mana40') || fx.has('magic15'))) k += 0.15;
     return k;
   }
@@ -166,7 +167,8 @@ export class Equipment extends System {
       (fx.has('speed20') ? 0.2 : 0) +
       (fx.has('speed10') ? 0.1 : 0) +
       (fx.has('speed') ? 0.2 : 0) +
-      (fx.has('cold') ? 0.1 : 0)
+      (fx.has('cold') ? 0.1 : 0) +
+      (fx.has('buff:sweet') ? 0.1 : 0)
     );
   }
 
@@ -240,12 +242,18 @@ export class Equipment extends System {
       }
     }
     const sinceCast = s.elapsed - (this.lastCast ?? -9);
-    s.mana = clamp(s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5), 0, this.maxMana());
+    s.mana = clamp(
+      s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5) * (fx.has('buff:clear_mind') ? 2 : 1),
+      0,
+      this.maxMana(),
+    );
     let regen = 0;
     if (fx.has('regen')) regen += 0.6;
     if (fx.has('buff:regeneration')) regen += 1.2;
     if (fx.has('spores')) regen += 0.5;
     if (fx.has('home')) regen += 0.35;
+    if (fx.has('buff:well_fed') || fx.has('buff:feasted')) regen += 0.4;
+    regen *= this.game.ailments.regenScale();
     if (regen && !s.dead) this.heal(regen * dt);
     if (fx.has('stamina')) s.vitals.stamina = clamp(s.vitals.stamina + dt * 2, 0, 100);
   }

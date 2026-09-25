@@ -144,6 +144,12 @@ export class SaveSystem extends System {
     s.pocket ??= null;
     s.realms ??= {};
     s.armoury ??= {};
+    s.vitals.vitamins ??= 70;
+    s.immune ??= {};
+    // Older records carry one disease; it becomes an ailment already showing.
+    s.ailments ??= s.disease
+      ? [{ id: s.disease, stage: 1, next: s.elapsed + 240, since: s.elapsed }]
+      : [];
     this.game.combat.projectiles = [];
     // Old records fill the quick slots with what they carry.
     if (s.hotbar.every((x) => x === null))

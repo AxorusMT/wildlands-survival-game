@@ -100,6 +100,7 @@ export class Physics extends System {
       (lava ? 0.45 : water ? 0.6 : 1) *
       (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) *
       (v.illness > 60 ? 0.82 : 1) *
+      this.game.ailments.speedScale() *
       (p.boots ? 1.12 : 1) *
       this.game.equipment.speedBonus() *
       this.game.dev.speed;

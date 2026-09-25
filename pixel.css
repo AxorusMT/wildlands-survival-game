@@ -825,3 +825,73 @@ canvas.icon {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── Ailments and freshness ────────────────────────────────────────────────── */
+#ailments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+#ailments:empty {
+  display: none;
+}
+.ail {
+  font: 400 9px var(--caps);
+  padding: 2px 5px;
+  color: #fff4e0;
+  background: #8a6a3a;
+  border: var(--px) solid #3a2a1a;
+}
+.ail.stage-2 {
+  background: #b0602a;
+}
+.ail.stage-3 {
+  background: #a02a2a;
+  animation: ail-pulse 1s steps(2) infinite;
+}
+.ail.off {
+  background: #6a6a74;
+}
+@keyframes ail-pulse {
+  50% {
+    background: #d04040;
+  }
+}
+.fresh-bar {
+  display: block;
+  width: 90px;
+  height: 4px;
+  margin-top: 2px;
+  background: #0000001f;
+}
+.fresh-bar i {
+  display: block;
+  height: 100%;
+  background: #6a9a4a;
+}
+.fresh-bar.stale i {
+  background: #c8a040;
+}
+.fresh-bar.spoiled i {
+  background: #c86a2a;
+}
+.fresh-bar.rotten i {
+  background: #8a3a2a;
+}
+small.spoiled {
+  color: #c86a2a;
+}
+.disease-note .pips i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  background: #0000002a;
+}
+.disease-note .pips i.on {
+  background: #a02a2a;
+}
+.disease-note.stage-3 {
+  border-color: #a02a2a;
+}

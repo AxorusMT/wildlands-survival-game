@@ -19,6 +19,7 @@
     BIOMES: () => BIOMES,
     BIOME_CENTERS: () => BIOME_CENTERS,
     BIOME_SPANS: () => BIOME_SPANS,
+    BITE_DISEASES: () => BITE_DISEASES,
     BLOCKS: () => BLOCKS,
     BOSSES: () => BOSSES,
     BOSS_SHRINES: () => BOSS_SHRINES,
@@ -39,6 +40,7 @@
     ENTRANCES: () => ENTRANCES,
     EVOLUTIONS: () => EVOLUTIONS,
     FAMILIES: () => FAMILIES,
+    FOOD: () => FOOD,
     GEMS: () => GEMS,
     GEN_ITEMS: () => GEN_ITEMS,
     GEN_PROJECTILES: () => GEN_PROJECTILES,
@@ -56,6 +58,7 @@
     LEVEL_DAMAGE: () => LEVEL_DAMAGE,
     MAX_LEVEL: () => MAX_LEVEL,
     MAX_TIER: () => MAX_TIER,
+    MEAL_BUFFS: () => MEAL_BUFFS,
     MINE_TIER: () => MINE_TIER,
     MOBS: () => MOBS,
     MOBS_BY_SIGIL: () => MOBS_BY_SIGIL,
@@ -64,11 +67,13 @@
     NATURAL: () => NATURAL,
     NODES: () => NODES,
     OVERWORLD_W: () => OVERWORLD_W,
+    PACK_COOLING: () => PACK_COOLING,
     POCKET: () => POCKET,
     POTIONS: () => POTIONS,
     PROJECTILES: () => PROJECTILES,
     QUALITIES: () => QUALITIES,
     RANGED: () => RANGED,
+    RAW: () => RAW,
     REALMS: () => REALMS,
     REALM_IDS: () => REALM_IDS,
     RECIPES: () => RECIPES,
@@ -81,6 +86,9 @@
     SIGNATURE: () => SIGNATURE,
     SKY_LADDERS: () => SKY_LADDERS,
     SKY_SEA: () => SKY_SEA,
+    STAGE_FORCE: () => STAGE_FORCE,
+    STAGE_NAMES: () => STAGE_NAMES,
+    STORAGE: () => STORAGE,
     SURFACE_BAND: () => SURFACE_BAND,
     TIERS: () => TIERS,
     TIER_NAMES: () => TIER_NAMES,
@@ -130,6 +138,7 @@
     layerAt: () => layerAt,
     layoutTile: () => layoutTile,
     makeDimensions: () => makeDimensions,
+    meltRate: () => meltRate,
     mobName: () => mobName,
     modById: () => modById,
     naturalWallKind: () => naturalWallKind,
@@ -141,6 +150,7 @@
     regionBounds: () => regionBounds,
     rollMods: () => rollMods,
     rollQuality: () => rollQuality,
+    rotRate: () => rotRate,
     seedOf: () => seedOf,
     setActiveRealm: () => setActiveRealm,
     settlerById: () => settlerById,
@@ -338,31 +348,305 @@
   ];
 
   // src/data/diseases.ts
+  var STAGE_FORCE = [0, 0.4, 1, 1.8];
+  var STAGE_NAMES = ["Incubating", "Mild", "Severe", "Critical"];
   var DISEASES = {
+    // ── Food and water ──
     dysentery: {
       name: "Dysentery",
       cause: "Untreated water or rotten food",
       treat: "Herbal rehydration tea",
-      item: "herbal_tea"
+      item: "herbal_tea",
+      kind: "illness",
+      incubate: 30,
+      worsen: 240,
+      recover: 300,
+      effect: { hydration: 0.07 },
+      cures: { herbal_tea: 3, rehydration_salts: 3, antibiotic: 3 },
+      immunity: 300,
+      symptoms: [
+        "Cramps and loose bowels",
+        "Constant thirst; water runs straight through you",
+        "Severe dehydration"
+      ]
     },
     fever: {
       name: "Fever",
       cause: "Raw meat or rotten food",
       treat: "Willow fever remedy",
-      item: "fever_remedy"
+      item: "fever_remedy",
+      kind: "illness",
+      incubate: 40,
+      worsen: 260,
+      recover: 360,
+      effect: { stamina: 0.5, hydration: 0.03 },
+      cures: { fever_remedy: 3, antibiotic: 3 },
+      immunity: 400,
+      symptoms: [
+        "Aches and a warm brow",
+        "Burning up and shivering by turns",
+        "Delirious with fever"
+      ]
     },
+    food_poisoning: {
+      name: "Food poisoning",
+      cause: "Spoiled food",
+      treat: "Herbal tea, and rest",
+      item: "herbal_tea",
+      kind: "illness",
+      incubate: 20,
+      worsen: 200,
+      recover: 180,
+      effect: { hydration: 0.05, calories: 0.04 },
+      cures: { herbal_tea: 2, rehydration_salts: 3, antibiotic: 3 },
+      chain: ["dysentery", 2e-3],
+      symptoms: ["Queasy", "Vomiting", "Retching and weak"]
+    },
+    tapeworm: {
+      name: "Tapeworm",
+      cause: "Raw meat or raw fish",
+      treat: "Vermifuge",
+      item: "vermifuge",
+      kind: "illness",
+      incubate: 240,
+      worsen: 600,
+      effect: { calories: 0.05, protein: 0.03 },
+      cures: { vermifuge: 3 },
+      symptoms: ["Always hungry", "Wasting, however much you eat", "Starving from within"]
+    },
+    cholera: {
+      name: "Cholera",
+      cause: "Brackish or foul realm water",
+      treat: "Rehydration salts",
+      item: "rehydration_salts",
+      kind: "illness",
+      incubate: 60,
+      worsen: 150,
+      effect: { hydration: 0.14, hp: 0.03 },
+      cures: { rehydration_salts: 2, antibiotic: 1 },
+      immunity: 900,
+      symptoms: ["Watery gut", "Losing water faster than you can drink", "Collapsing from thirst"]
+    },
+    scurvy: {
+      name: "Scurvy",
+      cause: "Days without fruit or greens",
+      treat: "Berries, fruit, herbs, or preserves",
+      item: "berry_preserves",
+      kind: "illness",
+      incubate: 0,
+      worsen: 900,
+      effect: { stamina: 0.4, regen: 0.5 },
+      cures: {},
+      symptoms: [
+        "Tired and bruising easily",
+        "Aching joints; wounds will not close",
+        "Bleeding gums; old scars reopen"
+      ]
+    },
+    // ── Wounds and bites ──
     wound: {
       name: "Infected wound",
       cause: "Animal bite and poor hygiene",
       treat: "Antiseptic poultice or cultured antibiotic",
-      item: "poultice"
+      item: "poultice",
+      kind: "infection",
+      incubate: 0,
+      worsen: 300,
+      effect: { hp: 0.02 },
+      cures: { poultice: 3, antibiotic: 3 },
+      chain: ["blood_poisoning", 4e-3],
+      symptoms: ["Red and swollen", "Hot, weeping, and spreading", "Streaks running up the limb"]
+    },
+    blood_poisoning: {
+      name: "Blood poisoning",
+      cause: "An infected wound left untreated",
+      treat: "Cultured antibiotic",
+      item: "antibiotic",
+      kind: "infection",
+      incubate: 0,
+      worsen: 200,
+      effect: { hp: 0.09, stamina: 0.3 },
+      cures: { antibiotic: 2 },
+      symptoms: ["Chills and a racing heart", "Confused and feverish", "Failing"]
+    },
+    tetanus: {
+      name: "Tetanus",
+      cause: "Deep cuts from old bone, rust, and tools",
+      treat: "Cultured antibiotic, or a field vaccine beforehand",
+      item: "antibiotic",
+      kind: "infection",
+      incubate: 150,
+      worsen: 300,
+      effect: { speed: 0.12, stamina: 0.3 },
+      cures: { antibiotic: 2 },
+      immunity: 3e3,
+      symptoms: ["A stiff jaw", "Muscles locking", "Spasms"]
+    },
+    rabies: {
+      name: "Rabies",
+      cause: "Bites from wolves, bats, and rats",
+      treat: "Rabies serum, before it takes hold",
+      item: "rabies_serum",
+      kind: "infection",
+      incubate: 400,
+      worsen: 500,
+      effect: { hp: 0.04, stamina: 0.3 },
+      cures: { rabies_serum: 3 },
+      lateCure: 2,
+      immunity: 99999,
+      symptoms: ["Tingling at the bite", "Restless, afraid of water", "Raving"]
     },
     poisoning: {
       name: "Venom poisoning",
-      cause: "Scorpion sting",
+      cause: "Scorpion stings and venomous bites",
       treat: "Antivenom or cultured antibiotic",
-      item: "antivenom"
+      item: "antivenom",
+      kind: "illness",
+      incubate: 0,
+      worsen: 160,
+      recover: 240,
+      effect: { hp: 0.03, stamina: 0.3 },
+      cures: { antivenom: 3, antibiotic: 3 },
+      symptoms: ["Numb around the sting", "Swelling and nausea", "Struggling to breathe"]
+    },
+    // ── Exposure ──
+    hypothermia: {
+      name: "Hypothermia",
+      cause: "A body left too cold for too long",
+      treat: "Warmth: a fire, dry clothes, a warming brew",
+      item: "warming_brew",
+      kind: "exposure",
+      incubate: 0,
+      worsen: 180,
+      effect: { speed: 0.15, stamina: 0.4 },
+      cures: { warming_brew: 2 },
+      chain: ["pneumonia", 3e-3],
+      symptoms: ["Shivering", "Clumsy and slow", "Shivering has stopped"]
+    },
+    frostbite: {
+      name: "Frostbite",
+      cause: "Fierce cold on bare skin",
+      treat: "Frost salve",
+      item: "frost_salve",
+      kind: "exposure",
+      incubate: 0,
+      worsen: 300,
+      effect: { stamina: 0.3, speed: 0.08 },
+      cures: { frost_salve: 3, poultice: 1 },
+      symptoms: ["White, numb fingertips", "Blistered and hard", "Blackening flesh"]
+    },
+    heatstroke: {
+      name: "Heatstroke",
+      cause: "A body left too hot for too long",
+      treat: "Shade, water, and rest",
+      item: "boiled_water",
+      kind: "exposure",
+      incubate: 0,
+      worsen: 160,
+      effect: { hydration: 0.08, stamina: 0.4 },
+      cures: { boiled_water: 1, filtered_water: 1, herbal_tea: 2 },
+      symptoms: ["Flushed and dizzy", "Pounding head, no more sweat", "Collapsing"]
+    },
+    pneumonia: {
+      name: "Pneumonia",
+      cause: "Cold and wet together, for too long",
+      treat: "Cultured antibiotic",
+      item: "antibiotic",
+      kind: "illness",
+      incubate: 60,
+      worsen: 260,
+      effect: { stamina: 0.6, hp: 0.02 },
+      cures: { antibiotic: 3, lungwort_tea: 1 },
+      immunity: 600,
+      symptoms: ["A wet cough", "Short of breath", "Drowning on dry land"]
+    },
+    // ── The realms ──
+    spore_lung: {
+      name: "Spore lung",
+      cause: "Breathing the spores of the Mycelial Deep",
+      treat: "Lungwort tea",
+      item: "lungwort_tea",
+      kind: "illness",
+      incubate: 45,
+      worsen: 240,
+      effect: { stamina: 0.5 },
+      cures: { lungwort_tea: 3, antibiotic: 1 },
+      immunity: 600,
+      symptoms: [
+        "A dry, dusty cough",
+        "Something growing in your chest",
+        "Coughing up glowing threads"
+      ]
+    },
+    void_rot: {
+      name: "Void rot",
+      cause: "Wounds from the things of the Void",
+      treat: "Void salve",
+      item: "void_salve",
+      kind: "infection",
+      incubate: 30,
+      worsen: 240,
+      effect: { hp: 0.05, regen: 0.6 },
+      cures: { void_salve: 3 },
+      symptoms: ["A cold, grey patch", "The grey spreads and forgets itself", "Coming unmade"]
+    },
+    // ── Injuries ──
+    bleeding: {
+      name: "Bleeding",
+      cause: "A heavy blow",
+      treat: "A bandage",
+      item: "bandage",
+      kind: "injury",
+      incubate: 0,
+      worsen: 60,
+      recover: 45,
+      effect: { hp: 0.12 },
+      cures: { bandage: 3, poultice: 2 },
+      chain: ["wound", 4e-3],
+      symptoms: ["Bleeding", "Bleeding freely", "Bleeding out"]
+    },
+    fracture: {
+      name: "Fracture",
+      cause: "A crushing blow or a bad fall",
+      treat: "A splint, then time",
+      item: "splint",
+      kind: "injury",
+      incubate: 0,
+      worsen: 400,
+      effect: { speed: 0.25, stamina: 0.2 },
+      cures: { splint: 1 },
+      symptoms: ["A cracked bone", "A broken bone", "A shattered bone"]
+    },
+    burn: {
+      name: "Burn",
+      cause: "Fire, lava, and burning embers",
+      treat: "Burn salve",
+      item: "burn_salve",
+      kind: "injury",
+      incubate: 0,
+      worsen: 200,
+      recover: 150,
+      effect: { stamina: 0.3 },
+      cures: { burn_salve: 3, poultice: 1 },
+      chain: ["wound", 2e-3],
+      symptoms: ["Scorched skin", "Blistered and raw", "Charred"]
     }
+  };
+  var BITE_DISEASES = {
+    wolf: ["rabies", 0.03],
+    bat: ["rabies", 0.04],
+    warren_rat: ["rabies", 0.05],
+    ash_hound: ["rabies", 0.03],
+    skeleton: ["tetanus", 0.06],
+    mole_guard: ["tetanus", 0.08],
+    cinder_knight: ["tetanus", 0.05],
+    shroomling: ["spore_lung", 0.08],
+    spore_bat: ["spore_lung", 0.1],
+    spore_slime: ["spore_lung", 0.1],
+    mycelid: ["spore_lung", 0.1],
+    void_stalker: ["void_rot", 0.1],
+    void_wisp: ["void_rot", 0.08],
+    watcher: ["void_rot", 0.06]
   };
 
   // src/data/weapons.ts
@@ -1240,7 +1524,19 @@
     featherfall: { name: "Featherfall", text: "Fall slowly; no fall damage", color: "#e8e8f8" },
     fireward: { name: "Fireward", text: "Immune to heat and lava", color: "#ff8a3a" },
     wrath: { name: "Wrath", text: "+15% damage", color: "#d04a4a" },
-    potion_sickness: { name: "Potion sickness", text: "Healing draughts rest", color: "#8a8070" }
+    potion_sickness: { name: "Potion sickness", text: "Healing draughts rest", color: "#8a8070" },
+    // The comfort of a good meal.
+    well_fed: { name: "Well fed", text: "Health and stamina recover faster", color: "#e8b84a" },
+    fiery: { name: "Fiery", text: "+10% damage", color: "#ff8a3a" },
+    sweet: { name: "Sugar rush", text: "+10% speed", color: "#f0a0c0" },
+    clear_mind: { name: "Clear mind", text: "Mana returns twice as fast", color: "#8ab0f0" },
+    warm_belly: { name: "Warm belly", text: "The cold bites less", color: "#e87a3a" },
+    feasted: { name: "Feasted", text: "Recover faster; +10% damage", color: "#f0c860" },
+    iron_gut: {
+      name: "Iron gut",
+      text: "Shrug off half of what you catch from food and water",
+      color: "#8a9a6a"
+    }
   };
   var POTIONS = {
     healing_draught: { heal: 60 },
@@ -1261,6 +1557,12 @@
     wind_boots: { effects: ["speed20", "jump"], text: "+20% speed, higher jumps" },
     mycelial_charm: { effects: ["regen"], text: "Regenerate health" },
     cloud_jar: { effects: ["double_jump"], text: "Double jump" },
+    insulated_satchel: {
+      effects: ["cool25"],
+      text: "Food in the pack keeps 25% longer; ice melts slower"
+    },
+    frost_lined_pack: { effects: ["cool50"], text: "Food in the pack keeps twice as long" },
+    rime_lined_pack: { effects: ["cool70"], text: "Food in the pack keeps over three times as long" },
     tide_conch: { effects: ["swim", "defense2"], text: "Swim with the tide; +2 defense" },
     kiln_heart: { effects: ["ashward", "fire"], text: "Ash storms pass you by; strikes may ignite" },
     queens_mandible: { effects: ["tremor", "damage10"], text: "Sense cave-ins; +10% damage" },
@@ -1823,6 +2125,43 @@
     ruby_staff: ["Ruby staff", "weapon"],
     sapphire_staff: ["Sapphire staff", "weapon"],
     emerald_staff: ["Emerald staff", "weapon"],
+    // ── Keeping food, and the cold-storage ladder ──
+    cool_pit: ["Cool pit", "structure"],
+    snow_cellar: ["Snow cellar", "structure"],
+    frost_chest: ["Frost chest", "structure"],
+    rime_vault: ["Rime vault", "structure"],
+    salting_barrel: ["Salting barrel", "structure"],
+    kitchen: ["Kitchen hearth", "structure"],
+    water_filter: ["Water filter", "structure"],
+    insulated_satchel: ["Insulated satchel", "accessory"],
+    frost_lined_pack: ["Frost-lined pack", "accessory"],
+    rime_lined_pack: ["Rime-lined pack", "accessory"],
+    salted_meat: ["Salted meat", "food", 7200],
+    salted_fish: ["Salted fish", "food", 7200],
+    pickled_mushrooms: ["Pickled mushrooms", "food", 9e3],
+    berry_preserves: ["Berry preserves", "food", 12e3],
+    hearty_stew: ["Hearty stew", "food", 1500],
+    fish_chowder: ["Fish chowder", "food", 1200],
+    spiced_skewers: ["Spiced skewers", "food", 1200],
+    honey_cakes: ["Honey cakes", "food", 2400],
+    mushroom_broth: ["Mushroom broth", "food", 1200],
+    orchard_pie: ["Orchard pie", "food", 2e3],
+    ember_chili: ["Ember chili", "food", 1500],
+    explorers_feast: ["Explorer's feast", "food", 1800],
+    brackish_water: ["Brackish water", "water", 1800],
+    filtered_water: ["Filtered water", "water", 2400],
+    // ── Medicine ──
+    rehydration_salts: ["Rehydration salts", "medicine", 9e3],
+    vermifuge: ["Vermifuge", "medicine", 9e3],
+    frost_salve: ["Frost salve", "medicine", 9e3],
+    burn_salve: ["Burn salve", "medicine", 9e3],
+    bandage: ["Bandage", "medicine"],
+    splint: ["Splint", "medicine"],
+    lungwort_tea: ["Lungwort tea", "medicine", 3e3],
+    void_salve: ["Void salve", "medicine", 9e3],
+    rabies_serum: ["Rabies serum", "medicine", 6e3],
+    field_vaccine: ["Field vaccine", "medicine", 6e3],
+    iron_gut_brew: ["Iron-gut brew", "medicine", 3e3],
     // ── Realms and Waystones ──
     waystone: ["Waystone", "structure"],
     kiln: ["Old kiln", "structure"],
@@ -2090,6 +2429,42 @@
     ["bucket", { iron_ingot: 3 }, "workbench", 3],
     ["rope", { fiber: 3 }, null, 1, 10],
     ["grappling_hook", { iron_ingot: 4, rope: 20, hide: 1 }, "workbench", 3],
+    // ── Keeping food: cold storage, preserves, meals, and clean water ──
+    ["cool_pit", { stone: 10, clay: 6, wood: 4 }, null, 1],
+    ["snow_cellar", { stone: 30, ice: 20, iron_ingot: 4, wood: 10 }, "workbench", 3],
+    ["frost_chest", { frost_shard: 6, steel_ingot: 6, ice: 10 }, "forge", 6],
+    ["rime_vault", { starmetal_ingot: 6, frost_shard: 12, crystal: 10 }, "starforge", 9],
+    ["insulated_satchel", { hide: 4, fiber: 8, resin: 2 }, "workbench", 2],
+    ["frost_lined_pack", { frost_shard: 4, hide: 4, silk: 4 }, "workbench", 6],
+    ["rime_lined_pack", { starmetal_ingot: 3, frost_shard: 8, sky_silk: 4 }, "starforge", 9],
+    ["salting_barrel", { wood: 8, iron_ingot: 2, salt: 4 }, "workbench", 2],
+    ["salted_meat", { raw_meat: 2, salt: 2 }, "salting_barrel", 2, 2],
+    ["salted_fish", { raw_fish: 2, salt: 2 }, "salting_barrel", 2, 2],
+    ["pickled_mushrooms", { mushroom: 3, salt: 1, boiled_water: 1 }, "salting_barrel", 2, 2],
+    ["berry_preserves", { berry: 4, honey: 1 }, "campfire", 2, 2],
+    ["kitchen", { stone: 20, clay: 10, iron_ingot: 6, wood: 10 }, "workbench", 3],
+    ["hearty_stew", { raw_meat: 2, potato: 2, herb: 1, boiled_water: 1 }, "kitchen", 3],
+    ["fish_chowder", { raw_fish: 2, potato: 1, boiled_water: 1 }, "kitchen", 3],
+    ["spiced_skewers", { raw_meat: 2, salt: 1, herb: 1 }, "kitchen", 3],
+    ["honey_cakes", { wheat: 3, honey: 1, berry: 2 }, "kitchen", 3],
+    ["mushroom_broth", { mushroom: 3, glowcap: 1, boiled_water: 1 }, "kitchen", 3],
+    ["orchard_pie", { bog_apple: 3, wheat: 2, honey: 1 }, "kitchen", 4],
+    ["ember_chili", { cactus_fruit: 2, raw_meat: 1, sulfur: 1 }, "kitchen", 3],
+    ["explorers_feast", { cooked_meat: 2, bread: 1, berry_preserves: 1, honey: 1 }, "kitchen", 4],
+    ["water_filter", { sand: 10, coal: 6, clay: 6, wood: 4 }, "workbench", 2],
+    ["filtered_water", { brackish_water: 1, sand: 1 }, "water_filter", 2],
+    // ── Medicine ──
+    ["rehydration_salts", { salt: 2, honey: 1, boiled_water: 1 }, "apothecary", 3],
+    ["vermifuge", { herb: 3, venom: 1 }, "apothecary", 3],
+    ["frost_salve", { honey: 1, herb: 2, resin: 1 }, "apothecary", 3],
+    ["burn_salve", { resin: 1, honey: 1, herb: 1 }, "apothecary", 3],
+    ["bandage", { fiber: 4, herb: 1 }, null, 1, 2],
+    ["splint", { wood: 3, fiber: 4 }, null, 1],
+    ["lungwort_tea", { glowcap: 2, herb: 2, boiled_water: 1 }, "apothecary", 5],
+    ["void_salve", { void_lily: 2, crystal: 1, herb: 1 }, "apothecary", 8],
+    ["rabies_serum", { antibiotic: 1, grave_dust: 2, herb: 2 }, "apothecary", 5],
+    ["field_vaccine", { antibiotic: 1, grave_dust: 1, herb: 2 }, "apothecary", 5],
+    ["iron_gut_brew", { herb: 3, venom: 1, boiled_water: 1 }, "apothecary", 3],
     // ── Realms: Waystones, fragments, and keys ──
     ["waystone", { stone: 40, iron_ingot: 8, crystal: 4 }, "workbench", 3],
     ["orchard_fragment", { crystal: 1, reeds: 6, raw_fish: 2 }, "workbench", 3],
@@ -4652,6 +5027,111 @@
     warren_queen: "serpent"
   };
 
+  // src/data/food.ts
+  var FOOD = {
+    glowcap: [10, 3, 6],
+    berry: [8, 0, 14],
+    mushroom: [9, 2, 4],
+    honey: [13, 0, 4],
+    wheat: [4, 2, 0],
+    potato: [14, 3, 5],
+    raw_meat: [21, 21, 0],
+    cooked_meat: [29, 25, 0],
+    bread: [27, 6, 0],
+    cactus_fruit: [11, 1, 16],
+    raw_fish: [16, 18, 2],
+    cooked_fish: [25, 22, 3],
+    smoked_meat: [38, 32, 0],
+    trail_ration: [48, 28, 6],
+    potato_stew: [41, 20, 10],
+    bog_apple: [12, 1, 14],
+    herb: [2, 0, 8],
+    sunbloom: [10, 1, 12],
+    // Preserves.
+    salted_meat: [34, 28, 0],
+    salted_fish: [28, 24, 1],
+    pickled_mushrooms: [14, 3, 12],
+    berry_preserves: [26, 0, 20],
+    // Meals.
+    hearty_stew: [55, 30, 14],
+    fish_chowder: [46, 30, 10],
+    spiced_skewers: [42, 32, 4],
+    honey_cakes: [44, 6, 12],
+    mushroom_broth: [30, 6, 16],
+    orchard_pie: [50, 4, 22],
+    ember_chili: [42, 18, 12],
+    explorers_feast: [70, 36, 24]
+  };
+  var RAW = /* @__PURE__ */ new Set(["raw_meat", "raw_fish"]);
+  var MEAL_BUFFS = {
+    hearty_stew: ["well_fed", 480],
+    fish_chowder: ["well_fed", 420],
+    spiced_skewers: ["fiery", 360],
+    honey_cakes: ["sweet", 360],
+    mushroom_broth: ["clear_mind", 420],
+    orchard_pie: ["warm_belly", 480],
+    ember_chili: ["warm_belly", 420],
+    explorers_feast: ["feasted", 600],
+    iron_gut_brew: ["iron_gut", 600]
+  };
+  function rotRate(temp) {
+    if (temp <= -10) return 0.3;
+    if (temp < 8) return 0.3 + (temp + 10) / 18 * 0.7;
+    if (temp <= 20) return 1;
+    return Math.min(2.6, 1 + (temp - 20) / 18);
+  }
+  function meltRate(temp) {
+    return temp <= 0 ? 0 : temp <= 20 ? 1 : Math.min(3, 1 + (temp - 20) / 12);
+  }
+  var STORAGE = {
+    cool_pit: {
+      name: "Cool pit",
+      tier: 1,
+      mult: 0.6,
+      capacity: 8,
+      text: "Dug into the earth: food keeps a little longer, better still underground."
+    },
+    icebox: {
+      name: "Icebox",
+      tier: 2,
+      mult: 0.18,
+      capacity: 12,
+      fuel: "ice",
+      per: 900,
+      text: "Cold while it has ice; ice melts faster in the heat."
+    },
+    snow_cellar: {
+      name: "Snow cellar",
+      tier: 3,
+      mult: 0.14,
+      capacity: 20,
+      fuel: "ice",
+      per: 2400,
+      text: "Packed snow keeps ice for a long time, and needs none below freezing."
+    },
+    frost_chest: {
+      name: "Frost chest",
+      tier: 4,
+      mult: 0.06,
+      capacity: 16,
+      fuel: "frost_shard",
+      per: 3600,
+      text: "Frost shards from the Frost Keep hold it near frozen whatever the weather."
+    },
+    rime_vault: {
+      name: "Rime vault",
+      tier: 5,
+      mult: 0.02,
+      capacity: 24,
+      text: "Starmetal and frost: food all but stops ageing, and it needs nothing."
+    }
+  };
+  var PACK_COOLING = {
+    insulated_satchel: 0.75,
+    frost_lined_pack: 0.5,
+    rime_lined_pack: 0.3
+  };
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -4745,6 +5225,193 @@
     game;
     constructor(game2) {
       this.game = game2;
+    }
+  };
+
+  // src/game/systems/Ailments.ts
+  var VACCINE = { seconds: 1800, against: ["tetanus", "rabies", "cholera"] };
+  var Ailments = class extends System {
+    /** Seconds each exposure condition has held (cold, heat, wet cold, scurvy). */
+    exposure = {};
+    warned = /* @__PURE__ */ new Set();
+    list() {
+      return this.game.s.ailments ??= [];
+    }
+    has(id) {
+      return this.list().some((a) => a.id === id);
+    }
+    /** The ailments showing symptoms, worst first. */
+    showing() {
+      return this.list().filter((a) => a.stage > 0).sort((a, b) => b.stage - a.stage);
+    }
+    immune(id) {
+      return (this.game.s.immune?.[id] ?? 0) > this.game.s.elapsed;
+    }
+    /**
+     * Catching something: it incubates first (unless `now`), so the journal cannot yet name it.
+     * Returns whether it took hold.
+     */
+    contract(id, now = false) {
+      const def = DISEASES[id];
+      if (!def || this.immune(id) || this.has(id)) return false;
+      if (!now && def.kind === "illness" && (this.game.s.buffs.iron_gut ?? 0) > 0 && this.game.rng() < 0.5)
+        return false;
+      const t = this.game.s.elapsed, hidden = !now && def.incubate > 0;
+      this.list().push({
+        id,
+        stage: hidden ? 0 : 1,
+        next: t + (hidden ? def.incubate : def.worsen),
+        since: t
+      });
+      if (!hidden) this.diagnose(id);
+      this.sync();
+      return true;
+    }
+    diagnose(id) {
+      const def = DISEASES[id];
+      this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
+      this.game.say(
+        `${def.kind === "injury" ? "Injury" : "Diagnosis"}: ${def.name} \xB7 ${def.symptoms[0].toLowerCase()}. Treat with ${def.treat.toLowerCase()}.`,
+        "danger"
+      );
+    }
+    /** Rids you of an ailment, with whatever immunity it leaves. */
+    cure(id, quiet = false) {
+      const def = DISEASES[id], s = this.game.s;
+      s.ailments = this.list().filter((a) => a.id !== id);
+      if (def?.immunity) (s.immune ??= {})[id] = s.elapsed + def.immunity;
+      if (!quiet && def) this.game.say(`${def.name} has passed.`, "good");
+      this.sync();
+    }
+    /** Uses a treatment: each ailment it helps loses stages; those brought to nothing are gone. */
+    treat(item) {
+      let helped = false;
+      for (const a of [...this.list()]) {
+        const def = DISEASES[a.id], power = def.cures[item];
+        if (!power) continue;
+        if (def.lateCure && a.stage >= def.lateCure) {
+          this.game.say(`${def.name} has gone too far for ${item.replace(/_/g, " ")}.`, "danger");
+          continue;
+        }
+        helped = true;
+        a.stage -= power;
+        a.mend = 0;
+        if (a.stage <= 0) this.cure(a.id);
+        else a.next = this.game.s.elapsed + def.worsen;
+      }
+      this.sync();
+      return helped;
+    }
+    /** Field vaccine: immunity to the worst of the bites and the water. */
+    vaccinate() {
+      const s = this.game.s;
+      for (const id of VACCINE.against)
+        (s.immune ??= {})[id] = Math.max(s.immune[id] ?? 0, s.elapsed + VACCINE.seconds);
+      this.game.say("Vaccinated against tetanus, rabies, and cholera for a good while.", "good");
+    }
+    // ─── Their effects ─────────────────────────────────────────────────────────
+    /** The strongest pull of one effect across every showing ailment. */
+    worst(key) {
+      let out = 0;
+      for (const a of this.list())
+        out = Math.max(out, (DISEASES[a.id]?.effect[key] ?? 0) * STAGE_FORCE[a.stage]);
+      return Math.min(0.8, out);
+    }
+    /** Multiplier on movement speed. */
+    speedScale() {
+      return 1 - this.worst("speed");
+    }
+    /** Multiplier on health regeneration. */
+    regenScale() {
+      return 1 - this.worst("regen");
+    }
+    /** Keeps `disease` (the worst showing) and the illness and infection gauges in step. */
+    sync() {
+      const s = this.game.s, shown = this.showing();
+      s.disease = shown[0]?.id ?? null;
+    }
+    update(dt) {
+      const s = this.game.s, v = s.vitals, t = s.elapsed;
+      this.watchExposure(dt);
+      let illness = 0, infection = 0;
+      for (const a of [...this.list()]) {
+        const def = DISEASES[a.id];
+        if (!def) {
+          s.ailments = this.list().filter((x) => x !== a);
+          continue;
+        }
+        if (a.stage === 0) {
+          const key = a.id + ":" + a.since;
+          if (t > a.next - def.incubate / 2 && !this.warned.has(key)) {
+            this.warned.add(key);
+            this.game.say("You feel a little off.", "ink");
+          }
+          if (t >= a.next) {
+            a.stage = 1;
+            a.next = t + def.worsen;
+            this.diagnose(a.id);
+          }
+          continue;
+        }
+        const well = v.hydration > 35 && v.calories > 30 && v.bodyTemp > 35.5 && v.bodyTemp < 38.8;
+        if (this.causeGone(a.id)) a.mend = (a.mend ?? 0) + dt * 4;
+        else if (def.recover && a.stage === 1 && well) a.mend = (a.mend ?? 0) + dt;
+        if (a.mend && a.mend >= (def.recover ?? 60)) {
+          if (a.stage > 1) {
+            a.stage--;
+            a.mend = 0;
+            a.next = t + def.worsen;
+          } else {
+            this.cure(a.id);
+            continue;
+          }
+        }
+        if (t >= a.next && a.stage < 3 && !this.causeGone(a.id)) {
+          a.stage++;
+          a.next = t + def.worsen;
+          this.game.say(
+            `${def.name} worsens: ${STAGE_NAMES[a.stage].toLowerCase()}. ${def.symptoms[a.stage - 1]}.`,
+            "danger"
+          );
+        }
+        if (a.stage === 3 && def.chain && this.game.rng() < def.chain[1] * dt)
+          this.contract(def.chain[0]);
+        const f = STAGE_FORCE[a.stage], e = def.effect;
+        if (e.hp) v.health = clamp(v.health - e.hp * f * dt, 0, this.game.maxHealth());
+        if (e.hydration) v.hydration = clamp(v.hydration - e.hydration * f * dt, 0, 100);
+        if (e.calories) v.calories = clamp(v.calories - e.calories * f * dt, 0, RULES.maxVital);
+        if (e.protein) v.protein = clamp(v.protein - e.protein * f * dt, 0, RULES.maxVital);
+        if (e.stamina) v.stamina = clamp(v.stamina - e.stamina * f * dt, 0, 100);
+        const gauge = [0, 30, 58, 82][a.stage];
+        if (def.kind === "infection") infection = Math.max(infection, gauge);
+        else if (def.kind === "illness") illness = Math.max(illness, gauge);
+      }
+      if (illness > v.illness) v.illness = Math.min(illness, v.illness + dt * 2);
+      if (infection > v.infection) v.infection = Math.min(infection, v.infection + dt * 2);
+      this.sync();
+    }
+    /** Exposure ailments ease as soon as their cause is gone. */
+    causeGone(id) {
+      const v = this.game.s.vitals;
+      if (id === "hypothermia") return v.bodyTemp > 36.2;
+      if (id === "heatstroke") return v.bodyTemp < 38.2;
+      if (id === "scurvy") return v.vitamins > 45;
+      return false;
+    }
+    /** Cold, heat, wet cold, and a diet without greens bring on ailments of their own. */
+    watchExposure(dt) {
+      const v = this.game.s.vitals, hold = (key, on, secs, id) => {
+        this.exposure[key] = on ? (this.exposure[key] ?? 0) + dt : 0;
+        if (this.exposure[key] >= secs && !this.has(id)) {
+          this.exposure[key] = 0;
+          this.contract(id, id !== "pneumonia");
+        }
+      };
+      hold("cold", v.bodyTemp < 34.6, 60, "hypothermia");
+      hold("freeze", v.bodyTemp < 33.4, 45, "frostbite");
+      hold("heat", v.bodyTemp > 39.2, 60, "heatstroke");
+      hold("wetcold", v.wetness > 60 && v.bodyTemp < 35.8, 120, "pneumonia");
+      hold("greens", v.vitamins < 10, 240, "scurvy");
     }
   };
 
@@ -5381,7 +6048,7 @@
     lastSwing = -9;
     // ─── Taking and dealing damage ─────────────────────────────────────────────
     /** Harms the player through armour; returns the damage actually taken. */
-    hurtPlayer(amount, source, disease) {
+    hurtPlayer(amount, source, disease, how = "blow") {
       const s = this.game.s, p = s.player;
       if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
       const cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1, scaled = amount * this.game.pocket.damageScale(), taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
@@ -5391,8 +6058,12 @@
       p.vy = Math.min(p.vy, -160);
       this.game.sound("hurt");
       this.game.event("damage", p.x, p.y - 50, String(taken), 1);
-      if (disease && this.game.rng() < (disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0)) * this.game.pocket.diseaseScale())
-        this.game.contract(disease[0]);
+      const ail = this.game.ailments, blight = this.game.pocket.diseaseScale();
+      if (disease && this.game.rng() < (disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0)) * blight)
+        ail.contract(disease[0], disease[0] === "wound" || disease[0] === "poisoning");
+      if (how === "fire" ? this.game.rng() < 0.3 : false) ail.contract("burn", true);
+      else if (taken >= 22 && this.game.rng() < 0.18) ail.contract("bleeding", true);
+      if ((how === "crush" || taken >= 45) && this.game.rng() < 0.12) ail.contract("fracture", true);
       this.game.say(source + " \xB7 " + taken + " damage.", "danger");
       if (s.vitals.health <= 0) this.game.survival.update(0);
       return taken;
@@ -5602,7 +6273,12 @@
             }
           }
         } else if (Math.hypot(p.x - b.x, p.y - 26 - b.y) < 20 + spec.size) {
-          this.hurtPlayer(b.damage, this.shotName(b.kind));
+          this.hurtPlayer(
+            b.damage,
+            this.shotName(b.kind),
+            void 0,
+            spec.fire ? "fire" : b.kind === "falling_rock" || b.kind === "shockwave" ? "crush" : "blow"
+          );
           if ((spec.pierce ?? 0) < 90) spent = true;
         }
         if (spent) this.projectiles.splice(i, 1);
@@ -5636,7 +6312,7 @@
     use(id) {
       const entry = this.game.s.inventory.filter((e) => e.id === id).sort((a, b) => (a.fresh ?? Infinity) - (b.fresh ?? Infinity))[0];
       if (!entry) return { ok: false, reason: "Not in your pack." };
-      const v = this.game.s.vitals, rotten = this.game.itemState(entry) === "rotten";
+      const v = this.game.s.vitals;
       if (WEAPONS[id]) {
         this.game.s.player.weapon = id;
         this.game.sound("equip");
@@ -5671,80 +6347,75 @@
         this.game.say("Choose a nearby place for " + itemName(id) + ".");
         return { ok: true };
       }
-      const food = {
-        glowcap: [10, 3],
-        berry: [8, 0],
-        mushroom: [9, 2],
-        honey: [13, 0],
-        wheat: [4, 2],
-        potato: [14, 3],
-        raw_meat: [21, 21],
-        cooked_meat: [29, 25],
-        bread: [27, 6],
-        cactus_fruit: [11, 1],
-        raw_fish: [16, 18],
-        cooked_fish: [25, 22],
-        smoked_meat: [38, 32],
-        trail_ration: [48, 28],
-        potato_stew: [41, 20],
-        bog_apple: [12, 1]
-      };
-      if (food[id]) {
-        v.calories = clamp(v.calories + (rotten ? 3 : food[id][0]), 0, RULES.maxVital);
-        v.protein = clamp(v.protein + (rotten ? 0 : food[id][1]), 0, RULES.maxVital);
-        v.morale = clamp(v.morale + (rotten ? -7 : 3), 0, RULES.maxVital);
-        if (rotten && this.game.rng() < 0.72)
-          this.game.contract(this.game.rng() < 0.5 ? "dysentery" : "fever");
-        if ((id === "raw_meat" || id === "raw_fish") && this.game.rng() < 0.48)
-          this.game.contract("fever");
-      } else if (id === "wild_water" || id === "boiled_water") {
-        v.hydration = clamp(v.hydration + (rotten ? 15 : 27), 0, RULES.maxVital);
-        if (id === "wild_water" && this.game.rng() < 0.38 || rotten && this.game.rng() < 0.6)
-          this.game.contract("dysentery");
-        if (id === "boiled_water" && !rotten) this.game.progress.record("drink:boiled_water");
-      } else if ([
-        "herbal_tea",
-        "poultice",
-        "fever_remedy",
-        "antibiotic",
-        "antivenom",
-        "warming_brew"
-      ].includes(id)) {
-        if (id === "herbal_tea") {
-          v.hydration = clamp(v.hydration + 22, 0, RULES.maxVital);
-          v.illness = clamp(v.illness - (rotten ? 8 : 45), 0, RULES.maxVital);
-          if (this.game.s.disease === "dysentery" && v.illness < 15) this.game.s.disease = null;
+      const state2 = this.game.itemState(entry), worth = state2 === "rotten" ? 0.1 : state2 === "spoiled" ? 0.4 : state2 === "stale" ? 0.65 : 1;
+      const ail = this.game.ailments, chance = (p) => this.game.rng() < p;
+      if (FOOD[id]) {
+        const [cal, pro, vit] = FOOD[id];
+        v.calories = clamp(v.calories + Math.max(3, cal * worth), 0, RULES.maxVital);
+        v.protein = clamp(v.protein + pro * worth, 0, RULES.maxVital);
+        v.vitamins = clamp(v.vitamins + vit * worth, 0, RULES.maxVital);
+        v.morale = clamp(v.morale + (worth < 0.5 ? -7 : MEAL_BUFFS[id] ? 8 : 3), 0, RULES.maxVital);
+        if (state2 === "rotten" && chance(0.72)) ail.contract(chance(0.5) ? "dysentery" : "fever");
+        if (state2 === "spoiled" && chance(0.35)) ail.contract("food_poisoning");
+        if (RAW.has(id)) {
+          if (chance(0.48)) ail.contract("fever");
+          if (chance(0.12)) ail.contract("tapeworm");
         }
-        if (id === "fever_remedy") {
-          v.illness = clamp(v.illness - (rotten ? 7 : 48), 0, RULES.maxVital);
-          if (this.game.s.disease === "fever" && v.illness < 15) this.game.s.disease = null;
+        const buff = MEAL_BUFFS[id];
+        if (buff && worth >= 0.65) {
+          this.game.equipment.addBuff(buff[0], buff[1]);
+          this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, "good");
         }
-        if (id === "poultice") {
-          v.infection = clamp(v.infection - (rotten ? 7 : 42), 0, RULES.maxVital);
-          if (this.game.s.disease === "wound" && v.infection < 15) this.game.s.disease = null;
+      } else if (ITEMS[id]?.[1] === "water") {
+        v.hydration = clamp(v.hydration + (state2 === "rotten" ? 15 : 27), 0, RULES.maxVital);
+        if (id === "wild_water" && chance(0.38)) ail.contract("dysentery");
+        if (id === "brackish_water") {
+          if (chance(0.45)) ail.contract("cholera");
+          if (chance(0.3)) ail.contract("dysentery");
         }
-        if (id === "antibiotic") {
-          v.infection = clamp(v.infection - 70, 0, RULES.maxVital);
-          v.illness = clamp(v.illness - 55, 0, RULES.maxVital);
-          this.game.s.disease = null;
-        }
-        if (id === "antivenom") {
-          v.illness = clamp(v.illness - 65, 0, RULES.maxVital);
-          if (this.game.s.disease === "poisoning") this.game.s.disease = null;
-        }
+        if (state2 === "rotten" && chance(0.6)) ail.contract("dysentery");
+        if (id === "boiled_water" && state2 !== "rotten")
+          this.game.progress.record("drink:boiled_water");
+        ail.treat(id);
+      } else if (ITEMS[id]?.[1] === "medicine") {
+        const weak = state2 === "rotten";
+        if (id === "herbal_tea") v.hydration = clamp(v.hydration + 22, 0, RULES.maxVital);
+        if (id === "rehydration_salts") v.hydration = clamp(v.hydration + 40, 0, RULES.maxVital);
         if (id === "warming_brew") {
           v.hydration = clamp(v.hydration + 16, 0, RULES.maxVital);
           v.bodyTemp = clamp(v.bodyTemp + 1.8, 30, 41);
           v.morale = clamp(v.morale + 8, 0, RULES.maxVital);
         }
+        if (id === "antibiotic") {
+          v.infection = clamp(v.infection - 70, 0, RULES.maxVital);
+          v.illness = clamp(v.illness - 55, 0, RULES.maxVital);
+        }
+        if (id === "poultice") v.infection = clamp(v.infection - (weak ? 7 : 42), 0, RULES.maxVital);
+        if (["herbal_tea", "fever_remedy", "antivenom"].includes(id))
+          v.illness = clamp(v.illness - (weak ? 8 : 45), 0, RULES.maxVital);
+        if (id === "field_vaccine") ail.vaccinate();
+        if (id === "iron_gut_brew") {
+          this.game.equipment.addBuff("iron_gut", MEAL_BUFFS.iron_gut_brew[1]);
+          this.game.say(`${BUFFS.iron_gut.name}: ${BUFFS.iron_gut.text.toLowerCase()}.`, "good");
+        }
+        const helped = weak ? false : ail.treat(id);
+        if (!helped && ![
+          "herbal_tea",
+          "warming_brew",
+          "antibiotic",
+          "field_vaccine",
+          "iron_gut_brew",
+          "poultice"
+        ].includes(id)) {
+          if (weak) return { ok: false, reason: "It has spoiled and lost its strength." };
+          return { ok: false, reason: "Nothing it treats ails you." };
+        }
       } else return { ok: false, reason: "This item is a crafting material." };
       this.game.remove(id);
-      this.game.sound(
-        food[id] ? "eat" : id === "wild_water" || id === "boiled_water" ? "drink" : "medicine"
-      );
+      this.game.sound(FOOD[id] ? "eat" : ITEMS[id]?.[1] === "water" ? "drink" : "medicine");
       this.game.say(
-        (rotten ? "Consumed spoiled " : "Used ") + itemName(id).toLowerCase() + ".",
-        rotten ? "danger" : "good"
+        (state2 === "rotten" || state2 === "spoiled" ? "Consumed spoiled " : "Used ") + itemName(id).toLowerCase() + ".",
+        state2 === "rotten" || state2 === "spoiled" ? "danger" : "good"
       );
       return { ok: true };
     }
@@ -6677,7 +7348,12 @@
       return t < RULES.nightEndsAt || t > RULES.nightStartsAt;
     }
     temperature() {
-      const b = this.game.biome(), layer = this.game.layer();
+      const p = this.game.s.player;
+      return this.temperatureAt(p.x, p.y);
+    }
+    /** Air temperature at a place: the region by day and night, or the rock below ground. */
+    temperatureAt(x, y) {
+      const b = biomeAt(x, y), layer = layerAt(x, y);
       if (layer.id === "upper_mines") return layer.temp + b.temp * 0.25;
       if (layer.id !== "surface") return layer.temp;
       return b.temp + (this.isNight() ? -8 : 0) + (this.game.s.weather === "rain" ? -4 : this.game.s.weather === "storm" ? -7 : 0);
@@ -6833,12 +7509,13 @@
       if (fx.has("damage10")) k += 0.1;
       if (fx.has("void")) k += 0.2;
       if (fx.has("buff:wrath")) k += 0.15;
+      if (fx.has("buff:fiery") || fx.has("buff:feasted")) k += 0.1;
       if (magic && (fx.has("mana40") || fx.has("magic15"))) k += 0.15;
       return k;
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
     maxHealth() {
@@ -6909,12 +7586,18 @@
         }
       }
       const sinceCast = s.elapsed - (this.lastCast ?? -9);
-      s.mana = clamp(s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5), 0, this.maxMana());
+      s.mana = clamp(
+        s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5) * (fx.has("buff:clear_mind") ? 2 : 1),
+        0,
+        this.maxMana()
+      );
       let regen = 0;
       if (fx.has("regen")) regen += 0.6;
       if (fx.has("buff:regeneration")) regen += 1.2;
       if (fx.has("spores")) regen += 0.5;
       if (fx.has("home")) regen += 0.35;
+      if (fx.has("buff:well_fed") || fx.has("buff:feasted")) regen += 0.4;
+      regen *= this.game.ailments.regenScale();
       if (regen && !s.dead) this.heal(regen * dt);
       if (fx.has("stamina")) s.vitals.stamina = clamp(s.vitals.stamina + dt * 2, 0, 100);
     }
@@ -7282,12 +7965,8 @@
           this.game.sound("place", st.x, st.y, 0.7);
           this.game.say("Fed the campfire with wood.", "good");
         } else return { ok: false, reason: "One wood refuels the campfire." };
-      } else if (st.type === "icebox") {
-        if (this.game.count("ice")) {
-          this.game.remove("ice");
-          st.fuel += RULES.iceboxRefuel;
-          this.game.say("Icebox cooled with fresh ice.", "good");
-        } else return { ok: false, reason: "One ice refuels the icebox." };
+      } else if (STORAGE[st.type]) {
+        return { ok: true, action: "larder", structure: st };
       } else if (st.type === "rain_catcher") {
         if (st.water < 1) return { ok: false, reason: "The rain catcher is empty. Wait for rain." };
         const amount = Math.min(3, Math.floor(st.water));
@@ -7391,11 +8070,11 @@
         node.y - 20
       );
       if (form === "water") {
-        const qty2 = roll();
-        this.game.add("wild_water", qty2);
+        const qty2 = roll(), id = this.game.pocket.here(node.x) ? "brackish_water" : "wild_water";
+        this.game.add(id, qty2);
         this.game.event("chip", node.x, node.y, "water");
-        this.game.say("Gathered " + qty2 + " wild water.", "good");
-        return { ok: true, id: "wild_water", qty: qty2 };
+        this.game.say("Gathered " + qty2 + " " + itemName(id).toLowerCase() + ".", "good");
+        return { ok: true, id, qty: qty2 };
       }
       this.game.event("chip", node.x, node.y - (form === "tree" ? 26 : 10), node.kind);
       if (form === "plant") {
@@ -7435,8 +8114,10 @@
     count(id) {
       return this.game.s.inventory.reduce((n, entry) => n + (entry.id === id ? entry.qty : 0), 0);
     }
+    /** Fresh, then stale (less nourishing), spoiled (may sicken), and at last rotten. */
     itemState(entry) {
-      return entry.fresh === void 0 ? "stable" : entry.fresh <= 0 ? "rotten" : entry.fresh < (ITEMS[entry.id]?.[2] || 1) * RULES.staleAtFraction ? "stale" : "fresh";
+      const life = ITEMS[entry.id]?.[2] || 1;
+      return entry.fresh === void 0 ? "stable" : entry.fresh <= 0 ? "rotten" : entry.fresh < life * 0.08 ? "spoiled" : entry.fresh < life * RULES.staleAtFraction ? "stale" : "fresh";
     }
     add(id, qty = 1, options = {}) {
       const perish = ITEMS[id]?.[2];
@@ -7474,6 +8155,118 @@
         (best, [id, [tool, tier]]) => tool === kind && this.count(id) ? Math.max(best, tier) : best,
         0
       );
+    }
+  };
+
+  // src/game/systems/Larder.ts
+  var ICE_IN_PACK = 700;
+  var Larder = class extends System {
+    melt = 0;
+    warned = /* @__PURE__ */ new Set();
+    spec(st) {
+      return STORAGE[st.type];
+    }
+    /** Whether a storage is cold right now. */
+    cold(st) {
+      const spec = this.spec(st);
+      if (!spec) return false;
+      if (!spec.fuel) return true;
+      if (st.type === "snow_cellar" && this.game.environment.temperatureAt(st.x, st.y - 20) <= 0)
+        return true;
+      return st.fuel > 0;
+    }
+    /** The rot multiplier inside a storage. */
+    multiplier(st) {
+      const spec = this.spec(st);
+      if (!this.cold(st)) return 1;
+      if (st.type === "cool_pit" && st.y > surfaceAt(st.x) + 60) return 0.45;
+      return spec.mult;
+    }
+    /** Seconds of cold a storage has left (Infinity if it needs none). */
+    coldLeft(st) {
+      const spec = this.spec(st);
+      if (!spec?.fuel) return Infinity;
+      const rate = st.type === "frost_chest" ? 1 : meltRate(this.game.environment.temperatureAt(st.x, st.y - 20));
+      return rate ? st.fuel / rate : Infinity;
+    }
+    /** The best cold storage close enough to cool what you carry. */
+    nearest() {
+      const p = this.game.s.player;
+      return this.game.s.structures.filter((st) => STORAGE[st.type] && dist(st, p) <= 135 && this.cold(st)).sort((a, b) => this.multiplier(a) - this.multiplier(b))[0];
+    }
+    /** Multiplier on rot in the pack from worn cooling charms. */
+    packCooling() {
+      return this.game.equipment.worn().accessories.reduce((k, id) => Math.min(k, PACK_COOLING[id] ?? 1), 1);
+    }
+    // ─── Stowing and taking ────────────────────────────────────────────────────
+    stow(st, id, qty = 1) {
+      const spec = this.spec(st);
+      if (!spec) return { ok: false, reason: "That is not cold storage." };
+      if (!ITEMS[id]?.[2])
+        return { ok: false, reason: "Only food, water, and medicine need the cold." };
+      const larder = st.larder ??= [];
+      const entries = this.game.s.inventory.filter((e) => e.id === id).sort((a, b) => (a.fresh ?? 0) - (b.fresh ?? 0)).slice(0, qty);
+      if (!entries.length) return { ok: false, reason: "You have none." };
+      if (larder.length + entries.length > spec.capacity)
+        return { ok: false, reason: `The ${spec.name.toLowerCase()} is full (${spec.capacity}).` };
+      for (const e of entries) larder.push({ ...e });
+      this.game.s.inventory = this.game.s.inventory.filter((e) => !entries.includes(e));
+      this.game.equipment.tidy();
+      this.game.sound("place", st.x, st.y, 0.5);
+      return { ok: true };
+    }
+    take(st, id, qty = 1) {
+      const larder = st.larder ?? [];
+      const entries = larder.filter((e) => e.id === id).sort((a, b) => (a.fresh ?? 0) - (b.fresh ?? 0)).slice(0, qty);
+      if (!entries.length) return { ok: false, reason: "None stored here." };
+      st.larder = larder.filter((e) => !entries.includes(e));
+      for (const e of entries) this.game.s.inventory.push({ ...e });
+      this.game.equipment.offer(id);
+      this.game.sound("pickup", st.x, st.y, 0.5);
+      return { ok: true };
+    }
+    /** Feeds a storage its cold: ice for iceboxes and cellars, frost shards for frost chests. */
+    refuel(st) {
+      const spec = this.spec(st);
+      if (!spec?.fuel) return { ok: false, reason: "It needs nothing to stay cold." };
+      if (!this.game.count(spec.fuel))
+        return { ok: false, reason: `It needs ${itemName(spec.fuel).toLowerCase()}.` };
+      this.game.remove(spec.fuel);
+      st.fuel += spec.per ?? 900;
+      this.warned.delete(st.id);
+      this.game.sound("place", st.x, st.y, 0.6);
+      this.game.say(`${spec.name} cooled with ${itemName(spec.fuel).toLowerCase()}.`, "good");
+      return { ok: true };
+    }
+    // ─── Time passing ──────────────────────────────────────────────────────────
+    /** Ages food in the pack and in every larder, burns storages' ice, and melts ice you carry. */
+    advance(dt) {
+      const s = this.game.s, env2 = this.game.environment, air = this.game.temperature(), near = this.nearest(), cool = this.packCooling();
+      const coolFor = near ? Math.min(dt, this.coldLeft(near)) : 0, mult = near ? this.multiplier(near) : 1;
+      for (const e of s.inventory)
+        if (e.fresh !== void 0) e.fresh -= (coolFor * mult + (dt - coolFor)) * rotRate(air) * cool;
+      for (const st of s.structures) {
+        const spec = STORAGE[st.type];
+        if (!spec) continue;
+        const temp = env2.temperatureAt(st.x, st.y - 20), k = this.multiplier(st) * rotRate(temp);
+        for (const e of st.larder ?? []) if (e.fresh !== void 0) e.fresh -= dt * k;
+        if (spec.fuel && st.fuel > 0 && !(st.type === "snow_cellar" && temp <= 0)) {
+          st.fuel = Math.max(0, st.fuel - dt * (st.type === "frost_chest" ? 1 : meltRate(temp)));
+          if (st.fuel < 120 && st.larder?.length && !this.warned.has(st.id) && dt < 5) {
+            this.warned.add(st.id);
+            this.game.say(`Your ${spec.name.toLowerCase()} is running out of cold.`, "danger");
+          }
+        }
+      }
+      if (this.game.count("ice") && !near && air > 0) {
+        this.melt += dt * meltRate(air) * cool;
+        while (this.melt >= ICE_IN_PACK && this.game.count("ice")) {
+          this.melt -= ICE_IN_PACK;
+          this.game.remove("ice");
+          this.game.add("wild_water");
+          if (dt < 5) this.game.say("Some of your ice has melted.", "ink");
+        }
+      }
     }
   };
 
@@ -7553,7 +8346,7 @@
       const lava = this.game.inLava(), water = this.game.pocket.submerged();
       if (lava && !this.wasInLava) this.game.sound("sizzle", p.x, p.y, 1.3);
       this.wasInLava = lava;
-      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
+      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
       p.vx = dx * speed;
       const shaft = inShaft(p.x, p.y);
@@ -8375,24 +9168,19 @@
       this.game.say("Washed with water. Infection risk eases, but your clothes are damp.", "good");
       return { ok: true };
     }
+    /** A diagnosis that shows at once (the incubating path is Ailments.contract). */
     contract(disease) {
-      this.game.s.disease = disease;
-      if (disease === "wound")
-        this.game.s.vitals.infection = Math.max(this.game.s.vitals.infection, 22);
-      else this.game.s.vitals.illness = Math.max(this.game.s.vitals.illness, 24);
-      this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
-      this.game.say(
-        "Diagnosis: " + DISEASES[disease].name + ". See Field Notes for treatment.",
-        "danger"
-      );
+      if (!DISEASES[disease]) return;
+      this.game.ailments.cure(disease, true);
+      this.game.ailments.contract(disease, true);
+      const v = this.game.s.vitals;
+      if (DISEASES[disease].kind === "infection") v.infection = Math.max(v.infection, 22);
+      else v.illness = Math.max(v.illness, 24);
     }
     advanceDecay(dt) {
-      const icebox = this.game.near("icebox", 135);
-      const cooledFor = icebox ? Math.min(dt, icebox.fuel) : 0;
-      for (const e of this.game.s.inventory)
-        if (e.fresh !== void 0) e.fresh -= cooledFor * RULES.cooledSpoilageRate + (dt - cooledFor);
+      this.game.larder.advance(dt);
       for (const st of this.game.s.structures)
-        if (st.fuel > 0 && ["campfire", "icebox", "lantern"].includes(st.type))
+        if (st.fuel > 0 && ["campfire", "lantern"].includes(st.type))
           st.fuel = Math.max(0, st.fuel - dt);
       for (const n of this.game.s.nodes)
         if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) {
@@ -8447,6 +9235,7 @@
         morale: 30
       });
       this.game.s.disease = null;
+      this.game.s.ailments = [];
       this.game.s.elapsed += 600;
       for (const e of this.game.s.inventory)
         if (ITEMS[e.id]?.[1] === "material" || ITEMS[e.id]?.[1] === "ore")
@@ -8485,16 +9274,18 @@
       );
       let target = 37 + (cold2 - (underground ? 6 : 15)) * 0.19 - v.wetness * 0.022 + (fire ? 4.5 : 0) + (shelter ? 1.8 : 0) + (p.cloak && cold2 < 15 ? 2.7 : 0) + (p.coat && cold2 < 15 ? 1.4 : 0);
       if (this.game.equipment.has("cold")) target = Math.max(target, 36.8);
+      if ((this.game.s.buffs.warm_belly ?? 0) > 0 && cold2 < 15) target += 2.2;
       target = clamp(target, 30, 41);
       v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
       const drain = this.game.pocket.drainScale();
       v.hydration = clamp(
-        v.hydration - dt * drain * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0) + (this.game.s.disease === "dysentery" ? 0.055 : 0)),
+        v.hydration - dt * drain * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0)),
         0,
         100
       );
       v.calories = clamp(v.calories - dt * drain * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
       v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
+      v.vitamins = clamp(v.vitamins - dt * drain * 0.012, 0, RULES.maxVital);
       v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
       v.hygiene = clamp(
         v.hygiene - dt * (this.game.biome().id === "marsh" ? 0.025 : 0.011),
@@ -8502,20 +9293,12 @@
         RULES.maxVital
       );
       v.stamina = clamp(
-        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2),
+        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) * ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1),
         0,
         100
       );
-      if (this.game.s.disease && ["dysentery", "fever", "poisoning"].includes(this.game.s.disease))
-        v.illness = clamp(
-          v.illness + dt * (this.game.s.disease === "poisoning" ? 0.07 : 0.025),
-          0,
-          RULES.maxVital
-        );
-      else v.illness = clamp(v.illness - dt * 0.015, 0, RULES.maxVital);
-      if (this.game.s.disease === "wound")
-        v.infection = clamp(v.infection + dt * (v.hygiene < 35 ? 0.045 : 0.02), 0, RULES.maxVital);
-      else v.infection = clamp(v.infection - dt * 0.013, 0, RULES.maxVital);
+      v.illness = clamp(v.illness - dt * 0.015, 0, RULES.maxVital);
+      v.infection = clamp(v.infection - dt * 0.013, 0, RULES.maxVital);
       if (v.hygiene < 20 && v.infection > 0)
         v.infection = clamp(v.infection + dt * 0.024, 0, RULES.maxVital);
       const threats = this.game.s.animals.some(
@@ -8527,6 +9310,7 @@
         100
       );
       const burning = this.lavaBurn();
+      if (burning && this.game.rng() < dt * 0.08) this.game.ailments.contract("burn", true);
       const harm = burning + this.heat() + (v.hydration <= 0 ? 0.15 : 0) + (v.calories <= 0 ? 0.11 : 0) + (v.protein <= 0 ? 0.04 : 0) + (v.bodyTemp < 35 || v.bodyTemp > 39 ? 0.09 : 0) + (v.illness > 70 ? 0.08 : 0) + (v.infection > 65 ? 0.1 : 0);
       const most = this.game.maxHealth();
       if (harm) v.health = clamp(v.health - harm * dt, 0, most);
@@ -9033,6 +9817,12 @@
       if (a.body) return this.stepBody(a, dt);
       this.stepLegacy(a, dt);
     }
+    /** Some bites carry worse than a wound: rabies from wolves and rats, spores, void rot. */
+    bite(a) {
+      const carried = BITE_DISEASES[a.type];
+      if (carried && this.game.rng() < carried[1] * this.game.pocket.diseaseScale())
+        this.game.ailments.contract(carried[0]);
+    }
     /** Bleeding, burning, and poison wear a creature down; stuns and slows run out. */
     afflict(a, dt) {
       const fx = a.fx, t = this.game.s.elapsed;
@@ -9103,6 +9893,7 @@
             (boss2 ? "Direwolf" : mobName(a.type)) + " attack!",
             boss2 ? ["wound", 0.4] : spec?.disease
           );
+          this.bite(a);
         }
       }
       if (a.howlCue && s.elapsed >= a.howlCue) {
@@ -9231,6 +10022,7 @@
         a.attackAt = t + spec.cooldown * 0.6;
         this.cry(a, "attack");
         this.game.combat.hurtPlayer(spec.damage, mobName(a.type) + " attack!", spec.disease);
+        this.bite(a);
       }
       if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {
         a.timers.shoot = t + spec.cooldown + this.game.rng() * 0.6;
@@ -9364,6 +10156,9 @@
       s.pocket ??= null;
       s.realms ??= {};
       s.armoury ??= {};
+      s.vitals.vitamins ??= 70;
+      s.immune ??= {};
+      s.ailments ??= s.disease ? [{ id: s.disease, stage: 1, next: s.elapsed + 240, since: s.elapsed }] : [];
       this.game.combat.projectiles = [];
       if (s.hotbar.every((x) => x === null))
         for (const e of s.inventory) this.game.equipment.offer(e.id);
@@ -9458,6 +10253,8 @@
     interaction = new Interaction(this);
     consumables = new Consumables(this);
     survival = new Survival(this);
+    ailments = new Ailments(this);
+    larder = new Larder(this);
     physics = new Physics(this);
     wildlife = new Wildlife(this);
     effergy = new Effergy(this);
@@ -9516,9 +10313,12 @@
           illness: 0,
           infection: 0,
           hygiene: 80,
-          morale: 73
+          morale: 73,
+          vitamins: 70
         },
         disease: null,
+        ailments: [],
+        immune: {},
         inventory: [],
         nodes: [],
         animals: [],
@@ -9575,6 +10375,7 @@
       this.realms.update(dt);
       this.pocket.update(dt);
       this.town.update(dt);
+      this.ailments.update(dt);
       this.survival.update(dt);
       this.devtools.sustain();
     }
@@ -9619,8 +10420,7 @@
       return !!this.near("shelter", 130);
     }
     cooled() {
-      const ice = this.near("icebox", 135);
-      return !!(ice && ice.fuel > 0);
+      return !!this.larder.nearest();
     }
     /** The item in the player's hand: the active quick slot, else the ready weapon. */
     heldItem() {
@@ -10491,6 +11291,42 @@
     queens_mandible: ["fang", "#e8a030"],
     queen_jelly: ["bottle", "#ffe8a0"],
     topaz: ["gem", "#f0b040"],
+    // Keeping food.
+    cool_pit: ["crate", "#6a6660"],
+    snow_cellar: ["crate", "#dfeaf2"],
+    frost_chest: ["crate", "#8fc0d8"],
+    rime_vault: ["crate", "#6a7a98"],
+    salting_barrel: ["crate", "#8a6440"],
+    kitchen: ["crate", "#8a7a6a"],
+    water_filter: ["bottle", "#dcc38e"],
+    insulated_satchel: ["pelt", "#a47c55"],
+    frost_lined_pack: ["pelt", "#8fc0d8"],
+    rime_lined_pack: ["pelt", "#f8e08a"],
+    salted_meat: ["meat", "#a8584a"],
+    salted_fish: ["fish", "#a0a8a8"],
+    pickled_mushrooms: ["bottle", "#b89068"],
+    berry_preserves: ["bottle", "#c8324a"],
+    hearty_stew: ["bowl", "#8a5a3a"],
+    fish_chowder: ["bowl", "#e8dcc0"],
+    spiced_skewers: ["meat", "#c8583a"],
+    honey_cakes: ["bread", "#e0b060"],
+    mushroom_broth: ["bowl", "#b89068"],
+    orchard_pie: ["bread", "#b8583a"],
+    ember_chili: ["bowl", "#e04a2a"],
+    explorers_feast: ["bowl", "#f0c860"],
+    brackish_water: ["bottle", "#6a8a70"],
+    filtered_water: ["bottle", "#cfeef8"],
+    rehydration_salts: ["bundle", "#ece8de"],
+    vermifuge: ["potion", "#8a9a4a"],
+    frost_salve: ["bowl", "#bfe8f8"],
+    burn_salve: ["bowl", "#e8b060"],
+    bandage: ["bundle", "#f0ece0"],
+    splint: ["log", "#b89468"],
+    lungwort_tea: ["potion", "#58e0d0"],
+    void_salve: ["bowl", "#b36cff"],
+    rabies_serum: ["potion", "#e8e0c0"],
+    field_vaccine: ["potion", "#9ae8c0"],
+    iron_gut_brew: ["potion", "#8a9a6a"],
     onyx: ["gem", "#3a3440"],
     opal: ["gem", "#e8f0f8"],
     fire_infusion: ["potion", "#ff8a3a"],
@@ -14145,6 +14981,68 @@
     })
   });
   Object.assign(STATIC, {
+    cool_pit: () => sprite(26, 10, 13, 9, (p) => {
+      stones(p, 0, 2, 26, 8, "#6a6660");
+      p.rect(4, 3, 18, 5, "#1c1814");
+      p.rect(3, 0, 20, 3, "#7a5a3c");
+      p.rect(3, 0, 20, 1, "#9a7a58");
+      for (let x = 6; x < 22; x += 5) p.rect(x, 0, 1, 3, "#5a4230");
+    }),
+    snow_cellar: () => sprite(34, 24, 17, 23, (p) => {
+      p.ellipse(17, 16, 16, 12, "#dfeaf2");
+      p.rect(1, 16, 32, 8, "#dfeaf2");
+      for (let y = 8; y < 24; y += 4) p.line(2, y, 32, y, "#b8c8d4");
+      p.rect(12, 12, 10, 12, "#4a5a68");
+      p.rect(12, 12, 10, 1, "#7a8a98");
+      p.shadeEdges(0.15, -0.2);
+    }),
+    frost_chest: () => sprite(24, 17, 12, 16, (p) => {
+      p.rect(0, 5, 24, 12, "#5a8aa8");
+      p.rect(0, 0, 24, 6, "#8fc0d8");
+      p.rect(0, 0, 24, 1, "#dff6ff");
+      p.rect(0, 5, 24, 1, "#3a5a78");
+      for (const x of [2, 20]) p.rect(x, 0, 2, 17, "#dfe3e6");
+      p.rect(10, 3, 4, 4, "#bfe8f8");
+      p.set(11, 4, "#ffffff");
+    }),
+    rime_vault: () => sprite(30, 28, 15, 27, (p) => {
+      p.rect(2, 4, 26, 24, "#6a7a98");
+      p.rect(2, 4, 26, 2, "#dfeaf8");
+      p.rect(0, 0, 30, 5, "#f8e08a");
+      p.rect(0, 0, 30, 1, "#fff4c0");
+      p.rect(9, 10, 12, 14, "#2a3a58");
+      p.ellipse(15, 17, 4, 4, "#bfe8f8");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    salting_barrel: () => sprite(18, 20, 9, 19, (p) => {
+      p.ellipse(9, 10, 8, 10, "#8a6440");
+      for (let x = 3; x < 16; x += 3) p.line(x, 1, x, 19, "#6a4a2c");
+      for (const y of [4, 15]) p.rect(1, y, 16, 1, "#a8a4a0");
+      p.ellipse(9, 2, 7, 2, "#ece8de");
+    }),
+    kitchen: () => sprite(40, 32, 20, 31, (p) => {
+      stones(p, 0, 8, 40, 24, "#8a7a6a");
+      p.rect(6, 16, 16, 10, "#1c1410");
+      p.rect(26, 12, 12, 3, "#4a4440");
+      p.rect(28, 6, 8, 6, "#6a6460");
+      p.rect(28, 6, 8, 1, "#8a8480");
+      p.rect(14, 0, 8, 8, "#6a5a4a");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    water_filter: () => sprite(18, 26, 9, 25, (p) => {
+      p.rect(2, 0, 14, 16, "#a88458");
+      for (const [y, c] of [
+        [2, "#dcc38e"],
+        [7, "#2c2c30"],
+        [12, "#a8a4a0"]
+      ])
+        p.rect(3, y, 12, 4, c);
+      p.rect(7, 16, 4, 4, "#6a4a2c");
+      p.rect(3, 20, 12, 6, "#8a6440");
+      p.rect(4, 21, 10, 2, "#7ab0c8");
+    })
+  });
+  Object.assign(STATIC, {
     waystone: () => sprite(26, 48, 13, 47, (p) => {
       stones(p, 1, 40, 24, 8, "#5a5a62");
       p.poly(
@@ -14415,6 +15313,11 @@
         blit(c, staticSprite("kiln"), x, y);
         flameAt(c, x, y - 4, t, 2, s.id);
         smoke(c, x, y - 40, t, s.id, 0.7);
+        return;
+      case "kitchen":
+        blit(c, staticSprite("kitchen"), x, y);
+        flameAt(c, x - 6, y - 7, t, 1, s.id);
+        smoke(c, x - 2, y - 34, t, s.id, 0.6);
         return;
       case "door":
         blit(c, staticSprite(s.crop === "open" ? "door_open" : "door_closed"), x, y);
@@ -19327,6 +20230,8 @@
     selectedRecipe: "stone_axe",
     farm: null,
     chest: null,
+    /** The cold storage open on the Pack page. */
+    larder: null,
     /** The settler whose wares the Town page shows. */
     shop: null,
     /** The Atlas page: generated realms (by the selected one), or the Rift Gate. */
@@ -19578,12 +20483,20 @@
       }
       if (result.action === "chest") {
         state.chest = result.structure ?? null;
+        state.larder = null;
         state.tab = "pack";
         toggleJournal(true);
       }
       if (result.action === "rift") {
         state.tab = "atlas";
         state.atlasView = "rift";
+        toggleJournal(true);
+      }
+      if (result.action === "larder") {
+        state.larder = result.structure ?? null;
+        state.chest = null;
+        state.tab = "pack";
+        sound("open");
         toggleJournal(true);
       }
       if (result.action === "atlas") {
@@ -19763,6 +20676,27 @@
       return `<svg class="sketch" viewBox="0 0 440 155" xmlns="http://www.w3.org/2000/svg"><circle cx="211" cy="74" r="63" fill="none" stroke="#afa085" stroke-width="1"/><g fill="none" stroke="#5d5147" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="2.6" d="M91 123q21-29 52-34l23-34 18 14 22-43 17 42 26-20 8 30 37-6 43 28-39 14-14 21-40 11-80-15z"/><path stroke-width="1.7" d="M154 94l-22-11 11-26 20 20m66-15 27-20 14 38m-37 57q23-19 56-21m-117 10 39-11 31 10m57-30 22 7-20 5"/><path stroke-width="1" d="M127 112l31-18m-16 26 28-20m-3 26 27-27m-8 30 30-24m-6 28 30-28m-3 28 25-24m-4 22 23-17m-42-63 26 15m-59-35 24 27m-32-39 17 38m-47-12 22 21m-62 9 22 10m93 5 16-15"/><path stroke-width="1.5" d="M311 102q-8 14-25 19m-91-33q10-5 18-3m-19-3 14-10m33 31 6 17m6-15 8 16"/></g><path d="M278 88q8-6 15 1-9 7-15-1" fill="#954d45"/><circle cx="286" cy="88" r="2" fill="#f0dbc1"/><path d="M327 97l14 4-13 5z" fill="#5d5147"/><text x="19" y="31" fill="#7c624d" font-family="Caveat" font-size="22">the old wolf</text><path d="M90 37q23 15 37 35" fill="none" stroke="#7c624d"/><text x="313" y="142" fill="#7c624d" font-family="Caveat" font-size="18">eyes like embers</text></svg>`;
     return `<svg class="sketch" viewBox="0 0 440 145" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#66694f" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="4" d="M167 121 278 17"/><path stroke-width="2" d="M163 119q-8 7-3 13 7 4 14-5l-7-8m103-99q19-15 42-11l27 24q-19 3-32 18l-37-17z"/><path stroke-width="1" d="M274 21q25 8 33 30m-15-40 19 30m-9-29 19 25m-71 25-11-14m8 18-11-14m7 20-12-13m6 18-11-13m-9 20-13-13m10 21-13-13m8 19-13-12m-23 23 12 12m90-80 20-15m-15 28 29-16m-25 26 30-14M62 120q40-17 86 0m197 4q26-11 58-3"/><path stroke-width="1.5" d="M52 125l-7-18m7 18 10-18m16 17-3-14m275 14-9-16m9 16 11-17"/></g><path d="M270 22l29-9 28 19-18 8z" fill="#a8a88a" opacity=".26"/><text x="35" y="37" fill="#7d624b" font-family="Caveat" font-size="22">stone edge</text><path d="M98 42q36-4 65 24" fill="none" stroke="#7d624b"/><text x="315" y="82" fill="#7d624b" font-family="Caveat" font-size="20">fiber binding</text><path d="M315 84q-27-6-49-15" fill="none" stroke="#7d624b"/></svg>`;
   }
+  function freshness(e) {
+    if (e.fresh === void 0) return "";
+    const st = game.itemState(e), life = ITEMS[e.id]?.[2] || 1, pct = clamp3(e.fresh / life * 100, 0, 100);
+    return `<small class="${st}">${st.toUpperCase()} \xB7 ${Math.max(0, Math.ceil(e.fresh / 60))} min</small><span class="fresh-bar ${st}"><i style="width:${pct}%"></i></span>`;
+  }
+  function larderPanel(st) {
+    const spec = STORAGE[st.type], larder = game.larder, cold2 = larder.cold(st), left = larder.coldLeft(st), stored = st.larder ?? [];
+    const byId = /* @__PURE__ */ new Map();
+    for (const e of stored) {
+      const b = byId.get(e.id);
+      if (!b) byId.set(e.id, { n: e.qty, worst: e });
+      else {
+        b.n += e.qty;
+        if ((e.fresh ?? 0) < (b.worst.fresh ?? 0)) b.worst = e;
+      }
+    }
+    const gauge = spec.fuel ? `<div class="vital-row ${left < 180 ? "danger" : ""}"><span>Cold</span><span class="mini-track"><i style="width:${clamp3(st.fuel / ((spec.per ?? 900) * 3) * 100, 0, 100)}%"></i></span><b>${left === Infinity ? "\u221E" : Math.round(left / 60) + "m"}</b></div>` : "";
+    return `<h2>${spec.name}</h2><p class="lede">${spec.text}</p>${gauge}<p>${cold2 ? `Cold: food here ages at <strong>\xD7${larder.multiplier(st).toFixed(2)}</strong>` : "<strong>Warm</strong>: food here ages as fast as anywhere"} \xB7 ${stored.length} / ${spec.capacity} stored</p>${spec.fuel ? `<div class="book-actions"><button data-refuel ${game.count(spec.fuel) ? "" : "disabled"}>ADD ${pretty(spec.fuel).toUpperCase()} \xB7 ${game.count(spec.fuel)} CARRIED</button></div>` : ""}<h3>Stored</h3><div class="book-list">${[...byId.entries()].map(
+      ([id, b]) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong>${freshness(b.worst)}</div></div><div><span class="qty">\xD7${b.n}</span><button data-take="${id}">TAKE</button></div></div>`
+    ).join("") || "<p>Empty. Stow food from your pack on the right.</p>"}</div><div class="book-actions"><button class="quiet" data-close-larder>CLOSE</button></div>`;
+  }
   function renderPack(left, right) {
     const items = game.s.inventory;
     left.innerHTML = `<h2>The Pack</h2><p class="lede">What you carry changes with time. What spoils can change you.</p>${sketch("pack")}<div class="divider"></div><h3>Equipment</h3><p>Weapon: <strong>${pretty(game.s.player.weapon)}</strong><br>Cloak: <strong>${game.s.player.cloak ? "Worn" : game.count("direwolf_cloak") ? "Packed" : "None"}</strong><br>Hide coat: <strong>${game.s.player.coat ? "Worn" : "Packed or absent"}</strong><br>Explorer boots: <strong>${game.s.player.boots ? "Worn" : "Packed or absent"}</strong></p><div class="note-block">Food and boiled water age in your pack, even while this record is closed. An icebox supplied with ice slows spoilage nearby.</div>${state.farm ? '<h3>Farm plot \xB7 Choose a seed</h3><div class="farm-choice"><button class="tiny-button" data-plant="herb">HERB</button><button class="tiny-button" data-plant="wheat">WHEAT</button><button class="tiny-button" data-plant="potato">POTATO</button></div>' : ""}${state.chest ? `<h3>Field chest</h3><p>Stowed here: ${Object.entries(state.chest.store).map(([id, n]) => `${n} ${pretty(id)}`).join(" \xB7 ") || "Nothing yet."}</p><div class="chest-actions"><select id="chest-item">${[.../* @__PURE__ */ new Set([...items.map((e) => e.id), ...Object.keys(state.chest.store)])].map((id) => `<option value="${id}">${pretty(id)}</option>`).join("")}</select><button data-store>STOW 1</button><button data-take>TAKE 1</button></div>` : ""}`;
@@ -19785,16 +20719,41 @@
       "block",
       "structure"
     ];
+    const shown = [];
+    for (const e of items) {
+      const same = e.fresh !== void 0 && shown.find((x) => x.id === e.id && x.fresh !== void 0);
+      if (same) {
+        same.qty += e.qty;
+        same.fresh = Math.min(same.fresh, e.fresh);
+      } else shown.push({ ...e });
+    }
     const groups = [...new Set(items.map((e) => ITEMS[e.id][1]))].sort(
       (a, b) => order.indexOf(a) - order.indexOf(b)
     );
     right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p>${groups.map(
-      (category) => `<h3>${category}</h3><div class="book-list">${items.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
-        const use = itemUseLabel(e.id), fresh = e.fresh === void 0 ? "" : `<small class="${game.itemState(e)}">${game.itemState(e).toUpperCase()} \xB7 ${Math.max(0, Math.ceil(e.fresh / 60))} min</small>`;
+      (category) => `<h3>${category}</h3><div class="book-list">${shown.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
+        const use = itemUseLabel(e.id), fresh = freshness(e);
         const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
-        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
+        const stow = state.larder && ITEMS[e.id]?.[2];
+        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
+    const larder = state.larder;
+    if (larder) {
+      left.innerHTML = larderPanel(larder);
+      const act = (r) => {
+        if (!r.ok) message(r.reason);
+        renderJournal();
+        updateUI(true);
+      };
+      left.querySelector("[data-refuel]")?.addEventListener("click", () => act(game.larder.refuel(larder)));
+      left.querySelectorAll("[data-take]").forEach((b) => b.onclick = () => act(game.larder.take(larder, b.dataset.take ?? "")));
+      left.querySelector("[data-close-larder]").onclick = () => {
+        state.larder = null;
+        renderJournal();
+      };
+      right.querySelectorAll("[data-stow]").forEach((b) => b.onclick = () => act(game.larder.stow(larder, b.dataset.stow ?? "")));
+    }
     right.querySelectorAll("[data-use]").forEach(
       (b) => b.onclick = () => {
         const r = game.use(b.dataset.use ?? "");
@@ -19884,14 +20843,27 @@
       }
     );
   }
+  function ailmentNotes() {
+    const list = game.ailments.list(), t = game.s.elapsed;
+    if (!list.length) return "<p>Nothing ails you.</p>";
+    return list.map((a) => {
+      const d = DISEASES[a.id];
+      if (a.stage === 0)
+        return `<div class="disease-note"><strong>Something is wrong</strong><p>You feel a little off. It has not shown itself yet.</p></div>`;
+      const pips = [1, 2, 3].map((i) => `<i class="${i <= a.stage ? "on" : ""}"></i>`).join("");
+      const left = Math.max(0, Math.round(a.next - t));
+      return `<div class="disease-note stage-${a.stage}"><strong>${d.name} <span class="pips">${pips}</span></strong><p>${STAGE_NAMES[a.stage]}: ${d.symptoms[a.stage - 1]}. Treat with ${d.treat.toLowerCase()}${game.count(d.item) ? ` (you carry ${pretty(d.item).toLowerCase()})` : ""}.${a.stage < 3 ? ` Worsens in about ${left}s untreated.` : " It will not wait long."} Likely cause: ${d.cause.toLowerCase()}.</p></div>`;
+    }).join("");
+  }
   function renderVitals(left, right) {
     const v = game.s.vitals, current2 = game.biome(), symptoms = game.vitalReasons();
-    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p>${sketch("tool")}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${current2.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${current2.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
     const labels = [
       ["health", "Health"],
       ["hydration", "Hydration"],
       ["calories", "Calories"],
       ["protein", "Protein"],
+      ["vitamins", "Vitamins"],
       ["stamina", "Stamina"],
       ["fatigue", "Fatigue"],
       ["wetness", "Wetness"],
@@ -19904,9 +20876,7 @@
       const val = Math.round(v[id]);
       const bad = ["fatigue", "wetness", "illness", "infection"].includes(id) ? val > 60 : val < 25;
       return `<div class="vital-row ${bad ? "danger" : ""}"><span>${label}</span><span class="mini-track"><i style="width:${val}%"></i></span><b>${val}</b></div>`;
-    }).join(
-      ""
-    )}<h3>Diagnosis</h3>${game.s.disease ? `<div class="disease-note"><strong>${DISEASES[game.s.disease].name}</strong><p>Likely cause: ${DISEASES[game.s.disease].cause}. Field treatment: ${DISEASES[game.s.disease].treat}.</p></div>` : "<p>No active disease is recorded.</p>"}<small>These are game systems, not real-world medical guidance.</small>`;
+    }).join("")}<small>These are game systems, not real-world medical guidance.</small>`;
     left.querySelector("[data-wash]").onclick = () => {
       const r = game.wash();
       if (!r.ok) message(r.reason);
@@ -19934,6 +20904,7 @@
       $("menu").classList.remove("hidden");
       $("continue-game").disabled = false;
       state.chest = null;
+      state.larder = null;
     };
     drawAtlas();
   }
@@ -20285,6 +21256,11 @@
     $("biome-name").textContent = place ? place.toUpperCase() : layer.id === "surface" ? game.biome().name.toUpperCase() : layer.id === "upper_mines" ? game.biome().name.toUpperCase() + " \xB7 " + layer.name.toUpperCase() : layer.name.toUpperCase();
     $("world-time").textContent = timeText();
     $("condition-line").textContent = game.vitalReasons()[0];
+    const chips = game.ailments.showing().map(
+      (a) => `<span class="ail stage-${a.stage}" title="${DISEASES[a.id].name}: ${DISEASES[a.id].symptoms[a.stage - 1]}">${DISEASES[a.id].name.toUpperCase()} ${"\u25CF".repeat(a.stage)}${"\u25CB".repeat(3 - a.stage)}</span>`
+    ).join("");
+    const off = game.ailments.list().some((a) => a.stage === 0) ? '<span class="ail off">FEELING OFF</span>' : "";
+    $("ailments").innerHTML = chips + off;
     $("weapon-name").textContent = game.s.player.weapon === "fists" ? pretty("fists") : game.armoury.title(game.s.player.weapon);
     const step = TUTORIAL[game.s.tutorial.step] || CHAPTERS[game.s.chapter];
     $("objective-text").textContent = step ? step[0] : "The final folio is complete.";
@@ -20301,7 +21277,7 @@
       const who = settlerById(near.object.settler ?? "");
       prompt = `<b>E</b> Talk to ${who ? who.name + " " + who.title : "the settler"}`;
     } else if (near) {
-      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "bed" ? "Sleep" : near.object.type === "door" ? near.object.crop === "open" ? "Close the door" : "Open the door" : near.object.type === "chair" || near.object.type === "table" ? "Check the room" : near.object.type === "icebox" ? "Add ice" : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
+      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "bed" ? "Sleep" : near.object.type === "door" ? near.object.crop === "open" ? "Close the door" : "Open the door" : near.object.type === "chair" || near.object.type === "table" ? "Check the room" : STORAGE[near.object.type] ? "Open the " + STORAGE[near.object.type].name.toLowerCase() : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
       prompt = `<b>E</b> ${action}`;
     } else
       prompt = held ? `<b>CLICK</b> ${game.hands.describe(cursorWorld())}` : "<b>E</b> Explore and gather";

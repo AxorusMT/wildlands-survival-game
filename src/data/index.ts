@@ -14,3 +14,4 @@ export * from './dimensions.ts';
 export * from './town.ts';
 export * from './weapons.ts';
 export * from './realms/index.ts';
+export * from './food.ts';

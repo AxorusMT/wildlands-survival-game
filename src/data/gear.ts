@@ -391,6 +391,18 @@ export const BUFFS: Record<string, { name: string; text: string; color: string }
   fireward: { name: 'Fireward', text: 'Immune to heat and lava', color: '#ff8a3a' },
   wrath: { name: 'Wrath', text: '+15% damage', color: '#d04a4a' },
   potion_sickness: { name: 'Potion sickness', text: 'Healing draughts rest', color: '#8a8070' },
+  // The comfort of a good meal.
+  well_fed: { name: 'Well fed', text: 'Health and stamina recover faster', color: '#e8b84a' },
+  fiery: { name: 'Fiery', text: '+10% damage', color: '#ff8a3a' },
+  sweet: { name: 'Sugar rush', text: '+10% speed', color: '#f0a0c0' },
+  clear_mind: { name: 'Clear mind', text: 'Mana returns twice as fast', color: '#8ab0f0' },
+  warm_belly: { name: 'Warm belly', text: 'The cold bites less', color: '#e87a3a' },
+  feasted: { name: 'Feasted', text: 'Recover faster; +10% damage', color: '#f0c860' },
+  iron_gut: {
+    name: 'Iron gut',
+    text: 'Shrug off half of what you catch from food and water',
+    color: '#8a9a6a',
+  },
 };
 /** Potions: instant healing or mana, and the buff each gives with its duration. */
 export const POTIONS: Record<string, { heal?: number; mana?: number; buff?: [string, number] }> = {
@@ -414,6 +426,12 @@ export const ACCESSORIES: Record<string, { effects: string[]; text: string }> = 
   wind_boots: { effects: ['speed20', 'jump'], text: '+20% speed, higher jumps' },
   mycelial_charm: { effects: ['regen'], text: 'Regenerate health' },
   cloud_jar: { effects: ['double_jump'], text: 'Double jump' },
+  insulated_satchel: {
+    effects: ['cool25'],
+    text: 'Food in the pack keeps 25% longer; ice melts slower',
+  },
+  frost_lined_pack: { effects: ['cool50'], text: 'Food in the pack keeps twice as long' },
+  rime_lined_pack: { effects: ['cool70'], text: 'Food in the pack keeps over three times as long' },
   tide_conch: { effects: ['swim', 'defense2'], text: 'Swim with the tide; +2 defense' },
   kiln_heart: { effects: ['ashward', 'fire'], text: 'Ash storms pass you by; strikes may ignite' },
   queens_mandible: { effects: ['tremor', 'damage10'], text: 'Sense cave-ins; +10% damage' },

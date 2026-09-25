@@ -38,6 +38,8 @@ const state = {
   selectedRecipe: 'stone_axe',
   farm: null as Structure | null,
   chest: null as Structure | null,
+  /** The cold storage open on the Pack page. */
+  larder: null as Structure | null,
   /** The settler whose wares the Town page shows. */
   shop: null as string | null,
   /** The Atlas page: generated realms (by the selected one), or the Rift Gate. */
@@ -307,12 +309,20 @@ function doInteract() {
     }
     if (result.action === 'chest') {
       state.chest = result.structure ?? null;
+      state.larder = null;
       state.tab = 'pack';
       toggleJournal(true);
     }
     if (result.action === 'rift') {
       state.tab = 'atlas';
       state.atlasView = 'rift';
+      toggleJournal(true);
+    }
+    if (result.action === 'larder') {
+      state.larder = result.structure ?? null;
+      state.chest = null;
+      state.tab = 'pack';
+      sound('open');
       toggleJournal(true);
     }
     if (result.action === 'atlas') {
@@ -498,6 +508,42 @@ function sketch(type: string) {
     return `<svg class="sketch" viewBox="0 0 440 155" xmlns="http://www.w3.org/2000/svg"><circle cx="211" cy="74" r="63" fill="none" stroke="#afa085" stroke-width="1"/><g fill="none" stroke="#5d5147" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="2.6" d="M91 123q21-29 52-34l23-34 18 14 22-43 17 42 26-20 8 30 37-6 43 28-39 14-14 21-40 11-80-15z"/><path stroke-width="1.7" d="M154 94l-22-11 11-26 20 20m66-15 27-20 14 38m-37 57q23-19 56-21m-117 10 39-11 31 10m57-30 22 7-20 5"/><path stroke-width="1" d="M127 112l31-18m-16 26 28-20m-3 26 27-27m-8 30 30-24m-6 28 30-28m-3 28 25-24m-4 22 23-17m-42-63 26 15m-59-35 24 27m-32-39 17 38m-47-12 22 21m-62 9 22 10m93 5 16-15"/><path stroke-width="1.5" d="M311 102q-8 14-25 19m-91-33q10-5 18-3m-19-3 14-10m33 31 6 17m6-15 8 16"/></g><path d="M278 88q8-6 15 1-9 7-15-1" fill="#954d45"/><circle cx="286" cy="88" r="2" fill="#f0dbc1"/><path d="M327 97l14 4-13 5z" fill="#5d5147"/><text x="19" y="31" fill="#7c624d" font-family="Caveat" font-size="22">the old wolf</text><path d="M90 37q23 15 37 35" fill="none" stroke="#7c624d"/><text x="313" y="142" fill="#7c624d" font-family="Caveat" font-size="18">eyes like embers</text></svg>`;
   return `<svg class="sketch" viewBox="0 0 440 145" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#66694f" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="4" d="M167 121 278 17"/><path stroke-width="2" d="M163 119q-8 7-3 13 7 4 14-5l-7-8m103-99q19-15 42-11l27 24q-19 3-32 18l-37-17z"/><path stroke-width="1" d="M274 21q25 8 33 30m-15-40 19 30m-9-29 19 25m-71 25-11-14m8 18-11-14m7 20-12-13m6 18-11-13m-9 20-13-13m10 21-13-13m8 19-13-12m-23 23 12 12m90-80 20-15m-15 28 29-16m-25 26 30-14M62 120q40-17 86 0m197 4q26-11 58-3"/><path stroke-width="1.5" d="M52 125l-7-18m7 18 10-18m16 17-3-14m275 14-9-16m9 16 11-17"/></g><path d="M270 22l29-9 28 19-18 8z" fill="#a8a88a" opacity=".26"/><text x="35" y="37" fill="#7d624b" font-family="Caveat" font-size="22">stone edge</text><path d="M98 42q36-4 65 24" fill="none" stroke="#7d624b"/><text x="315" y="82" fill="#7d624b" font-family="Caveat" font-size="20">fiber binding</text><path d="M315 84q-27-6-49-15" fill="none" stroke="#7d624b"/></svg>`;
 }
+/** A food's freshness: its stage and time left, and a bar that empties as it ages. */
+function freshness(e: { id: string; fresh?: number }) {
+  if (e.fresh === undefined) return '';
+  const st = game.itemState(e as { id: string; qty: number; fresh?: number }),
+    life = D.ITEMS[e.id]?.[2] || 1,
+    pct = clamp((e.fresh / life) * 100, 0, 100);
+  return `<small class="${st}">${st.toUpperCase()} · ${Math.max(0, Math.ceil(e.fresh / 60))} min</small><span class="fresh-bar ${st}"><i style="width:${pct}%"></i></span>`;
+}
+/** The open cold storage: how cold it is, how long its ice lasts, and what is inside. */
+function larderPanel(st: Structure) {
+  const spec = D.STORAGE[st.type],
+    larder = game.larder,
+    cold = larder.cold(st),
+    left = larder.coldLeft(st),
+    stored = st.larder ?? [];
+  const byId = new Map<string, { n: number; worst: { id: string; fresh?: number } }>();
+  for (const e of stored) {
+    const b = byId.get(e.id);
+    if (!b) byId.set(e.id, { n: e.qty, worst: e });
+    else {
+      b.n += e.qty;
+      if ((e.fresh ?? 0) < (b.worst.fresh ?? 0)) b.worst = e;
+    }
+  }
+  const gauge = spec.fuel
+    ? `<div class="vital-row ${left < 180 ? 'danger' : ''}"><span>Cold</span><span class="mini-track"><i style="width:${clamp((st.fuel / ((spec.per ?? 900) * 3)) * 100, 0, 100)}%"></i></span><b>${left === Infinity ? '∞' : Math.round(left / 60) + 'm'}</b></div>`
+    : '';
+  return `<h2>${spec.name}</h2><p class="lede">${spec.text}</p>${gauge}<p>${cold ? `Cold: food here ages at <strong>×${larder.multiplier(st).toFixed(2)}</strong>` : '<strong>Warm</strong>: food here ages as fast as anywhere'} · ${stored.length} / ${spec.capacity} stored</p>${spec.fuel ? `<div class="book-actions"><button data-refuel ${game.count(spec.fuel) ? '' : 'disabled'}>ADD ${pretty(spec.fuel).toUpperCase()} · ${game.count(spec.fuel)} CARRIED</button></div>` : ''}<h3>Stored</h3><div class="book-list">${
+    [...byId.entries()]
+      .map(
+        ([id, b]) =>
+          `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong>${freshness(b.worst)}</div></div><div><span class="qty">×${b.n}</span><button data-take="${id}">TAKE</button></div></div>`,
+      )
+      .join('') || '<p>Empty. Stow food from your pack on the right.</p>'
+  }</div><div class="book-actions"><button class="quiet" data-close-larder>CLOSE</button></div>`;
+}
 function renderPack(left: HTMLElement, right: HTMLElement) {
   const items = game.s.inventory;
   left.innerHTML = `<h2>The Pack</h2><p class="lede">What you carry changes with time. What spoils can change you.</p>${sketch('pack')}<div class="divider"></div><h3>Equipment</h3><p>Weapon: <strong>${pretty(game.s.player.weapon)}</strong><br>Cloak: <strong>${game.s.player.cloak ? 'Worn' : game.count('direwolf_cloak') ? 'Packed' : 'None'}</strong><br>Hide coat: <strong>${game.s.player.coat ? 'Worn' : 'Packed or absent'}</strong><br>Explorer boots: <strong>${game.s.player.boots ? 'Worn' : 'Packed or absent'}</strong></p><div class="note-block">Food and boiled water age in your pack, even while this record is closed. An icebox supplied with ice slows spoilage nearby.</div>${state.farm ? '<h3>Farm plot · Choose a seed</h3><div class="farm-choice"><button class="tiny-button" data-plant="herb">HERB</button><button class="tiny-button" data-plant="wheat">WHEAT</button><button class="tiny-button" data-plant="potato">POTATO</button></div>' : ''}${
@@ -528,6 +574,15 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
     'block',
     'structure',
   ];
+  // Perishables of a kind share a row: the count, and the freshness of the oldest.
+  const shown: typeof items = [];
+  for (const e of items) {
+    const same = e.fresh !== undefined && shown.find((x) => x.id === e.id && x.fresh !== undefined);
+    if (same) {
+      same.qty += e.qty;
+      same.fresh = Math.min(same.fresh!, e.fresh!);
+    } else shown.push({ ...e });
+  }
   const groups = [...new Set(items.map((e) => D.ITEMS[e.id][1]))].sort(
     (a, b) => order.indexOf(a) - order.indexOf(b),
   );
@@ -535,23 +590,43 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
     groups
       .map(
         (category) =>
-          `<h3>${category}</h3><div class="book-list">${items
+          `<h3>${category}</h3><div class="book-list">${shown
             .filter((e) => D.ITEMS[e.id][1] === category)
             .sort((a, b) => pretty(a.id).localeCompare(pretty(b.id)))
             .map((e) => {
               const use = itemUseLabel(e.id),
-                fresh =
-                  e.fresh === undefined
-                    ? ''
-                    : `<small class="${game.itemState(e)}">${game.itemState(e).toUpperCase()} · ${Math.max(0, Math.ceil(e.fresh / 60))} min</small>`;
+                fresh = freshness(e);
               const weapon = D.WEAPONS[e.id] && game.armoury.known(e.id),
                 q = weapon ? D.QUALITIES[game.armoury.entry(e.id).q] : null;
-              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">×${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
+              const stow = state.larder && D.ITEMS[e.id]?.[2];
+              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">×${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
             })
             .join('')}</div>`,
       )
       .join('') || '<p>Only the journal remains. Gather what the meadow offers.</p>'
   }`;
+  const larder = state.larder;
+  if (larder) {
+    left.innerHTML = larderPanel(larder);
+    const act = (r: { ok: boolean; reason?: string }) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    left
+      .querySelector<HTMLButtonElement>('[data-refuel]')
+      ?.addEventListener('click', () => act(game.larder.refuel(larder)));
+    left
+      .querySelectorAll<HTMLButtonElement>('[data-take]')
+      .forEach((b) => (b.onclick = () => act(game.larder.take(larder, b.dataset.take ?? ''))));
+    left.querySelector<HTMLButtonElement>('[data-close-larder]')!.onclick = () => {
+      state.larder = null;
+      renderJournal();
+    };
+    right
+      .querySelectorAll<HTMLButtonElement>('[data-stow]')
+      .forEach((b) => (b.onclick = () => act(game.larder.stow(larder, b.dataset.stow ?? ''))));
+  }
   right.querySelectorAll<HTMLButtonElement>('[data-use]').forEach(
     (b) =>
       (b.onclick = () => {
@@ -654,16 +729,33 @@ function renderRecipes(left: HTMLElement, right: HTMLElement) {
       }),
   );
 }
+/** The journal's diagnosis: each ailment with its stage, symptoms, treatment, and clock. */
+function ailmentNotes() {
+  const list = game.ailments.list(),
+    t = game.s.elapsed;
+  if (!list.length) return '<p>Nothing ails you.</p>';
+  return list
+    .map((a) => {
+      const d = D.DISEASES[a.id];
+      if (a.stage === 0)
+        return `<div class="disease-note"><strong>Something is wrong</strong><p>You feel a little off. It has not shown itself yet.</p></div>`;
+      const pips = [1, 2, 3].map((i) => `<i class="${i <= a.stage ? 'on' : ''}"></i>`).join('');
+      const left = Math.max(0, Math.round(a.next - t));
+      return `<div class="disease-note stage-${a.stage}"><strong>${d.name} <span class="pips">${pips}</span></strong><p>${D.STAGE_NAMES[a.stage]}: ${d.symptoms[a.stage - 1]}. Treat with ${d.treat.toLowerCase()}${game.count(d.item) ? ` (you carry ${pretty(d.item).toLowerCase()})` : ''}.${a.stage < 3 ? ` Worsens in about ${left}s untreated.` : ' It will not wait long.'} Likely cause: ${d.cause.toLowerCase()}.</p></div>`;
+    })
+    .join('');
+}
 function renderVitals(left: HTMLElement, right: HTMLElement) {
   const v = game.s.vitals,
     current = game.biome(),
     symptoms = game.vitalReasons();
-  left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p>${sketch('tool')}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}°C</strong> in the ${current.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}°C</strong><br>Weather: <strong>${game.s.weather}</strong> · ${game.isNight() ? 'night' : 'day'}</p><div class="note-block">${symptoms.map((s) => `<div>• ${s}</div>`).join('')}</div><div class="book-actions"><button data-wash ${game.count('wild_water') + game.count('boiled_water') ? '' : 'disabled'}>WASH · 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+  left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}°C</strong> in the ${current.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}°C</strong><br>Weather: <strong>${game.s.weather}</strong> · ${game.isNight() ? 'night' : 'day'}</p><div class="note-block">${symptoms.map((s) => `<div>• ${s}</div>`).join('')}</div><div class="book-actions"><button data-wash ${game.count('wild_water') + game.count('boiled_water') ? '' : 'disabled'}>WASH · 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
   const labels: [keyof Vitals, string][] = [
     ['health', 'Health'],
     ['hydration', 'Hydration'],
     ['calories', 'Calories'],
     ['protein', 'Protein'],
+    ['vitamins', 'Vitamins'],
     ['stamina', 'Stamina'],
     ['fatigue', 'Fatigue'],
     ['wetness', 'Wetness'],
@@ -678,9 +770,7 @@ function renderVitals(left: HTMLElement, right: HTMLElement) {
       const bad = ['fatigue', 'wetness', 'illness', 'infection'].includes(id) ? val > 60 : val < 25;
       return `<div class="vital-row ${bad ? 'danger' : ''}"><span>${label}</span><span class="mini-track"><i style="width:${val}%"></i></span><b>${val}</b></div>`;
     })
-    .join(
-      '',
-    )}<h3>Diagnosis</h3>${game.s.disease ? `<div class="disease-note"><strong>${D.DISEASES[game.s.disease].name}</strong><p>Likely cause: ${D.DISEASES[game.s.disease].cause}. Field treatment: ${D.DISEASES[game.s.disease].treat}.</p></div>` : '<p>No active disease is recorded.</p>'}<small>These are game systems, not real-world medical guidance.</small>`;
+    .join('')}<small>These are game systems, not real-world medical guidance.</small>`;
   left.querySelector<HTMLButtonElement>('[data-wash]')!.onclick = () => {
     const r = game.wash();
     if (!r.ok) message(r.reason);
@@ -710,6 +800,7 @@ function renderNotes(left: HTMLElement, right: HTMLElement) {
     $('menu').classList.remove('hidden');
     $<HTMLButtonElement>('continue-game').disabled = false;
     state.chest = null;
+    state.larder = null;
   };
   drawAtlas();
 }
@@ -1231,6 +1322,18 @@ function updateUI(force = false) {
         : layer.name.toUpperCase();
   $('world-time').textContent = timeText();
   $('condition-line').textContent = game.vitalReasons()[0];
+  // A strip of ailments showing, each with its stage.
+  const chips = game.ailments
+    .showing()
+    .map(
+      (a) =>
+        `<span class="ail stage-${a.stage}" title="${D.DISEASES[a.id].name}: ${D.DISEASES[a.id].symptoms[a.stage - 1]}">${D.DISEASES[a.id].name.toUpperCase()} ${'●'.repeat(a.stage)}${'○'.repeat(3 - a.stage)}</span>`,
+    )
+    .join('');
+  const off = game.ailments.list().some((a) => a.stage === 0)
+    ? '<span class="ail off">FEELING OFF</span>'
+    : '';
+  $('ailments').innerHTML = chips + off;
   $('weapon-name').textContent =
     game.s.player.weapon === 'fists' ? pretty('fists') : game.armoury.title(game.s.player.weapon);
   const step = D.TUTORIAL[game.s.tutorial.step] || D.CHAPTERS[game.s.chapter];
@@ -1297,8 +1400,8 @@ function updateUI(force = false) {
                       : 'Open the door'
                     : near.object.type === 'chair' || near.object.type === 'table'
                       ? 'Check the room'
-                      : near.object.type === 'icebox'
-                        ? 'Add ice'
+                      : D.STORAGE[near.object.type]
+                        ? 'Open the ' + D.STORAGE[near.object.type].name.toLowerCase()
                         : near.object.type === 'campfire'
                           ? 'Add wood'
                           : 'Use ' + pretty(near.object.type);

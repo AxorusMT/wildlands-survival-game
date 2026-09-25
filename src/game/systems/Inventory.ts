@@ -9,14 +9,18 @@ export class Inventory extends System {
   count(id: string) {
     return this.game.s.inventory.reduce((n, entry) => n + (entry.id === id ? entry.qty : 0), 0);
   }
-  itemState(entry: InventoryEntry) {
+  /** Fresh, then stale (less nourishing), spoiled (may sicken), and at last rotten. */
+  itemState(entry: InventoryEntry): 'stable' | 'fresh' | 'stale' | 'spoiled' | 'rotten' {
+    const life = ITEMS[entry.id]?.[2] || 1;
     return entry.fresh === undefined
       ? 'stable'
       : entry.fresh <= 0
         ? 'rotten'
-        : entry.fresh < (ITEMS[entry.id]?.[2] || 1) * RULES.staleAtFraction
-          ? 'stale'
-          : 'fresh';
+        : entry.fresh < life * 0.08
+          ? 'spoiled'
+          : entry.fresh < life * RULES.staleAtFraction
+            ? 'stale'
+            : 'fresh';
   }
   add(id: string, qty = 1, options: { fresh?: number } = {}) {
     const perish = ITEMS[id]?.[2];

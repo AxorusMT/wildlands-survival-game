@@ -407,6 +407,76 @@ Object.assign(STATIC, {
       p.rect(2, 26, 2, 2, IRON);
     }),
 });
+// Keeping food: the cold-storage ladder, the salting barrel, the kitchen, and the water filter.
+Object.assign(STATIC, {
+  cool_pit: () =>
+    sprite(26, 10, 13, 9, (p) => {
+      stones(p, 0, 2, 26, 8, '#6a6660');
+      p.rect(4, 3, 18, 5, '#1c1814');
+      p.rect(3, 0, 20, 3, '#7a5a3c');
+      p.rect(3, 0, 20, 1, '#9a7a58');
+      for (let x = 6; x < 22; x += 5) p.rect(x, 0, 1, 3, '#5a4230');
+    }),
+  snow_cellar: () =>
+    sprite(34, 24, 17, 23, (p) => {
+      p.ellipse(17, 16, 16, 12, '#dfeaf2');
+      p.rect(1, 16, 32, 8, '#dfeaf2');
+      for (let y = 8; y < 24; y += 4) p.line(2, y, 32, y, '#b8c8d4');
+      p.rect(12, 12, 10, 12, '#4a5a68');
+      p.rect(12, 12, 10, 1, '#7a8a98');
+      p.shadeEdges(0.15, -0.2);
+    }),
+  frost_chest: () =>
+    sprite(24, 17, 12, 16, (p) => {
+      p.rect(0, 5, 24, 12, '#5a8aa8');
+      p.rect(0, 0, 24, 6, '#8fc0d8');
+      p.rect(0, 0, 24, 1, '#dff6ff');
+      p.rect(0, 5, 24, 1, '#3a5a78');
+      for (const x of [2, 20]) p.rect(x, 0, 2, 17, '#dfe3e6');
+      p.rect(10, 3, 4, 4, '#bfe8f8');
+      p.set(11, 4, '#ffffff');
+    }),
+  rime_vault: () =>
+    sprite(30, 28, 15, 27, (p) => {
+      p.rect(2, 4, 26, 24, '#6a7a98');
+      p.rect(2, 4, 26, 2, '#dfeaf8');
+      p.rect(0, 0, 30, 5, '#f8e08a');
+      p.rect(0, 0, 30, 1, '#fff4c0');
+      p.rect(9, 10, 12, 14, '#2a3a58');
+      p.ellipse(15, 17, 4, 4, '#bfe8f8');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  salting_barrel: () =>
+    sprite(18, 20, 9, 19, (p) => {
+      p.ellipse(9, 10, 8, 10, '#8a6440');
+      for (let x = 3; x < 16; x += 3) p.line(x, 1, x, 19, '#6a4a2c');
+      for (const y of [4, 15]) p.rect(1, y, 16, 1, '#a8a4a0');
+      p.ellipse(9, 2, 7, 2, '#ece8de');
+    }),
+  kitchen: () =>
+    sprite(40, 32, 20, 31, (p) => {
+      stones(p, 0, 8, 40, 24, '#8a7a6a');
+      p.rect(6, 16, 16, 10, '#1c1410');
+      p.rect(26, 12, 12, 3, '#4a4440');
+      p.rect(28, 6, 8, 6, '#6a6460');
+      p.rect(28, 6, 8, 1, '#8a8480');
+      p.rect(14, 0, 8, 8, '#6a5a4a');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  water_filter: () =>
+    sprite(18, 26, 9, 25, (p) => {
+      p.rect(2, 0, 14, 16, '#a88458');
+      for (const [y, c] of [
+        [2, '#dcc38e'],
+        [7, '#2c2c30'],
+        [12, '#a8a4a0'],
+      ] as const)
+        p.rect(3, y, 12, 4, c);
+      p.rect(7, 16, 4, 4, '#6a4a2c');
+      p.rect(3, 20, 12, 6, '#8a6440');
+      p.rect(4, 21, 10, 2, '#7ab0c8');
+    }),
+});
 // Realm furnishings.
 Object.assign(STATIC, {
   waystone: () =>
@@ -714,6 +784,11 @@ export function drawStructure(
       blit(c, staticSprite('kiln'), x, y);
       flameAt(c, x, y - 4, t, 2, s.id);
       smoke(c, x, y - 40, t, s.id, 0.7);
+      return;
+    case 'kitchen':
+      blit(c, staticSprite('kitchen'), x, y);
+      flameAt(c, x - 6, y - 7, t, 1, s.id);
+      smoke(c, x - 2, y - 34, t, s.id, 0.6);
       return;
     case 'door':
       blit(c, staticSprite(s.crop === 'open' ? 'door_open' : 'door_closed'), x, y);

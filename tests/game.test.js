@@ -82,6 +82,11 @@ test('diseases have corresponding treatments; washing improves hygiene', () => {
   g.rng = () => 0;
   g.add('wild_water');
   g.use('wild_water');
+  // It incubates before it shows.
+  assert.equal(g.s.disease, null);
+  assert.ok(g.ailments.has('dysentery'));
+  g.s.elapsed += 31;
+  g.ailments.update(0.1);
   assert.equal(g.s.disease, 'dysentery');
   g.contract('dysentery');
   g.add('herbal_tea');
@@ -89,6 +94,9 @@ test('diseases have corresponding treatments; washing improves hygiene', () => {
   assert.equal(g.s.disease, null);
   g.add('raw_meat');
   g.use('raw_meat');
+  assert.ok(g.ailments.has('fever'));
+  g.s.elapsed += 41;
+  g.ailments.update(0.1);
   assert.equal(g.s.disease, 'fever');
   g.contract('fever');
   g.add('fever_remedy');

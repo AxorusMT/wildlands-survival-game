@@ -124,6 +124,54 @@ Below the surface the world descends through four layers, joined by ladder shaft
 
 The world changes as you work it. Chopped trees topple and leave stumps that slowly sprout and regrow; rock and ore veins break apart and are gone for good; plants are stripped and grow back. Whatever you break or kill drops its materials on the ground, and they fly to you when you walk near. Mined tiles stay mined, and saves record only the tiles you have changed. Copper comes from the forest, iron and coal from cold regions, sulfur from the desert and badlands, and obsidian from the badlands. Deer, wolves, boars, bats, and scorpions have distinct behavior and drops. The camp gear includes fishing gear, camp shelters, rain catchers, food preservation, protective clothing, lanterns, platforms, traps, and storage. A furnace smelts copper and iron; a forge makes steel and obsidian tools. Farm plots grow herb, wheat, or potato. An icebox supplied with mined ice slows nearby spoilage. The Effergy of Beasts is a costly forge craft; place it, open the **Beasts** folio, attune wolves, and complete hunts to summon each Direwolf. Only obsidian-tier or better weapons can damage a Direwolf. Existing local saves are migrated when loaded; records from the earlier, narrower world keep the pack, camp, and progress, and move to the same place in each wider region.
 
+### Hard survival: food, cold, and disease
+
+- **Rot:** food rots faster the hotter the air (up to ×2.6 in hell) and slower in the cold. It goes **stale** (less nourishing), then **spoiled** (it may give you food poisoning), then **rotten** (it will make you ill). Every food shows a freshness bar, and food of one kind shares a row showing the oldest.
+- **Cold storage:** a ladder of storages, each holding food in its own larder.
+
+  | Storage     | Rot                           | Cold source                                              |
+  | ----------- | ----------------------------- | -------------------------------------------------------- |
+  | Cool pit    | ×0.6 (×0.45 dug below ground) | None needed                                              |
+  | Icebox      | ×0.18                         | Ice, which melts faster in the heat                      |
+  | Snow cellar | ×0.14                         | Ice lasts a long time, and none is needed below freezing |
+  | Frost chest | ×0.06                         | Frost shards                                             |
+  | Rime vault  | ×0.02                         | None needed                                              |
+
+  Stow food and add ice from the larder page. A storage warns you before its cold runs out. Standing beside cold storage also cools your pack.
+
+- **Ice:** ice in the pack melts into water unless it is freezing out. The **insulated satchel**, **frost-lined pack** and **rime-lined pack** keep the pack cool and slow the melting.
+- **Preserves:** a salting barrel makes salted meat and fish and pickled mushrooms. Berry preserves come from the campfire. Preserves keep for hours.
+- **Meals:** the kitchen hearth cooks meals that leave a comfort behind them:
+
+  | Comfort    | Effect                      |
+  | ---------- | --------------------------- |
+  | Well fed   | Faster health and stamina   |
+  | Fiery      | +10% damage                 |
+  | Sugar rush | +10% speed                  |
+  | Clear mind | Mana returns twice as fast  |
+  | Warm belly | The cold bites less         |
+  | Feasted    | Well fed and fiery together |
+
+- **Vitamins:** fruit, greens and preserves keep your vitamins up. Run out for long and scurvy sets in.
+- **Water:** wild water can carry dysentery, so boil it. Water in the generated realms is **brackish** and can carry cholera; only a **water filter** makes it safe.
+- **Ailments:** twenty diseases and injuries, each following the same course:
+  - **Incubation:** it starts with no symptoms, and the journal only says you feel a little off.
+  - **Stages:** once it shows, it is mild, then severe, then critical, worsening on its own clock unless treated.
+  - **Recovery:** some mild ones pass off while you are fed, watered and warm, and exposure ailments ease once the cause is gone.
+  - **Chains:** a critical infected wound can become blood poisoning, and a critical hypothermia can turn to pneumonia.
+  - **Too late:** rabies serum works only before rabies takes hold.
+  - **Immunity:** many leave you immune for a while, and a field vaccine guards against tetanus, rabies and cholera.
+
+  | Group            | Ailments                                                    |
+  | ---------------- | ----------------------------------------------------------- |
+  | Food and water   | Dysentery, fever, food poisoning, tapeworm, cholera, scurvy |
+  | Wounds and bites | Infected wounds, blood poisoning, tetanus, rabies, venom    |
+  | Exposure         | Hypothermia, frostbite, heatstroke, pneumonia               |
+  | The realms       | Spore lung, void rot                                        |
+  | Injuries         | Bleeding, fractures, burns                                  |
+
+  Each ailment has its own treatment: bandages, splints, salves, teas, serums, and the older remedies. The **Vitals** page lists every ailment with its stage, symptoms, treatment and time left. A strip of ailments on the HUD shows their stages at a glance.
+
 ### Dungeons
 
 Four dungeons are built into the world. Each has its own brick, torches and music, a spanning tree of rooms linked by corridors and ladders, and a boss arena at the far end:
@@ -234,7 +282,7 @@ Signature weapons, such as the Tidecaller spear and the Hellrazor, belong to a f
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 311 recipes and 441 items (134 weapons), and 58 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 345 recipes and 476 items (134 weapons), and 58 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 
@@ -247,6 +295,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the dungeons (loot, traps, guardians, altars and brick);
 - boss fights and sigils, the Rift Gate, travel and portals home, and every dimension's walls, life and boss;
 - the hotbar (digging, building and torches), armour and set bonuses, potions, buffs and crystals, bows, staves and mana, and monsters of the deep;
+- survival: rot by temperature, the cold-storage ladder, melting ice, freshness stages, ailments that incubate, worsen, chain and pass off, exposure and injuries, meals and brackish water, and older records' diseases;
 - the weapon hierarchy: a complete, ever-stronger grid, quality, the anvil and evolutions, family mechanics, infusions and gems, crossbows and tomes;
 - generated realms: seeds, keys and tiers, furnishing, modifiers, hazards, bosses and relics, and saving an open realm;
 - homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
