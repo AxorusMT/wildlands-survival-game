@@ -54,6 +54,7 @@ export const NODES: Record<string, NodeSpec> = {
   abyssal_pearl: { yield: [2, 3], tool: 'pick', req: 8, hp: 6, regen: 0 },
   heartstone: { yield: [2, 3], tool: 'pick', req: 8, hp: 7, regen: 0 },
   seasonbloom: { yield: [1, 3], hp: 2, regen: 260 },
+  fracture_shard: { yield: [1, 2], tool: 'pick', req: 9, hp: 7, regen: 0 },
   topaz: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
   onyx: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
   opal: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },

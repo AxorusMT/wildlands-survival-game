@@ -3,6 +3,7 @@ import { BARROW } from './barrow.ts';
 import { CHOIR } from './choir.ts';
 import { EMBERHEART } from './emberheart.ts';
 import { FEVERLANDS } from './feverlands.ts';
+import { FRACTURED, fracture, setFracturePool } from './fractured.ts';
 import { GARDEN } from './garden.ts';
 import { GUTTER } from './gutter.ts';
 import { OBSERVATORY } from './observatory.ts';
@@ -45,7 +46,15 @@ export const REALMS: RealmTemplate[] = [
   UNDERTOW,
   EMBERHEART,
   GARDEN,
+  FRACTURED,
 ];
+/** Every realm a Fractured Realm can be spliced from. */
+export const WHOLE_REALMS = REALMS.filter((r) => r.id !== 'fractured');
+setFracturePool(() => WHOLE_REALMS);
+export { FRACTURED_LOOT, fracture } from './fractured.ts';
+/** The template an expedition was built from (a Fractured one is spliced from its seed). */
+export const templateOf = (inst: { realm: string; seed: number }) =>
+  inst.realm === 'fractured' ? fracture(inst.seed) : realmById(inst.realm);
 export const realmById = (id: string) => REALMS.find((r) => r.id === id);
 export const REALM_IDS = new Set(REALMS.map((r) => r.id));
 
@@ -73,7 +82,7 @@ export function setActiveRealm(inst: RealmInstance | null) {
     active = null;
     return null;
   }
-  const tpl = realmById(inst.realm);
+  const tpl = templateOf(inst);
   if (!tpl) {
     active = null;
     return null;

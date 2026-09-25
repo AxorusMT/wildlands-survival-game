@@ -236,6 +236,17 @@ Beyond the Rift lie realms that are built anew every time you enter.
 | Emberheart (V)             | Magma rises through the lower ledges every two minutes                          | Heartstone                                        | Forgeborn set (magma- and lava-proof; +4 defense), anvil maul, heartfire staff         | The Anvil God · Anvil spark                                                 |
 | Garden of Lost Seasons (V) | The season turns every 150 s: summer scorches, autumn rots, winter freezes      | Seasonbloom                                       | Druid set (seasons cannot touch you; regenerate), season bow, thornlash                | The Four-Faced Warden, whose attacks change with its face · Seed of Seasons |
 
+### The Fractured Realms
+
+Beyond Band V the realms come apart. **Fracture shards** drop from the great foes of Band V, and four of them make a **Fractured key**.
+
+- **Splicing:** each Fractured expedition joins two realms at a seam, with a shaft and ladder between them.
+- **Hazard and creatures:** it borrows one realm's hazard and gathers creatures from both.
+- **The great foe:** it calls a boss from any realm, empowered with half again its health.
+- **Tiers never end:** the Atlas counts them in Roman numerals, and each tier scales monsters and loot further.
+- **Rewards:** shards drop in plenty. They forge **Ascended ingots** for the twelfth weapon tier. In the Armoury a shard can reforge a weapon, rolling its quality twice and keeping the better.
+- **Relic:** the Prism of worlds.
+
 ### Homes and the town
 
 - **Building:** place **back walls** (dirt, stone, wood, brick, glass and the stones of every dungeon and world), **doors**, **chairs**, **tables** and **beds**. Walls must touch ground or another wall. A **hammer** knocks walls down and picks furniture back up. Dungeon walls need an iron hammer.
@@ -249,7 +260,7 @@ Beyond the Rift lie realms that are built anew every time you enter.
 
 ### The weapon hierarchy
 
-One table in `src/data/weapons.ts` governs every weapon: eleven material tiers by ten families. The **Armoury**, reached from the Gear page, shows the whole grid and which weapons you have found.
+One table in `src/data/weapons.ts` governs every weapon: twelve material tiers by ten families. The **Armoury**, reached from the Gear page, shows the whole grid and which weapons you have found.
 
 | Tier | Material  | Tier | Material   |
 | ---- | --------- | ---- | ---------- |
@@ -258,7 +269,7 @@ One table in `src/data/weapons.ts` governs every weapon: eleven material tiers b
 | 3    | Iron      | 9    | Starmetal  |
 | 4    | Steel     | 10   | Voidsteel  |
 | 5    | Obsidian  | 11   | Riftforged |
-| 6    | Hellstone |      |            |
+| 6    | Hellstone | 12   | Ascended   |
 
 | Family     | Its gift at every tier                                |
 | ---------- | ----------------------------------------------------- |
@@ -321,6 +332,10 @@ Nothing here resets. The world is persistent, and so is everything you learn in 
   Finishing a page grants a lasting bonus.
 
 - **The relic shelf** is built at the workbench. Relics set on it (the realm bosses' prizes and great trophies) lend their gifts wherever you are. It holds three relics, four at renown 20 and five at renown 40.
+
+### Feats and titles
+
+Sixty-three feats (Beasts › The Codex › Feats) record what the expedition has done. They fall into seven groups: hunting, great foes, wayfaring, survival, making, arms and renown. Each shows its progress. Completing one grants a small permanent perk and a title, such as _the Blooded_, _Walker of Worlds_ or _the Realmbreaker_. The title you choose to wear shows beside your renown on the HUD.
 
 ### Gear, potions, and crystals
 

@@ -33,6 +33,7 @@ import { gutter } from './gutter.ts';
 import { undertow } from './undertow.ts';
 import { emberheart } from './emberheart.ts';
 import { garden } from './garden.ts';
+import { fractured } from './fractured.ts';
 import { town } from './town.ts';
 import { voidsong } from './voidsong.ts';
 
@@ -74,6 +75,7 @@ export const TRACK_LIST: Track[] = [
   undertow,
   emberheart,
   garden,
+  fractured,
 ];
 
 export const TRACKS: Record<string, Track> = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));

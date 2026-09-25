@@ -40,6 +40,7 @@ const LAYER_TRACKS: Record<string, string> = {
   undertow: 'undertow',
   emberheart: 'emberheart',
   garden: 'garden',
+  fractured: 'fractured',
 };
 /** Each dungeon's own music; the Citadel keeps the throne-room theme of lower hell. */
 const DUNGEON_TRACKS: Record<string, string> = {

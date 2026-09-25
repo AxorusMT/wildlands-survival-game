@@ -444,6 +444,11 @@ export const ITEMS: Record<string, ItemSpec> = {
   thornlash: ['Thornlash', 'weapon'],
   seasons_seed: ['Seed of Seasons', 'accessory'],
   warden_face: ["The Warden's face", 'trophy'],
+  // The Fractured Realms.
+  fracture_shard: ['Fracture shard', 'material'],
+  fractured_key: ['Fractured key', 'key'],
+  ascended_ingot: ['Ascended ingot', 'metal'],
+  world_prism: ['Prism of worlds', 'accessory'],
   // ── Getting about ──
   bucket: ['Bucket', 'tool'],
   water_bucket: ['Water bucket', 'tool'],

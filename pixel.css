@@ -647,6 +647,9 @@ canvas.icon {
   border-style: double;
   border-width: 3px;
 }
+.book-row.muted-row {
+  opacity: 0.6;
+}
 .book-row.selected {
   outline: 2px solid #c8902a;
 }

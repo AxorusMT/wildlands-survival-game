@@ -520,6 +520,7 @@ export const MINERALS: Record<string, Mineral> = {
   crown_gold: { rock: '#5a4a2a', fleck: '#f0c850', shine: '#fff0a0' },
   abyssal_pearl: { rock: '#3a4a5a', crystal: '#e8f8ff', glow: true },
   heartstone: { rock: '#3a1a10', crystal: '#ff8a3a', glow: true },
+  fracture_shard: { rock: '#2a1c3a', crystal: '#e0c0ff', glow: true },
   coal: { rock: '#5a5a5e', fleck: '#1c1c20', shine: '#8a8a96' },
   ice: { rock: '#8fb8d0', crystal: '#dff4ff' },
   obsidian: { rock: '#3a3448', crystal: '#2a2433', shine: '#9a8ac0' },

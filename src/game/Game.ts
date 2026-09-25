@@ -35,6 +35,7 @@ import { Physics } from './systems/Physics.ts';
 import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
+import { Feats } from './systems/Feats.ts';
 import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
 import { Terrain } from './systems/Terrain.ts';
@@ -74,6 +75,7 @@ export class Game {
   readonly combat = new Combat(this);
   readonly armoury = new Armoury(this);
   readonly skills = new Skills(this);
+  readonly feats = new Feats(this);
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
   readonly pocket = new Pocket(this);
@@ -162,7 +164,7 @@ export class Game {
       pocket: null,
       realms: {},
       armoury: {},
-      meta: { renown: 0, skills: [], mastery: {} },
+      meta: { renown: 0, skills: [], mastery: {}, feats: [] },
       placing: null,
       dead: false,
       lastSave: Date.now(),
@@ -191,6 +193,7 @@ export class Game {
     this.equipment.update(dt);
     this.realms.update(dt);
     this.pocket.update(dt);
+    this.feats.update();
     this.town.update(dt);
     this.ailments.update(dt);
     this.survival.update(dt);

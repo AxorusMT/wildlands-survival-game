@@ -431,6 +431,7 @@ export const RELIC_EFFECTS: Record<string, string[]> = {
   leviathan_scale: ['gills', 'defense3'],
   anvil_spark: ['forgeward', 'fire'],
   seasons_seed: ['seasonward', 'regen'],
+  world_prism: ['damage10', 'defense3', 'regen'],
   rot_heart: ['regen'],
   astronomer_eye: ['magic15'],
   kings_ransom: ['damage10'],

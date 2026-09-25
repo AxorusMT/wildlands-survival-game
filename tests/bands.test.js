@@ -27,8 +27,8 @@ const BAND23 = [
 ];
 
 test('every realm is complete: creatures, boss, keys, relic, music, and codex page', () => {
-  assert.equal(D.REALMS.length, 14);
-  for (const tpl of D.REALMS) {
+  assert.equal(D.REALMS.length, 15);
+  for (const tpl of D.WHOLE_REALMS) {
     for (const m of tpl.mobs) assert.ok(D.MOBS[m.type], `${tpl.id} mob ${m.type}`);
     assert.ok(D.MOBS[tpl.boss]?.boss, `${tpl.id} boss`);
     assert.ok(D.MOBS[tpl.elite], `${tpl.id} elite`);
@@ -357,4 +357,53 @@ test('the Garden turns through four seasons that change the air', () => {
   }
   assert.equal(seen.size, 4);
   assert.ok(seen.get('summer') > seen.get('winter') + 40);
+});
+
+test('the Fractured Realms splice two realms, borrow a hazard, and never run out of tiers', () => {
+  const a = D.fracture(424242),
+    b = D.fracture(424242);
+  assert.equal(a, b, 'the same seed, the same splice');
+  assert.match(a.name, /Fractured .* · /);
+  assert.ok(D.WHOLE_REALMS.some((r) => r.boss === a.boss));
+  const geo = a.build(424242);
+  const mid = D.RW / 2;
+  assert.equal(geo.tile(mid, geo.floors[0](mid) - 40), 0, 'the seam is open');
+  assert.ok(geo.ladders.some((l) => Math.abs(l.x - mid) < 1));
+  assert.equal(D.tierName(14), 'XIV');
+  assert.ok(D.rollMods(40, () => 0.5).length <= 6);
+  const g = fresh();
+  g.pocket.record('fractured').best = 11;
+  assert.equal(g.pocket.maxTier('fractured'), 12);
+  assert.equal(g.pocket.maxTier('orchard'), 1);
+  g.command('realm fractured 12');
+  assert.equal(g.s.pocket.realm, 'fractured');
+  assert.equal(g.s.pocket.tier, 12);
+  assert.ok(g.s.animals.filter(inside).length > 20);
+  const altar = g.s.structures.find((st) => st.type === 'boss_altar' && inside(st));
+  assert.equal(altar.kind, D.templateOf(g.s.pocket).boss);
+  g.s.player.x = altar.x - 200;
+  g.s.player.y = altar.y;
+  assert.ok(g.bosses.summon(altar).ok);
+  const boss = g.bosses.active();
+  assert.ok(boss.maxHp > D.MOBS[boss.type].hp * D.TIER_SCALE.hp(12) * 1.4, 'empowered');
+});
+
+test('tier twelve is forged from fracture shards, and a shard reforges well', () => {
+  assert.equal(D.TIERS.at(-1).mat, 'ascended');
+  assert.ok(D.WEAPONS.ascended_sword && D.RECIPES.some((r) => r.id === 'ascended_sword'));
+  assert.ok(D.RECIPES.find((r) => r.id === 'ascended_ingot').cost.fracture_shard);
+  assert.ok(D.RECIPES.find((r) => r.id === 'fractured_key').cost.fracture_shard);
+  assert.ok(D.MOBS.the_leviathan.loot.some(([id]) => id === 'fracture_shard'));
+  const g = fresh();
+  g.command('god');
+  g.add('iron_sword');
+  g.add('fracture_shard', 3);
+  const before = g.s.armoury.iron_sword.q;
+  g.dev.god = false;
+  g.add('workbench');
+  const x = g.s.player.x + 40;
+  g.place('workbench', x, g.groundTopAt(x));
+  assert.ok(g.armoury.reforge('iron_sword', true).ok);
+  assert.equal(g.count('fracture_shard'), 2);
+  assert.ok(g.s.armoury.iron_sword.q >= before);
 });

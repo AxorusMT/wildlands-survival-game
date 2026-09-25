@@ -783,6 +783,10 @@ export const ACCESSORIES: Record<string, { effects: string[]; text: string }> = 
     effects: ['seasonward', 'regen'],
     text: 'The seasons cannot touch you; regenerate',
   },
+  world_prism: {
+    effects: ['damage10', 'defense3', 'regen'],
+    text: '+10% damage, +3 defense, regenerate: a little of every world',
+  },
   miners_lamp: { effects: ['light'], text: 'Light around you' },
   magma_stone: { effects: ['lava'], text: 'Resist lava and heat' },
   watcher_eye: { effects: ['damage10', 'light'], text: '+10% damage; see in the dark' },

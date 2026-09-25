@@ -7,7 +7,8 @@ import { MOBS } from '../../data/mobs.ts';
 import {
   MAX_TIER,
   RW,
-  TIER_NAMES,
+  tierName,
+  templateOf,
   TIER_SCALE,
   AIR_SECONDS,
   FEVER_BITES,
@@ -92,7 +93,9 @@ export class Pocket extends System {
   }
   /** Highest tier a realm can be opened at: one above the best cleared. */
   maxTier(id: string) {
-    return Math.min(MAX_TIER, this.record(id).best + 1);
+    const next = this.record(id).best + 1;
+    // The Fractured Realms go on for ever.
+    return id === 'fractured' ? next : Math.min(MAX_TIER, next);
   }
   /** Whether the player (or a point) is inside the open realm. */
   here(x = this.game.s.player.x) {
@@ -157,7 +160,7 @@ export class Pocket extends System {
       god = this.game.dev.god;
     if (!stone && !god) return { ok: false, reason: 'Stand at a Waystone.' };
     if (tier < 1 || tier > this.maxTier(realmId))
-      return { ok: false, reason: `Clear tier ${TIER_NAMES[tier - 1] ?? 'I'} first.` };
+      return { ok: false, reason: `Clear tier ${tierName(Math.max(1, tier - 1))} first.` };
     if (!god && !this.game.count(tpl.key))
       return { ok: false, reason: `You need a ${itemName(tpl.key).toLowerCase()}.` };
     // Keywise and Riftborn wayfinders sometimes turn a key without spending it.
@@ -195,14 +198,14 @@ export class Pocket extends System {
   }
   private enter() {
     const inst = this.game.s.pocket!,
-      tpl = realmById(inst.realm)!,
+      tpl = templateOf(inst)!,
       x = POCKET.start + POCKET.arrive + 70;
     this.game.realms.teleport(x, this.game.groundTopAt(x) + 1);
     const rec = this.record(inst.realm);
     rec.visits++;
     this.game.progress.record('realm:' + inst.realm);
     this.banner = { name: tpl.name, tier: inst.tier, mods: inst.mods, at: this.game.s.elapsed };
-    this.game.say(`You step into the ${tpl.name} · Tier ${TIER_NAMES[inst.tier]}.`, 'victory');
+    this.game.say(`You step into the ${tpl.name} · Tier ${tierName(inst.tier)}.`, 'victory');
     this.caveInAt = this.game.s.elapsed + 20;
     this.breath = AIR_SECONDS;
     this.goldWas = -1;
@@ -270,7 +273,7 @@ export class Pocket extends System {
   }
   private populate(inst: RealmInstance) {
     const g = this.game,
-      tpl = realmById(inst.realm)!,
+      tpl = templateOf(inst)!,
       geo = activeRealm()!.geo,
       rng = seededRandom(inst.seed),
       mods = new Set(inst.mods),
@@ -389,7 +392,7 @@ export class Pocket extends System {
   /** The realm's boss has fallen: the tier is cleared, and the first victory yields its relic. */
   cleared(a: Animal) {
     const inst = this.inst(),
-      tpl = inst && realmById(inst.realm);
+      tpl = inst && templateOf(inst);
     if (!inst || !tpl || tpl.boss !== a.type) return;
     inst.cleared = true;
     const rec = this.record(inst.realm),
@@ -402,9 +405,9 @@ export class Pocket extends System {
       this.game.progress.record('relic:' + tpl.relic);
       this.game.say(`The ${itemName(tpl.relic)} is yours: a relic of the ${tpl.name}.`, 'victory');
     }
-    if (first && inst.tier < MAX_TIER)
+    if (first && inst.tier < this.maxTier(inst.realm) + (inst.realm === 'fractured' ? 1 : 0))
       this.game.say(
-        `Tier ${TIER_NAMES[inst.tier + 1]} of the ${tpl.name} can now be opened.`,
+        `Tier ${tierName(inst.tier + 1)} of the ${tpl.name} can now be opened.`,
         'good',
       );
     this.game.progress.record('clear:' + inst.realm);
@@ -566,7 +569,7 @@ export class Pocket extends System {
       }
     }
     if (!this.here() || s.dead) return;
-    const tpl = realmById(inst.realm)!,
+    const tpl = templateOf(inst)!,
       fx = this.game.equipment.effects(),
       v = s.vitals;
     const hard = 1 - Math.min(0.8, this.game.skills.get('hazard'));

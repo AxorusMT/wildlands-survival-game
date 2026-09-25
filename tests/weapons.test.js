@@ -21,10 +21,10 @@ const dummy = (g, type = 'skeleton') => {
   return a;
 };
 
-test('the hierarchy is complete: ten families by eleven tiers, stronger at every tier', () => {
+test('the hierarchy is complete: ten families by twelve tiers, stronger at every tier', () => {
   assert.equal(D.FAMILIES.length, 10);
-  assert.equal(D.TIERS.length, 11);
-  assert.equal(D.GRID.length, 110);
+  assert.equal(D.TIERS.length, 12);
+  assert.equal(D.GRID.length, 120);
   for (const w of D.GRID) {
     assert.ok(D.WEAPONS[w.id], `${w.id} stats`);
     assert.ok(D.ITEMS[w.id], `${w.id} item`);

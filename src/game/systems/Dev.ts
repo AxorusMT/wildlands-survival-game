@@ -272,7 +272,7 @@ export class Dev extends System {
     },
     realm: {
       usage: 'realm <id> [tier] | realm home | realm close',
-      help: 'Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden) at a tier and step in, go home, or collapse it.',
+      help: 'Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden, fractured) at a tier and step in, go home, or collapse it.',
       run: ([id, tier]) => {
         const pocket = this.game.pocket;
         if (id === 'home') return pocket.leave().ok ? ['Home.'] : ['! No realm is open.'];
@@ -282,7 +282,7 @@ export class Dev extends System {
         }
         const tpl = REALMS.find((r) => r.id === id);
         if (!tpl) return ['! Usage: realm <' + REALMS.map((r) => r.id).join('|') + '> [1-5]'];
-        const t = Math.max(1, Math.min(5, Number(tier) || 1)),
+        const t = Math.max(1, Math.min(tpl.id === 'fractured' ? 999 : 5, Number(tier) || 1)),
           rec = pocket.record(tpl.id),
           god = this.game.dev.god;
         rec.best = Math.max(rec.best, t - 1);

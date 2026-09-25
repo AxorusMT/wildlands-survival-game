@@ -127,6 +127,16 @@ export const TIERS: WeaponTier[] = [
     color: '#ff6ad5',
     glow: '#ffb0ec',
   },
+  {
+    tier: 12,
+    mat: 'ascended',
+    name: 'Ascended',
+    bar: 'ascended_ingot',
+    station: 'starforge',
+    base: 300,
+    color: '#e8d8ff',
+    glow: '#ffffff',
+  },
 ];
 export const tierOf = (t: number) => TIERS[Math.max(0, Math.min(TIERS.length - 1, t - 1))];
 

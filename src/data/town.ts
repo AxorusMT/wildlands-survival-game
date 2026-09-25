@@ -386,5 +386,7 @@ export const BASE_VALUE: Record<string, number> = {
   leviathan_heart: 1200,
   anvil_heart: 1200,
   warden_face: 1200,
+  fracture_shard: 150,
+  ascended_ingot: 600,
   coin: 1,
 };

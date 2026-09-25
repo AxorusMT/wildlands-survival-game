@@ -228,3 +228,39 @@ test('renown, skills, and mastery survive a save', () => {
   assert.equal(loaded.skills.mastery('spear'), 4);
   assert.equal(loaded.skills.points(), 6);
 });
+
+test('sixty-odd feats, each with a title and a perk, earned from the record', () => {
+  assert.ok(D.FEATS.length >= 60);
+  assert.equal(new Set(D.FEATS.map((f) => f.id)).size, D.FEATS.length);
+  const g = fresh();
+  const st = g.skills.stats();
+  for (const f of D.FEATS) {
+    assert.ok(f.title && f.perkText, f.id);
+    for (const k of Object.keys(f.perk)) assert.ok(k in st, `${f.id}: ${k}`);
+    const [have, need] = f.measure(g.feats.ctx());
+    assert.ok(need > 0 && have >= 0, f.id);
+  }
+  assert.equal(g.feats.earned().length, 0);
+  const dmg = g.skills.get('meleeDmg');
+  g.progress.record('kill:wolf');
+  assert.ok(g.feats.has('first_blood'));
+  assert.ok(g.skills.get('meleeDmg') > dmg, 'the perk applies');
+  assert.equal(g.feats.title(), null);
+  assert.ok(g.feats.wear('first_blood').ok);
+  assert.equal(g.feats.title(), 'the Blooded');
+  assert.equal(g.feats.wear('realmbreaker').ok, false);
+  // Feats and titles survive a save.
+  const store = new Map();
+  const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
+  g.save(storage);
+  const h = fresh();
+  h.load(storage);
+  assert.ok(h.feats.has('first_blood'));
+  assert.equal(h.feats.title(), 'the Blooded');
+  // Progress is measured.
+  for (let i = 0; i < 40; i++) h.progress.record('kill:boar');
+  const kills = Object.entries(h.s.tutorial.tally)
+    .filter(([k]) => k.startsWith('kill:'))
+    .reduce((n, [, v]) => n + v, 0);
+  assert.deepEqual(h.feats.progress('hunter'), [kills, 100]);
+});

@@ -95,6 +95,8 @@ export interface RealmTemplate {
   /** Region data for the HUD, temperature, and the journal. */
   biome: Biome;
   build(seed: number): RealmGeometry;
+  /** The region at a local x, when a realm is made of more than one (the Fractured Realms). */
+  biomeAt?(lx: number): Biome;
   /** Anything beyond the common scatter: set pieces, vaults, and landmarks. */
   extra?(geo: RealmGeometry, ctx: RealmCtx): void;
 }

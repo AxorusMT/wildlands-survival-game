@@ -2071,6 +2071,7 @@ Object.assign(MOBS, {
     boss: true,
     loot: [
       L('leviathan_heart', 1, 1, 1),
+      L('fracture_shard', 2, 4, 1),
       L('abyssal_pearl', 14, 20, 1),
       L('undertow_fragment', 2, 3, 1),
       L('life_fruit', 1, 1, 1),
@@ -2090,6 +2091,7 @@ Object.assign(MOBS, {
     boss: true,
     loot: [
       L('anvil_heart', 1, 1, 1),
+      L('fracture_shard', 2, 4, 1),
       L('heartstone', 14, 20, 1),
       L('emberheart_fragment', 2, 3, 1),
       L('life_fruit', 1, 1, 1),
@@ -2109,6 +2111,7 @@ Object.assign(MOBS, {
     boss: true,
     loot: [
       L('warden_face', 1, 1, 1),
+      L('fracture_shard', 2, 4, 1),
       L('seasonbloom', 14, 20, 1),
       L('garden_fragment', 2, 3, 1),
       L('life_fruit', 1, 1, 1),

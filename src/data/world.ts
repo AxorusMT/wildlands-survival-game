@@ -574,7 +574,11 @@ function spanIndex(x: number) {
 }
 export function biomeAt(x: number, y: number): Biome {
   const dim = dimensionAt(x);
-  if (dim === POCKET) return activeRealm()?.tpl.biome ?? BETWEEN;
+  if (dim === POCKET) {
+    const r = activeRealm();
+    if (!r) return BETWEEN;
+    return r.tpl.biomeAt?.(x - POCKET.start) ?? r.tpl.biome;
+  }
   if (dim) return BIOMES.find((b) => b.id === dim.id)!;
   const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
   const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;

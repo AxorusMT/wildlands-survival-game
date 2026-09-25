@@ -1,9 +1,9 @@
 "use strict";
 (() => {
   var __defProp = Object.defineProperty;
-  var __export = (target, all) => {
-    for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
+  var __export = (target, all2) => {
+    for (var name in all2)
+      __defProp(target, name, { get: all2[name], enumerable: true });
   };
 
   // src/data/index.ts
@@ -43,9 +43,11 @@
     ENTRANCES: () => ENTRANCES,
     EVOLUTIONS: () => EVOLUTIONS,
     FAMILIES: () => FAMILIES,
+    FEATS: () => FEATS,
     FEVER_BITES: () => FEVER_BITES,
     FEVER_CHANCE: () => FEVER_CHANCE,
     FOOD: () => FOOD,
+    FRACTURED_LOOT: () => FRACTURED_LOOT,
     GEMS: () => GEMS,
     GEN_ITEMS: () => GEN_ITEMS,
     GEN_PROJECTILES: () => GEN_PROJECTILES,
@@ -123,6 +125,7 @@
     WALL_ITEM: () => WALL_ITEM,
     WEAPONS: () => WEAPONS,
     WEAPON_CLASS: () => WEAPON_CLASS,
+    WHOLE_REALMS: () => WHOLE_REALMS,
     WORLD_H: () => WORLD_H,
     WORLD_W: () => WORLD_W,
     activeRealm: () => activeRealm,
@@ -142,7 +145,9 @@
     dimensionTile: () => dimensionTile,
     dungeonAt: () => dungeonAt,
     familyById: () => familyById,
+    featById: () => featById,
     flatten: () => flatten,
+    fracture: () => fracture,
     hymnAt: () => hymnAt,
     inPocket: () => inPocket,
     inShaft: () => inShaft,
@@ -183,7 +188,9 @@
     starPulse: () => starPulse,
     surfaceAt: () => surfaceAt,
     syncPocket: () => syncPocket,
+    templateOf: () => templateOf,
     tideLevel: () => tideLevel,
+    tierName: () => tierName,
     tierOf: () => tierOf,
     underworldCeiling: () => underworldCeiling,
     underworldFloor: () => underworldFloor,
@@ -854,6 +861,16 @@
       base: 240,
       color: "#ff6ad5",
       glow: "#ffb0ec"
+    },
+    {
+      tier: 12,
+      mat: "ascended",
+      name: "Ascended",
+      bar: "ascended_ingot",
+      station: "starforge",
+      base: 300,
+      color: "#e8d8ff",
+      glow: "#ffffff"
     }
   ];
   var tierOf = (t) => TIERS[Math.max(0, Math.min(TIERS.length - 1, t - 1))];
@@ -2036,6 +2053,10 @@
       effects: ["seasonward", "regen"],
       text: "The seasons cannot touch you; regenerate"
     },
+    world_prism: {
+      effects: ["damage10", "defense3", "regen"],
+      text: "+10% damage, +3 defense, regenerate: a little of every world"
+    },
     miners_lamp: { effects: ["light"], text: "Light around you" },
     magma_stone: { effects: ["lava"], text: "Resist lava and heat" },
     watcher_eye: { effects: ["damage10", "light"], text: "+10% damage; see in the dark" },
@@ -2419,6 +2440,8 @@
     leviathan_heart: 1200,
     anvil_heart: 1200,
     warden_face: 1200,
+    fracture_shard: 150,
+    ascended_ingot: 600,
     coin: 1
   };
 
@@ -2864,6 +2887,11 @@
     thornlash: ["Thornlash", "weapon"],
     seasons_seed: ["Seed of Seasons", "accessory"],
     warden_face: ["The Warden's face", "trophy"],
+    // The Fractured Realms.
+    fracture_shard: ["Fracture shard", "material"],
+    fractured_key: ["Fractured key", "key"],
+    ascended_ingot: ["Ascended ingot", "metal"],
+    world_prism: ["Prism of worlds", "accessory"],
     // ── Getting about ──
     bucket: ["Bucket", "tool"],
     water_bucket: ["Water bucket", "tool"],
@@ -3192,6 +3220,9 @@
     ["choir_stave", { rime_silver: 10, frost_lily: 4, crystal: 4 }, "starforge", 9],
     ["bellhammer", { rime_silver: 12, bell_bronze: 4, wood: 3 }, "starforge", 9],
     ["respirator", { iron_ingot: 4, reeds: 6, crystal: 2, hide: 2 }, "workbench", 5],
+    // The Fractured Realms: shards open them, and forge the twelfth tier.
+    ["fractured_key", { fracture_shard: 4 }, "waystone", 11],
+    ["ascended_ingot", { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 }, "starforge", 12],
     // The Feverlands.
     ["venom_blade", { plague_ivory: 10, venom: 6, gold_ingot: 2 }, "starforge", 9],
     ["plague_censer", { plague_ivory: 8, fever_bloom: 6, silk: 4 }, "starforge", 9],
@@ -3280,6 +3311,7 @@
     abyssal_pearl: { yield: [2, 3], tool: "pick", req: 8, hp: 6, regen: 0 },
     heartstone: { yield: [2, 3], tool: "pick", req: 8, hp: 7, regen: 0 },
     seasonbloom: { yield: [1, 3], hp: 2, regen: 260 },
+    fracture_shard: { yield: [1, 2], tool: "pick", req: 9, hp: 7, regen: 0 },
     topaz: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     onyx: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     opal: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
@@ -3414,13 +3446,13 @@
     return (hash(i, seed) * (1 - t) + hash(i + 1, seed) * t) * 2 - 1;
   }
   function fbm1(x, seed = 0, octaves = 3) {
-    let sum = 0, amp = 1, norm = 0;
+    let sum2 = 0, amp = 1, norm = 0;
     for (let o = 0; o < octaves; o++) {
-      sum += noise1(x * 2 ** o, seed + o * 17) * amp;
+      sum2 += noise1(x * 2 ** o, seed + o * 17) * amp;
       norm += amp;
       amp *= 0.5;
     }
-    return sum / norm;
+    return sum2 / norm;
   }
   function noise2(x, y, seed = 0) {
     const i = Math.floor(x), j = Math.floor(y), tx = ease(x - i), ty = ease(y - j);
@@ -3428,38 +3460,38 @@
     return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
   }
   function fbm2(x, y, seed = 0, octaves = 3) {
-    let sum = 0, amp = 1, norm = 0;
+    let sum2 = 0, amp = 1, norm = 0;
     for (let o = 0; o < octaves; o++) {
-      sum += noise2(x * 2 ** o, y * 2 ** o, seed + o * 29) * amp;
+      sum2 += noise2(x * 2 ** o, y * 2 ** o, seed + o * 29) * amp;
       norm += amp;
       amp *= 0.5;
     }
-    return sum / norm;
+    return sum2 / norm;
   }
 
   // src/data/dimensions.ts
   var DIM_GAP = 640;
   var DIM_WIDTH = 9600;
   function makeDimensions(overworldW) {
-    const at = (i) => overworldW + DIM_GAP + i * (DIM_WIDTH + DIM_GAP);
+    const at2 = (i) => overworldW + DIM_GAP + i * (DIM_WIDTH + DIM_GAP);
     return [
       {
         id: "mycelia",
         name: "Mycelial Deep",
-        start: at(0),
-        end: at(0) + DIM_WIDTH,
+        start: at2(0),
+        end: at2(0) + DIM_WIDTH,
         arrive: 520,
         temp: 19
       },
       {
         id: "skyreach",
         name: "Skyreach",
-        start: at(1),
-        end: at(1) + DIM_WIDTH,
+        start: at2(1),
+        end: at2(1) + DIM_WIDTH,
         arrive: 520,
         temp: 6
       },
-      { id: "void", name: "Hollow Void", start: at(2), end: at(2) + DIM_WIDTH, arrive: 520, temp: 3 }
+      { id: "void", name: "Hollow Void", start: at2(2), end: at2(2) + DIM_WIDTH, arrive: 520, temp: 3 }
     ];
   }
   var DT = {
@@ -3919,10 +3951,10 @@
     };
   }
   function flatten(fn, x0, x1, level) {
-    const mid = (x0 + x1) / 2, at = level ?? fn(mid), fade = 260;
+    const mid = (x0 + x1) / 2, at2 = level ?? fn(mid), fade = 260;
     return (x) => {
       const d = x < x0 ? x0 - x : x > x1 ? x - x1 : 0, k = d >= fade ? 0 : 1 - d / fade, s = k * k * (3 - 2 * k);
-      return fn(x) * (1 - s) + at * s;
+      return fn(x) * (1 - s) + at2 * s;
     };
   }
   function weighted(rng2, list) {
@@ -4377,6 +4409,145 @@
     },
     build: build4
   };
+
+  // src/core/random.ts
+  var RANDOM_GENERATOR = {
+    multiplier: 1664525,
+    increment: 1013904223,
+    modulus: 2 ** 32
+  };
+  function seededRandom(seed) {
+    let s = seed >>> 0;
+    return () => (s = RANDOM_GENERATOR.multiplier * s + RANDOM_GENERATOR.increment >>> 0) / RANDOM_GENERATOR.modulus;
+  }
+  var pick = (r, a) => a[Math.floor(r() * a.length)];
+
+  // src/data/realms/fractured.ts
+  var PORTABLE = /* @__PURE__ */ new Set([
+    "ash",
+    "cavein",
+    "shards",
+    "traps",
+    "sun",
+    "hymn",
+    "fever",
+    "stars",
+    "curse",
+    "seasons"
+  ]);
+  var FRACTURED_LOOT = [
+    ["fracture_shard", 2, 4, 1],
+    ["ascended_ingot", 1, 2, 0.35],
+    ["voidsteel_ingot", 2, 4, 0.6],
+    ["healing_draught", 3, 5, 1],
+    ["life_fruit", 1, 1, 0.3]
+  ];
+  var FRACTURED = {
+    id: "fractured",
+    name: "Fractured Realms",
+    band: 6,
+    note: "Where the realms come apart. Every expedition splices two realms at a seam, borrows a hazard, and calls a great foe from anywhere, empowered. The tiers never end.",
+    sky: "open",
+    temp: 12,
+    ambient: [0.1, 0.08, 0.14],
+    daylight: 0.8,
+    wall: 23,
+    hazard: {
+      id: "ash",
+      name: "Borrowed",
+      text: "Each Fractured Realm borrows the hazard of one of the realms it is made from.",
+      ward: ""
+    },
+    fragment: "fracture_shard",
+    key: "fractured_key",
+    material: "fracture_shard",
+    relic: "world_prism",
+    boss: "unmaker",
+    elite: "void_stalker",
+    music: "fractured",
+    ores: [],
+    nodes: [["stone", 1]],
+    nodeCount: 70,
+    mobs: [],
+    mobCount: 46,
+    chests: 6,
+    chestLoot: FRACTURED_LOOT,
+    biome: {
+      id: "fractured",
+      name: "Fractured Realms",
+      x: 19,
+      y: 0,
+      color: "#8a6aa8",
+      shade: "#e0c0ff",
+      temp: 12,
+      note: "Where the realms come apart.",
+      resources: ["fracture_shard"]
+    },
+    build: (seed) => fracture(seed, POOL()).build(seed)
+  };
+  var POOL = () => [];
+  function setFracturePool(pool) {
+    POOL = pool;
+  }
+  var made = /* @__PURE__ */ new Map();
+  function fracture(seed, pool = POOL()) {
+    const hit = made.get(seed);
+    if (hit) return hit;
+    const rng2 = seededRandom(seed ^ 1002183);
+    const portable = pool.filter((r) => PORTABLE.has(r.hazard.id));
+    const a = portable[Math.floor(rng2() * portable.length)], others = pool.filter((r) => r.id !== a.id), b = others[Math.floor(rng2() * others.length)], bosses = pool.map((r) => r.boss), boss2 = bosses[Math.floor(rng2() * bosses.length)];
+    const mid = Math.round(RW / 2);
+    const tpl = {
+      ...FRACTURED,
+      name: `Fractured ${a.name} \xB7 ${b.name}`,
+      sky: a.sky === "open" || b.sky === "open" ? "open" : "cavern",
+      temp: Math.round((a.temp + b.temp) / 2),
+      ambient: a.ambient,
+      daylight: Math.max(a.daylight, b.daylight),
+      wall: a.wall,
+      hazard: a.hazard,
+      boss: boss2,
+      elite: rng2() < 0.5 ? a.elite : b.elite,
+      music: "fractured",
+      ores: [...a.ores, ...b.ores],
+      nodes: [...a.nodes, ...b.nodes, ["fracture_shard", 3]],
+      mobs: [...a.mobs, ...b.mobs],
+      chestLoot: [...FRACTURED_LOOT, ...a.chestLoot.slice(2, 4), ...b.chestLoot.slice(2, 4)],
+      biome: { ...a.biome, id: "fractured", name: `Fractured ${a.name}` },
+      biomeAt: (lx) => lx < mid ? a.biome : b.biome,
+      build(s) {
+        const ga = a.build(s), gb = b.build(s + 1);
+        const pick2 = (fa, fb) => (x) => x < mid ? fa(x) : fb(x);
+        const surface = pick2(ga.surface, gb.surface), main = pick2(ga.floors[0], gb.floors[0]), low = pick2(ga.floors[ga.floors.length - 1], gb.floors[gb.floors.length - 1]);
+        const top = Math.min(ga.floors[0](mid - 60), gb.floors[0](mid + 60)) - 60, bottom = Math.max(ga.floors[0](mid - 60), gb.floors[0](mid + 60), low(mid)) + 10;
+        const geo = {
+          ...ga,
+          tile: (x, y) => {
+            if (Math.abs(x - mid) < 60 && y > top - 200 && y < bottom) return 0;
+            if (Math.abs(x - mid) < 60 && y >= bottom && y < bottom + 40) return 23;
+            return x < mid ? ga.tile(x, y) : gb.tile(x, y);
+          },
+          surface,
+          floors: [main, main, low],
+          ladders: [
+            ...ga.ladders.filter((l) => l.x < mid - 100),
+            ...gb.ladders.filter((l) => l.x > mid + 100),
+            { x: mid, top: top - 4, bottom: bottom - 20 }
+          ],
+          arrive: ga.arrive,
+          arena: gb.arena,
+          arenaFloor: gb.arenaFloor
+        };
+        return geo;
+      },
+      extra(geo, ctx2) {
+        a.extra?.(geo, ctx2);
+      }
+    };
+    if (made.size > 8) made.clear();
+    made.set(seed, tpl);
+    return tpl;
+  }
 
   // src/data/realms/garden.ts
   var BLOOM_LOAM = 56;
@@ -5064,9 +5235,9 @@
     ground = flatten(ground, arrive - 240, arrive + 240, 1440);
     ground = flatten(ground, arena - 420, arena + 420, 1420);
     const floor = walkable(ground);
-    let sum = 0;
-    for (let x = 0; x < RW; x += 64) sum += floor(x);
-    const tideMid = sum / Math.ceil(RW / 64) + 30;
+    let sum2 = 0;
+    for (let x = 0; x < RW; x += 64) sum2 += floor(x);
+    const tideMid = sum2 / Math.ceil(RW / 64) + 30;
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
       const g = floor(x);
@@ -5547,7 +5718,7 @@
   function rollMods(tier, rng2) {
     const pool = [...MODS], out = [];
     const clash = { frostbound: "scorched", scorched: "frostbound" };
-    while (out.length < Math.max(0, tier - 1) && pool.length) {
+    while (out.length < Math.min(6, Math.max(0, tier - 1)) && pool.length) {
       const m = pool.splice(Math.floor(rng2() * pool.length), 1)[0];
       if (clash[m.id] && out.includes(clash[m.id])) continue;
       out.push(m.id);
@@ -5561,6 +5732,26 @@
   };
   var MAX_TIER = 5;
   var TIER_NAMES = ["", "I", "II", "III", "IV", "V"];
+  function tierName(n) {
+    const R2 = [
+      [1e3, "M"],
+      [900, "CM"],
+      [500, "D"],
+      [400, "CD"],
+      [100, "C"],
+      [90, "XC"],
+      [50, "L"],
+      [40, "XL"],
+      [10, "X"],
+      [9, "IX"],
+      [5, "V"],
+      [4, "IV"],
+      [1, "I"]
+    ];
+    let out = "";
+    for (const [v, s] of R2) while (n >= v) out += s, n -= v;
+    return out;
+  }
 
   // src/data/realms/index.ts
   var REALMS = [
@@ -5577,8 +5768,12 @@
     GUTTER,
     UNDERTOW,
     EMBERHEART,
-    GARDEN
+    GARDEN,
+    FRACTURED
   ];
+  var WHOLE_REALMS = REALMS.filter((r) => r.id !== "fractured");
+  setFracturePool(() => WHOLE_REALMS);
+  var templateOf = (inst) => inst.realm === "fractured" ? fracture(inst.seed) : realmById(inst.realm);
   var realmById = (id) => REALMS.find((r) => r.id === id);
   var REALM_IDS = new Set(REALMS.map((r) => r.id));
   var active = null;
@@ -5588,7 +5783,7 @@
       active = null;
       return null;
     }
-    const tpl = realmById(inst.realm);
+    const tpl = templateOf(inst);
     if (!tpl) {
       active = null;
       return null;
@@ -5629,11 +5824,11 @@
     badlands: 3400
   };
   var BIOME_SPANS = (() => {
-    let at = 0;
+    let at2 = 0;
     return SIDE_ORDER.map((id) => {
-      const start2 = at;
-      at += BIOME_WIDTHS[id];
-      return { id, start: start2, end: at, center: (start2 + at) / 2 };
+      const start2 = at2;
+      at2 += BIOME_WIDTHS[id];
+      return { id, start: start2, end: at2, center: (start2 + at2) / 2 };
     });
   })();
   var MAP_LABEL_Y = 610;
@@ -5909,12 +6104,12 @@
   var BASELINE = (() => {
     const r = Math.round(520 / SURFACE_STEP), out = new Float32Array(SURFACE.length);
     for (let i = 0; i < SURFACE.length; i++) {
-      let sum = 0, n = 0;
+      let sum2 = 0, n = 0;
       for (let j = Math.max(0, i - r); j <= Math.min(SURFACE.length - 1, i + r); j++) {
-        sum += SURFACE[j];
+        sum2 += SURFACE[j];
         n++;
       }
-      out[i] = sum / n;
+      out[i] = sum2 / n;
     }
     return out;
   })();
@@ -5981,7 +6176,7 @@
       return f < 0.5 ? west > s.start + 200 ? west : east : east < s.end - 200 ? east : west;
     })
   ).filter(
-    (x, i, all) => !inDungeonBox(x, 0, 2e3, 160) && !all.some((o, j) => j < i && Math.abs(o - x) < 500)
+    (x, i, all2) => !inDungeonBox(x, 0, 2e3, 160) && !all2.some((o, j) => j < i && Math.abs(o - x) < 500)
   );
   function dryLanding(x) {
     for (let d = 0; d < 900; d += 32)
@@ -5991,15 +6186,15 @@
   var SHAFTS = [
     ...ENTRANCES.map((x) => ({ ...shaftAt(x, surfaceAt(x) - 4, caveY(x, 3) + 40), mouth: true })),
     ...BIOME_SPANS.flatMap((s, i) => {
-      const at = (f) => s.start + (s.end - s.start) * f;
+      const at2 = (f) => s.start + (s.end - s.start) * f;
       const list = [
-        shaftAt(at(0.5), caveY(at(0.5), 3), caveY(at(0.5), 4) + 40),
-        shaftAt(at(0.16), caveY(at(0.16), 4), caveY(at(0.16), 5) + 40),
-        i % 2 ? shaftAt(at(0.84), caveY(at(0.84), 5), caveY(at(0.84), 6) + 40) : shaftAt(at(0.62), caveY(at(0.62), 5), caveY(at(0.62), 6) + 40),
-        shaftAt(at(0.36), caveY(at(0.36), 6), caveY(at(0.36), 7) + 40)
+        shaftAt(at2(0.5), caveY(at2(0.5), 3), caveY(at2(0.5), 4) + 40),
+        shaftAt(at2(0.16), caveY(at2(0.16), 4), caveY(at2(0.16), 5) + 40),
+        i % 2 ? shaftAt(at2(0.84), caveY(at2(0.84), 5), caveY(at2(0.84), 6) + 40) : shaftAt(at2(0.62), caveY(at2(0.62), 5), caveY(at2(0.62), 6) + 40),
+        shaftAt(at2(0.36), caveY(at2(0.36), 6), caveY(at2(0.36), 7) + 40)
       ];
       if (i % 3 === 2) {
-        const x = dryLanding(at(0.66));
+        const x = dryLanding(at2(0.66));
         list.push(shaftAt(x, caveY(x, 7), underworldFloor(x) - 6));
       }
       return list.filter((sh) => !inDungeonBox(sh.x, sh.top, sh.bottom, 60));
@@ -6064,7 +6259,11 @@
   }
   function biomeAt(x, y) {
     const dim = dimensionAt(x);
-    if (dim === POCKET) return activeRealm()?.tpl.biome ?? BETWEEN;
+    if (dim === POCKET) {
+      const r = activeRealm();
+      if (!r) return BETWEEN;
+      return r.tpl.biomeAt?.(x - POCKET.start) ?? r.tpl.biome;
+    }
     if (dim) return BIOMES.find((b) => b.id === dim.id);
     const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
     const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;
@@ -8158,6 +8357,7 @@
       boss: true,
       loot: [
         L2("leviathan_heart", 1, 1, 1),
+        L2("fracture_shard", 2, 4, 1),
         L2("abyssal_pearl", 14, 20, 1),
         L2("undertow_fragment", 2, 3, 1),
         L2("life_fruit", 1, 1, 1)
@@ -8177,6 +8377,7 @@
       boss: true,
       loot: [
         L2("anvil_heart", 1, 1, 1),
+        L2("fracture_shard", 2, 4, 1),
         L2("heartstone", 14, 20, 1),
         L2("emberheart_fragment", 2, 3, 1),
         L2("life_fruit", 1, 1, 1)
@@ -8196,6 +8397,7 @@
       boss: true,
       loot: [
         L2("warden_face", 1, 1, 1),
+        L2("fracture_shard", 2, 4, 1),
         L2("seasonbloom", 14, 20, 1),
         L2("garden_fragment", 2, 3, 1),
         L2("life_fruit", 1, 1, 1)
@@ -9182,6 +9384,7 @@
     leviathan_scale: ["gills", "defense3"],
     anvil_spark: ["forgeward", "fire"],
     seasons_seed: ["seasonward", "regen"],
+    world_prism: ["damage10", "defense3", "regen"],
     rot_heart: ["regen"],
     astronomer_eye: ["magic15"],
     kings_ransom: ["damage10"],
@@ -9221,21 +9424,728 @@
   var relicText = (id) => (RELIC_EFFECTS[id] ?? []).map((k) => EFFECT_TEXT[k] ?? k).join(", ");
   var shelfSlots = (renown) => 3 + (renown >= 20 ? 1 : 0) + (renown >= 40 ? 1 : 0);
 
+  // src/data/feats.ts
+  var sum = (c, prefix) => Object.entries(c.tally).reduce((n, [k, v]) => k.startsWith(prefix) ? n + v : n, 0);
+  var distinct = (c, prefix) => Object.keys(c.tally).filter((k) => k.startsWith(prefix) && c.tally[k] > 0).length;
+  var all = (c, prefix, ids) => [
+    ids.filter((id) => (c.tally[prefix + id] ?? 0) > 0).length,
+    ids.length
+  ];
+  var at = (have, need) => [Math.min(have, need), need];
+  var BAND = {
+    1: ["orchard_mother", "kiln_beast", "warren_queen"],
+    2: ["lumen_stag", "ossuary_hydra"],
+    3: ["engine_saint", "mirage_tyrant", "the_hymnal"],
+    4: ["mother_of_rot", "the_astronomer", "pauper_king"],
+    5: ["the_leviathan", "anvil_god", "four_faced_warden"]
+  };
+  var REALM_IDS2 = [
+    "orchard",
+    "steppe",
+    "warren",
+    "glasswood",
+    "marches",
+    "barrow",
+    "saltflats",
+    "choir",
+    "feverlands",
+    "observatory",
+    "gutter",
+    "undertow",
+    "emberheart",
+    "garden"
+  ];
+  var RELICS = [
+    "tide_conch",
+    "kiln_heart",
+    "queens_mandible",
+    "lumen_antler",
+    "hydra_tooth",
+    "saint_cog",
+    "tyrant_eye",
+    "hymnal_bell",
+    "rot_mask",
+    "astrolabe",
+    "pauper_crown",
+    "leviathan_scale",
+    "anvil_spark",
+    "seasons_seed"
+  ];
+  var MEALS = [
+    "hearty_stew",
+    "potato_stew",
+    "trail_ration",
+    "berry_preserves",
+    "pickled_mushrooms",
+    "salted_meat",
+    "smoked_meat"
+  ];
+  var F = (id, name, title, group, text, measure, perk, perkText) => ({ id, name, title, group, text, measure, perk, perkText });
+  var FEATS = [
+    // ── Hunting ──
+    F(
+      "first_blood",
+      "First blood",
+      "the Blooded",
+      "Hunting",
+      "Slay a creature",
+      (c) => at(sum(c, "kill:"), 1),
+      { meleeDmg: 0.02 },
+      "+2% melee damage"
+    ),
+    F(
+      "hunter",
+      "The hunt",
+      "the Hunter",
+      "Hunting",
+      "Slay 100 creatures",
+      (c) => at(sum(c, "kill:"), 100),
+      { rangedDmg: 0.02 },
+      "+2% ranged damage"
+    ),
+    F(
+      "slayer",
+      "Slayer",
+      "the Slayer",
+      "Hunting",
+      "Slay 1,000 creatures",
+      (c) => at(sum(c, "kill:"), 1e3),
+      { crit: 0.02 },
+      "+2% critical chance"
+    ),
+    F(
+      "exterminator",
+      "Exterminator",
+      "the Scourge",
+      "Hunting",
+      "Slay 5,000 creatures",
+      (c) => at(sum(c, "kill:"), 5e3),
+      { maxHp: 10 },
+      "+10 health"
+    ),
+    F(
+      "naturalist",
+      "Naturalist",
+      "the Naturalist",
+      "Hunting",
+      "Slay 25 kinds of creature",
+      (c) => at(distinct(c, "kill:"), 25),
+      { luck: 0.03 },
+      "Loot 3% more likely"
+    ),
+    F(
+      "bestiarist",
+      "Bestiarist",
+      "the Bestiarist",
+      "Hunting",
+      "Slay 75 kinds of creature",
+      (c) => at(distinct(c, "kill:"), 75),
+      { xp: 0.05 },
+      "+5% renown"
+    ),
+    F(
+      "wolfbane",
+      "Wolfbane",
+      "Wolfbane",
+      "Hunting",
+      "Bring down the three Direwolves",
+      (c) => at(c.tally["kill:boss"] ?? 0, 3),
+      { killStamina: 2 },
+      "Kills restore 2 stamina"
+    ),
+    F(
+      "beastmaster",
+      "Beastmaster",
+      "the Beastmaster",
+      "Hunting",
+      "Slay 50 of any one creature",
+      (c) => at(
+        Math.max(
+          0,
+          ...Object.entries(c.tally).filter(([k]) => k.startsWith("kill:")).map(([, v]) => v)
+        ),
+        50
+      ),
+      { thorns: 0.05 },
+      "Biters take 5% back"
+    ),
+    // ── Great foes ──
+    F(
+      "foebreaker",
+      "Foe-breaker",
+      "Foe-breaker",
+      "Great foes",
+      "Defeat a great foe",
+      (c) => at(sum(c, "boss:"), 1),
+      { bossDmg: 0.03 },
+      "+3% against great foes"
+    ),
+    F(
+      "crypt_lords",
+      "Lords of the deep places",
+      "the Delver",
+      "Great foes",
+      "Defeat the four dungeon lords",
+      (c) => all(c, "boss:", ["hollow_king", "rime_colossus", "pharaoh", "archdemon"]),
+      { defense: 1 },
+      "+1 defense"
+    ),
+    F(
+      "dimension_lords",
+      "Lords of other worlds",
+      "the Otherworldly",
+      "Great foes",
+      "Defeat the Sporemother, the Tempest Roc, and the Unmaker",
+      (c) => all(c, "boss:", ["sporemother", "tempest_roc", "unmaker"]),
+      { maxMana: 20 },
+      "+20 mana"
+    ),
+    F(
+      "band1",
+      "First band broken",
+      "the Tidebreaker",
+      "Great foes",
+      "Defeat the great foes of Band I",
+      (c) => all(c, "boss:", BAND[1]),
+      { realmLoot: 0.03 },
+      "Realm loot +3%"
+    ),
+    F(
+      "band2",
+      "Second band broken",
+      "the Glassbreaker",
+      "Great foes",
+      "Defeat the great foes of Band II",
+      (c) => all(c, "boss:", BAND[2]),
+      { realmLoot: 0.03 },
+      "Realm loot +3%"
+    ),
+    F(
+      "band3",
+      "Third band broken",
+      "the Gearbreaker",
+      "Great foes",
+      "Defeat the great foes of Band III",
+      (c) => all(c, "boss:", BAND[3]),
+      { realmLoot: 0.04 },
+      "Realm loot +4%"
+    ),
+    F(
+      "band4",
+      "Fourth band broken",
+      "the Kingbreaker",
+      "Great foes",
+      "Defeat the great foes of Band IV",
+      (c) => all(c, "boss:", BAND[4]),
+      { defense: 1 },
+      "+1 defense"
+    ),
+    F(
+      "band5",
+      "Fifth band broken",
+      "the Worldbreaker",
+      "Great foes",
+      "Defeat the great foes of Band V",
+      (c) => all(c, "boss:", BAND[5]),
+      { maxHp: 15 },
+      "+15 health"
+    ),
+    F(
+      "realmbreaker",
+      "Realmbreaker",
+      "the Realmbreaker",
+      "Great foes",
+      "Defeat every realm\u2019s great foe",
+      (c) => all(c, "boss:", Object.values(BAND).flat()),
+      { meleeDmg: 0.03, rangedDmg: 0.03, magicDmg: 0.03 },
+      "+3% damage"
+    ),
+    F(
+      "repeat",
+      "Old enemies",
+      "the Relentless",
+      "Great foes",
+      "Defeat great foes 25 times",
+      (c) => at(sum(c, "boss:"), 25),
+      { bossDmg: 0.04 },
+      "+4% against great foes"
+    ),
+    // ── Wayfaring ──
+    F(
+      "first_realm",
+      "Through the stone",
+      "the Wayfarer",
+      "Wayfaring",
+      "Enter a generated realm",
+      (c) => at(sum(c, "realm:"), 1),
+      { speed: 0.02 },
+      "+2% speed"
+    ),
+    F(
+      "band1_seen",
+      "Band I walked",
+      "the Wanderer",
+      "Wayfaring",
+      "Enter every Band I realm",
+      (c) => all(c, "realm:", ["orchard", "steppe", "warren"]),
+      { keySave: 0.03 },
+      "3% chance to keep a key"
+    ),
+    F(
+      "all_realms",
+      "Walker of worlds",
+      "Walker of Worlds",
+      "Wayfaring",
+      "Enter all fourteen realms",
+      (c) => all(c, "realm:", REALM_IDS2),
+      { speed: 0.03 },
+      "+3% speed"
+    ),
+    F(
+      "tempered",
+      "Tempered",
+      "the Tempered",
+      "Wayfaring",
+      "Clear a realm at tier V",
+      (c) => at(c.tally["clear:tier5"] ?? 0, 1),
+      { tierHarm: 0.03 },
+      "Take 3% less harm in realms"
+    ),
+    F(
+      "tempered5",
+      "Tempered five times",
+      "the Hardened",
+      "Wayfaring",
+      "Clear five different realms at tier V",
+      (c) => at(REALM_IDS2.filter((r) => (c.realmBest[r] ?? 0) >= 5).length, 5),
+      { tierHarm: 0.03 },
+      "Take 3% less harm in realms"
+    ),
+    F(
+      "seamwalker",
+      "Seamwalker",
+      "the Seamwalker",
+      "Wayfaring",
+      "Clear the Fractured Realms at tier X",
+      (c) => at(c.realmBest.fractured ?? 0, 10),
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    F(
+      "beyond",
+      "Beyond the seams",
+      "the Unbound",
+      "Wayfaring",
+      "Clear the Fractured Realms at tier XXV",
+      (c) => at(c.realmBest.fractured ?? 0, 25),
+      { maxHp: 20 },
+      "+20 health"
+    ),
+    F(
+      "regions",
+      "Nine regions",
+      "the Cartographer",
+      "Wayfaring",
+      "Visit all nine regions of the wildlands",
+      (c) => all(c, "visit:", [
+        "coast",
+        "marsh",
+        "forest",
+        "meadow",
+        "taiga",
+        "tundra",
+        "alpine",
+        "desert",
+        "badlands"
+      ]),
+      { coldResist: 1, heatResist: 1 },
+      "Shrug off 1\xB0 of heat and cold"
+    ),
+    F(
+      "dungeons",
+      "Four dungeons",
+      "the Delver",
+      "Wayfaring",
+      "Enter all four dungeons",
+      (c) => all(c, "visit:", ["crypt", "frost_keep", "tomb", "citadel"]),
+      { luck: 0.03 },
+      "Loot 3% more likely"
+    ),
+    F(
+      "relics5",
+      "Relic-keeper",
+      "the Relic-Keeper",
+      "Wayfaring",
+      "Win five realm relics",
+      (c) => at(all(c, "relic:", RELICS)[0], 5),
+      { maxMana: 10 },
+      "+10 mana"
+    ),
+    F(
+      "relics_all",
+      "Every relic",
+      "the Curator",
+      "Wayfaring",
+      "Win every realm\u2019s relic",
+      (c) => all(c, "relic:", RELICS),
+      { meleeDmg: 0.03, rangedDmg: 0.03, magicDmg: 0.03 },
+      "+3% damage"
+    ),
+    F(
+      "codex5",
+      "Scholar",
+      "the Scholar",
+      "Wayfaring",
+      "Complete five Codex pages",
+      (c) => at(c.codexDone, 5),
+      { xp: 0.03 },
+      "+3% renown"
+    ),
+    F(
+      "codex20",
+      "Loremaster",
+      "the Loremaster",
+      "Wayfaring",
+      "Complete twenty Codex pages",
+      (c) => at(c.codexDone, 20),
+      { xp: 0.05 },
+      "+5% renown"
+    ),
+    // ── Survival ──
+    F(
+      "day5",
+      "Five days",
+      "the Enduring",
+      "Survival",
+      "Survive five days",
+      (c) => at(c.day, 5),
+      { maxHp: 5 },
+      "+5 health"
+    ),
+    F(
+      "day30",
+      "A month in the wild",
+      "the Weathered",
+      "Survival",
+      "Survive thirty days",
+      (c) => at(c.day, 30),
+      { staminaRegen: 0.05 },
+      "Stamina returns 5% faster"
+    ),
+    F(
+      "day100",
+      "A hundred days",
+      "the Undying",
+      "Survival",
+      "Survive a hundred days",
+      (c) => at(c.day, 100),
+      { maxHp: 15 },
+      "+15 health"
+    ),
+    F(
+      "mended",
+      "Mended",
+      "the Mended",
+      "Survival",
+      "Recover from an ailment",
+      (c) => at(sum(c, "cure:"), 1),
+      { disease: 0.02 },
+      "2% chance to shrug off a sickness"
+    ),
+    F(
+      "mended10",
+      "Hard to kill",
+      "the Hardy",
+      "Survival",
+      "Recover from ten ailments",
+      (c) => at(sum(c, "cure:"), 10),
+      { immunity: 0.1 },
+      "Immunities last 10% longer"
+    ),
+    F(
+      "maladies",
+      "Survivor of plagues",
+      "the Survivor",
+      "Survival",
+      "Suffer eight different ailments and live",
+      (c) => at(distinct(c, "ail:"), 8),
+      { disease: 0.03 },
+      "3% chance to shrug off a sickness"
+    ),
+    F(
+      "palate",
+      "Wide palate",
+      "the Gourmand",
+      "Survival",
+      "Eat 25 different foods",
+      (c) => at(distinct(c, "eat:"), 25),
+      { calories: -0.03 },
+      "Hunger 3% slower"
+    ),
+    F(
+      "cook",
+      "Camp cook",
+      "the Cook",
+      "Survival",
+      "Cook five kinds of meal or preserve",
+      (c) => at(MEALS.filter((m) => (c.tally["craft:" + m] ?? 0) > 0).length, 5),
+      { meals: 0.1 },
+      "Meal comforts last 10% longer"
+    ),
+    F(
+      "coldchain",
+      "The cold chain",
+      "the Provisioner",
+      "Survival",
+      "Build an icebox",
+      (c) => at(c.tally["place:icebox"] ?? 0, 1),
+      { packRot: 0.05 },
+      "Food in the pack keeps 5% longer"
+    ),
+    F(
+      "vault",
+      "Rime vault",
+      "the Keeper of Stores",
+      "Survival",
+      "Build a rime vault",
+      (c) => at(c.tally["place:rime_vault"] ?? 0, 1),
+      { packRot: 0.05 },
+      "Food in the pack keeps 5% longer"
+    ),
+    // ── Making ──
+    F(
+      "maker",
+      "Maker",
+      "the Maker",
+      "Making",
+      "Craft 50 things",
+      (c) => at(sum(c, "craft:"), 50),
+      { gather: 0.03 },
+      "3% more chance of an extra find"
+    ),
+    F(
+      "artisan",
+      "Artisan",
+      "the Artisan",
+      "Making",
+      "Craft 500 things",
+      (c) => at(sum(c, "craft:"), 500),
+      { gather: 0.05 },
+      "5% more chance of an extra find"
+    ),
+    F(
+      "builder",
+      "Builder",
+      "the Builder",
+      "Making",
+      "Place 200 blocks and things",
+      (c) => at(sum(c, "place:"), 200),
+      { defense: 1 },
+      "+1 defense"
+    ),
+    F(
+      "mason",
+      "Master mason",
+      "the Mason",
+      "Making",
+      "Place 2,000 blocks and things",
+      (c) => at(sum(c, "place:"), 2e3),
+      { maxHp: 10 },
+      "+10 health"
+    ),
+    F(
+      "townsfolk",
+      "A little town",
+      "the Founder",
+      "Making",
+      "House three settlers",
+      (c) => at(sum(c, "settler:"), 3),
+      { coins: 0.05 },
+      "5% more silver marks"
+    ),
+    F(
+      "town8",
+      "A real town",
+      "the Mayor",
+      "Making",
+      "House eight settlers",
+      (c) => at(sum(c, "settler:"), 8),
+      { haggle: 0.1 },
+      "Prices 10% kinder"
+    ),
+    F(
+      "gatherer",
+      "Gatherer",
+      "the Gatherer",
+      "Making",
+      "Gather 500 times",
+      (c) => at(sum(c, "gather:"), 500),
+      { gather: 0.05 },
+      "5% more chance of an extra find"
+    ),
+    F(
+      "wealth",
+      "A full purse",
+      "the Wealthy",
+      "Making",
+      "Carry 5,000 silver marks",
+      (c) => at(c.coins, 5e3),
+      { coins: 0.05 },
+      "5% more silver marks"
+    ),
+    // ── Arms ──
+    F(
+      "plus5",
+      "Honed",
+      "the Honed",
+      "Arms",
+      "Upgrade a weapon to +5",
+      (c) => at(c.tally["upgrade:5"] ?? 0, 1),
+      { meleeDmg: 0.02 },
+      "+2% melee damage"
+    ),
+    F(
+      "plus10",
+      "Perfected",
+      "the Perfected",
+      "Arms",
+      "Upgrade a weapon to +10",
+      (c) => at(c.tally["upgrade:10"] ?? 0, 1),
+      { crit: 0.02 },
+      "+2% critical chance"
+    ),
+    F(
+      "families5",
+      "Versatile",
+      "the Versatile",
+      "Arms",
+      "Wield five families of weapon",
+      (c) => at(distinct(c, "family:"), 5),
+      { crit: 0.01 },
+      "+1% critical chance"
+    ),
+    F(
+      "hoarder",
+      "Hoarder",
+      "the Hoarder",
+      "Arms",
+      "Find 50 different weapons",
+      (c) => at(distinct(c, "weapon:"), 50),
+      { luck: 0.03 },
+      "Loot 3% more likely"
+    ),
+    F(
+      "adept",
+      "Adept",
+      "the Adept",
+      "Arms",
+      "Reach mastery 10 with any family",
+      (c) => at(Math.max(0, ...Object.values(c.mastery)), 10),
+      { meleeDmg: 0.02, rangedDmg: 0.02, magicDmg: 0.02 },
+      "+2% damage"
+    ),
+    F(
+      "grandmaster",
+      "Grandmaster",
+      "the Grandmaster",
+      "Arms",
+      "Reach mastery 20 with any family",
+      (c) => at(Math.max(0, ...Object.values(c.mastery)), 20),
+      { crit: 0.03 },
+      "+3% critical chance"
+    ),
+    F(
+      "many_arms",
+      "Many arms",
+      "the Many-Armed",
+      "Arms",
+      "Reach mastery 10 with five families",
+      (c) => at(Object.values(c.mastery).filter((l) => l >= 10).length, 5),
+      { maxHp: 10 },
+      "+10 health"
+    ),
+    F(
+      "ascended",
+      "Ascended",
+      "the Ascended",
+      "Arms",
+      "Forge a weapon of the twelfth tier",
+      (c) => at(
+        Object.keys(c.tally).filter(
+          (k) => k.startsWith("craft:ascended_") && k !== "craft:ascended_ingot"
+        ).length,
+        1
+      ),
+      { meleeDmg: 0.05, rangedDmg: 0.05, magicDmg: 0.05 },
+      "+5% damage"
+    ),
+    // ── Renown ──
+    F(
+      "renown10",
+      "Known",
+      "the Known",
+      "Renown",
+      "Reach renown 10",
+      (c) => at(c.renown, 10),
+      { xp: 0.02 },
+      "+2% renown"
+    ),
+    F(
+      "renown30",
+      "Famous",
+      "the Famous",
+      "Renown",
+      "Reach renown 30",
+      (c) => at(c.renown, 30),
+      { maxHp: 10 },
+      "+10 health"
+    ),
+    F(
+      "renown60",
+      "Legend",
+      "the Legend",
+      "Renown",
+      "Reach renown 60",
+      (c) => at(c.renown, 60),
+      { meleeDmg: 0.05, rangedDmg: 0.05, magicDmg: 0.05 },
+      "+5% damage"
+    ),
+    F(
+      "keystone",
+      "Keystone",
+      "the Decided",
+      "Renown",
+      "Learn a keystone",
+      (c) => at(c.keystones, 1),
+      { staminaRegen: 0.05 },
+      "Stamina returns 5% faster"
+    ),
+    F(
+      "keystones3",
+      "Three keystones",
+      "the Many-Sided",
+      "Renown",
+      "Learn three keystones",
+      (c) => at(c.keystones, 3),
+      { maxMana: 20 },
+      "+20 mana"
+    ),
+    F(
+      "shelf",
+      "A full shelf",
+      "the Collector",
+      "Renown",
+      "Set five relics on your shelves",
+      (c) => at(c.shelved, 5),
+      { maxHp: 5 },
+      "+5 health"
+    )
+  ];
+  var featById = (id) => FEATS.find((f) => f.id === id);
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-
-  // src/core/random.ts
-  var RANDOM_GENERATOR = {
-    multiplier: 1664525,
-    increment: 1013904223,
-    modulus: 2 ** 32
-  };
-  function seededRandom(seed) {
-    let s = seed >>> 0;
-    return () => (s = RANDOM_GENERATOR.multiplier * s + RANDOM_GENERATOR.increment >>> 0) / RANDOM_GENERATOR.modulus;
-  }
-  var pick = (r, a) => a[Math.floor(r() * a.length)];
 
   // src/game/rules.ts
   var RULES = {
@@ -9667,13 +10577,18 @@
       return { ok: true };
     }
     /** Rerolls quality at the anvil. */
-    reforge(id) {
+    /** Rerolls quality. A fracture shard stands in for the materials and rolls twice, keeping the better. */
+    reforge(id, catalyst = false) {
       const why = this.owned(id) ?? this.atAnvil(id);
       if (why) return { ok: false, reason: why };
-      const [, tier] = this.classOf(id), cost = reforgeCost(tier);
-      if (!this.pay(cost)) return { ok: false, reason: "Reforging needs more materials and marks." };
+      const [, tier] = this.classOf(id), cost = catalyst ? { fracture_shard: 1 } : reforgeCost(tier);
+      if (!this.pay(cost))
+        return {
+          ok: false,
+          reason: catalyst ? "You need a fracture shard." : "Reforging needs more materials and marks."
+        };
       const e = this.record(id);
-      e.q = rollQuality(this.game.rng, 1.2);
+      e.q = catalyst ? Math.max(rollQuality(this.game.rng, 1.6), rollQuality(this.game.rng, 1.6), e.q) : rollQuality(this.game.rng, 1.2);
       e.gems = e.gems.slice(0, QUALITIES[e.q].sockets);
       this.game.sound("craft_anvil");
       this.game.say(`Reforged: ${this.title(id)}.`, e.q >= 3 ? "victory" : "good");
@@ -9775,6 +10690,7 @@
         timers: { start: s.elapsed }
       };
       if (realm) a.maxHp = a.hp = Math.round(spec.hp * this.game.pocket.hpScale());
+      if (realm && s.pocket?.realm === "fractured") a.maxHp = a.hp = Math.round(a.maxHp * 1.5);
       s.animals.push(a);
       this.game.event("burst", x, y - 60, "#ffffff");
       this.game.sound("boss", x, y - 40, 1.6);
@@ -9788,6 +10704,8 @@
       s.animals = s.animals.filter((m) => !(m.minion && m.deadUntil) && !(m === a));
       this.game.progress.record("boss:" + a.type);
       this.game.pocket.cleared(a);
+      if (s.pocket?.realm === "fractured" && this.game.pocket.here(a.x))
+        this.game.drops.spawn("fracture_shard", 3 + s.pocket.tier, a.x, a.y - 30);
       s.vitals.morale = clamp(s.vitals.morale + 30, 0, RULES.maxVital);
       this.game.say(MOBS[a.type].name + " is defeated!", "victory");
       this.game.sound("victory", a.x, a.y);
@@ -11508,7 +12426,7 @@
       },
       realm: {
         usage: "realm <id> [tier] | realm home | realm close",
-        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden) at a tier and step in, go home, or collapse it.",
+        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden, fractured) at a tier and step in, go home, or collapse it.",
         run: ([id, tier]) => {
           const pocket = this.game.pocket;
           if (id === "home") return pocket.leave().ok ? ["Home."] : ["! No realm is open."];
@@ -11518,7 +12436,7 @@
           }
           const tpl = REALMS.find((r2) => r2.id === id);
           if (!tpl) return ["! Usage: realm <" + REALMS.map((r2) => r2.id).join("|") + "> [1-5]"];
-          const t = Math.max(1, Math.min(5, Number(tier) || 1)), rec = pocket.record(tpl.id), god = this.game.dev.god;
+          const t = Math.max(1, Math.min(tpl.id === "fractured" ? 999 : 5, Number(tier) || 1)), rec = pocket.record(tpl.id), god = this.game.dev.god;
           rec.best = Math.max(rec.best, t - 1);
           this.game.dev.god = true;
           const r = pocket.open(tpl.id, t);
@@ -11747,11 +12665,11 @@
   // src/game/systems/Effergy.ts
   var Effergy = class extends System {
     /** Calls the Direwolf beside the altar, or at `at` when summoned from the field console. */
-    summonBoss(at) {
-      const altar = at ?? this.game.s.structures.find((st) => st.type === "effergy");
+    summonBoss(at2) {
+      const altar = at2 ?? this.game.s.structures.find((st) => st.type === "effergy");
       if (!altar) return;
       const cfg = BOSSES[this.game.s.altar.level - 1];
-      const x = clamp(altar.x + (at ? 0 : 145), 40, WORLD_W - 40), y = at ? this.game.floorNear(x, at.y - 20) : this.game.groundTopAt(x) - 1;
+      const x = clamp(altar.x + (at2 ? 0 : 145), 40, WORLD_W - 40), y = at2 ? this.game.floorNear(x, at2.y - 20) : this.game.groundTopAt(x) - 1;
       const boss2 = {
         id: uniqueId(),
         type: "boss",
@@ -11768,7 +12686,7 @@
         deadUntil: 0,
         warning: 2,
         phase: 0,
-        ...at ? { walkY: at.y } : {}
+        ...at2 ? { walkY: at2.y } : {}
       };
       this.game.s.animals.push(boss2);
       this.game.s.altar.activeBoss = boss2.id;
@@ -11779,8 +12697,8 @@
           type: "wolf",
           companion: true,
           x: cx,
-          y: at ? this.game.floorNear(cx, at.y - 20) : this.game.groundTopAt(cx) - 1,
-          ...at ? { walkY: at.y } : {},
+          y: at2 ? this.game.floorNear(cx, at2.y - 20) : this.game.groundTopAt(cx) - 1,
+          ...at2 ? { walkY: at2.y } : {},
           homeX: altar.x,
           homeY: altar.y,
           hp: 66,
@@ -11910,8 +12828,8 @@
     assign(index, id) {
       const s = this.game.s;
       if (id) {
-        const at = s.hotbar.indexOf(id);
-        if (at >= 0) s.hotbar[at] = s.hotbar[index];
+        const at2 = s.hotbar.indexOf(id);
+        if (at2 >= 0) s.hotbar[at2] = s.hotbar[index];
       }
       s.hotbar[index] = id;
     }
@@ -12948,12 +13866,13 @@
       return this.game.s.pocket ?? null;
     }
     record(id) {
-      const all = this.game.s.realms ??= {};
-      return all[id] ??= { visits: 0, best: 0, kills: 0, relic: false };
+      const all2 = this.game.s.realms ??= {};
+      return all2[id] ??= { visits: 0, best: 0, kills: 0, relic: false };
     }
     /** Highest tier a realm can be opened at: one above the best cleared. */
     maxTier(id) {
-      return Math.min(MAX_TIER, this.record(id).best + 1);
+      const next = this.record(id).best + 1;
+      return id === "fractured" ? next : Math.min(MAX_TIER, next);
     }
     /** Whether the player (or a point) is inside the open realm. */
     here(x = this.game.s.player.x) {
@@ -13005,7 +13924,7 @@
       const stone = this.waystoneNear(), god = this.game.dev.god;
       if (!stone && !god) return { ok: false, reason: "Stand at a Waystone." };
       if (tier < 1 || tier > this.maxTier(realmId))
-        return { ok: false, reason: `Clear tier ${TIER_NAMES[tier - 1] ?? "I"} first.` };
+        return { ok: false, reason: `Clear tier ${tierName(Math.max(1, tier - 1))} first.` };
       if (!god && !this.game.count(tpl.key))
         return { ok: false, reason: `You need a ${itemName(tpl.key).toLowerCase()}.` };
       const keep = this.game.skills.get("keySave") + (this.game.skills.flag("riftborn") ? 0.3 : 0);
@@ -13039,13 +13958,13 @@
       return { ok: true };
     }
     enter() {
-      const inst = this.game.s.pocket, tpl = realmById(inst.realm), x = POCKET.start + POCKET.arrive + 70;
+      const inst = this.game.s.pocket, tpl = templateOf(inst), x = POCKET.start + POCKET.arrive + 70;
       this.game.realms.teleport(x, this.game.groundTopAt(x) + 1);
       const rec = this.record(inst.realm);
       rec.visits++;
       this.game.progress.record("realm:" + inst.realm);
       this.banner = { name: tpl.name, tier: inst.tier, mods: inst.mods, at: this.game.s.elapsed };
-      this.game.say(`You step into the ${tpl.name} \xB7 Tier ${TIER_NAMES[inst.tier]}.`, "victory");
+      this.game.say(`You step into the ${tpl.name} \xB7 Tier ${tierName(inst.tier)}.`, "victory");
       this.caveInAt = this.game.s.elapsed + 20;
       this.breath = AIR_SECONDS;
       this.goldWas = -1;
@@ -13106,7 +14025,7 @@
       this.rebuildTiles();
     }
     populate(inst) {
-      const g = this.game, tpl = realmById(inst.realm), geo = activeRealm().geo, rng2 = seededRandom(inst.seed), mods = new Set(inst.mods), x0 = POCKET.start;
+      const g = this.game, tpl = templateOf(inst), geo = activeRealm().geo, rng2 = seededRandom(inst.seed), mods = new Set(inst.mods), x0 = POCKET.start;
       const ctx2 = {
         rng: rng2,
         tier: inst.tier,
@@ -13202,7 +14121,7 @@
     }
     /** The realm's boss has fallen: the tier is cleared, and the first victory yields its relic. */
     cleared(a) {
-      const inst = this.inst(), tpl = inst && realmById(inst.realm);
+      const inst = this.inst(), tpl = inst && templateOf(inst);
       if (!inst || !tpl || tpl.boss !== a.type) return;
       inst.cleared = true;
       const rec = this.record(inst.realm), first = inst.tier > rec.best;
@@ -13214,9 +14133,9 @@
         this.game.progress.record("relic:" + tpl.relic);
         this.game.say(`The ${itemName(tpl.relic)} is yours: a relic of the ${tpl.name}.`, "victory");
       }
-      if (first && inst.tier < MAX_TIER)
+      if (first && inst.tier < this.maxTier(inst.realm) + (inst.realm === "fractured" ? 1 : 0))
         this.game.say(
-          `Tier ${TIER_NAMES[inst.tier + 1]} of the ${tpl.name} can now be opened.`,
+          `Tier ${tierName(inst.tier + 1)} of the ${tpl.name} can now be opened.`,
           "good"
         );
       this.game.progress.record("clear:" + inst.realm);
@@ -13355,7 +14274,7 @@
         }
       }
       if (!this.here() || s.dead) return;
-      const tpl = realmById(inst.realm), fx = this.game.equipment.effects(), v = s.vitals;
+      const tpl = templateOf(inst), fx = this.game.equipment.effects(), v = s.vitals;
       const hard = 1 - Math.min(0.8, this.game.skills.get("hazard"));
       if (tpl.hazard.id === "mire" && this.inMire() && !fx.has("mirewalk")) {
         v.wetness = clamp(v.wetness + dt * 5, 0, 100);
@@ -13555,6 +14474,7 @@
     record(key, qty = 1) {
       this.game.s.tutorial.tally[key] = (this.game.s.tutorial.tally[key] || 0) + qty;
       this.game.skills.noted(key, qty);
+      this.game.feats.check();
       this.advanceTutorial();
       this.advanceChapter();
     }
@@ -13895,11 +14815,78 @@
     }
   };
 
+  // src/game/systems/Feats.ts
+  var Feats = class extends System {
+    checkAt = 0;
+    get meta() {
+      return this.game.s.meta ??= { renown: 0, skills: [], mastery: {} };
+    }
+    earned() {
+      return this.meta.feats ??= [];
+    }
+    has(id) {
+      return this.earned().includes(id);
+    }
+    /** The title the player wears, if any. */
+    title() {
+      const id = this.meta.title;
+      return id && this.has(id) ? featById(id)?.title ?? null : null;
+    }
+    wear(id) {
+      if (id && !this.has(id)) return { ok: false, reason: "That feat is not yet yours." };
+      this.meta.title = id ?? void 0;
+      return { ok: true };
+    }
+    /** Everything a feat may look at. */
+    ctx() {
+      const s = this.game.s, sk = this.game.skills;
+      const mastery = {};
+      for (const f of Object.keys(this.meta.mastery)) mastery[f] = sk.mastery(f);
+      const realmBest = {};
+      for (const [id, r] of Object.entries(s.realms ?? {})) realmBest[id] = r.best;
+      return {
+        tally: s.tutorial.tally,
+        day: s.day,
+        renown: sk.level(),
+        mastery,
+        keystones: this.meta.skills.filter((id) => skillById(id)?.keystone).length,
+        bosses: s.bosses,
+        realmBest,
+        codexDone: CODEX.filter((p) => sk.pageDone(p)).length,
+        coins: this.game.count("coin"),
+        shelved: sk.shelved().length
+      };
+    }
+    progress(id) {
+      const f = featById(id);
+      return f ? f.measure(this.ctx()) : [0, 1];
+    }
+    /** Awards any feat newly done. */
+    check() {
+      const c = this.ctx(), earned = this.earned();
+      for (const f of FEATS) {
+        if (earned.includes(f.id)) continue;
+        const [have, need] = f.measure(c);
+        if (have < need) continue;
+        earned.push(f.id);
+        this.game.skills.refresh();
+        this.game.sound("victory");
+        this.game.say(`Feat: ${f.name} \xB7 ${f.perkText}. You may be known as ${f.title}.`, "victory");
+      }
+    }
+    update() {
+      if (this.game.s.elapsed < this.checkAt) return;
+      this.checkAt = this.game.s.elapsed + 3;
+      this.check();
+    }
+  };
+
   // src/game/systems/Skills.ts
   var ZERO = () => Object.fromEntries(
     [
       ...new Set(SKILLS.flatMap((n) => Object.keys(n.stats))),
-      ...CODEX.flatMap((p) => Object.keys(p.bonus))
+      ...CODEX.flatMap((p) => Object.keys(p.bonus)),
+      ...FEATS.flatMap((f) => Object.keys(f.perk))
     ].map((k) => [k, 0])
   );
   var Skills = class extends System {
@@ -14017,7 +15004,7 @@
     }
     // ─── Everything added up ───────────────────────────────────────────────────
     stats() {
-      const key = this.meta.skills.join(",") + "|" + Math.floor(this.game.s.elapsed / 2);
+      const key = this.meta.skills.join(",") + "|" + (this.meta.feats?.length ?? 0) + "|" + Math.floor(this.game.s.elapsed / 2);
       if (this.cache?.key === key) return this.cache.stats;
       const out = ZERO();
       const add = (st) => {
@@ -14028,8 +15015,16 @@
         if (n) add(n.stats);
       }
       for (const p of CODEX) if (this.pageDone(p)) add(p.bonus);
+      for (const id of this.meta.feats ?? []) {
+        const f = featById(id);
+        if (f) add(f.perk);
+      }
       this.cache = { key, stats: out };
       return out;
+    }
+    /** Forgets the cached totals (after a feat, say). */
+    refresh() {
+      this.cache = null;
     }
     get(k) {
       return this.stats()[k] ?? 0;
@@ -14711,10 +15706,10 @@
         );
         return;
       }
-      const at = animal.x === void 0 ? this.game.s.player : animal;
+      const at2 = animal.x === void 0 ? this.game.s.player : animal;
       const breath = this.game.skills.get("killStamina");
       if (breath) this.game.s.vitals.stamina = clamp(this.game.s.vitals.stamina + breath, 0, 100);
-      const more = this.game.pocket.lootScale(at.x);
+      const more = this.game.pocket.lootScale(at2.x);
       if (spec && !animal.minion && animal.type !== "deer") {
         const coins = Math.max(
           1,
@@ -14722,7 +15717,7 @@
             spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more * (1 + this.game.skills.get("coins") + (this.game.equipment.fullSet() === "gilded" ? 0.25 : 0))
           )
         );
-        this.game.drops.spawn("coin", coins, at.x, at.y - 20);
+        this.game.drops.spawn("coin", coins, at2.x, at2.y - 20);
       }
       if (spec) {
         for (const [id, min, max, chance] of spec.loot)
@@ -14730,8 +15725,8 @@
             this.game.drops.spawn(
               id,
               Math.max(1, Math.round((min + Math.floor(this.game.rng() * (max - min + 1))) * more)),
-              at.x,
-              at.y - 20
+              at2.x,
+              at2.y - 20
             );
       }
       this.game.progress.record("kill:" + animal.type);
@@ -15224,6 +16219,7 @@
     combat = new Combat(this);
     armoury = new Armoury(this);
     skills = new Skills(this);
+    feats = new Feats(this);
     bosses = new Bosses(this);
     realms = new Realms(this);
     pocket = new Pocket(this);
@@ -15309,7 +16305,7 @@
         pocket: null,
         realms: {},
         armoury: {},
-        meta: { renown: 0, skills: [], mastery: {} },
+        meta: { renown: 0, skills: [], mastery: {}, feats: [] },
         placing: null,
         dead: false,
         lastSave: Date.now()
@@ -15337,6 +16333,7 @@
       this.equipment.update(dt);
       this.realms.update(dt);
       this.pocket.update(dt);
+      this.feats.update();
       this.town.update(dt);
       this.ailments.update(dt);
       this.survival.update(dt);
@@ -16237,6 +17234,7 @@
     leviathan: "#5a9ac0",
     forgeborn: "#8a2a1a",
     druid: "#8ad070",
+    ascended: "#e8d8ff",
     warden: "#8a9098",
     bulwark: "#c04a3a",
     aegis: "#f0e0a0",
@@ -16456,6 +17454,10 @@
     garden_fragment: ["scroll", "#8ad070"],
     garden_key: ["key", "#8ad070"],
     diving_bell: ["crate", "#5a9ac0"],
+    fracture_shard: ["crystal", "#d8a0ff"],
+    fractured_key: ["key", "#e0c0ff"],
+    ascended_ingot: ["ingot", "#e8d8ff"],
+    world_prism: ["gem", "#f0d8ff"],
     respirator: ["ring", "#8a9aa8"],
     plague_ivory: ["ore", "#e6dcc6", "#5a6a3a"],
     fever_bloom: ["bundle", "#e8f070"],
@@ -20354,6 +21356,7 @@
     crown_gold: { rock: "#5a4a2a", fleck: "#f0c850", shine: "#fff0a0" },
     abyssal_pearl: { rock: "#3a4a5a", crystal: "#e8f8ff", glow: true },
     heartstone: { rock: "#3a1a10", crystal: "#ff8a3a", glow: true },
+    fracture_shard: { rock: "#2a1c3a", crystal: "#e0c0ff", glow: true },
     coal: { rock: "#5a5a5e", fleck: "#1c1c20", shine: "#8a8a96" },
     ice: { rock: "#8fb8d0", crystal: "#dff4ff" },
     obsidian: { rock: "#3a3448", crystal: "#2a2433", shine: "#9a8ac0" },
@@ -22640,7 +23643,7 @@
       }
     }
     const mean = (v) => v.reduce((a, b) => a + b, 0) / v.length;
-    const cost = (v) => previous && previous.length === v.length ? v.reduce((sum, n, i) => sum + Math.abs(n - previous[i]), 0) + Math.abs(mean(v) - center) * 0.35 : Math.abs(mean(v) - center);
+    const cost = (v) => previous && previous.length === v.length ? v.reduce((sum2, n, i) => sum2 + Math.abs(n - previous[i]), 0) + Math.abs(mean(v) - center) * 0.35 : Math.abs(mean(v) - center);
     return candidates.reduce((best, v) => cost(v) < cost(best) ? v : best);
   }
 
@@ -22767,12 +23770,12 @@
     return g;
   }
   function adsr(k, t, dur, a, d, s, r, peak) {
-    const g = k.ctx.createGain(), p = g.gain, at = Math.max(2e-3, Math.min(a, dur * 0.9));
+    const g = k.ctx.createGain(), p = g.gain, at2 = Math.max(2e-3, Math.min(a, dur * 0.9));
     p.setValueAtTime(0, t);
-    p.linearRampToValueAtTime(peak, t + at);
-    p.setTargetAtTime(peak * s, t + at, d / 3 + 1e-3);
-    p.setTargetAtTime(0, t + Math.max(dur, at), r / 3 + 1e-3);
-    return { g, end: t + Math.max(dur, at) + r * 2.5 + 0.02 };
+    p.linearRampToValueAtTime(peak, t + at2);
+    p.setTargetAtTime(peak * s, t + at2, d / 3 + 1e-3);
+    p.setTargetAtTime(0, t + Math.max(dur, at2), r / 3 + 1e-3);
+    return { g, end: t + Math.max(dur, at2) + r * 2.5 + 0.02 };
   }
   function adsrN(n, k, t, dur, a, d, s, r, peak) {
     const envs = Array.from({ length: n }, () => adsr(k, t, dur, a, d, s, r, peak));
@@ -24551,13 +25554,13 @@
      */
     progression(bar, symbols) {
       const out = [];
-      let at = bar;
+      let at2 = bar;
       for (const token of symbols.trim().split(/\s+/)) {
         if (token === "|") continue;
         const [sym, len] = token.split(":");
         const bars = len ? Number(len) : 1;
-        out.push([parseChord(sym), at, bars]);
-        at += bars;
+        out.push([parseChord(sym), at2, bars]);
+        at2 += bars;
       }
       return out;
     }
@@ -24565,12 +25568,12 @@
     pad(part, bar, symbols, center = 62, opts = {}) {
       let prev;
       const prog = this.progression(bar, symbols);
-      for (const [chord, at, bars] of prog) {
+      for (const [chord, at2, bars] of prog) {
         prev = voiceChord(chord, center, prev);
         for (const m of prev)
           this.note(
             part,
-            this.beat(at),
+            this.beat(at2),
             m + (opts.transpose ?? 0),
             bars * this.bpb * (opts.gate ?? 1),
             opts.vel ?? 1
@@ -24588,7 +25591,7 @@
         throw new Error(`${this.meta.id}/${part}: rhythm needs ${this.stepsPerBar} steps`);
       let prev;
       const prog = this.progression(bar, symbols);
-      for (const [chord, at, bars] of prog) {
+      for (const [chord, at2, bars] of prog) {
         const low = pitchAtOrAbove(chord.root, center - 7);
         prev = chord.intervals.length === 2 ? [low, low + 7, low + 12] : voiceChord(chord, center, prev);
         const total = Math.round(bars * this.stepsPerBar);
@@ -24601,7 +25604,7 @@
           for (const m of prev)
             this.note(
               part,
-              this.beat(at) + s / this.spb,
+              this.beat(at2) + s / this.spb,
               m + (opts.transpose ?? 0),
               len / this.spb * (opts.gate ?? 0.9),
               vel * (opts.vel ?? 1)
@@ -24618,7 +25621,7 @@
     arp(part, bar, symbols, pattern, low = 60, rate = 2, opts = {}) {
       const idx = pattern.trim().split(/\s+/);
       const prog = this.progression(bar, symbols);
-      for (const [chord, at, bars] of prog) {
+      for (const [chord, at2, bars] of prog) {
         const tones = chordTones(chord, low);
         const steps = Math.round(bars * this.stepsPerBar);
         for (let s = 0, k = 0; s < steps; s += rate, k++) {
@@ -24628,7 +25631,7 @@
           const m = tones[i % tones.length] + 12 * Math.floor(i / tones.length);
           this.note(
             part,
-            this.beat(at) + s / this.spb,
+            this.beat(at2) + s / this.spb,
             m + (opts.transpose ?? 0),
             Math.min(rate, steps - s) / this.spb * (opts.gate ?? 0.9),
             opts.vel ?? 1
@@ -24648,7 +25651,7 @@
         return [deg, Number(len || 4)];
       });
       const prog = this.progression(bar, symbols);
-      for (const [chord, at, bars] of prog) {
+      for (const [chord, at2, bars] of prog) {
         const root = pitchAtOrAbove(chord.bass, low);
         const third = chord.intervals.find((i) => i === 3 || i === 4) ?? 4;
         const seventh = chord.intervals.find((i) => i === 10 || i === 11) ?? 10;
@@ -24667,7 +25670,7 @@
             if (!(deg in offsets)) throw new Error(`${this.meta.id}/${part}: bad bass degree ${deg}`);
             this.note(
               part,
-              this.beat(at) + s / this.spb,
+              this.beat(at2) + s / this.spb,
               root + offsets[deg] + (opts.transpose ?? 0),
               Math.min(len, steps - s) / this.spb * (opts.gate ?? 0.9),
               opts.vel ?? 1
@@ -24684,8 +25687,8 @@
       this.events.push({ t: this.beat(bar), d: bars * this.bpb, p: part, param, from, to });
     }
     endOf(prog) {
-      const [, at, bars] = prog[prog.length - 1];
-      return at + bars;
+      const [, at2, bars] = prog[prog.length - 1];
+      return at2 + bars;
     }
     build() {
       const m = this.meta;
@@ -26868,6 +27871,55 @@
     }
   );
 
+  // src/audio/tracks/fractured.ts
+  var fractured = compose(
+    {
+      id: "fractured",
+      title: "Seams",
+      mood: "The Fractured Realms",
+      bpm: 100,
+      bars: 24,
+      parts: {
+        kick: { inst: "kick", vol: 0.6 },
+        snare: { inst: "snare", vol: 0.4, rev: 0.3 },
+        hat: { inst: "hat", vol: 0.3, pan: 0.3 },
+        pulse: { inst: "pulse", vol: 0.45, rev: 0.3, echo: 0.3, pan: -0.2 },
+        supersaw: { inst: "supersaw", vol: 0.35, rev: 0.5, cutoff: 2e3 },
+        crystal: { inst: "crystal", vol: 0.5, rev: 0.6, echo: 0.3 },
+        bell: { inst: "bell", vol: 0.4, rev: 0.7 },
+        synthbass: { inst: "synthbass", vol: 0.65 },
+        riser: { inst: "riser", vol: 0.3, rev: 0.5 }
+      },
+      echoBeats: 0.75,
+      echoFeedback: 0.45
+    },
+    (s) => {
+      const progA = "Bm G D A Bm G Em F#", progB = "G A Bm Bm G A F# F#";
+      const beat = (bar, prog, skip) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("kick", bar, skip ? "x..x..x...x..x.." : "x.......x.......", n);
+        s.grid("snare", bar, "....x.......x..x", n, { vel: 0.7 });
+        s.grid("hat", bar, "x.x.x.xxx.x.x.xx", n, { vel: 0.5 });
+        s.bass("synthbass", bar, prog, "R:3 R:3 R:2 5:4 R:4", 35);
+        s.pad("supersaw", bar, prog, 60, { vel: 0.5 });
+      };
+      const shard = "b5:2 d6:2 f#6:4 e6:2 d6:2 c#6:4 | c#6:4 a5:4 b5:8 | d6:2 f#6:2 a6:4 g6:4 e6:4 | f#6:16 | b5:2 b5:2 d6:4 b5:2 f#5:2 a5:4 | g5:4 e5:4 b5:8 | a#5:4 c#6:4 e6:4 f#6:4 | b5:16";
+      s.play("pulse", 0, shard);
+      beat(0, progA, false);
+      s.play(
+        "crystal",
+        8,
+        "d6:8 e6:8 | f#6:12 r:4 | b5:8 d6:8 | f#5:16 | g5:8 a5:8 | b5:8 c#6:8 | a#5:16 | f#5:16"
+      );
+      for (let b = 8; b < 16; b += 2) s.at("bell", b + 1, b % 4 ? "f#6" : "b5", 2, 0.6);
+      s.play("riser", 14, "b4:32", { vel: 0.6 });
+      beat(8, progB, true);
+      s.play("pulse", 16, shard);
+      s.play("crystal", 16, shard, { transpose: -12, vel: 0.5 });
+      beat(16, progA, true);
+    }
+  );
+
   // src/audio/tracks/town.ts
   var town = compose(
     {
@@ -27014,7 +28066,8 @@
     gutter,
     undertow,
     emberheart,
-    garden
+    garden,
+    fractured
   ];
   var TRACKS = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
 
@@ -27105,14 +28158,14 @@
     listener.x = x;
     listener.y = y;
   }
-  function effect(kind, at, strength = 1) {
+  function effect(kind, at2, strength = 1) {
     start();
     if (!ac || !sfxBus) return;
     const now = ac.currentTime, gap = MIN_GAP[kind] ?? (kind.startsWith("step") ? 0.12 : 0.03);
     if (now - (lastPlayed.get(kind) ?? -1) < gap) return;
     let pan = 0, level = strength;
-    if (at) {
-      const dx = at.x - listener.x, d = Math.hypot(dx, (at.y - listener.y) * 1.4);
+    if (at2) {
+      const dx = at2.x - listener.x, d = Math.hypot(dx, (at2.y - listener.y) * 1.4);
       if (d > 1100) return;
       pan = Math.max(-0.85, Math.min(0.85, dx / 650));
       level *= 1 / (1 + (d / 420) ** 2);
@@ -27173,7 +28226,8 @@
     gutter: "gutter",
     undertow: "undertow",
     emberheart: "emberheart",
-    garden: "garden"
+    garden: "garden",
+    fractured: "fractured"
   };
   var DUNGEON_TRACKS = {
     crypt: "dungeon",
@@ -27741,6 +28795,7 @@
     if (tab === "notes") renderNotes(left, right);
     if (tab === "beasts") {
       if (state.beastsView === "codex") renderCodex(left, right);
+      else if (state.beastsView === "feats") renderFeats(left, right);
       else renderBeasts(left, right);
     }
     if (tab === "gear") {
@@ -28290,7 +29345,9 @@
         const [a2, b2] = sk.page(p2);
         return `<div class="book-row ${state.codexPage === p2.id ? "selected" : ""}"><div><strong>${p2.name}</strong><small>${a2 >= b2 ? "\u2713 " : ""}${p2.bonusText}</small></div><div><span class="qty">${a2}/${b2}</span><button data-page="${p2.id}">READ</button></div></div>`;
       }).join("")}</div>`
-    ).join("")}<div class="book-actions"><button class="quiet" data-beasts>\u2039 BEASTS</button></div>`;
+    ).join(
+      ""
+    )}<div class="book-actions"><button class="quiet" data-beasts>\u2039 BEASTS</button><button data-feats>FEATS \u203A</button></div>`;
     const p = CODEX.find((x) => x.id === state.codexPage) ?? CODEX[0], tally = game.s.tutorial.tally, [a, b] = sk.page(p);
     const entry = (e) => {
       const found = (tally[p.prefix + e] ?? 0) > 0, mob = p.prefix === "kill:" && MOBS[e], name = mob ? MOBS[e].name : BIOMES.find((x) => x.id === e)?.name ?? DUNGEONS.find((d) => d.def.id === e)?.def.name ?? realmById(e)?.name ?? (ITEMS[e] ? pretty(e) : e[0].toUpperCase() + e.slice(1));
@@ -28309,6 +29366,44 @@
       state.beastsView = "beasts";
       renderJournal();
     };
+    left.querySelector("[data-feats]").onclick = () => {
+      state.beastsView = "feats";
+      renderJournal();
+    };
+  }
+  function renderFeats(left, right) {
+    const feats = game.feats, c = feats.ctx(), done = feats.earned();
+    const groups = [...new Set(FEATS.map((f) => f.group))];
+    left.innerHTML = `<h2>Feats</h2><p class="lede">${done.length} of ${FEATS.length} deeds done. Each leaves a small gift for good, and a title you may wear.</p>${groups.map(
+      (g) => `<h3>${g}</h3><div class="book-list">${FEATS.filter((f) => f.group === g).map((f) => {
+        const [have, need] = f.measure(c), got = done.includes(f.id);
+        return `<div class="book-row ${got ? "" : "muted-row"}"><div><strong>${got ? "\u2713 " : ""}${f.name}</strong><small>${f.text} \xB7 ${f.perkText}</small></div><span class="qty">${got ? "DONE" : `${Math.floor(have)}/${need}`}</span></div>`;
+      }).join("")}</div>`
+    ).join(
+      ""
+    )}<div class="book-actions"><button class="quiet" data-codex>\u2039 THE CODEX</button></div>`;
+    const worn2 = feats.title();
+    right.innerHTML = `<h2>Titles</h2><p class="lede">${worn2 ? `You are known as <strong>${worn2}</strong>.` : "You wear no title yet."}</p><div class="book-list">${done.map((id) => featById(id)).map(
+      (f) => f && `<div class="book-row ${feats.title() === f.title ? "selected" : ""}"><div><strong>${f.title}</strong><small>${f.name}</small></div><button data-wear="${f.id}">WEAR</button></div>`
+    ).join("") || "<p>Do something worth remembering.</p>"}</div>${worn2 ? '<div class="book-actions"><button class="quiet" data-unwear>WEAR NO TITLE</button></div>' : ""}`;
+    left.querySelector("[data-codex]").onclick = () => {
+      state.beastsView = "codex";
+      renderJournal();
+    };
+    right.querySelectorAll("[data-wear]").forEach(
+      (b) => b.onclick = () => {
+        feats.wear(b.dataset.wear ?? null);
+        renderJournal();
+        updateUI(true);
+      }
+    );
+    const off = right.querySelector("[data-unwear]");
+    if (off)
+      off.onclick = () => {
+        feats.wear(null);
+        renderJournal();
+        updateUI(true);
+      };
   }
   function renderArmoury(left, right) {
     const arm = game.armoury, owned = (id2) => game.count(id2) > 0;
@@ -28330,7 +29425,7 @@
     const infusions = INFUSIONS.filter((i) => game.count(i.item) > 0 || game.dev.god), gems = Object.keys(GEMS).filter((g) => game.count(g) > 0 || game.dev.god);
     right.innerHTML = `<h2 style="color:${has ? q.color : "inherit"}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} \xB7 tier ${tier} (${tierOf(tier).name}) \xB7 ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` \xB7 ${ranged.kind === "bow" ? "shots" : "mana " + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` \xB7 reach ${Math.round(st.reach)} \xB7 swing \xD7${st.pace.toFixed(2)}`} \xB7 crit ${Math.round(st.crit * 100)}%${st.defense ? ` \xB7 +${st.defense} defense` : ""}</p>${has ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? "disabled" : ""}>${game.s.player.weapon === id ? "IN HAND" : "READY IT"}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (\xD7${q.mult}) \xB7 level <strong>+${e.lvl}</strong> / ${MAX_LEVEL} \xB7 infusion <strong>${e.inf ? infusionById(e.inf)?.name : "none"}</strong> \xB7 sockets <strong>${e.gems.map((g) => GEMS[g].name).join(", ") || "\u2014"}</strong> (${e.gems.length}/${q.sockets})</p>${stage >= 0 ? `<h3>Evolve \xB7 choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0].map(
       (ev, i) => `<div class="book-row"><div><strong>${ev.name}</strong><small>${ev.text}</small></div><button data-evolve="${i}">CHOOSE</button></div>`
-    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button></div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button></div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
+    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
     left.querySelectorAll("[data-weapon]").forEach(
       (b) => b.onclick = () => {
         state.armourySel = b.dataset.weapon ?? id;
@@ -28349,6 +29444,7 @@
     const on = (sel, fn) => right.querySelectorAll(sel).forEach((b) => b.onclick = () => act(fn(b)));
     on("[data-upgrade]", () => arm.upgrade(id));
     on("[data-reforge]", () => arm.reforge(id));
+    on("[data-shard]", () => arm.reforge(id, true));
     on("[data-evolve]", (b) => arm.evolve(id, Number(b.dataset.evolve)));
     on("[data-infuse]", (b) => arm.infuse(id, b.dataset.infuse ?? ""));
     on("[data-gem]", (b) => arm.socket(id, b.dataset.gem ?? ""));
@@ -28360,13 +29456,13 @@
   }
   function wardText(ward) {
     const sets = ARMOR_SETS.filter((x) => x.bonus === ward).map((x) => `the ${x.name} set`), charms = Object.entries(ACCESSORIES).filter(([, a]) => a.effects.includes(ward)).map(([id]) => `the ${pretty(id)}`);
-    const all = [...sets, ...charms];
-    return all.length ? ` <em>Ward: ${all.join(" or ")}.</em>` : "";
+    const all2 = [...sets, ...charms];
+    return all2.length ? ` <em>Ward: ${all2.join(" or ")}.</em>` : "";
   }
   function renderAtlas(left, right) {
     const pocket = game.pocket, open = game.s.pocket, stone = pocket.waystoneNear();
-    const tier = (t) => TIER_NAMES[t] ?? String(t);
-    left.innerHTML = `<h2>The Atlas</h2><p class="lede">Each realm lies behind its own key. Turn one in a Waystone and the realm is built anew: its tier sets how hard it bites and how much it gives.</p>${open ? `<div class="note-block">Open now: <strong>${realmById(open.realm)?.name}</strong> \xB7 Tier ${tier(open.tier)}${open.mods.length ? " \xB7 " + open.mods.map((m) => modById(m)?.name).join(", ") : ""}${open.cleared ? " \xB7 its master is slain" : ""}.</div>` : ""}<h3>Realms</h3><div class="book-list">${REALMS.map((r2) => {
+    const tier = (t) => tierName(t);
+    left.innerHTML = `<h2>The Atlas</h2><p class="lede">Each realm lies behind its own key. Turn one in a Waystone and the realm is built anew: its tier sets how hard it bites and how much it gives.</p>${open ? `<div class="note-block">Open now: <strong>${templateOf(open)?.name}</strong> \xB7 Tier ${tier(open.tier)}${open.mods.length ? " \xB7 " + open.mods.map((m) => modById(m)?.name).join(", ") : ""}${open.cleared ? " \xB7 its master is slain" : ""}.</div>` : ""}<h3>Realms</h3><div class="book-list">${REALMS.map((r2) => {
       const rec2 = pocket.record(r2.id);
       return `<div class="book-row ${state.atlasRealm === r2.id ? "selected" : ""}"><div class="with-icon">${icon(r2.key)}<div><strong>${r2.name}</strong><small>Band ${tier(r2.band)} \xB7 ${rec2.visits ? "best tier " + (rec2.best ? tier(rec2.best) : "\u2014") : "unvisited"}${rec2.relic ? " \xB7 relic found" : ""}</small></div></div><div><span class="qty">\xD7${game.count(r2.key)}</span><button data-realm="${r2.id}">VIEW</button></div></div>`;
     }).join(
@@ -28375,17 +29471,14 @@
     const r = realmById(state.atlasRealm) ?? REALMS[0], rec = pocket.record(r.id), max = pocket.maxTier(r.id);
     state.atlasTier = Math.min(Math.max(1, state.atlasTier), max);
     const keys2 = game.count(r.key), canOpen = (!!stone || game.dev.god) && (keys2 > 0 || game.dev.god);
-    right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> \xB7 ${r.hazard.text}${wardText(r.hazard.ward)}</p><p>Great foe: <strong>${MOBS[r.boss]?.name}</strong> \xB7 relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? " (found)" : ""}<br>Signature: <strong>${pretty(r.material)}</strong> \xB7 Temperature ${r.temp}\xB0C</p><h3>Tier</h3><div class="farm-choice">${[
-      1,
-      2,
-      3,
-      4,
-      5
-    ].map(
+    right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> \xB7 ${r.hazard.text}${wardText(r.hazard.ward)}</p><p>Great foe: <strong>${MOBS[r.boss]?.name}</strong> \xB7 relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? " (found)" : ""}<br>Signature: <strong>${pretty(r.material)}</strong> \xB7 Temperature ${r.temp}\xB0C</p><h3>Tier</h3><div class="farm-choice">${Array.from(
+      { length: 5 },
+      (_, i) => i + Math.max(1, Math.min(max, state.atlasTier) - 2)
+    ).map(
       (t) => `<button class="tiny-button ${t === state.atlasTier ? "active" : ""}" data-tier="${t}" ${t > max ? "disabled" : ""}>${tier(t)}</button>`
     ).join(
       ""
-    )}</div><p class="muted">Monsters \xD7${TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, \xD7${TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm \xB7 loot \xD7${TIER_SCALE.loot(state.atlasTier).toFixed(2)} \xB7 ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? "" : "s"}.</p><div class="book-actions"><button data-open-realm ${canOpen ? "" : "disabled"}>OPEN \xB7 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? "" : "disabled"}>RETURN TO ${realmById(open.realm)?.name.toUpperCase()}</button>` : ""}</div><div class="note-block">${stone ? "The Waystone hums beside you." : "Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal."} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a ${RECIPES.find((x) => x.id === r.fragment)?.station ?? "workbench"}${r.band > 1 ? ` from the spoils of Band ${TIER_NAMES[r.band - 1]} realms` : ""}, or found in the realms.</div>${open?.realm === r.id && open.mods.length ? `<h3>This expedition</h3><div class="book-list">${open.mods.map((m) => modById(m)).map(
+    )}</div><p class="muted">Monsters \xD7${TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, \xD7${TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm \xB7 loot \xD7${TIER_SCALE.loot(state.atlasTier).toFixed(2)} \xB7 ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? "" : "s"}.</p><div class="book-actions"><button data-open-realm ${canOpen ? "" : "disabled"}>OPEN \xB7 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? "" : "disabled"}>RETURN TO ${realmById(open.realm)?.name.toUpperCase()}</button>` : ""}</div><div class="note-block">${stone ? "The Waystone hums beside you." : "Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal."} ${r.id === "fractured" ? "Keys: four fracture shards at a Waystone. Shards fall from the great foes of Band V, and from the Fractured Realms themselves." : `Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a ${RECIPES.find((x) => x.id === r.fragment)?.station ?? "workbench"}${r.band > 1 ? ` from the spoils of Band ${tierName(r.band - 1)} realms` : ""}, or found in the realms.`}</div>${open?.realm === r.id && open.mods.length ? `<h3>This expedition</h3><div class="book-list">${open.mods.map((m) => modById(m)).map(
       (m) => `<div class="book-row"><div><strong>${m?.name}</strong><small>${m?.text}</small></div><span class="qty">${m?.kind === "boon" ? "BOON" : "BANE"}</span></div>`
     ).join("")}</div>` : ""}`;
     left.querySelectorAll("[data-realm]").forEach(
@@ -28467,7 +29560,8 @@
     $("defense-value").textContent = String(game.equipment.defense());
     const [into, need] = game.skills.progress();
     $("renown-value").textContent = String(game.skills.level());
-    $("renown-points").textContent = game.skills.points() > 0 ? `\xB7 ${game.skills.points()} TO SPEND` : "";
+    const title = game.feats.title();
+    $("renown-points").textContent = game.skills.points() > 0 ? `\xB7 ${game.skills.points()} TO SPEND` : title ? `\xB7 ${title.toUpperCase()}` : "";
     $("renown-bar").style.width = clamp3(into / need * 100, 0, 100) + "%";
     $("buffs").innerHTML = Object.entries(game.s.buffs).map(
       ([id, left]) => `<span style="color:${BUFFS[id]?.color ?? "#fff"}">${(BUFFS[id]?.name ?? id).toUpperCase()} ${Math.ceil(left)}s</span>`
@@ -28518,7 +29612,7 @@
     $("realm-banner").classList.toggle("hidden", !showBanner);
     if (showBanner && $("realm-banner").dataset.at !== String(b.at)) {
       $("realm-banner").dataset.at = String(b.at);
-      $("realm-banner").innerHTML = `<small>TIER ${TIER_NAMES[b.tier]}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => modById(m)?.name).join(" \xB7 ")}</span>` : ""}<em>${realmById(game.s.pocket?.realm ?? "")?.hazard.name ?? ""}</em>`;
+      $("realm-banner").innerHTML = `<small>TIER ${tierName(b.tier)}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => modById(m)?.name).join(" \xB7 ")}</span>` : ""}<em>${realmById(game.s.pocket?.realm ?? "")?.hazard.name ?? ""}</em>`;
     }
     const msg = game.messages[0];
     if (msg && msg !== state.seenMessage) {

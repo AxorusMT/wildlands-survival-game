@@ -257,14 +257,23 @@ export class Armoury extends System {
     return { ok: true };
   }
   /** Rerolls quality at the anvil. */
-  reforge(id: string): GameResult {
+  /** Rerolls quality. A fracture shard stands in for the materials and rolls twice, keeping the better. */
+  reforge(id: string, catalyst = false): GameResult {
     const why = this.owned(id) ?? this.atAnvil(id);
     if (why) return { ok: false, reason: why };
     const [, tier] = this.classOf(id),
-      cost = reforgeCost(tier);
-    if (!this.pay(cost)) return { ok: false, reason: 'Reforging needs more materials and marks.' };
+      cost = catalyst ? { fracture_shard: 1 } : reforgeCost(tier);
+    if (!this.pay(cost))
+      return {
+        ok: false,
+        reason: catalyst
+          ? 'You need a fracture shard.'
+          : 'Reforging needs more materials and marks.',
+      };
     const e = this.record(id);
-    e.q = rollQuality(this.game.rng, 1.2);
+    e.q = catalyst
+      ? Math.max(rollQuality(this.game.rng, 1.6), rollQuality(this.game.rng, 1.6), e.q)
+      : rollQuality(this.game.rng, 1.2);
     e.gems = e.gems.slice(0, QUALITIES[e.q].sockets);
     this.game.sound('craft_anvil');
     this.game.say(`Reforged: ${this.title(id)}.`, e.q >= 3 ? 'victory' : 'good');

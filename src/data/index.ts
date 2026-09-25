@@ -17,3 +17,4 @@ export * from './realms/index.ts';
 export * from './food.ts';
 export * from './skills.ts';
 export * from './codex.ts';
+export * from './feats.ts';

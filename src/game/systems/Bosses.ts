@@ -75,6 +75,8 @@ export class Bosses extends System {
       timers: { start: s.elapsed },
     };
     if (realm) a.maxHp = a.hp = Math.round(spec.hp * this.game.pocket.hpScale());
+    // A Fractured Realm's foe comes empowered, and its fall yields shards.
+    if (realm && s.pocket?.realm === 'fractured') a.maxHp = a.hp = Math.round(a.maxHp * 1.5);
     s.animals.push(a);
     this.game.event('burst', x, y - 60, '#ffffff');
     this.game.sound('boss', x, y - 40, 1.6);
@@ -89,6 +91,8 @@ export class Bosses extends System {
     s.animals = s.animals.filter((m) => !(m.minion && m.deadUntil) && !(m === a));
     this.game.progress.record('boss:' + a.type);
     this.game.pocket.cleared(a);
+    if (s.pocket?.realm === 'fractured' && this.game.pocket.here(a.x))
+      this.game.drops.spawn('fracture_shard', 3 + s.pocket.tier, a.x, a.y - 30);
     s.vitals.morale = clamp(s.vitals.morale + 30, 0, RULES.maxVital);
     this.game.say(MOBS[a.type].name + ' is defeated!', 'victory');
     this.game.sound('victory', a.x, a.y);

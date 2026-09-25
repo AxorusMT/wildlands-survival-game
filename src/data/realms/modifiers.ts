@@ -71,7 +71,7 @@ export function rollMods(tier: number, rng: () => number): string[] {
   const pool = [...MODS],
     out: string[] = [];
   const clash: Record<string, string> = { frostbound: 'scorched', scorched: 'frostbound' };
-  while (out.length < Math.max(0, tier - 1) && pool.length) {
+  while (out.length < Math.min(6, Math.max(0, tier - 1)) && pool.length) {
     const m = pool.splice(Math.floor(rng() * pool.length), 1)[0];
     if (clash[m.id] && out.includes(clash[m.id])) continue;
     out.push(m.id);
@@ -87,3 +87,24 @@ export const TIER_SCALE = {
 };
 export const MAX_TIER = 5;
 export const TIER_NAMES = ['', 'I', 'II', 'III', 'IV', 'V'];
+/** A tier as a Roman numeral, however high it climbs (the Fractured Realms never end). */
+export function tierName(n: number) {
+  const R: [number, string][] = [
+    [1000, 'M'],
+    [900, 'CM'],
+    [500, 'D'],
+    [400, 'CD'],
+    [100, 'C'],
+    [90, 'XC'],
+    [50, 'L'],
+    [40, 'XL'],
+    [10, 'X'],
+    [9, 'IX'],
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ];
+  let out = '';
+  for (const [v, s] of R) while (n >= v) ((out += s), (n -= v));
+  return out;
+}

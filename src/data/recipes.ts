@@ -265,6 +265,9 @@ export const RECIPES: Recipe[] = (
     ['choir_stave', { rime_silver: 10, frost_lily: 4, crystal: 4 }, 'starforge', 9],
     ['bellhammer', { rime_silver: 12, bell_bronze: 4, wood: 3 }, 'starforge', 9],
     ['respirator', { iron_ingot: 4, reeds: 6, crystal: 2, hide: 2 }, 'workbench', 5],
+    // The Fractured Realms: shards open them, and forge the twelfth tier.
+    ['fractured_key', { fracture_shard: 4 }, 'waystone', 11],
+    ['ascended_ingot', { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 }, 'starforge', 12],
     // The Feverlands.
     ['venom_blade', { plague_ivory: 10, venom: 6, gold_ingot: 2 }, 'starforge', 9],
     ['plague_censer', { plague_ivory: 8, fever_bloom: 6, silk: 4 }, 'starforge', 9],
