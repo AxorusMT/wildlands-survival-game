@@ -657,6 +657,37 @@ Object.assign(STATIC, {
       for (let y = 9; y < 26; y += 4) p.line(6, y, 16, y, '#5a5e5a');
       p.rect(8, 6, 6, 2, '#d8b848');
     }),
+  signpost: () =>
+    sprite(26, 30, 13, 29, (p) => {
+      p.rect(11, 8, 4, 22, '#6a4a2c');
+      p.rect(12, 8, 1, 22, '#8a6440');
+      p.rect(1, 3, 24, 11, '#9a7048');
+      p.rect(1, 3, 24, 1, '#c09060');
+      p.rect(1, 13, 24, 1, '#6a4a2c');
+      for (const y of [6, 9]) p.line(5, y, 20, y, '#5a3c22');
+    }),
+  bramble: () =>
+    sprite(34, 22, 17, 21, (p) => {
+      p.ellipse(17, 15, 16, 7, '#3e5a2c');
+      p.ellipse(11, 11, 8, 6, '#4e6e34');
+      p.ellipse(23, 12, 9, 6, '#4a6a30');
+      for (const [x, y] of [
+        [4, 12],
+        [9, 6],
+        [16, 5],
+        [24, 7],
+        [30, 11],
+        [13, 14],
+        [21, 15],
+      ])
+        p.rect(x, y, 2, 1, '#d8c8a0');
+      for (const [x, y] of [
+        [8, 13],
+        [19, 9],
+        [27, 14],
+      ])
+        p.rect(x, y, 2, 2, '#a02a3a');
+    }),
   cairn: () =>
     sprite(20, 16, 10, 15, (p) => {
       p.ellipse(10, 13, 9, 3, '#7c7a74');

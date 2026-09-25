@@ -15,6 +15,7 @@ import { ORCHARD } from './orchard.ts';
 import { SALTFLATS } from './saltflats.ts';
 import { STEPPE } from './steppe.ts';
 import type { RealmGeometry, RealmTemplate } from './types.ts';
+import { TRAINING } from './tutorial.ts';
 import { WARREN } from './warren.ts';
 
 export * from './modifiers.ts';
@@ -58,7 +59,9 @@ export { FRACTURED_LOOT, fracture } from './fractured.ts';
 /** The template an expedition was built from (a Fractured one is spliced from its seed). */
 export const templateOf = (inst: { realm: string; seed: number }) =>
   inst.realm === 'fractured' ? fracture(inst.seed) : realmById(inst.realm);
-export const realmById = (id: string) => REALMS.find((r) => r.id === id);
+export const realmById = (id: string) =>
+  id === TRAINING.id ? TRAINING : REALMS.find((r) => r.id === id);
+export { TRAINING, COURSE_BRAMBLES, COURSE_HOLLOW } from './tutorial.ts';
 export const REALM_IDS = new Set(REALMS.map((r) => r.id));
 
 /** One expedition into a realm: which, how hard, its seed, and its modifiers. */

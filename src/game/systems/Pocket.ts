@@ -5,6 +5,7 @@ import { BUFFS } from '../../data/gear.ts';
 import { itemName } from '../../data/items.ts';
 import { LORE, MERCHANT_GOODS } from '../../data/lore.ts';
 import { MOBS } from '../../data/mobs.ts';
+import { COURSE } from '../../data/tutorial.ts';
 import {
   MAX_TIER,
   REALMS,
@@ -13,6 +14,9 @@ import {
   templateOf,
   TIER_SCALE,
   AIR_SECONDS,
+  COURSE_BRAMBLES,
+  COURSE_HOLLOW,
+  TRAINING,
   FEVER_BITES,
   FEVER_CHANCE,
   ashStorm,
@@ -86,6 +90,7 @@ export class Pocket extends System {
   private ventAt = 0;
   private stormWas = false;
   private submergedWas = false;
+  private leaveAsked = -99;
   /** The latest arrival, for the interface's banner. */
   banner: { name: string; tier: number; mods: string[]; at: number } | null = null;
 
@@ -233,6 +238,84 @@ export class Pocket extends System {
     return { ok: true };
   }
 
+  // ─── The Training Grounds ──────────────────────────────────────────────────
+  /** Whether the open realm is the Training Grounds. */
+  inCourse() {
+    return this.game.s.pocket?.realm === TRAINING.id;
+  }
+  /** Lays out the Training Grounds and sets a new traveller down at its start. */
+  startCourse(): GameResult {
+    const s = this.game.s,
+      hx = RULES.spawnX;
+    this.load(
+      {
+        realm: TRAINING.id,
+        tier: 1,
+        seed: 1,
+        mods: [],
+        opened: s.elapsed,
+        home: { x: hx, y: this.game.groundTopAt(hx) },
+      },
+      true,
+    );
+    const x = POCKET.start + POCKET.arrive + 180;
+    this.game.realms.teleport(x, this.game.groundTopAt(x) + 1);
+    s.tutorial.course = 0;
+    this.banner = { name: TRAINING.name, tier: 0, mods: [], at: s.elapsed };
+    this.game.say(
+      'Welcome to the Training Grounds. Walk up to the signpost and press E.',
+      'victory',
+    );
+    return { ok: true };
+  }
+  /**
+   * Leaves the course for the wildlands: finished at the far portal, or skipped (the near
+   * portal asks twice, so a stray press does not end the course).
+   */
+  finishCourse(done = true, ask = !done): GameResult {
+    const s = this.game.s;
+    if (!this.inCourse()) return { ok: false, reason: 'You are not on the course.' };
+    if (ask && s.elapsed - this.leaveAsked > 4) {
+      this.leaveAsked = s.elapsed;
+      return { ok: false, reason: 'Press E again to skip the rest of the course.' };
+    }
+    if (done) this.game.progress.record('course:done');
+    s.tutorial.course = COURSE.length;
+    this.close();
+    // With the course behind you, the field tasks catch up with what you have already done.
+    this.game.progress.record('course:left');
+    this.game.say(
+      done
+        ? 'Course complete. The wildlands are yours to cross.'
+        : 'You leave the Training Grounds for the wildlands.',
+      'victory',
+    );
+    return { ok: true };
+  }
+  /** The course's own triggers: the hollow below the ledges, and the brambles. */
+  private coach() {
+    const s = this.game.s,
+      p = s.player,
+      lx = p.x - POCKET.start,
+      t = s.tutorial.tally;
+    if (
+      !t['course:climb'] &&
+      lx > COURSE_HOLLOW.x0 &&
+      lx < COURSE_HOLLOW.x1 &&
+      p.y > COURSE_HOLLOW.y
+    )
+      this.game.progress.record('course:climb');
+    if (!t['course:bramble'] && lx > COURSE_BRAMBLES[0] && lx < COURSE_BRAMBLES[1]) {
+      this.game.progress.record('course:bramble');
+      this.game.ailments.contract('bleeding', true);
+      this.game.sound('hurt', p.x, p.y);
+      this.game.say(
+        'The brambles tear at you. Open the chest ahead and bandage the bleeding.',
+        'danger',
+      );
+    }
+  }
+
   // ─── Building the realm ────────────────────────────────────────────────────
   /** Fills the pocket strip with a realm (clearing whatever was there), furnished if fresh. */
   load(inst: RealmInstance, fresh: boolean) {
@@ -308,6 +391,16 @@ export class Pocket extends System {
         f = floors[Math.floor(rng() * floors.length)];
       return ctx.floorAt(x0 + lx, f(lx) - 30);
     };
+    // The Training Grounds are laid by hand: a way home, then its own stations.
+    if (tpl.course) {
+      const ax = x0 + geo.arrive;
+      g.realms.furnish('portal', ax, g.floorNear(ax, geo.floors[0](geo.arrive) - 40), {
+        kind: 'home',
+      });
+      tpl.extra?.(geo, ctx);
+      for (const st of g.s.structures) if (st.type === 'icebox' && inPocket(st.x)) st.fuel = 3600;
+      return;
+    }
     // Resources, thicker with Bountiful, ore doubled by Rich Veins.
     const nodes: [string, number][] = tpl.nodes.map(([k, w]) => [
       k,
@@ -673,6 +766,7 @@ export class Pocket extends System {
       }
     }
     if (!this.here() || s.dead) return;
+    if (this.inCourse()) return this.coach();
     const tpl = templateOf(inst)!,
       fx = this.game.equipment.effects(),
       v = s.vitals;

@@ -5,7 +5,7 @@ import { activeRealm } from '../../data/realms/index.ts';
 import { ITEMS } from '../../data/items.ts';
 import { NODES } from '../../data/resources.ts';
 import { isAggressive } from '../../data/mobs.ts';
-import { dimensionAt, surfaceAt } from '../../data/world.ts';
+import { POCKET, dimensionAt, surfaceAt } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -85,6 +85,12 @@ export class Survival extends System {
         );
     this.game.s.player.x = stands ? bed.x + 20 : RULES.spawnX;
     this.game.s.player.y = stands ? bed.y : this.game.groundTopAt(RULES.spawnX) + 1;
+    // A fall on the Training Grounds wakes you back at its start.
+    if (this.game.pocket.inCourse()) {
+      const x = POCKET.start + POCKET.arrive + 180;
+      this.game.s.player.x = x;
+      this.game.s.player.y = this.game.groundTopAt(x) + 1;
+    }
     this.game.s.player.vx = 0;
     this.game.s.player.vy = 0;
     this.game.s.player.grounded = true;

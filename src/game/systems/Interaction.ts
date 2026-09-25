@@ -6,6 +6,7 @@ import { STORAGE } from '../../data/food.ts';
 import { RULES } from '../rules.ts';
 
 import { LORE } from '../../data/lore.ts';
+import { STATIONS } from '../../data/tutorial.ts';
 
 import { System } from './System.ts';
 
@@ -20,6 +21,7 @@ export class Interaction extends System {
         .filter(
           (st) =>
             st.type !== 'torch' &&
+            st.type !== 'bramble' &&
             !st.type.startsWith('trap_') &&
             !(st.type === 'dungeon_chest' && st.crop === 'open'),
         )
@@ -86,8 +88,11 @@ export class Interaction extends System {
       this.game.realms.socket();
       return { ok: true, action: 'rift', structure: st };
     }
-    if (st.type === 'portal')
+    if (st.type === 'portal') {
+      if (this.game.pocket.inCourse() && this.game.pocket.here(st.x))
+        return this.game.pocket.finishCourse(st.kind === 'course');
       return this.game.pocket.here(st.x) ? this.game.pocket.leave() : this.game.realms.goHome();
+    }
     if (st.type === 'waystone') return { ok: true, action: 'atlas', structure: st };
     if (st.type === 'shrine') return this.game.pocket.pray(st);
     if (st.type === 'kiln') return { ok: false, reason: 'An old kiln. It still smelts ore.' };
@@ -126,6 +131,11 @@ export class Interaction extends System {
       if (first) this.game.skills.gain(10);
       this.game.sound('page', st.x, st.y);
       this.game.say(`The tablet reads: “${LORE[i % LORE.length]}”`, 'ink');
+    } else if (st.type === 'signpost') {
+      const i = Number(st.kind) || 0;
+      this.game.progress.record('sign:' + i);
+      this.game.sound('page', st.x, st.y);
+      this.game.say(STATIONS[i]?.sign ?? 'The sign is weathered blank.', 'ink');
     } else if (st.type === 'cairn') {
       this.game.say('Stones piled with care. Something lies sealed in the rock below.', 'ink');
     } else if (st.type === 'merchant_stall') {

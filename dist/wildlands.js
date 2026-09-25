@@ -34,6 +34,9 @@
     CHAPTERS: () => CHAPTERS,
     CLOTHING: () => CLOTHING,
     CODEX: () => CODEX,
+    COURSE: () => COURSE,
+    COURSE_BRAMBLES: () => COURSE_BRAMBLES,
+    COURSE_HOLLOW: () => COURSE_HOLLOW,
     CRYSTALS: () => CRYSTALS,
     DIET_MEMORY: () => DIET_MEMORY,
     DIMENSIONS: () => DIMENSIONS,
@@ -119,6 +122,7 @@
     SKY_SEA: () => SKY_SEA,
     STAGE_FORCE: () => STAGE_FORCE,
     STAGE_NAMES: () => STAGE_NAMES,
+    STATIONS: () => STATIONS,
     STATION_LINES: () => STATION_LINES,
     STATION_QUALITY: () => STATION_QUALITY,
     STORAGE: () => STORAGE,
@@ -131,6 +135,7 @@
     TILE_ROWS: () => TILE_ROWS,
     TILE_YIELD: () => TILE_YIELD,
     TOOL_TIERS: () => TOOL_TIERS,
+    TRAINING: () => TRAINING,
     TREES: () => TREES,
     TREE_NODES: () => TREE_NODES,
     TUTORIAL: () => TUTORIAL,
@@ -209,6 +214,7 @@
     skillById: () => skillById,
     sporeBloom: () => sporeBloom,
     starPulse: () => starPulse,
+    stationOf: () => stationOf,
     surfaceAt: () => surfaceAt,
     syncPocket: () => syncPocket,
     templateOf: () => templateOf,
@@ -2874,6 +2880,8 @@
     garden_key: ["Garden of Lost Seasons key", "key"],
     diving_bell: ["Diving bell", "structure"],
     lore_tablet: ["Lore tablet", "structure"],
+    signpost: ["Signpost", "structure"],
+    bramble: ["Bramble", "structure"],
     cairn: ["Cairn", "structure"],
     merchant_stall: ["Wanderer's stall", "structure"],
     respirator: ["Respirator", "accessory"],
@@ -3659,13 +3667,13 @@
       hollow: { x0: DIM_WIDTH - 1500, x1: DIM_WIDTH - 260, top: 2150, bottom: 2780 },
       ladders: [0.12, 0.34, 0.58, 0.8].map((f) => Math.round(DIM_WIDTH * f)),
       tile(x, y) {
-        const floor = geo.floor(x), ceil = geo.ceiling(x), h = geo.hollow;
+        const floor2 = geo.floor(x), ceil = geo.ceiling(x), h = geo.hollow;
         const drip2 = Math.max(0, noise1(x / 60, ch(207)) - 0.45) * 520;
-        const open = y > ceil + drip2 && y < floor || Math.abs(y - geo.tunnel(x)) < 70 + 14 * Math.sin(x / 83) || x > h.x0 && x < h.x1 && y > h.top + 60 * Math.abs(Math.sin((x - h.x0) / 300)) && y < h.bottom || geo.ladders.some(
-          (lx) => Math.abs(x - lx) < 44 && y > floor - 10 && y < geo.tunnel(lx) + 40
+        const open = y > ceil + drip2 && y < floor2 || Math.abs(y - geo.tunnel(x)) < 70 + 14 * Math.sin(x / 83) || x > h.x0 && x < h.x1 && y > h.top + 60 * Math.abs(Math.sin((x - h.x0) / 300)) && y < h.bottom || geo.ladders.some(
+          (lx) => Math.abs(x - lx) < 44 && y > floor2 - 10 && y < geo.tunnel(lx) + 40
         );
         if (open) return 0;
-        if (y >= floor && y < floor + 64) return DT.mycelium;
+        if (y >= floor2 && y < floor2 + 64) return DT.mycelium;
         if (fbm2(x / 150, y / 110, ch(209)) > 0.7) return DT.glowshroom;
         return DT.fungal;
       }
@@ -3736,10 +3744,10 @@
     bottom: 0
   }));
   function voidTile(x, y) {
-    const floor = VOID.floor(x);
-    for (const l of VOID_LADDERS) if (Math.abs(x - l.x) < 40 && y > l.top - 40 && y < floor) return 0;
-    if (y >= floor) return y < floor + 40 && noise1(x / 50, 225) > 0.55 ? DT.crystal : DT.voidstone;
-    if (y > floor - 60 && noise1(x / 34, 227) > 0.78 && !(x > VOID.maw.x0 && x < VOID.maw.x1))
+    const floor2 = VOID.floor(x);
+    for (const l of VOID_LADDERS) if (Math.abs(x - l.x) < 40 && y > l.top - 40 && y < floor2) return 0;
+    if (y >= floor2) return y < floor2 + 40 && noise1(x / 50, 225) > 0.55 ? DT.crystal : DT.voidstone;
+    if (y > floor2 - 60 && noise1(x / 34, 227) > 0.78 && !(x > VOID.maw.x0 && x < VOID.maw.x1))
       return DT.crystal;
     for (const s of VOID.shards) {
       const d = (x - s.cx) / s.half;
@@ -3914,9 +3922,9 @@
     for (let j = 0; j < def.cellsY - 1; j++) {
       rooms.push([]);
       for (let i = 0; i < def.cellsX; i++) {
-        const w = 7 + ri(3), h = 5 + ri(2), x = 1 + i * CW + 1 + ri(CW - 2 - w), floor = rowFloor(j);
-        carve(x, floor - h + 1, w, h);
-        rooms[j].push({ x, w, floor, h });
+        const w = 7 + ri(3), h = 5 + ri(2), x = 1 + i * CW + 1 + ri(CW - 2 - w), floor2 = rowFloor(j);
+        carve(x, floor2 - h + 1, w, h);
+        rooms[j].push({ x, w, floor: floor2, h });
       }
     }
     const arena = {
@@ -4241,13 +4249,13 @@
     }, 16);
     ground = flatten(ground, arrive - 240, arrive + 240);
     ground = flatten(ground, arena - 520, arena + 520);
-    const floor = walkable(ground);
-    const arenaY = floor(arena);
+    const floor2 = walkable(ground);
+    const arenaY = floor2(arena);
     const cave2 = walkable((x) => 2050 + 120 * fbm1(x / 1200, s(3)) + 24 * Math.sin(x / 200));
     const ladderXs = [0.15, 0.38, 0.6, 0.8].map((f) => Math.round(RW * f));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       const ax = x - arena;
       if (Math.abs(ax) < 480 && y < g) {
         const roof = arenaY - 360 - 60 * Math.cos(ax / 480 * Math.PI * 0.5);
@@ -4265,12 +4273,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, cave2],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: cave2(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, cave2],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: cave2(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   var CHOIR = {
@@ -4462,12 +4470,12 @@
     );
     ground = flatten(ground, arrive - 240, arrive + 240);
     ground = flatten(ground, arena - 440, arena + 440);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     const roots = walkable((x) => 1950 + 100 * fbm1(x / 800, s(3)) + 30 * Math.sin(x / 130));
     const ladderXs = [0.14, 0.36, 0.58, 0.8].map((f) => Math.round(RW * f));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       if (y < g) return 0;
       const r = roots(x);
       if (y > r - 120 - 24 * Math.sin(x / 60) && y < r && x > 200 && x < RW - 200) return 0;
@@ -4477,12 +4485,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, roots],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: roots(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, roots],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: roots(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   var FEVERLANDS = {
@@ -4711,7 +4719,7 @@
     );
     ground = flatten(ground, arrive - 240, arrive + 240);
     ground = flatten(ground, arena - 480, arena + 480);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     const roots = walkable((x) => 1980 + 90 * fbm1(x / 900, s(3)) + 20 * Math.sin(x / 150));
     const ladderXs = [0.17, 0.4, 0.62, 0.84].map((f) => Math.round(RW * f));
     const walls = Array.from(
@@ -4720,7 +4728,7 @@
     );
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       for (const wx of walls)
         if (Math.abs(x - wx) < 40 && y < g && y > g - 70 && Math.abs(wx - arena) > 560 && Math.abs(wx - arrive) > 300)
           return SEASONSTONE;
@@ -4733,12 +4741,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, roots],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: roots(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, roots],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: roots(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   var GARDEN = {
@@ -4924,7 +4932,7 @@
     }, 24);
     ground = flatten(ground, arrive - 240, arrive + 240);
     ground = flatten(ground, arena - 460, arena + 460);
-    const floor = walkable(ground, 24);
+    const floor2 = walkable(ground, 24);
     const chasms = Array.from(
       { length: 8 },
       (_, i) => 1100 + i * ((RW - 2400) / 8) + 160 * noise1(i * 2.1, s(3))
@@ -4934,7 +4942,7 @@
     const pillars = Array.from({ length: 14 }, (_, i) => 800 + i * ((RW - 1600) / 14));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       const chasm = chasms.some((c) => Math.abs(x - c) < 110) && y > g - 10 && y < vault(x) - 130;
       if (chasm) return 0;
       for (const px of pillars)
@@ -4949,12 +4957,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, vault],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: vault(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, vault],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: vault(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   function starPulse(t, seed = 0) {
@@ -5039,11 +5047,11 @@
     }, 20);
     ground = flatten(ground, arrive - 240, arrive + 240, 1500);
     ground = flatten(ground, arena - 460, arena + 460, 1700);
-    const floor = walkable(ground, 20);
+    const floor2 = walkable(ground, 20);
     const caves = walkable((x) => 2450 + 90 * fbm1(x / 1e3, s(3)));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       if (y < g) {
         const reef = fbm2(x / 90, y / 140, s(4));
         return reef > 0.78 && y > g - 260 && Math.abs(x - arrive) > 300 && Math.abs(x - arena) > 520 ? PEARL_ROCK : 0;
@@ -5055,12 +5063,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, caves],
+      surface: floor2,
+      floors: [floor2, floor2, caves],
       ladders: [],
       arrive,
       arena,
-      arenaFloor: floor,
+      arenaFloor: floor2,
       sea: 700
     };
   }
@@ -5144,7 +5152,7 @@
     let ground = walkable((x) => 1350 + 180 * fbm1(x / 1400, s(1)) + 40 * noise1(x / 240, s(2)), 12);
     ground = flatten(ground, arrive - 240, arrive + 240);
     ground = flatten(ground, arena - 440, arena + 440);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     const hollow = walkable((x) => 1980 + 110 * fbm1(x / 1100, s(3)) + 24 * Math.sin(x / 190));
     const spires = Array.from({ length: 22 }, (_, i) => {
       const x = 700 + i * ((RW - 1400) / 22) + 180 * noise1(i * 2.3, s(4));
@@ -5157,10 +5165,10 @@
     const ladderXs = [0.16, 0.4, 0.63, 0.86].map((f) => Math.round(RW * f));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       for (const sp of spires) {
-        const dx = Math.abs(x - sp.x), top = floor(sp.x) - sp.h;
-        if (y > top && y < floor(sp.x) + 10 && dx < sp.w * (1 - (floor(sp.x) - y) / (sp.h * 1.15)))
+        const dx = Math.abs(x - sp.x), top = floor2(sp.x) - sp.h;
+        if (y > top && y < floor2(sp.x) + 10 && dx < sp.w * (1 - (floor2(sp.x) - y) / (sp.h * 1.15)))
           return PRISMROCK;
       }
       if (y < g) return 0;
@@ -5172,12 +5180,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, hollow],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: hollow(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, hollow],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: hollow(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   var GLASSWOOD = {
@@ -5259,7 +5267,7 @@
     }, 10);
     ground = flatten(ground, arrive - 240, arrive + 240, base - 40);
     ground = flatten(ground, arena - 440, arena + 440, base - 30);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     const mire = base + 20;
     const crypt = walkable((x) => 2050 + 80 * fbm1(x / 1e3, s(3)) + 20 * Math.sin(x / 150));
     const ribs = Array.from({ length: 9 }, (_, i) => ({
@@ -5269,11 +5277,11 @@
     const ladderXs = [0.15, 0.37, 0.6, 0.84].map((f) => Math.round(RW * f));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       if (y < g) {
         for (const r of ribs) {
-          const d = Math.hypot((x - r.x) / 1.4, y - floor(r.x) - 10);
-          if (d > r.r - 14 && d < r.r && y < floor(r.x) - 20) return BONEROCK;
+          const d = Math.hypot((x - r.x) / 1.4, y - floor2(r.x) - 10);
+          if (d > r.r - 14 && d < r.r && y < floor2(r.x) - 20) return BONEROCK;
         }
         return 0;
       }
@@ -5285,12 +5293,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, crypt],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: crypt(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, crypt],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: crypt(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor,
+      arenaFloor: floor2,
       mire
     };
   }
@@ -5456,13 +5464,13 @@
     );
     ground = flatten(ground, arrive - 240, arrive + 240, 1440);
     ground = flatten(ground, arena - 420, arena + 420, 1420);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     let sum2 = 0;
-    for (let x = 0; x < RW; x += 64) sum2 += floor(x);
+    for (let x = 0; x < RW; x += 64) sum2 += floor2(x);
     const tideMid = sum2 / Math.ceil(RW / 64) + 30;
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       if (y < g) return 0;
       if (y > g + 180 && y < 3400 && fbm2(x / 220, y / 160, s(4)) > 0.7) return 0;
       if (y < g + 90) return BRINESOIL;
@@ -5470,12 +5478,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor],
+      surface: floor2,
+      floors: [floor2],
       ladders: [],
       arrive,
       arena,
-      arenaFloor: floor,
+      arenaFloor: floor2,
       tideMid
     };
   }
@@ -5557,13 +5565,13 @@
     }, 18);
     ground = flatten(ground, arrive - 240, arrive + 240, 1450);
     ground = flatten(ground, arena - 460, arena + 460, 1450);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     const mine = walkable((x) => 1900 + 70 * fbm1(x / 900, s(3)) + 16 * Math.sin(x / 140));
     const deep = walkable((x) => 2350 + 90 * fbm1(x / 1100, s(4)));
     const ladderXs = [0.13, 0.33, 0.55, 0.76, 0.9].map((f) => Math.round(RW * f));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       if (y < g) return 0;
       const m = mine(x), d = deep(x);
       if (y > m - 110 && y < m && x > 200 && x < RW - 200) return 0;
@@ -5575,12 +5583,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, mine, deep],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: deep(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, mine, deep],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: deep(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   var SALTFLATS = {
@@ -5674,12 +5682,12 @@
     });
     ground = flatten(ground, arrive - 240, arrive + 240);
     ground = flatten(ground, arena - 420, arena + 420);
-    const floor = walkable(ground);
+    const floor2 = walkable(ground);
     const tunnel = walkable((x) => 1980 + 80 * fbm1(x / 1e3, s(3)) + 16 * Math.sin(x / 170));
     const ladderXs = [0.14, 0.38, 0.62, 0.84].map((f) => Math.round(RW * f));
     const tile = (x, y) => {
       if (x < EDGE || x > RW - EDGE) return 27;
-      const g = floor(x);
+      const g = floor2(x);
       if (y < g) return 0;
       const tt = tunnel(x);
       if (y > tt - 110 - 10 * Math.sin(x / 90) && y < tt && x > 200 && x < RW - 200) return 0;
@@ -5690,12 +5698,12 @@
     };
     return {
       tile,
-      surface: floor,
-      floors: [floor, floor, tunnel],
-      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: tunnel(x) - 20 })),
+      surface: floor2,
+      floors: [floor2, floor2, tunnel],
+      ladders: ladderXs.map((x) => ({ x, top: floor2(x) - 4, bottom: tunnel(x) - 20 })),
       arrive,
       arena,
-      arenaFloor: floor
+      arenaFloor: floor2
     };
   }
   var STEPPE = {
@@ -5770,10 +5778,212 @@
     }
   };
 
+  // src/data/tutorial.ts
+  var STATIONS = [
+    {
+      at: 520,
+      name: "First steps",
+      sign: "A / D walk, W or Space jumps, S drops down. E reads signs, gathers, and uses things. The portal behind you leaves the course whenever you like.",
+      lessons: [["Read the signpost (E)", "sign:0", 1]]
+    },
+    {
+      at: 610,
+      name: "Ledges and shafts",
+      sign: "Jump the step and the gap. At a ladder, hold W to climb and S to go down. Climb down into the hollow below, then back up the far ladder.",
+      lessons: [["Climb down into the hollow", "course:climb", 1]]
+    },
+    {
+      at: 1340,
+      name: "The grove",
+      sign: "Stand by trees, stones and fibre and press E to gather. Open the journal (J) and choose Recipes to craft. Tools make gathering and mining faster.",
+      lessons: [
+        ["Gather wood", "wood", 8],
+        ["Gather stone", "stone", 8],
+        ["Collect fibre", "fiber", 4],
+        ["Craft a stone axe (J \u2192 Recipes)", "craft:stone_axe", 1],
+        ["Craft a stone pickaxe", "craft:stone_pick", 1],
+        ["Craft a campfire", "craft:campfire", 1],
+        ["Place the campfire (pick it on the hotbar, click the ground)", "place:campfire", 1]
+      ]
+    },
+    {
+      at: 2e3,
+      name: "The pond",
+      sign: "Wild water can carry dysentery. Collect it with E, boil it at a campfire in Recipes, then drink it from your Pack. Thirst drains faster in the heat.",
+      lessons: [
+        ["Collect untreated water", "wild_water", 1],
+        ["Boil water at the campfire", "craft:boiled_water", 1],
+        ["Drink safe water from your Pack", "drink:boiled_water", 1]
+      ]
+    },
+    {
+      at: 2370,
+      name: "The rock face",
+      sign: "Hold R or click to mine the ground itself, and gather ore with E. Harder rock needs a better pickaxe: copper, then iron, and on up the tiers.",
+      lessons: [["Mine copper ore", "copper_ore", 2]]
+    },
+    {
+      at: 2800,
+      name: "The pen",
+      sign: "Press F to strike. Slimes fight back; deer run. Cook raw meat at the campfire. Raw meat can make you ill, and a varied diet keeps you strong.",
+      lessons: [
+        ["Slay the slime (F)", "kill:slime", 1],
+        ["Hunt a deer", "kill:deer", 1],
+        ["Cook meat at the campfire", "craft:cooked_meat", 1],
+        ["Eat the cooked meat", "eat:cooked_meat", 1]
+      ]
+    },
+    {
+      at: 3350,
+      name: "The icebox",
+      sign: "Food rots: fast in the heat, slowly in the cold. Press E at cold storage to open it, then stow food from your Pack. An icebox needs ice; a cool pit needs nothing.",
+      lessons: [["Stow food in the icebox", "stow", 1]]
+    },
+    {
+      at: 3530,
+      name: "The brambles",
+      sign: "Wounds, illness and exposure show on the HUD as ailments. Hover one to see its cause and cure. Walk through the brambles, then bandage yourself from your Pack.",
+      lessons: [
+        ["Open the chest past the brambles", "bandage", 1],
+        ["Bandage your bleeding", "cure:bleeding", 1]
+      ]
+    },
+    {
+      at: 3840,
+      name: "The wardrobe",
+      sign: "Clothes keep out cold, heat and rain, and they wear out as they do. Mend worn gear on the Gear page. Put on the coat from the chest.",
+      lessons: [["Wear the oilskin coat", "wear:oilskin_coat", 1]]
+    },
+    {
+      at: 4020,
+      name: "The Waystone",
+      sign: "A Waystone opens generated realms. Turn a realm key in it: three fragments make a key, and the first fragments come from the old dungeons and their sigils.",
+      lessons: [["Read the Waystone signpost", "sign:9", 1]]
+    },
+    {
+      at: 4220,
+      name: "The journal",
+      sign: "In the journal (J): Skills spends Renown, the Codex fills as you discover things, Feats earn titles, and the Atlas tracks realms. The portal ahead leads to the wildlands.",
+      lessons: [
+        ["Read the journal signpost", "sign:10", 1],
+        ["Step through the portal to the wildlands", "course:done", 1]
+      ]
+    }
+  ];
+  var COURSE = STATIONS.flatMap((s) => s.lessons);
+  var stationOf = (lesson) => {
+    let i = lesson;
+    for (const [n, s] of STATIONS.entries()) {
+      if (i < s.lessons.length) return n;
+      i -= s.lessons.length;
+    }
+    return STATIONS.length - 1;
+  };
+
+  // src/data/realms/tutorial.ts
+  var SOIL = 1;
+  var STONE = 2;
+  var BEDROCK = 27;
+  var COURSE_GROUND = 1280;
+  var G = COURSE_GROUND;
+  var HOLLOW_TOP = G + 160;
+  var HOLLOW_FLOOR = G + 256;
+  var HOLLOW = [900, 1260];
+  var LADDERS = [940, 1220];
+  var END = 4520;
+  var COURSE_HOLLOW = { x0: HOLLOW[0], x1: HOLLOW[1], y: HOLLOW_TOP + 20 };
+  var COURSE_BRAMBLES = [3590, 3700];
+  function floor(x) {
+    if (x >= 640 && x < 780) return G - 64;
+    if (x >= 780 && x < 860) return G + 64;
+    if (x >= 2380 && x < 2720) return G - 64;
+    if (x >= 2860 && x < 3200) return G + 96;
+    if (x >= 3200 && x < 3260) return G + 32;
+    return G;
+  }
+  function build15() {
+    const tile = (x, y) => {
+      if (x < EDGE || x > END) return BEDROCK;
+      const g = floor(x);
+      if (y >= HOLLOW_TOP && y < HOLLOW_FLOOR && x > HOLLOW[0] && x < HOLLOW[1]) return 0;
+      if (LADDERS.some((lx) => Math.abs(x - lx) < 40) && y < HOLLOW_FLOOR) return 0;
+      if (y < g) return 0;
+      if (x >= 2380 && x < 2720 && y < G + 32) return STONE;
+      return y < g + 96 ? SOIL : STONE;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, () => HOLLOW_FLOOR],
+      ladders: LADDERS.map((x) => ({ x, top: floor(x) - 4, bottom: HOLLOW_FLOOR - 20 })),
+      arrive: 300,
+      arena: 4420,
+      arenaFloor: floor
+    };
+  }
+  var TRAINING = {
+    id: "tutorial",
+    name: "The Training Grounds",
+    band: 0,
+    course: true,
+    note: "A short course that teaches the ways of the wildlands, one station at a time.",
+    sky: "open",
+    temp: 16,
+    ambient: [0.12, 0.12, 0.1],
+    daylight: 1,
+    wall: SOIL,
+    hazard: { id: "none", name: "", text: "Nothing here is out to kill you.", ward: "" },
+    fragment: "",
+    key: "",
+    material: "",
+    relic: "",
+    boss: "",
+    elite: "",
+    music: "meadow",
+    ores: [],
+    nodes: [],
+    nodeCount: 0,
+    mobs: [],
+    mobCount: 0,
+    chests: 0,
+    chestLoot: [],
+    biome: {
+      id: "tutorial",
+      name: "Training Grounds",
+      x: 0,
+      y: 0,
+      color: "#7ea860",
+      shade: "#c8e0a8",
+      temp: 16,
+      note: "A gentle meadow laid out for learning.",
+      resources: ["wood", "stone", "fiber", "copper_ore"]
+    },
+    build: build15,
+    extra(geo, ctx2) {
+      const at2 = (lx) => ctx2.floorAt(ctx2.x0 + lx, geo.surface(lx) - 30);
+      const put = (type, lx, kind) => ctx2.furnish(type, ctx2.x0 + lx, at2(lx), kind);
+      STATIONS.forEach((s, i) => put("signpost", s.at, String(i)));
+      const node = (kind, lx) => ctx2.node(kind, ctx2.x0 + lx, at2(lx));
+      for (let i = 0; i < 5; i++) node("wood", 1420 + i * 100);
+      for (const lx of [1470, 1570, 1670, 1770, 1870, 1930]) node("stone", lx);
+      for (const lx of [1290, 1375, 1990]) node("fiber", lx);
+      for (const lx of [2120, 2220]) node("water", lx);
+      for (const lx of [2460, 2560, 2660]) node("copper_ore", lx);
+      ctx2.mob("slime", ctx2.x0 + 2960, at2(2960));
+      for (const lx of [3060, 3140]) ctx2.mob("deer", ctx2.x0 + lx, at2(lx));
+      put("icebox", 3440);
+      for (let lx = COURSE_BRAMBLES[0] + 10; lx < COURSE_BRAMBLES[1]; lx += 36) put("bramble", lx);
+      ctx2.chest(ctx2.x0 + 3760, at2(3760), [["bandage", 2, 2, 1]]);
+      ctx2.chest(ctx2.x0 + 3920, at2(3920), [["oilskin_coat", 1, 1, 1]]);
+      put("waystone", 4110);
+      put("portal", 4420, "course");
+    }
+  };
+
   // src/data/realms/warren.ts
   var WARREN_EARTH = 33;
   var AMBERSTONE = 34;
-  function build15(seed) {
+  function build16(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 950;
     const lane = (base, k) => walkable((x) => base + 170 * fbm1(x / 1300, s(k)) + 30 * noise1(x / 260, s(k + 1)));
@@ -5877,7 +6087,7 @@
       note: "A realm that is all burrow.",
       resources: ["burrow_amber", "mushroom", "gold_ore", "iron_ore"]
     },
-    build: build15
+    build: build16
   };
 
   // src/data/realms/modifiers.ts
@@ -6011,7 +6221,7 @@
   var WHOLE_REALMS = REALMS.filter((r) => r.id !== "fractured");
   setFracturePool(() => WHOLE_REALMS);
   var templateOf = (inst) => inst.realm === "fractured" ? fracture(inst.seed) : realmById(inst.realm);
-  var realmById = (id) => REALMS.find((r) => r.id === id);
+  var realmById = (id) => id === TRAINING.id ? TRAINING : REALMS.find((r) => r.id === id);
   var REALM_IDS = new Set(REALMS.map((r) => r.id));
   var active = null;
   var built = /* @__PURE__ */ new Map();
@@ -6448,10 +6658,10 @@
     return SHAFTS.some(near) || inPocket(x) && pocketShafts().some(near);
   }
   function inUnderworld(x, y) {
-    const ceil = underworldCeiling(x), floor = underworldFloor(x);
-    if (y < ceil || y > floor) return false;
+    const ceil = underworldCeiling(x), floor2 = underworldFloor(x);
+    if (y < ceil || y > floor2) return false;
     const spire = noise1(x / 150, 73);
-    if (spire > 0.55 && y < ceil + (floor - ceil) * (spire - 0.55) * 1.3) return false;
+    if (spire > 0.55 && y < ceil + (floor2 - ceil) * (spire - 0.55) * 1.3) return false;
     return true;
   }
   function inCavern(x, y, surface) {
@@ -12855,9 +13065,9 @@
         for (let i = 0; i < n; i++) {
           const x = span.start + (i + 0.3 + this.game.rng() * 0.4) / n * width, level = levels[i % levels.length];
           if (level === 0) {
-            const floor = underworldFloor(x);
-            if (floor > LAVA_Y - 20) continue;
-            this.addAnimal(type, x, floor - 1, { underground: true });
+            const floor2 = underworldFloor(x);
+            if (floor2 > LAVA_Y - 20) continue;
+            this.addAnimal(type, x, floor2 - 1, { underground: true });
           } else this.addAnimal(type, x, caveY(x, level), { tunnel: level });
         }
       }
@@ -12916,9 +13126,9 @@
               if (SHAFTS.some((sh) => Math.abs(sh.x - x) < 70)) continue;
               let y;
               if (level === 0) {
-                const floor = underworldFloor(x);
-                if (floor > LAVA_Y - 20) continue;
-                y = this.game.floorNear(x, floor - 20);
+                const floor2 = underworldFloor(x);
+                if (floor2 > LAVA_Y - 20) continue;
+                y = this.game.floorNear(x, floor2 - 20);
               } else y = this.game.floorNear(x, caveY(x, level));
               if (!this.nodeFits(kind, x, y)) continue;
               push(kind, x, y, true);
@@ -13174,16 +13384,23 @@
       },
       realm: {
         usage: "realm <id> [tier] | realm home | realm close",
-        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden, fractured) at a tier and step in, go home, or collapse it.",
+        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden, fractured) at a tier and step in, go home, or collapse it. `realm course` enters or leaves the Training Grounds.",
         run: ([id, tier]) => {
           const pocket = this.game.pocket;
           if (id === "home") return pocket.leave().ok ? ["Home."] : ["! No realm is open."];
+          if (id === "course") {
+            if (pocket.inCourse())
+              return pocket.finishCourse(false, false).ok ? ["Course left."] : [];
+            pocket.startCourse();
+            return ["Into the Training Grounds."];
+          }
           if (id === "close") {
             pocket.close();
             return ["The realm collapses."];
           }
           const tpl = REALMS.find((r2) => r2.id === id);
-          if (!tpl) return ["! Usage: realm <" + REALMS.map((r2) => r2.id).join("|") + "> [1-5]"];
+          if (!tpl)
+            return ["! Usage: realm <" + REALMS.map((r2) => r2.id).join("|") + "|course> [1-5]"];
           const t = Math.max(1, Math.min(tpl.id === "fractured" ? 999 : 5, Number(tier) || 1)), rec = pocket.record(tpl.id), god = this.game.dev.god;
           rec.best = Math.max(rec.best, t - 1);
           this.game.dev.god = true;
@@ -13217,7 +13434,7 @@
     complete(line) {
       const words = line.split(/\s+/), last = (words[words.length - 1] ?? "").toLowerCase();
       if (words.length <= 1) return Object.keys(this.commands).filter((c) => c.startsWith(last));
-      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
+      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close", "course"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
       return words.length === 2 ? pool.filter((id) => id.startsWith(last)) : [];
     }
     /** Godmode keeps every need met; called each tick. */
@@ -13593,6 +13810,7 @@
           this.game.say(itemName(id) + " taken off.");
         } else {
           p.armor[piece.slot] = id;
+          this.game.progress.record("wear:" + id);
           this.game.say(itemName(id) + " worn.", "good");
         }
         this.game.sound("wear");
@@ -13606,6 +13824,7 @@
           this.game.say(itemName(id) + " taken off.");
         } else {
           p.clothing[garment.layer] = id;
+          this.game.progress.record("wear:" + id);
           this.game.say(`${itemName(id)} worn \xB7 ${garment.text.toLowerCase()}.`, "good");
         }
         this.game.sound("wear");
@@ -14094,7 +14313,7 @@
       const objects = [
         ...this.game.s.nodes.filter((n) => n.hp > 0).map((n) => ({ object: n, type: "node", d: dist(n, p) })),
         ...this.game.s.structures.filter(
-          (st) => st.type !== "torch" && !st.type.startsWith("trap_") && !(st.type === "dungeon_chest" && st.crop === "open")
+          (st) => st.type !== "torch" && st.type !== "bramble" && !st.type.startsWith("trap_") && !(st.type === "dungeon_chest" && st.crop === "open")
         ).map((st) => ({
           object: st,
           type: "structure",
@@ -14144,8 +14363,11 @@
         this.game.realms.socket();
         return { ok: true, action: "rift", structure: st };
       }
-      if (st.type === "portal")
+      if (st.type === "portal") {
+        if (this.game.pocket.inCourse() && this.game.pocket.here(st.x))
+          return this.game.pocket.finishCourse(st.kind === "course");
         return this.game.pocket.here(st.x) ? this.game.pocket.leave() : this.game.realms.goHome();
+      }
       if (st.type === "waystone") return { ok: true, action: "atlas", structure: st };
       if (st.type === "shrine") return this.game.pocket.pray(st);
       if (st.type === "kiln") return { ok: false, reason: "An old kiln. It still smelts ore." };
@@ -14180,6 +14402,11 @@
         if (first) this.game.skills.gain(10);
         this.game.sound("page", st.x, st.y);
         this.game.say(`The tablet reads: \u201C${LORE[i % LORE.length]}\u201D`, "ink");
+      } else if (st.type === "signpost") {
+        const i = Number(st.kind) || 0;
+        this.game.progress.record("sign:" + i);
+        this.game.sound("page", st.x, st.y);
+        this.game.say(STATIONS[i]?.sign ?? "The sign is weathered blank.", "ink");
       } else if (st.type === "cairn") {
         this.game.say("Stones piled with care. Something lies sealed in the rock below.", "ink");
       } else if (st.type === "merchant_stall") {
@@ -14497,6 +14724,7 @@
       this.game.s.inventory = this.game.s.inventory.filter((e) => !entries.includes(e));
       this.game.equipment.tidy();
       this.game.sound("place", st.x, st.y, 0.5);
+      this.game.progress.record("stow", entries.length);
       return { ok: true };
     }
     take(st, id, qty = 1) {
@@ -14752,6 +14980,7 @@
     ventAt = 0;
     stormWas = false;
     submergedWas = false;
+    leaveAsked = -99;
     /** The latest arrival, for the interface's banner. */
     banner = null;
     inst() {
@@ -14875,6 +15104,71 @@
       this.game.say("The Waystone draws you home.", "good");
       return { ok: true };
     }
+    // ─── The Training Grounds ──────────────────────────────────────────────────
+    /** Whether the open realm is the Training Grounds. */
+    inCourse() {
+      return this.game.s.pocket?.realm === TRAINING.id;
+    }
+    /** Lays out the Training Grounds and sets a new traveller down at its start. */
+    startCourse() {
+      const s = this.game.s, hx = RULES.spawnX;
+      this.load(
+        {
+          realm: TRAINING.id,
+          tier: 1,
+          seed: 1,
+          mods: [],
+          opened: s.elapsed,
+          home: { x: hx, y: this.game.groundTopAt(hx) }
+        },
+        true
+      );
+      const x = POCKET.start + POCKET.arrive + 180;
+      this.game.realms.teleport(x, this.game.groundTopAt(x) + 1);
+      s.tutorial.course = 0;
+      this.banner = { name: TRAINING.name, tier: 0, mods: [], at: s.elapsed };
+      this.game.say(
+        "Welcome to the Training Grounds. Walk up to the signpost and press E.",
+        "victory"
+      );
+      return { ok: true };
+    }
+    /**
+     * Leaves the course for the wildlands: finished at the far portal, or skipped (the near
+     * portal asks twice, so a stray press does not end the course).
+     */
+    finishCourse(done = true, ask = !done) {
+      const s = this.game.s;
+      if (!this.inCourse()) return { ok: false, reason: "You are not on the course." };
+      if (ask && s.elapsed - this.leaveAsked > 4) {
+        this.leaveAsked = s.elapsed;
+        return { ok: false, reason: "Press E again to skip the rest of the course." };
+      }
+      if (done) this.game.progress.record("course:done");
+      s.tutorial.course = COURSE.length;
+      this.close();
+      this.game.progress.record("course:left");
+      this.game.say(
+        done ? "Course complete. The wildlands are yours to cross." : "You leave the Training Grounds for the wildlands.",
+        "victory"
+      );
+      return { ok: true };
+    }
+    /** The course's own triggers: the hollow below the ledges, and the brambles. */
+    coach() {
+      const s = this.game.s, p = s.player, lx = p.x - POCKET.start, t = s.tutorial.tally;
+      if (!t["course:climb"] && lx > COURSE_HOLLOW.x0 && lx < COURSE_HOLLOW.x1 && p.y > COURSE_HOLLOW.y)
+        this.game.progress.record("course:climb");
+      if (!t["course:bramble"] && lx > COURSE_BRAMBLES[0] && lx < COURSE_BRAMBLES[1]) {
+        this.game.progress.record("course:bramble");
+        this.game.ailments.contract("bleeding", true);
+        this.game.sound("hurt", p.x, p.y);
+        this.game.say(
+          "The brambles tear at you. Open the chest ahead and bandage the bleeding.",
+          "danger"
+        );
+      }
+    }
     // ─── Building the realm ────────────────────────────────────────────────────
     /** Fills the pocket strip with a realm (clearing whatever was there), furnished if fresh. */
     load(inst, fresh) {
@@ -14938,6 +15232,15 @@
         const floors = geo.floors, f = floors[Math.floor(rng2() * floors.length)];
         return ctx2.floorAt(x0 + lx, f(lx) - 30);
       };
+      if (tpl.course) {
+        const ax2 = x0 + geo.arrive;
+        g.realms.furnish("portal", ax2, g.floorNear(ax2, geo.floors[0](geo.arrive) - 40), {
+          kind: "home"
+        });
+        tpl.extra?.(geo, ctx2);
+        for (const st of g.s.structures) if (st.type === "icebox" && inPocket(st.x)) st.fuel = 3600;
+        return;
+      }
       const nodes = tpl.nodes.map(([k, w]) => [
         k,
         mods.has("rich_veins") && tpl.ores.includes(k) ? w * 3 : w
@@ -15033,7 +15336,7 @@
     vault(geo, rng2, x0) {
       const s = this.game.s;
       for (let attempt = 0; attempt < 8; attempt++) {
-        const lx = 900 + rng2() * (RW - 2400), floor = geo.floors[0](lx), tx0 = Math.floor((x0 + lx) / TILE) - 3, ty0 = Math.floor((floor + 170) / TILE);
+        const lx = 900 + rng2() * (RW - 2400), floor2 = geo.floors[0](lx), tx0 = Math.floor((x0 + lx) / TILE) - 3, ty0 = Math.floor((floor2 + 170) / TILE);
         let solid = true;
         for (let ty = ty0 - 2; ty <= ty0 + 4 && solid; ty++)
           for (let tx = tx0 - 2; tx <= tx0 + 8 && solid; tx++)
@@ -15057,7 +15360,7 @@
           ],
           rng2
         );
-        this.game.realms.furnish("cairn", x0 + lx, this.game.floorNear(x0 + lx, floor - 30));
+        this.game.realms.furnish("cairn", x0 + lx, this.game.floorNear(x0 + lx, floor2 - 30));
         return;
       }
     }
@@ -15256,6 +15559,7 @@
         }
       }
       if (!this.here() || s.dead) return;
+      if (this.inCourse()) return this.coach();
       const tpl = templateOf(inst), fx = this.game.equipment.effects(), v = s.vitals;
       const hard = 1 - Math.min(0.8, this.game.skills.get("hazard"));
       if (tpl.hazard.id === "mire" && this.inMire() && !fx.has("mirewalk")) {
@@ -15478,10 +15782,25 @@
       this.game.s.tutorial.tally[key] = (this.game.s.tutorial.tally[key] || 0) + qty;
       this.game.skills.noted(key, qty);
       this.game.feats.check();
+      this.advanceCourse();
       this.advanceTutorial();
       this.advanceChapter();
     }
+    /** The Training Grounds' lessons, while you are on the course. */
+    advanceCourse() {
+      const t = this.game.s.tutorial;
+      if (!this.game.pocket.inCourse() || t.course === void 0) return;
+      let step = t.course;
+      while (step < COURSE.length) {
+        const [, key, n] = COURSE[step];
+        if ((t.tally[key] || 0) < n) break;
+        step++;
+        if (step < COURSE.length) this.game.say("Lesson learned \xB7 next: " + COURSE[step][0], "good");
+      }
+      t.course = step;
+    }
     advanceTutorial() {
+      if (this.game.pocket.inCourse()) return;
       let step = this.game.s.tutorial.step;
       while (step < TUTORIAL.length) {
         const [, key, n] = TUTORIAL[step];
@@ -16153,6 +16472,11 @@
       );
       this.game.s.player.x = stands ? bed.x + 20 : RULES.spawnX;
       this.game.s.player.y = stands ? bed.y : this.game.groundTopAt(RULES.spawnX) + 1;
+      if (this.game.pocket.inCourse()) {
+        const x = POCKET.start + POCKET.arrive + 180;
+        this.game.s.player.x = x;
+        this.game.s.player.y = this.game.groundTopAt(x) + 1;
+      }
       this.game.s.player.vx = 0;
       this.game.s.player.vy = 0;
       this.game.s.player.grounded = true;
@@ -17526,8 +17850,8 @@
     constructor(seed = RULES.defaultSeed) {
       this.newGame(seed);
     }
-    /** Starts a fresh expedition from a seed. */
-    newGame(seed = RULES.defaultSeed) {
+    /** Starts a fresh expedition from a seed, in the Training Grounds if asked. */
+    newGame(seed = RULES.defaultSeed, opts = {}) {
       this.rng = seededRandom(seed);
       setActiveRealm(null);
       syncPocket();
@@ -17615,7 +17939,8 @@
         this.equipment.wear(id);
       }
       this.messages = [];
-      this.say("Field record I \xB7 Stranded in the meadow. Find wood, stone, and fiber.");
+      if (opts.tutorial) this.pocket.startCourse();
+      else this.say("Field record I \xB7 Stranded in the meadow. Find wood, stone, and fiber.");
       return this;
     }
     /** Advances the whole simulation by one frame. */
@@ -18060,10 +18385,10 @@
     }
   };
   var sprites = /* @__PURE__ */ new Map();
-  function cached(key, build16) {
+  function cached(key, build17) {
     let s = sprites.get(key);
     if (!s) {
-      s = build16();
+      s = build17();
       if (sprites.size > 4e3) sprites.clear();
       sprites.set(key, s);
     }
@@ -18766,6 +19091,8 @@
     diving_bell: ["crate", "#5a9ac0"],
     fracture_shard: ["crystal", "#d8a0ff"],
     lore_tablet: ["scroll", "#8b8f8a"],
+    signpost: ["log", "#9a7048"],
+    bramble: ["bundle", "#5a7a3a"],
     cairn: ["lump", "#8b8f8a"],
     merchant_stall: ["crate", "#c85a4a"],
     tinkers_bench: ["crate", "#8a6440"],
@@ -22209,7 +22536,7 @@
         solid: new Uint8Array(size),
         size
       };
-    const R2 = buf.r, G = buf.g, B = buf.b, S2 = buf.solid;
+    const R2 = buf.r, G2 = buf.g, B = buf.b, S2 = buf.solid;
     const [sr, sg, sb] = skyLight(g);
     const realm = data_exports.inPocket(g.s.player.x) ? data_exports.activeRealm() : null, starless = realm?.inst.mods.includes("starless") ? 0.15 : 1, realmAmbient = realm?.tpl.ambient.map((v) => v * starless);
     const layerAmbient = (y) => realmAmbient ? realmAmbient : y >= data_exports.LAYERS[4].top ? [0.3, 0.1, 0.07] : y >= data_exports.LAYERS[3].top ? [0.22, 0.09, 0.07] : y >= data_exports.LAYERS[2].top ? [0.05, 0.055, 0.08] : [0.06, 0.06, 0.07];
@@ -22240,7 +22567,7 @@
           }
         }
         R2[k] = r;
-        G[k] = gg;
+        G2[k] = gg;
         B[k] = b;
       }
     for (const [lx, ly, r, gg, b] of lights) {
@@ -22248,13 +22575,13 @@
       if (i < 0 || j < 0 || i >= gw || j >= gh) continue;
       const k = j * gw + i;
       R2[k] = Math.max(R2[k], r);
-      G[k] = Math.max(G[k], gg);
+      G2[k] = Math.max(G2[k], gg);
       B[k] = Math.max(B[k], b);
     }
     const step = (k, from) => {
-      const keep = !S2[k] ? AIR_KEEP : S2[from] ? SOLID_KEEP : 0.88, r = R2[from] * keep, gg = G[from] * keep, b = B[from] * keep;
+      const keep = !S2[k] ? AIR_KEEP : S2[from] ? SOLID_KEEP : 0.88, r = R2[from] * keep, gg = G2[from] * keep, b = B[from] * keep;
       if (r > R2[k]) R2[k] = r;
-      if (gg > G[k]) G[k] = gg;
+      if (gg > G2[k]) G2[k] = gg;
       if (b > B[k]) B[k] = b;
     };
     for (let pass = 0; pass < 2; pass++) {
@@ -22272,7 +22599,7 @@
     const k2 = grid.getContext("2d"), img = k2.createImageData(gw, gh), d = img.data;
     for (let k = 0; k < size; k++) {
       d[k * 4] = Math.min(255, (R2[k] + 0.035) * 255);
-      d[k * 4 + 1] = Math.min(255, (G[k] + 0.03) * 255);
+      d[k * 4 + 1] = Math.min(255, (G2[k] + 0.03) * 255);
       d[k * 4 + 2] = Math.min(255, (B[k] + 0.045) * 255);
       d[k * 4 + 3] = 255;
     }
@@ -22858,8 +23185,8 @@
     if (mire) {
       c.fillStyle = "rgba(104, 112, 44, 0.6)";
       for (let x = x0; x < x1; x++) {
-        const floor = Math.round(data_exports.surfaceAt((x + ax) * PX) / PX - ay) + 3;
-        if (floor > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor) - Math.max(0, top));
+        const floor2 = Math.round(data_exports.surfaceAt((x + ax) * PX) / PX - ay) + 3;
+        if (floor2 > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor2) - Math.max(0, top));
       }
     } else {
       const kind = g.pocket.waterKind();
@@ -23223,7 +23550,7 @@
   // src/renderer/structures.ts
   var WOOD = "#8a6440";
   var DARKWOOD = "#5e4631";
-  var STONE = "#8b8f8a";
+  var STONE2 = "#8b8f8a";
   var IRON = "#6f7375";
   function planks(p, x, y, w, h, base = WOOD) {
     const [d, , m, l] = ramp(base);
@@ -23234,7 +23561,7 @@
     }
     for (let i = x + 3; i < x + w; i += 7) p.set(i, y + i % 2, "#3a302a");
   }
-  function stones(p, x, y, w, h, base = STONE) {
+  function stones(p, x, y, w, h, base = STONE2) {
     const [d, , m, l] = ramp(base);
     p.rect(x, y, w, h, m);
     for (let j = 0; j < h; j += 4) {
@@ -23790,6 +24117,35 @@
       p.rect(3, 4, 1, 26, "#a8aca8");
       for (let y = 9; y < 26; y += 4) p.line(6, y, 16, y, "#5a5e5a");
       p.rect(8, 6, 6, 2, "#d8b848");
+    }),
+    signpost: () => sprite(26, 30, 13, 29, (p) => {
+      p.rect(11, 8, 4, 22, "#6a4a2c");
+      p.rect(12, 8, 1, 22, "#8a6440");
+      p.rect(1, 3, 24, 11, "#9a7048");
+      p.rect(1, 3, 24, 1, "#c09060");
+      p.rect(1, 13, 24, 1, "#6a4a2c");
+      for (const y of [6, 9]) p.line(5, y, 20, y, "#5a3c22");
+    }),
+    bramble: () => sprite(34, 22, 17, 21, (p) => {
+      p.ellipse(17, 15, 16, 7, "#3e5a2c");
+      p.ellipse(11, 11, 8, 6, "#4e6e34");
+      p.ellipse(23, 12, 9, 6, "#4a6a30");
+      for (const [x, y] of [
+        [4, 12],
+        [9, 6],
+        [16, 5],
+        [24, 7],
+        [30, 11],
+        [13, 14],
+        [21, 15]
+      ])
+        p.rect(x, y, 2, 1, "#d8c8a0");
+      for (const [x, y] of [
+        [8, 13],
+        [19, 9],
+        [27, 14]
+      ])
+        p.rect(x, y, 2, 2, "#a02a3a");
     }),
     cairn: () => sprite(20, 16, 10, 15, (p) => {
       p.ellipse(10, 13, 9, 3, "#7c7a74");
@@ -26856,7 +27212,7 @@
       this.ctx = ctx2;
       this.out = out;
       const k = kit(ctx2);
-      const bed = (name, build16) => {
+      const bed = (name, build17) => {
         const g = ctx2.createGain();
         g.gain.value = 0;
         const n = ctx2.createBufferSource();
@@ -26864,7 +27220,7 @@
         n.loop = true;
         n.playbackRate.value = 0.97 + Object.keys(this.beds).length * 0.013;
         n.start();
-        build16(n).connect(g).connect(out);
+        build17(n).connect(g).connect(out);
         this.beds[name] = g;
       };
       bed("rain", (n) => {
@@ -29769,7 +30125,8 @@
     emberheart: "emberheart",
     garden: "garden",
     fractured: "fractured",
-    mycelial: "mycelia"
+    mycelial: "mycelia",
+    tutorial: "meadow"
   };
   var DUNGEON_TRACKS = {
     crypt: "dungeon",
@@ -30080,11 +30437,35 @@
     Audio.start();
     updateUI(true);
   }
+  var TUTORIAL_PREF = "wildlands-tutorial";
+  function tutorialPref() {
+    try {
+      return localStorage.getItem(TUTORIAL_PREF) !== "off";
+    } catch {
+      return true;
+    }
+  }
   $("new-game").onclick = () => {
     sound("page");
-    game.newGame(Date.now() % UI_RULES.seedRange);
-    game.save(localStorage, true);
-    showIntro();
+    $("menu-panel").classList.remove("hidden");
+    $("menu-panel").innerHTML = `<h2>A new expedition</h2><p>Choose how the wildlands begin. The same seed always grows the same world.</p><label>World seed <input id="world-seed" type="text" inputmode="numeric" placeholder="Leave blank for chance" autocomplete="off"></label><label class="check"><input id="world-tutorial" type="checkbox" ${tutorialPref() ? "checked" : ""}> Start in the Training Grounds <small>A short course that teaches moving, gathering, crafting, water, mining, fighting, cold storage, ailments, clothing and realms. You can leave it at any time.</small></label><div class="book-actions"><button id="world-begin" class="ink-button">Begin <span>\u2192</span></button><button id="panel-close" class="ink-button quiet">Not yet</button></div>`;
+    $("panel-close").onclick = () => {
+      $("menu-panel").classList.add("hidden");
+      sound("page");
+    };
+    $("world-begin").onclick = () => {
+      sound("page");
+      const raw = $("world-seed").value.trim(), tutorial = $("world-tutorial").checked;
+      const seed = !raw ? Date.now() % UI_RULES.seedRange : /^\d+$/.test(raw) ? Number(raw) % UI_RULES.seedRange : [...raw].reduce((h, c) => h * 31 + c.charCodeAt(0) >>> 0, 7) % UI_RULES.seedRange;
+      try {
+        localStorage.setItem(TUTORIAL_PREF, tutorial ? "on" : "off");
+      } catch {
+      }
+      $("menu-panel").classList.add("hidden");
+      game.newGame(seed, { tutorial });
+      game.save(localStorage, true);
+      showIntro();
+    };
   };
   $("continue-game").onclick = () => {
     sound("page");
@@ -30684,7 +31065,16 @@
   }
   function renderNotes(left, right) {
     const biome = game.biome(), t = game.s.tutorial, current2 = TUTORIAL[t.step];
-    left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface, the mines and hell beneath, four dungeons, and three worlds behind the Rift.</p><canvas id="atlas-map" class="atlas-map" width="300" height="150" aria-label="Side elevation of the regions, depths, dungeons, and dimensions"></canvas><h3>Current ground \xB7 ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(", ")}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
+    left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface, the mines and hell beneath, four dungeons, and three worlds behind the Rift.</p><canvas id="atlas-map" class="atlas-map" width="300" height="150" aria-label="Side elevation of the regions, depths, dungeons, and dimensions"></canvas><h3>Current ground \xB7 ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(", ")}.</p><div class="book-actions"><button data-save>SAVE RECORD</button>${game.pocket.inCourse() ? "<button data-skip-course>LEAVE THE TRAINING GROUNDS</button>" : ""}<button class="quiet" data-menu>MAIN MENU</button></div>`;
+    const skip = left.querySelector("[data-skip-course]");
+    if (skip)
+      skip.onclick = () => {
+        const r = game.pocket.finishCourse(false, false);
+        if (!r.ok) message(r.reason);
+        sound("page");
+        toggleJournal(false);
+        updateUI(true);
+      };
     right.innerHTML = `<h2>Lessons &amp; sightings</h2><p class="lede">${current2 ? current2[0] + " \xB7 " + Math.min(current2[2], t.tally[current2[1]] || 0) + "/" + current2[2] : "The first field lessons are complete."}</p><ol class="objective-list">${TUTORIAL.map(([label], i) => `<li class="${i < t.step ? "done" : i === t.step ? "current" : ""}">${label}</li>`).join("")}</ol><h3>Expedition chapters</h3><ol class="objective-list">${CHAPTERS.map(([label], i) => `<li class="${i < game.s.chapter ? "done" : i === game.s.chapter ? "current" : ""}">${label}</li>`).join("")}</ol><h3>Biome ledger</h3>${BIOMES.map((b) => `<div class="biome-entry ${b.id === biome.id ? "current" : ""}"><strong>${b.name}</strong><small>${b.note}</small></div>`).join("")}<h3>Controls</h3><p>A / D move \xB7 W / Space jump and climb \xB7 S descend \xB7 E gather or interact \xB7 F strike \xB7 R / click mine \xB7 G fish \xB7 J / I journal \xB7 M map \xB7 Esc pause \xB7 1\u20135 turn pages.</p>`;
     left.querySelector("[data-save]").onclick = () => {
       game.save();
@@ -31287,7 +31677,11 @@
     const off = game.ailments.list().some((a) => a.stage === 0) ? '<span class="ail off" title="Something is incubating. Rest, keep clean, and check the journal\u2019s Health page before it shows.">FEELING OFF</span>' : "";
     $("ailments").innerHTML = chips + off;
     $("weapon-name").textContent = game.s.player.weapon === "fists" ? pretty("fists") : game.armoury.title(game.s.player.weapon);
-    const step = TUTORIAL[game.s.tutorial.step] || CHAPTERS[game.s.chapter];
+    const lesson = game.pocket.inCourse() ? game.s.tutorial.course ?? COURSE.length : -1, step = lesson >= 0 && lesson < COURSE.length ? COURSE[lesson] : TUTORIAL[game.s.tutorial.step] || CHAPTERS[game.s.chapter];
+    const hint = lesson >= 0 && lesson < COURSE.length ? STATIONS[stationOf(lesson)] : null;
+    $("objective-label").textContent = hint ? `TRAINING \xB7 ${hint.name.toUpperCase()}` : "CURRENT FIELD TASK";
+    $("objective-hint").textContent = hint ? hint.sign : "";
+    $("objective-hint").classList.toggle("hidden", !hint);
     $("objective-text").textContent = step ? step[0] : "The final folio is complete.";
     $("objective-progress").textContent = step ? `${Math.min(step[2], game.s.tutorial.tally[step[1]] || 0)} / ${step[2]}` : "EXPEDITION COMPLETE";
     const near = game.nearestInteractable();
@@ -31297,7 +31691,7 @@
     else if (near && near.type === "structure" && ["dungeon_chest", "boss_altar", "rift_gate", "portal", "waystone", "shrine"].includes(
       near.object.type
     ))
-      prompt = `<b>E</b> ${near.object.type === "dungeon_chest" ? "Open the chest" : near.object.type === "boss_altar" ? game.bosses.active() ? "The altar burns" : "Call " + MOBS[near.object.kind ?? ""]?.name : near.object.type === "portal" ? game.pocket.here(near.object.x) ? "Return to your Waystone" : "Return home through the portal" : near.object.type === "waystone" ? "Open the Atlas" : near.object.type === "shrine" ? near.object.crop === "spent" ? "The shrine is quiet" : "Pray at the shrine" : "Open the Rift"}`;
+      prompt = `<b>E</b> ${near.object.type === "dungeon_chest" ? "Open the chest" : near.object.type === "boss_altar" ? game.bosses.active() ? "The altar burns" : "Call " + MOBS[near.object.kind ?? ""]?.name : near.object.type === "portal" ? game.pocket.inCourse() && game.pocket.here(near.object.x) ? near.object.kind === "course" ? "Step out into the wildlands" : "Skip the course" : game.pocket.here(near.object.x) ? "Return to your Waystone" : "Return home through the portal" : near.object.type === "waystone" ? "Open the Atlas" : near.object.type === "shrine" ? near.object.crop === "spent" ? "The shrine is quiet" : "Pray at the shrine" : "Open the Rift"}`;
     else if (near && near.type === "settler") {
       const who = settlerById(near.object.settler ?? "");
       prompt = `<b>E</b> Talk to ${who ? who.name + " " + who.title : "the settler"}`;
@@ -31322,7 +31716,7 @@
     $("realm-banner").classList.toggle("hidden", !showBanner);
     if (showBanner && $("realm-banner").dataset.at !== String(b.at)) {
       $("realm-banner").dataset.at = String(b.at);
-      $("realm-banner").innerHTML = `<small>TIER ${tierName(b.tier)}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => modById(m)?.name).join(" \xB7 ")}</span>` : ""}<em>${realmById(game.s.pocket?.realm ?? "")?.hazard.name ?? ""}</em>`;
+      $("realm-banner").innerHTML = `<small>${b.tier ? "TIER " + tierName(b.tier) : "A SHORT COURSE"}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => modById(m)?.name).join(" \xB7 ")}</span>` : ""}<em>${realmById(game.s.pocket?.realm ?? "")?.hazard.name ?? ""}</em>`;
     }
     const msg = game.messages[0];
     if (msg && msg !== state.seenMessage) {

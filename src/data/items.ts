@@ -395,6 +395,8 @@ export const ITEMS: Record<string, ItemSpec> = {
   garden_key: ['Garden of Lost Seasons key', 'key'],
   diving_bell: ['Diving bell', 'structure'],
   lore_tablet: ['Lore tablet', 'structure'],
+  signpost: ['Signpost', 'structure'],
+  bramble: ['Bramble', 'structure'],
   cairn: ['Cairn', 'structure'],
   merchant_stall: ["Wanderer's stall", 'structure'],
   respirator: ['Respirator', 'accessory'],

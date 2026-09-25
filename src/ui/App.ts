@@ -248,11 +248,44 @@ function enterGame() {
   Audio.start();
   updateUI(true);
 }
+// World creation: a seed (or chance), and whether to begin in the Training Grounds.
+const TUTORIAL_PREF = 'wildlands-tutorial';
+function tutorialPref() {
+  try {
+    return localStorage.getItem(TUTORIAL_PREF) !== 'off';
+  } catch {
+    return true;
+  }
+}
 $('new-game').onclick = () => {
   sound('page');
-  game.newGame(Date.now() % UI_RULES.seedRange);
-  game.save(localStorage, true);
-  showIntro();
+  $('menu-panel').classList.remove('hidden');
+  $('menu-panel').innerHTML =
+    `<h2>A new expedition</h2><p>Choose how the wildlands begin. The same seed always grows the same world.</p><label>World seed <input id="world-seed" type="text" inputmode="numeric" placeholder="Leave blank for chance" autocomplete="off"></label><label class="check"><input id="world-tutorial" type="checkbox" ${tutorialPref() ? 'checked' : ''}> Start in the Training Grounds <small>A short course that teaches moving, gathering, crafting, water, mining, fighting, cold storage, ailments, clothing and realms. You can leave it at any time.</small></label><div class="book-actions"><button id="world-begin" class="ink-button">Begin <span>→</span></button><button id="panel-close" class="ink-button quiet">Not yet</button></div>`;
+  $('panel-close').onclick = () => {
+    $('menu-panel').classList.add('hidden');
+    sound('page');
+  };
+  $('world-begin').onclick = () => {
+    sound('page');
+    const raw = $<HTMLInputElement>('world-seed').value.trim(),
+      tutorial = $<HTMLInputElement>('world-tutorial').checked;
+    // A number is used as is; any other words are hashed into one.
+    const seed = !raw
+      ? Date.now() % UI_RULES.seedRange
+      : /^\d+$/.test(raw)
+        ? Number(raw) % UI_RULES.seedRange
+        : [...raw].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % UI_RULES.seedRange;
+    try {
+      localStorage.setItem(TUTORIAL_PREF, tutorial ? 'on' : 'off');
+    } catch {
+      /* The choice is only remembered where storage allows. */
+    }
+    $('menu-panel').classList.add('hidden');
+    game.newGame(seed, { tutorial });
+    game.save(localStorage, true);
+    showIntro();
+  };
 };
 $('continue-game').onclick = () => {
   sound('page');
@@ -960,7 +993,16 @@ function renderNotes(left: HTMLElement, right: HTMLElement) {
   const biome = game.biome(),
     t = game.s.tutorial,
     current = D.TUTORIAL[t.step];
-  left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface, the mines and hell beneath, four dungeons, and three worlds behind the Rift.</p><canvas id="atlas-map" class="atlas-map" width="300" height="150" aria-label="Side elevation of the regions, depths, dungeons, and dimensions"></canvas><h3>Current ground · ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(', ')}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
+  left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface, the mines and hell beneath, four dungeons, and three worlds behind the Rift.</p><canvas id="atlas-map" class="atlas-map" width="300" height="150" aria-label="Side elevation of the regions, depths, dungeons, and dimensions"></canvas><h3>Current ground · ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(', ')}.</p><div class="book-actions"><button data-save>SAVE RECORD</button>${game.pocket.inCourse() ? '<button data-skip-course>LEAVE THE TRAINING GROUNDS</button>' : ''}<button class="quiet" data-menu>MAIN MENU</button></div>`;
+  const skip = left.querySelector<HTMLButtonElement>('[data-skip-course]');
+  if (skip)
+    skip.onclick = () => {
+      const r = game.pocket.finishCourse(false, false);
+      if (!r.ok) message(r.reason);
+      sound('page');
+      toggleJournal(false);
+      updateUI(true);
+    };
   right.innerHTML = `<h2>Lessons &amp; sightings</h2><p class="lede">${current ? current[0] + ' · ' + Math.min(current[2], t.tally[current[1]] || 0) + '/' + current[2] : 'The first field lessons are complete.'}</p><ol class="objective-list">${D.TUTORIAL.map(([label], i) => `<li class="${i < t.step ? 'done' : i === t.step ? 'current' : ''}">${label}</li>`).join('')}</ol><h3>Expedition chapters</h3><ol class="objective-list">${D.CHAPTERS.map(([label], i) => `<li class="${i < game.s.chapter ? 'done' : i === game.s.chapter ? 'current' : ''}">${label}</li>`).join('')}</ol><h3>Biome ledger</h3>${D.BIOMES.map((b) => `<div class="biome-entry ${b.id === biome.id ? 'current' : ''}"><strong>${b.name}</strong><small>${b.note}</small></div>`).join('')}<h3>Controls</h3><p>A / D move · W / Space jump and climb · S descend · E gather or interact · F strike · R / click mine · G fish · J / I journal · M map · Esc pause · 1–5 turn pages.</p>`;
   left.querySelector<HTMLButtonElement>('[data-save]')!.onclick = () => {
     game.save();
@@ -1858,7 +1900,17 @@ function updateUI(force = false) {
   $('ailments').innerHTML = chips + off;
   $('weapon-name').textContent =
     game.s.player.weapon === 'fists' ? pretty('fists') : game.armoury.title(game.s.player.weapon);
-  const step = D.TUTORIAL[game.s.tutorial.step] || D.CHAPTERS[game.s.chapter];
+  const lesson = game.pocket.inCourse() ? (game.s.tutorial.course ?? D.COURSE.length) : -1,
+    step =
+      lesson >= 0 && lesson < D.COURSE.length
+        ? D.COURSE[lesson]
+        : D.TUTORIAL[game.s.tutorial.step] || D.CHAPTERS[game.s.chapter];
+  const hint = lesson >= 0 && lesson < D.COURSE.length ? D.STATIONS[D.stationOf(lesson)] : null;
+  $('objective-label').textContent = hint
+    ? `TRAINING · ${hint.name.toUpperCase()}`
+    : 'CURRENT FIELD TASK';
+  $('objective-hint').textContent = hint ? hint.sign : '';
+  $('objective-hint').classList.toggle('hidden', !hint);
   $('objective-text').textContent = step ? step[0] : 'The final folio is complete.';
   $('objective-progress').textContent = step
     ? `${Math.min(step[2], game.s.tutorial.tally[step[1]] || 0)} / ${step[2]}`
@@ -1882,9 +1934,13 @@ function updateUI(force = false) {
             ? 'The altar burns'
             : 'Call ' + D.MOBS[near.object.kind ?? '']?.name
           : near.object.type === 'portal'
-            ? game.pocket.here(near.object.x)
-              ? 'Return to your Waystone'
-              : 'Return home through the portal'
+            ? game.pocket.inCourse() && game.pocket.here(near.object.x)
+              ? near.object.kind === 'course'
+                ? 'Step out into the wildlands'
+                : 'Skip the course'
+              : game.pocket.here(near.object.x)
+                ? 'Return to your Waystone'
+                : 'Return home through the portal'
             : near.object.type === 'waystone'
               ? 'Open the Atlas'
               : near.object.type === 'shrine'
@@ -1955,7 +2011,7 @@ function updateUI(force = false) {
   if (showBanner && $('realm-banner').dataset.at !== String(b.at)) {
     $('realm-banner').dataset.at = String(b.at);
     $('realm-banner').innerHTML =
-      `<small>TIER ${D.tierName(b.tier)}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => D.modById(m)?.name).join(' · ')}</span>` : ''}<em>${D.realmById(game.s.pocket?.realm ?? '')?.hazard.name ?? ''}</em>`;
+      `<small>${b.tier ? 'TIER ' + D.tierName(b.tier) : 'A SHORT COURSE'}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => D.modById(m)?.name).join(' · ')}</span>` : ''}<em>${D.realmById(game.s.pocket?.realm ?? '')?.hazard.name ?? ''}</em>`;
   }
   const msg = game.messages[0];
   if (msg && msg !== state.seenMessage) {

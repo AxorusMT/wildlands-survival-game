@@ -53,7 +53,8 @@ export interface RealmHazard {
     | 'pressure'
     | 'magma'
     | 'seasons'
-    | 'spores';
+    | 'spores'
+    | 'none';
   name: string;
   /** What it does, for the Atlas and the banner. */
   text: string;
@@ -66,6 +67,8 @@ export interface RealmTemplate {
   name: string;
   /** Difficulty band, I to V. */
   band: number;
+  /** A hand-laid course (the Training Grounds): no scatter, no great foe, only its own set pieces. */
+  course?: boolean;
   note: string;
   /** Open sky, or rock overhead. */
   sky: 'open' | 'cavern';

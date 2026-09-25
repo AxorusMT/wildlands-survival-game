@@ -87,6 +87,7 @@ export class Equipment extends System {
         this.game.say(itemName(id) + ' taken off.');
       } else {
         p.armor[piece.slot] = id;
+        this.game.progress.record('wear:' + id);
         this.game.say(itemName(id) + ' worn.', 'good');
       }
       this.game.sound('wear');
@@ -100,6 +101,7 @@ export class Equipment extends System {
         this.game.say(itemName(id) + ' taken off.');
       } else {
         p.clothing[garment.layer] = id;
+        this.game.progress.record('wear:' + id);
         this.game.say(`${itemName(id)} worn · ${garment.text.toLowerCase()}.`, 'good');
       }
       this.game.sound('wear');

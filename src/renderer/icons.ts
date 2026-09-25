@@ -314,6 +314,8 @@ export const ICONS: Record<string, [Tpl, string, string?]> = {
   diving_bell: ['crate', '#5a9ac0'],
   fracture_shard: ['crystal', '#d8a0ff'],
   lore_tablet: ['scroll', '#8b8f8a'],
+  signpost: ['log', '#9a7048'],
+  bramble: ['bundle', '#5a7a3a'],
   cairn: ['lump', '#8b8f8a'],
   merchant_stall: ['crate', '#c85a4a'],
   tinkers_bench: ['crate', '#8a6440'],

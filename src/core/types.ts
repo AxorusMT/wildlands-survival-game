@@ -306,7 +306,8 @@ export interface GameState {
   tileEdits: Record<number, number>;
   drops: Drop[];
   effects: unknown[];
-  tutorial: { step: number; tally: Record<string, number> };
+  /** Field lessons: the overworld step, every tally, and the Training Grounds lesson (if on the course). */
+  tutorial: { step: number; tally: Record<string, number>; course?: number };
   chapter: number;
   discoveries: string[];
   altar: Altar;

@@ -1014,14 +1014,57 @@ small.spoiled {
   z-index: 6;
 }
 #boss-hud[data-shape='notched'] {
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  clip-path: polygon(
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px),
+    0 10px
+  );
 }
 #boss-hud[data-shape='plate'] {
-  clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%);
+  clip-path: polygon(
+    18px 0,
+    calc(100% - 18px) 0,
+    100% 50%,
+    calc(100% - 18px) 100%,
+    18px 100%,
+    0 50%
+  );
   padding-inline: 34px;
 }
 #boss-hud[data-shape='jagged'] {
-  clip-path: polygon(0 0, 8% 6px, 16% 0, 24% 6px, 32% 0, 40% 6px, 50% 0, 60% 6px, 68% 0, 76% 6px, 84% 0, 92% 6px, 100% 0, 100% 100%, 92% calc(100% - 6px), 84% 100%, 76% calc(100% - 6px), 68% 100%, 60% calc(100% - 6px), 50% 100%, 40% calc(100% - 6px), 32% 100%, 24% calc(100% - 6px), 16% 100%, 8% calc(100% - 6px), 0 100%);
+  clip-path: polygon(
+    0 0,
+    8% 6px,
+    16% 0,
+    24% 6px,
+    32% 0,
+    40% 6px,
+    50% 0,
+    60% 6px,
+    68% 0,
+    76% 6px,
+    84% 0,
+    92% 6px,
+    100% 0,
+    100% 100%,
+    92% calc(100% - 6px),
+    84% 100%,
+    76% calc(100% - 6px),
+    68% 100%,
+    60% calc(100% - 6px),
+    50% 100%,
+    40% calc(100% - 6px),
+    32% 100%,
+    24% calc(100% - 6px),
+    16% 100%,
+    8% calc(100% - 6px),
+    0 100%
+  );
   padding-block: 12px 11px;
 }
 #hud.boss-fight .hud-location {
@@ -1132,7 +1175,12 @@ small.spoiled {
 }
 #boss-hud[data-pattern='cracks'] .boss-track i {
   background:
-    repeating-linear-gradient(60deg, transparent 0 10px, #0a080688 10px 11px, transparent 11px 23px),
+    repeating-linear-gradient(
+      60deg,
+      transparent 0 10px,
+      #0a080688 10px 11px,
+      transparent 11px 23px
+    ),
     repeating-linear-gradient(-50deg, transparent 0 17px, #0a080666 17px 18px),
     linear-gradient(90deg, var(--boss-a), var(--boss-b));
 }
@@ -1188,4 +1236,41 @@ small.spoiled {
     width: 70vw;
     top: 8px;
   }
+}
+
+/* The Training Grounds: the station's sign under the lesson. */
+.hud-right .objective-hint {
+  margin: 8px 0 0;
+  padding-top: 6px;
+  border-top: var(--px) dashed #b8a47c;
+  font: 400 14px/1.2 var(--pixel);
+  color: var(--ink);
+}
+.hud-right .objective-hint.hidden {
+  display: none;
+}
+/* World creation: a checkbox with its note beneath. */
+.menu-panel label.check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: center;
+}
+.menu-panel label.check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.menu-panel label.check small {
+  grid-column: 2;
+  font-size: 15px;
+  opacity: 0.8;
+}
+.menu-panel input[type='text'] {
+  margin-top: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  border: 2px solid #4a3a2a;
+  background: #f4ead4;
+  box-sizing: border-box;
 }

@@ -116,6 +116,32 @@ The game automatically saves to browser local storage every 40 seconds and when 
 
 For a quick starting route: gather wood, stone, and fiber in the meadow; make a stone axe and pickaxe; find flint and make a spear; place a campfire; collect water at a blue pool and boil it at the fire. The field task in the upper right follows this route live.
 
+### The Training Grounds
+
+A new expedition starts in the **Training Grounds**, a short hand-laid course, unless you untick _Start in the Training Grounds_ when creating the world. The same page also takes an optional world seed: a number, or any words.
+
+The course has eleven stations, each with a signpost. The HUD shows the lesson you are on, with its sign's text beneath it. In order, the stations teach:
+
+1. moving;
+2. jumping and climbing ladders;
+3. gathering and crafting a stone axe, a pickaxe and a campfire;
+4. collecting, boiling and drinking water;
+5. mining copper;
+6. fighting and hunting, then cooking and eating;
+7. stowing food in an icebox;
+8. treating bleeding from the brambles with a bandage from the chest;
+9. wearing and mending clothes;
+10. what Waystones and realm keys do;
+11. what the journal holds: Skills, the Codex, Feats and the Atlas.
+
+The course is also where you leave it:
+
+- **Finishing:** the portal at the far end takes you to the meadow. You keep everything you made, and the field tasks there catch up with what you have already done.
+- **Skipping:** press E twice at the portal where you arrived, or use _Leave the Training Grounds_ on the journal's Notes page.
+- **Falling:** if you fall on the course, you wake at its start.
+
+In the field console, `realm course` enters the course or leaves it.
+
 ## Progression
 
 Stone → copper → iron → steel → obsidian → hellstone → myconite → starmetal → voidsteel. Tool tiers gate ore and hard ground. Nine wide biomes form a 30,000 × 4,480 side-view overworld. Each region has its own lie of the land (flat marsh and tundra, rolling meadow and forest, hilly taiga, alpine peaks, desert dunes, terraced badlands mesas), and each border has its own feature: a lagoon, a river valley, ridges, a frozen lake, an escarpment, and a canyon. Every slope stays walkable.
@@ -415,7 +441,7 @@ All diseases and treatments are fictional game mechanics, not medical advice.
 
 Run `npm test` with a recent Node.js release. It checks:
 
-- the tutorial, crafting and ore gates, illness, spoilage, offline saves, farming, side-view physics and mining;
+- the Training Grounds (its layout, lessons, brambles, portals, saving, and staying out of the Atlas), the tutorial, crafting and ore gates, illness, spoilage, offline saves, farming, side-view physics and mining;
 - Effergy placement, Direwolf hunts, rewards and upgrades;
 - the dungeons (loot, traps, guardians, altars and brick);
 - boss fights and sigils, the Rift Gate, travel and portals home, and every dimension's walls, life and boss;

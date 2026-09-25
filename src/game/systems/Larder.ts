@@ -89,6 +89,7 @@ export class Larder extends System {
     this.game.s.inventory = this.game.s.inventory.filter((e) => !entries.includes(e));
     this.game.equipment.tidy();
     this.game.sound('place', st.x, st.y, 0.5);
+    this.game.progress.record('stow', entries.length);
     return { ok: true };
   }
   take(st: Structure, id: string, qty = 1): GameResult {

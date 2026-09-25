@@ -94,8 +94,8 @@ export class Game {
     this.newGame(seed);
   }
 
-  /** Starts a fresh expedition from a seed. */
-  newGame(seed: number = RULES.defaultSeed): this {
+  /** Starts a fresh expedition from a seed, in the Training Grounds if asked. */
+  newGame(seed: number = RULES.defaultSeed, opts: { tutorial?: boolean } = {}): this {
     this.rng = seededRandom(seed);
     // A fresh world starts with the pocket strip empty.
     setActiveRealm(null);
@@ -185,7 +185,8 @@ export class Game {
       this.equipment.wear(id);
     }
     this.messages = [];
-    this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
+    if (opts.tutorial) this.pocket.startCourse();
+    else this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
     return this;
   }
 
