@@ -2,6 +2,8 @@ import * as D from '../data/index.ts';
 import { Game } from '../game/Game.ts';
 import { draw, pixelView, spawnEffects, type PixelView } from '../renderer/Renderer.ts';
 import { iconURL } from '../renderer/icons.ts';
+import { mobPortrait } from '../renderer/actors.ts';
+import { ART, GROUND } from '../renderer/art.ts';
 import { Audio } from '../audio/Audio.ts';
 import { musicScene } from '../audio/scenes.ts';
 import { SILENCE, type AmbienceLevels } from '../audio/sfx.ts';
@@ -661,7 +663,7 @@ function renderNotes(left: HTMLElement, right: HTMLElement) {
   const biome = game.biome(),
     t = game.s.tutorial,
     current = D.TUTORIAL[t.step];
-  left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface; beneath them the upper and lower mines, and below those, hell.</p><canvas id="atlas-map" class="atlas-map" width="420" height="300" aria-label="Side elevation of the nine regions and the depths below"></canvas><h3>Current ground · ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(', ')}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
+  left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface, the mines and hell beneath, four dungeons, and three worlds behind the Rift.</p><canvas id="atlas-map" class="atlas-map" width="300" height="150" aria-label="Side elevation of the regions, depths, dungeons, and dimensions"></canvas><h3>Current ground · ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(', ')}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
   right.innerHTML = `<h2>Lessons &amp; sightings</h2><p class="lede">${current ? current[0] + ' · ' + Math.min(current[2], t.tally[current[1]] || 0) + '/' + current[2] : 'The first field lessons are complete.'}</p><ol class="objective-list">${D.TUTORIAL.map(([label], i) => `<li class="${i < t.step ? 'done' : i === t.step ? 'current' : ''}">${label}</li>`).join('')}</ol><h3>Expedition chapters</h3><ol class="objective-list">${D.CHAPTERS.map(([label], i) => `<li class="${i < game.s.chapter ? 'done' : i === game.s.chapter ? 'current' : ''}">${label}</li>`).join('')}</ol><h3>Biome ledger</h3>${D.BIOMES.map((b) => `<div class="biome-entry ${b.id === biome.id ? 'current' : ''}"><strong>${b.name}</strong><small>${b.note}</small></div>`).join('')}<h3>Controls</h3><p>A / D move · W / Space jump and climb · S descend · E gather or interact · F strike · R / click mine · G fish · J / I journal · M map · Esc pause · 1–5 turn pages.</p>`;
   left.querySelector<HTMLButtonElement>('[data-save]')!.onclick = () => {
     game.save();
@@ -679,94 +681,114 @@ function renderNotes(left: HTMLElement, right: HTMLElement) {
   };
   drawAtlas();
 }
+/** Every creature, bosses last, with how many the player has slain. */
+const bestiary = () =>
+  Object.keys(D.MOBS)
+    .map((id) => ({ id, kills: game.s.tutorial.tally['kill:' + id] ?? 0 }))
+    .sort((a, b) => Number(!!D.MOBS[a.id].boss) - Number(!!D.MOBS[b.id].boss));
+let atlasLand: HTMLCanvasElement | null = null;
+/** The field atlas: a pixel side-elevation of the overworld, its dungeons, and the worlds beyond. */
 function drawAtlas() {
   const map = $<HTMLCanvasElement>('atlas-map'),
     ink = map.getContext('2d')!;
   const w = map.width,
-    h = map.height;
-  ink.fillStyle = '#ddcfaa';
+    h = map.height,
+    worldH = 112;
+  ink.imageSmoothingEnabled = false;
+  ink.fillStyle = '#d8caa4';
   ink.fillRect(0, 0, w, h);
-  ink.strokeStyle = '#8e795e';
-  ink.lineWidth = 1;
-  for (let y = 20; y < h; y += 25) {
-    ink.beginPath();
-    ink.moveTo(0, y);
-    ink.lineTo(w, y);
-    ink.stroke();
-  }
-  const X = (x: number) => (x / D.WORLD_W) * w,
-    Y = (y: number) => (y / D.WORLD_H) * (h - 30) + 14;
-  const step = D.WORLD_W / 420;
-  // Each depth is washed in its own ink, from earth to the red of hell.
-  const bands: [number, number, string][] = [
-    [D.LAYERS[1].top, D.LAYERS[2].top, '#8a8667'],
-    [D.LAYERS[2].top, D.LAYERS[3].top, '#6f7483'],
-    [D.LAYERS[3].top, D.LAYERS[4].top, '#8d5a4a'],
-    [D.LAYERS[4].top, D.WORLD_H, '#6e3434'],
-  ];
-  for (const [top, bottom, color] of bands) {
-    ink.fillStyle = color;
-    ink.beginPath();
-    ink.moveTo(0, Y(bottom));
-    for (let x = 0; x <= D.WORLD_W; x += step) ink.lineTo(X(x), Y(Math.max(top, D.surfaceAt(x))));
-    ink.lineTo(w, Y(bottom));
-    ink.fill();
-  }
-  ink.strokeStyle = '#f1dfb3';
-  ink.lineWidth = 1.6;
-  for (let level = 1; level <= D.CAVE_LEVELS; level++) {
-    ink.beginPath();
-    for (let x = 0; x <= D.WORLD_W; x += step) {
-      const xx = X(x),
-        yy = Y(D.caveY(x, level));
-      if (!x) ink.moveTo(xx, yy);
-      else ink.lineTo(xx, yy);
+  const X = (x: number) => Math.floor((x / D.OVERWORLD_W) * w),
+    Y = (y: number) => Math.floor((y / D.WORLD_H) * worldH) + 4;
+  const dot = (x: number, y: number, c: string) => {
+    ink.fillStyle = c;
+    ink.fillRect(x, y, 1, 1);
+  };
+  // The land never changes shape on this scale, so it is surveyed once and reused.
+  if (atlasLand) ink.drawImage(atlasLand, 0, 0);
+  else {
+    // Each column: sky above the surface, then the layer inks, caves carved in light.
+    for (let px = 0; px < w; px++) {
+      const x = ((px + 0.5) / w) * D.OVERWORLD_W,
+        top = Y(D.surfaceAt(x));
+      for (let py = top; py < worldH + 4; py++) {
+        const y = ((py - 4 + 0.5) / worldH) * D.WORLD_H;
+        const cave = D.caveAt(x, y),
+          lava = D.lavaAt(x, y);
+        dot(
+          px,
+          py,
+          lava
+            ? '#e8702a'
+            : cave
+              ? '#c8b890'
+              : y >= D.LAYERS[4].top
+                ? '#6e3434'
+                : y >= D.LAYERS[3].top
+                  ? '#8d5a4a'
+                  : y >= D.LAYERS[2].top
+                    ? '#6f7483'
+                    : py === top
+                      ? (ART[D.biomeAt(x, 0).id]?.grass[1] ?? '#6a8a4a')
+                      : '#8a8667',
+        );
+      }
     }
-    ink.stroke();
+    atlasLand = document.createElement('canvas');
+    atlasLand.width = w;
+    atlasLand.height = h;
+    atlasLand.getContext('2d')!.drawImage(map, 0, 0);
   }
-  ink.fillStyle = '#2b1a18';
-  ink.beginPath();
-  for (let x = 0; x <= D.WORLD_W; x += step) ink.lineTo(X(x), Y(D.underworldCeiling(x)));
-  for (let x = D.WORLD_W; x >= 0; x -= step) ink.lineTo(X(x), Y(D.underworldFloor(x)));
-  ink.fill();
-  ink.fillStyle = '#e8702a';
-  for (let x = 0; x <= D.WORLD_W; x += step)
-    if (D.underworldFloor(x) > D.LAVA_Y)
-      ink.fillRect(X(x), Y(D.LAVA_Y), 1.2, Y(D.underworldFloor(x)) - Y(D.LAVA_Y));
-  ink.strokeStyle = '#3a2a1a';
-  ink.lineWidth = 1;
-  for (const shaft of D.SHAFTS) {
-    ink.beginPath();
-    ink.moveTo(X(shaft.x), Y(shaft.top));
-    ink.lineTo(X(shaft.x), Y(shaft.bottom));
-    ink.stroke();
+  // Dungeons are marked as walled boxes in their brick colour.
+  for (const d of D.DUNGEONS) {
+    const x0 = X(d.tx0 * D.TILE),
+      x1 = X((d.tx0 + d.cols) * D.TILE),
+      y0 = Y(d.ty0 * D.TILE),
+      y1 = Y((d.ty0 + d.rows) * D.TILE),
+      seen = game.s.discoveries.includes(d.def.id);
+    ink.fillStyle = seen ? (GROUND[d.def.brick]?.base ?? '#555') : '#5a5048';
+    ink.fillRect(x0, y0, x1 - x0, y1 - y0);
+    ink.fillStyle = '#2e2419';
+    ink.fillRect(x0, y0, x1 - x0, 1);
+    ink.fillRect(x0, y1 - 1, x1 - x0, 1);
+    ink.fillRect(x0, y0, 1, y1 - y0);
+    ink.fillRect(x1 - 1, y0, 1, y1 - y0);
+    if (game.s.bosses[d.def.boss]) dot(Math.floor((x0 + x1) / 2), y1 - 3, '#fff0a0');
   }
-  ink.font = 'italic 10px "EB Garamond", Georgia, serif';
-  ink.textAlign = 'left';
-  ink.fillStyle = '#f5ead0';
-  for (const layer of D.LAYERS.slice(2)) ink.fillText(layer.name, 4, Y(layer.top) + 11);
-  ink.font = 'bold 10px "EB Garamond", Georgia, serif';
-  ink.textAlign = 'center';
-  ink.fillStyle = '#322c24';
-  D.SIDE_ORDER.forEach((id, i) => {
-    const x = D.BIOME_CENTERS[id][0];
-    ink.fillText(
-      D.BIOMES.find((b) => b.id === id)!
-        .name.slice(0, 4)
-        .toUpperCase(),
-      X(x),
-      Y(D.surfaceAt(x)) - (i % 2 ? 26 : 13),
-    );
+  // The three dimensions, known once visited.
+  const dimY = worldH + 10,
+    dimW = Math.floor((w - 16) / 3);
+  D.DIMENSIONS.forEach((dim, i) => {
+    const x0 = 4 + i * (dimW + 4),
+      seen = game.s.discoveries.includes(dim.id),
+      colors: Record<string, [string, string]> = {
+        mycelia: ['#1c3a3a', '#58e0d0'],
+        skyreach: ['#8ab8e0', '#f4f4f8'],
+        void: ['#1a0f2a', '#b36cff'],
+      };
+    const [bg, fg] = colors[dim.id];
+    ink.fillStyle = seen ? bg : '#8a7a5a';
+    ink.fillRect(x0, dimY, dimW, h - dimY - 4);
+    if (seen)
+      for (let k = 0; k < 14; k++)
+        dot(x0 + 2 + ((k * 37) % (dimW - 4)), dimY + 2 + ((k * 23) % (h - dimY - 8)), fg);
+    ink.fillStyle = '#2e2419';
+    ink.fillRect(x0, dimY, dimW, 1);
+    ink.fillRect(x0, h - 5, dimW, 1);
+    if (D.regionAt(game.s.player.x) === dim.id) {
+      const px = x0 + Math.floor(((game.s.player.x - dim.start) / (dim.end - dim.start)) * dimW);
+      ink.fillStyle = '#a34d3f';
+      ink.fillRect(px - 1, dimY + 4, 3, 3);
+    }
   });
-  const px = X(game.s.player.x),
-    py = Y(game.s.player.y);
-  ink.beginPath();
-  ink.arc(px, py, 5, 0, 7);
-  ink.fillStyle = '#a34d3f';
-  ink.fill();
-  ink.font = '18px Caveat, cursive';
-  ink.textAlign = 'left';
-  ink.fillText('you', Math.min(w - 24, px + 8), py - 7);
+  // You are here.
+  if (D.regionAt(game.s.player.x) === 'overworld') {
+    const px = X(game.s.player.x),
+      py = Y(game.s.player.y);
+    ink.fillStyle = '#1a1410';
+    ink.fillRect(px - 2, py - 2, 5, 5);
+    ink.fillStyle = '#e8475a';
+    ink.fillRect(px - 1, py - 1, 3, 3);
+  }
 }
 function renderBeasts(left: HTMLElement, right: HTMLElement) {
   const a = game.s.altar,
@@ -780,7 +802,12 @@ function renderBeasts(left: HTMLElement, right: HTMLElement) {
     .map(([id, n]) => `${n} ${pretty(id)}`)
     .join(
       ' · ',
-    )} · ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? 'disabled' : ''}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? 'disabled' : ''}>UPGRADE · ${a.level === 1 ? 100 : 250} XP</button>` : ''}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ''}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p>`;
+    )} · ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? 'disabled' : ''}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? 'disabled' : ''}>UPGRADE · ${a.level === 1 ? 100 : 250} XP</button>` : ''}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ''}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p><h3>Bestiary · ${bestiary().filter((b) => b.kills).length} / ${Object.keys(D.MOBS).length}</h3><div class="book-list">${bestiary()
+    .map(
+      (b) =>
+        `<div class="book-row"><div class="with-icon"><span class="icon-slot portrait"><img src="${b.kills ? mobPortrait(b.id) : ''}" alt="" ${b.kills ? '' : 'hidden'}></span><div><strong>${b.kills ? D.MOBS[b.id].name : '???'}</strong><small>${b.kills ? (D.MOBS[b.id].boss ? 'Slain ' + b.kills + '×' : b.kills + ' slain') + ' · ' + D.MOBS[b.id].hp + ' health' : 'Not yet met'}</small></div></div></div>`,
+    )
+    .join('')}</div>`;
   const attune = right.querySelector<HTMLButtonElement>('[data-attune]'),
     upgrade = right.querySelector<HTMLButtonElement>('[data-upgrade]');
   if (attune)

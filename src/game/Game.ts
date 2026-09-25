@@ -219,7 +219,7 @@ export class Game {
   }
   /** Seconds one use of an item takes (the swing animation length). */
   useDuration(id: string) {
-    return RANGED[id] ? Math.min(0.3, RANGED[id].delay) : 0.3;
+    return RANGED[id] ? RANGED[id].delay : 0.3;
   }
   /** Uses the held item toward a world point (the mouse cursor). */
   useAt(x: number, y: number) {

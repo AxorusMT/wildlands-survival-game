@@ -3,7 +3,8 @@
 // monster is a line in MOBS rather than a new drawing routine.
 import type { Animal, Player } from '../core/types.ts';
 import { D } from './art.ts';
-import { iconSprite, useStyle } from './icons.ts';
+import { BLOCKS } from '../data/gear.ts';
+import { iconSprite, miniIcon, useStyle } from './icons.ts';
 import {
   PX,
   Painter,
@@ -303,8 +304,10 @@ export function drawPlayer(
     c.save();
     c.translate(Math.round(x + facing * (hx + reach)), Math.round(sy - bob + hy));
     c.scale(facing, 1);
-    if (style === 'hold') c.drawImage(icon.cv, -5, -12);
-    else {
+    if (style === 'hold') {
+      const small = BLOCKS[held] !== undefined ? miniIcon(held) : icon;
+      c.drawImage(small.cv, small === icon ? -5 : -2, small === icon ? -12 : -7);
+    } else {
       // Icons point up and right from a grip near their lower left; line that up with the arm.
       c.rotate(Math.atan2(Math.cos(qa), Math.sin(qa)) + Math.PI / 4);
       c.drawImage(icon.cv, -5, -13);
@@ -737,7 +740,7 @@ Object.assign(MOBS, {
   },
   unmaker: {
     tpl: 'floater',
-    body: '#2a1c3a',
+    body: '#6a4a8a',
     belly: '#ff5a8a',
     eye: '#0a0610',
     w: 64,
@@ -1093,24 +1096,71 @@ function paintCrawler(p: Painter, a: MobArt, frame: number, ox: number, oy: numb
 }
 
 function paintSlime(p: Painter, a: MobArt, frame: number, ox: number, oy: number) {
-  const [, d, m, l, ll] = ramp(a.body),
-    squash = [0, 1, 2, 1][frame % 4],
+  const [dk, d, m, l, ll] = ramp(a.body),
+    squash = [0, 1, 2, 1][frame % 4] * Math.max(1, Math.round(a.h / 14)),
     w = a.w / 2 + squash,
-    h = a.h - squash * 2;
-  p.ellipse(ox, oy - h / 2, w, h / 2, m);
-  for (let x = Math.round(ox - w); x <= ox + w; x++) if (p.alpha(x, oy - 1)) p.set(x, oy - 1, d);
-  p.rect(Math.round(ox - w / 2), Math.round(oy - h + 2), 2, 1, ll);
-  p.set(Math.round(ox - w / 2), Math.round(oy - h + 3), l);
-  p.set(ox + 2, Math.round(oy - h / 2), a.eye ?? '#1b1716');
-  p.set(ox - 1, Math.round(oy - h / 2), a.eye ?? '#1b1716');
-  if (a.parts?.includes('crown')) {
-    p.rect(ox - 3, Math.round(oy - h - 2), 7, 2, '#e8c84a');
-    p.set(ox - 3, Math.round(oy - h - 3), '#e8c84a');
-    p.set(ox, Math.round(oy - h - 3), '#e8c84a');
-    p.set(ox + 3, Math.round(oy - h - 3), '#e8c84a');
+    h = a.h - squash * 2,
+    cy = oy - h / 2,
+    big = a.w > 30;
+  p.ellipse(ox, cy, w, h / 2, m);
+  // Light from the upper left, a darker belly, and a shine.
+  for (let y = Math.round(oy - h); y < oy; y++)
+    for (let x = Math.round(ox - w); x <= ox + w; x++) {
+      if (!p.alpha(x, y)) continue;
+      const dx = (x - ox) / w,
+        dy = (y - cy) / (h / 2);
+      if (dx * 0.6 + dy * 0.9 > 0.75) p.set(x, y, d);
+      else if (dx * 0.5 + dy * 0.8 < -0.7) p.set(x, y, l);
+    }
+  for (let x = Math.round(ox - w); x <= ox + w; x++) if (p.alpha(x, oy - 1)) p.set(x, oy - 1, dk);
+  const shine = Math.max(1, Math.round(w / 6));
+  p.rect(
+    Math.round(ox - w * 0.55),
+    Math.round(oy - h * 0.8),
+    shine + 1,
+    Math.max(1, Math.round(shine / 2)),
+    ll,
+  );
+  // Eyes grow with the body; big slimes get pupils and a mouth.
+  const e = Math.max(1, Math.round(w / 7)),
+    ey = Math.round(cy - h * 0.08),
+    eye = a.eye ?? '#1b1716';
+  for (const ex of [ox - Math.round(w * 0.3), ox + Math.round(w * 0.3)]) {
+    if (big) {
+      p.ellipse(ex, ey, e * 1.2, e * 1.3, '#f4f0e8');
+      p.ellipse(ex + Math.ceil(e / 3), ey + 1, e * 0.6, e * 0.8, eye);
+      p.set(ex - Math.floor(e / 2), ey - Math.floor(e / 2), '#ffffff');
+    } else p.rect(ex, ey, e, e, eye);
   }
-  if (a.parts?.includes('core'))
-    p.rect(ox - 1, Math.round(oy - h / 2) + 1, 2, 2, a.belly ?? '#ffffff');
+  if (big)
+    p.rect(
+      ox - Math.round(w * 0.2),
+      ey + e * 2,
+      Math.round(w * 0.4),
+      Math.max(1, Math.round(e / 2)),
+      dk,
+    );
+  if (a.parts?.includes('core')) {
+    const cr = Math.max(1, Math.round(w / 8));
+    p.ellipse(ox + Math.round(w * 0.1), Math.round(cy + h * 0.2), cr, cr, a.belly ?? '#ffffff');
+  }
+  if (big)
+    // Mushroom caps sprout from a great slime's back, and spores freckle its skin.
+    for (let k = 0; k < 5; k++) {
+      const cx = Math.round(ox - w * 0.6 + k * w * 0.3),
+        top = Math.round(
+          oy - h * (0.85 + 0.12 * Math.sin(k * 1.7)) + Math.abs(cx - ox) * (h / w) * 0.35,
+        );
+      p.rect(cx, top - 3, 2, 4, '#e8dcc8');
+      p.ellipse(cx + 1, top - 4, 4, 2.2, a.belly ?? '#58e0d0');
+      p.set(cx, top - 5, '#ffffff');
+    }
+  if (a.parts?.includes('crown')) {
+    const cw = Math.max(7, Math.round(w * 0.5)),
+      top = Math.round(oy - h - 2);
+    p.rect(ox - Math.floor(cw / 2), top, cw, 2, '#e8c84a');
+    for (let x = ox - Math.floor(cw / 2); x < ox + cw / 2; x += 3) p.set(x, top - 1, '#e8c84a');
+  }
 }
 
 function paintFloater(p: Painter, a: MobArt, frame: number, ox: number, oy: number) {
@@ -1119,18 +1169,50 @@ function paintFloater(p: Painter, a: MobArt, frame: number, ox: number, oy: numb
     cy = oy - Math.round(a.h * 0.6),
     r = a.w / 2;
   if (parts.has('eye')) {
+    if (r > 20)
+      // The Unmaker trails tentacles of void, swaying as it drifts.
+      for (let k = 0; k < 6; k++) {
+        let x = ox - r * 0.6 + k * r * 0.24,
+          y = cy + r * 0.7;
+        for (let j = 0; j < 16; j++) {
+          x += Math.sin(j * 0.6 + k * 1.3 + frame * 0.8) * 1.4;
+          y += 1.7;
+          const t = Math.max(1, Math.round(3.5 - j / 5));
+          p.rect(
+            Math.round(x),
+            Math.round(y),
+            t,
+            t,
+            j % 4 === 3 ? (a.belly ?? '#ff5a8a') : j % 2 ? m : d,
+          );
+        }
+      }
+    // Sclera shaded toward the lower right, a ringed iris, a slit pupil, and a wet highlight.
     p.ellipse(ox, cy, r, r, '#e8e0e0');
-    p.ellipse(ox + 1, cy, r * 0.55, r * 0.55, a.belly ?? '#b36cff');
-    p.ellipse(ox + 1, cy, r * 0.25, r * 0.35, '#0a0610');
-    p.rect(Math.round(ox - r * 0.5), Math.round(cy - r * 0.6), 2, 1, '#ffffff');
-    for (let i = 0; i < 4; i++)
+    for (let y = Math.round(cy - r); y <= cy + r; y++)
+      for (let x = Math.round(ox - r); x <= ox + r; x++)
+        if (p.alpha(x, y) && (x - ox) * 0.6 + (y - cy) * 0.8 > r * 0.55) p.set(x, y, '#b8a8b0');
+    for (let i = 0; i < 6; i++) {
+      const ang = (i / 6) * Math.PI * 2 + 0.4;
       p.line(
-        Math.round(ox - r + 1),
-        cy + i - 1,
-        Math.round(ox - r - 4 - ((i + frame) % 3)),
-        cy + i * 2 - 2,
-        '#a02a3a',
+        Math.round(ox + Math.cos(ang) * r * 0.95),
+        Math.round(cy + Math.sin(ang) * r * 0.95),
+        Math.round(ox + Math.cos(ang + 0.2) * r * 0.6),
+        Math.round(cy + Math.sin(ang + 0.2) * r * 0.6),
+        '#c84a5a',
       );
+    }
+    const iris = a.belly ?? '#b36cff';
+    p.ellipse(ox + 1, cy, r * 0.58, r * 0.58, shade(iris, -0.35));
+    p.ellipse(ox + 1, cy, r * 0.5, r * 0.5, iris);
+    p.ellipse(ox + 1, cy, r * 0.12 + 0.5, r * 0.36, a.eye ?? '#0a0610');
+    p.rect(
+      Math.round(ox - r * 0.45),
+      Math.round(cy - r * 0.55),
+      Math.max(2, Math.round(r / 8)),
+      Math.max(1, Math.round(r / 16)),
+      '#ffffff',
+    );
     return;
   }
   if (parts.has('ghost')) {
@@ -1179,10 +1261,12 @@ const PAINT: Record<Tpl, (p: Painter, a: MobArt, frame: number, ox: number, oy: 
 };
 function mobSprite(key: string, a: MobArt, frame: number): Sprite {
   return cached(`mob:${key}:${frame}`, () => {
-    const W = Math.round(a.w * (a.tpl === 'flyer' ? 1.2 : 1.6)) + 8,
-      H = a.h + 14,
+    // Floaters trail tentacles or tails below their anchor, so they get room underneath.
+    const below = a.tpl === 'floater' ? Math.round(a.h * 0.5) : 0,
+      W = Math.round(a.w * (a.tpl === 'flyer' ? 1.2 : 1.6)) + 8,
+      H = a.h + 14 + below,
       ox = Math.round(W / 2),
-      oy = H - 1;
+      oy = H - 1 - below;
     return sprite(W, H, ox, oy, (p) => PAINT[a.tpl](p, a, frame, ox, oy));
   });
 }
@@ -1269,4 +1353,16 @@ export function drawAnimal(
     );
     blit(c, bang, x, by);
   }
+}
+
+const portraits = new Map<string, string>();
+/** A creature's first frame as a data URL, for the journal's bestiary. */
+export function mobPortrait(type: string): string {
+  let url = portraits.get(type);
+  if (!url) {
+    const art = MOBS[type] ?? MOBS.wolf;
+    url = mobSprite(type, art, 0).cv.toDataURL();
+    portraits.set(type, url);
+  }
+  return url;
 }

@@ -753,6 +753,22 @@ export function iconSprite(id: string): Sprite {
     return sprite(16, 16, 8, 8, (p) => paint(p, tpl, col, col2));
   });
 }
+/** A half-size icon for blocks carried in hand, sampled pixel for pixel. */
+export function miniIcon(id: string): Sprite {
+  return cached('mini:' + id, () => {
+    const full = iconSprite(id),
+      src = full.cv.getContext('2d')!.getImageData(0, 0, full.cv.width, full.cv.height),
+      w = Math.ceil(full.cv.width / 2),
+      h = Math.ceil(full.cv.height / 2),
+      p = new Painter(w, h);
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const i = (y * 2 * src.width + x * 2) * 4;
+        if (src.data[i + 3] > 0) p.set(x, y, [src.data[i], src.data[i + 1], src.data[i + 2]]);
+      }
+    return { cv: p.toCanvas(), ox: Math.floor(w / 2), oy: Math.floor(h / 2) };
+  });
+}
 /** A glowing item keeps a soft pulse in the world and a light in the dark. */
 export const glowingItem = (id: string) =>
   /crystal|hellstone|hellfire|eclipse|core|myconite|starmetal|voidsteel|sigil|star|essence|torch|glow/.test(

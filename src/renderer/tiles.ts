@@ -172,9 +172,11 @@ function patternPixel(p: Pattern, s: GroundStyle, x: number, y: number): number 
       return rocky(x, y, 16, 29);
     }
     case 'void': {
-      if (h < 0.02) return s.accent ?? 4;
+      // Glassy black-violet slabs, faintly veined, with the odd star caught inside.
+      if (h < 0.015) return s.accent ?? 4;
       const swirl = Math.abs(pnoise(x, y, 16, 31) - 0.5);
-      return swirl < 0.04 ? 3 : n > 0.55 ? 1 : 2;
+      if (swirl < 0.035) return 3;
+      return rocky(x, y, 16, 33) === 0 ? 0 : n > 0.55 ? 1 : 2;
     }
     case 'obsidian': {
       if (wrap(x * 3 + y * 5, 23) === 0) return s.accent ?? 4;

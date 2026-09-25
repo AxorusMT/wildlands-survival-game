@@ -822,7 +822,20 @@
     ["Place the Effergy of Beasts", "place:effergy", 1],
     ["Defeat an Eclipse Direwolf", "kill:boss", 1],
     ["Defeat an Ember Direwolf", "kill:boss", 2],
-    ["Defeat the Void Direwolf", "kill:boss", 3]
+    ["Defeat the Void Direwolf", "kill:boss", 3],
+    // Beyond the Effergy: the dungeons, the Rift, and the worlds behind it.
+    ["Find the Mossy Crypt beneath the forest", "visit:crypt", 1],
+    ["Slay the Hollow King", "boss:hollow_king", 1],
+    ["Build the Rift Gate and set the Sigil of Bone", "place:rift_gate", 1],
+    ["Step into the Mycelial Deep", "visit:mycelia", 1],
+    ["Slay the Rime Colossus in the Frost Keep", "boss:rime_colossus", 1],
+    ["Slay Pharaoh Ankhet in the Sunken Tomb", "boss:pharaoh", 1],
+    ["Walk the islands of Skyreach", "visit:skyreach", 1],
+    ["Slay Archdemon Vahl in the Cinder Citadel", "boss:archdemon", 1],
+    ["Slay the Sporemother", "boss:sporemother", 1],
+    ["Slay the Tempest Roc", "boss:tempest_roc", 1],
+    ["Cross into the Hollow Void", "visit:void", 1],
+    ["Unmake the Unmaker", "boss:unmaker", 1]
   ];
 
   // src/data/recipes.ts
@@ -5118,6 +5131,12 @@
     }
     // The first visit to each region is recorded as a discovery.
     discover() {
+      const p = this.game.s.player, dungeon2 = dungeonAt(p.x, p.y - 20);
+      if (dungeon2 && !this.game.s.discoveries.includes(dungeon2.def.id)) {
+        this.game.s.discoveries.push(dungeon2.def.id);
+        this.record("visit:" + dungeon2.def.id);
+        this.game.say("New field entry: " + dungeon2.def.name + ".", "good");
+      }
       const region = this.game.biome();
       if (this.game.s.discoveries.includes(region.id)) return;
       this.game.s.discoveries.push(region.id);
@@ -6307,7 +6326,7 @@
     }
     /** Seconds one use of an item takes (the swing animation length). */
     useDuration(id) {
-      return RANGED[id] ? Math.min(0.3, RANGED[id].delay) : 0.3;
+      return RANGED[id] ? RANGED[id].delay : 0.3;
     }
     /** Uses the held item toward a world point (the mouse cursor). */
     useAt(x, y) {
@@ -6892,8 +6911,8 @@
     19: { base: "#5a4a6a", pattern: "soil", cap: "mycel", wall: "#221a2e" },
     20: { base: "#4a3f5e", pattern: "fungal", accent: "#6ae0d0", wall: "#1a1426" },
     21: { base: "#f4f4f8", pattern: "cloud", cap: "cloud" },
-    22: { base: "#cfc4b0", pattern: "stone", cap: "region", wall: "#6a6050" },
-    23: { base: "#2e1c46", pattern: "void", accent: "#b36cff", wall: "#0c0616" },
+    22: { base: "#c4ccd8", pattern: "stone", cap: "region", wall: "#5a6478" },
+    23: { base: "#4a3470", pattern: "void", accent: "#d8a8ff", wall: "#140a22" },
     24: { base: "#a06cf0", pattern: "crystal", accent: "#f0d8ff", glow: "#b36cff" },
     25: { base: "#262030", pattern: "obsidian", accent: "#7a6aa0", wall: "#0e0a14" },
     26: { base: "#e0c890", pattern: "bigbrick", accent: "#fff0c0", wall: "#6a5a3a" },
@@ -7608,6 +7627,17 @@
       return sprite(16, 16, 8, 8, (p) => paint(p, tpl, col, col2));
     });
   }
+  function miniIcon(id) {
+    return cached("mini:" + id, () => {
+      const full = iconSprite(id), src = full.cv.getContext("2d").getImageData(0, 0, full.cv.width, full.cv.height), w = Math.ceil(full.cv.width / 2), h = Math.ceil(full.cv.height / 2), p = new Painter(w, h);
+      for (let y = 0; y < h; y++)
+        for (let x = 0; x < w; x++) {
+          const i = (y * 2 * src.width + x * 2) * 4;
+          if (src.data[i + 3] > 0) p.set(x, y, [src.data[i], src.data[i + 1], src.data[i + 2]]);
+        }
+      return { cv: p.toCanvas(), ox: Math.floor(w / 2), oy: Math.floor(h / 2) };
+    });
+  }
   var glowingItem = (id) => /crystal|hellstone|hellfire|eclipse|core|myconite|starmetal|voidsteel|sigil|star|essence|torch|glow/.test(
     id
   );
@@ -7827,8 +7857,10 @@
       c.save();
       c.translate(Math.round(x + facing * (hx + reach)), Math.round(sy - bob + hy));
       c.scale(facing, 1);
-      if (style === "hold") c.drawImage(icon2.cv, -5, -12);
-      else {
+      if (style === "hold") {
+        const small = BLOCKS[held] !== void 0 ? miniIcon(held) : icon2;
+        c.drawImage(small.cv, small === icon2 ? -5 : -2, small === icon2 ? -12 : -7);
+      } else {
         c.rotate(Math.atan2(Math.cos(qa), Math.sin(qa)) + Math.PI / 4);
         c.drawImage(icon2.cv, -5, -13);
       }
@@ -8239,7 +8271,7 @@
     },
     unmaker: {
       tpl: "floater",
-      body: "#2a1c3a",
+      body: "#6a4a8a",
       belly: "#ff5a8a",
       eye: "#0a0610",
       w: 64,
@@ -8531,37 +8563,103 @@
     p.set(bx + bw - 1, by + 2, a.eye ?? "#1b1716");
   }
   function paintSlime(p, a, frame2, ox, oy) {
-    const [, d, m, l, ll] = ramp(a.body), squash = [0, 1, 2, 1][frame2 % 4], w = a.w / 2 + squash, h = a.h - squash * 2;
-    p.ellipse(ox, oy - h / 2, w, h / 2, m);
-    for (let x = Math.round(ox - w); x <= ox + w; x++) if (p.alpha(x, oy - 1)) p.set(x, oy - 1, d);
-    p.rect(Math.round(ox - w / 2), Math.round(oy - h + 2), 2, 1, ll);
-    p.set(Math.round(ox - w / 2), Math.round(oy - h + 3), l);
-    p.set(ox + 2, Math.round(oy - h / 2), a.eye ?? "#1b1716");
-    p.set(ox - 1, Math.round(oy - h / 2), a.eye ?? "#1b1716");
-    if (a.parts?.includes("crown")) {
-      p.rect(ox - 3, Math.round(oy - h - 2), 7, 2, "#e8c84a");
-      p.set(ox - 3, Math.round(oy - h - 3), "#e8c84a");
-      p.set(ox, Math.round(oy - h - 3), "#e8c84a");
-      p.set(ox + 3, Math.round(oy - h - 3), "#e8c84a");
+    const [dk, d, m, l, ll] = ramp(a.body), squash = [0, 1, 2, 1][frame2 % 4] * Math.max(1, Math.round(a.h / 14)), w = a.w / 2 + squash, h = a.h - squash * 2, cy = oy - h / 2, big = a.w > 30;
+    p.ellipse(ox, cy, w, h / 2, m);
+    for (let y = Math.round(oy - h); y < oy; y++)
+      for (let x = Math.round(ox - w); x <= ox + w; x++) {
+        if (!p.alpha(x, y)) continue;
+        const dx = (x - ox) / w, dy = (y - cy) / (h / 2);
+        if (dx * 0.6 + dy * 0.9 > 0.75) p.set(x, y, d);
+        else if (dx * 0.5 + dy * 0.8 < -0.7) p.set(x, y, l);
+      }
+    for (let x = Math.round(ox - w); x <= ox + w; x++) if (p.alpha(x, oy - 1)) p.set(x, oy - 1, dk);
+    const shine = Math.max(1, Math.round(w / 6));
+    p.rect(
+      Math.round(ox - w * 0.55),
+      Math.round(oy - h * 0.8),
+      shine + 1,
+      Math.max(1, Math.round(shine / 2)),
+      ll
+    );
+    const e = Math.max(1, Math.round(w / 7)), ey = Math.round(cy - h * 0.08), eye = a.eye ?? "#1b1716";
+    for (const ex of [ox - Math.round(w * 0.3), ox + Math.round(w * 0.3)]) {
+      if (big) {
+        p.ellipse(ex, ey, e * 1.2, e * 1.3, "#f4f0e8");
+        p.ellipse(ex + Math.ceil(e / 3), ey + 1, e * 0.6, e * 0.8, eye);
+        p.set(ex - Math.floor(e / 2), ey - Math.floor(e / 2), "#ffffff");
+      } else p.rect(ex, ey, e, e, eye);
     }
-    if (a.parts?.includes("core"))
-      p.rect(ox - 1, Math.round(oy - h / 2) + 1, 2, 2, a.belly ?? "#ffffff");
+    if (big)
+      p.rect(
+        ox - Math.round(w * 0.2),
+        ey + e * 2,
+        Math.round(w * 0.4),
+        Math.max(1, Math.round(e / 2)),
+        dk
+      );
+    if (a.parts?.includes("core")) {
+      const cr = Math.max(1, Math.round(w / 8));
+      p.ellipse(ox + Math.round(w * 0.1), Math.round(cy + h * 0.2), cr, cr, a.belly ?? "#ffffff");
+    }
+    if (big)
+      for (let k = 0; k < 5; k++) {
+        const cx = Math.round(ox - w * 0.6 + k * w * 0.3), top = Math.round(
+          oy - h * (0.85 + 0.12 * Math.sin(k * 1.7)) + Math.abs(cx - ox) * (h / w) * 0.35
+        );
+        p.rect(cx, top - 3, 2, 4, "#e8dcc8");
+        p.ellipse(cx + 1, top - 4, 4, 2.2, a.belly ?? "#58e0d0");
+        p.set(cx, top - 5, "#ffffff");
+      }
+    if (a.parts?.includes("crown")) {
+      const cw = Math.max(7, Math.round(w * 0.5)), top = Math.round(oy - h - 2);
+      p.rect(ox - Math.floor(cw / 2), top, cw, 2, "#e8c84a");
+      for (let x = ox - Math.floor(cw / 2); x < ox + cw / 2; x += 3) p.set(x, top - 1, "#e8c84a");
+    }
   }
   function paintFloater(p, a, frame2, ox, oy) {
     const [dk, d, m, l, ll] = ramp(a.body), parts = new Set(a.parts ?? []), cy = oy - Math.round(a.h * 0.6), r = a.w / 2;
     if (parts.has("eye")) {
+      if (r > 20)
+        for (let k = 0; k < 6; k++) {
+          let x = ox - r * 0.6 + k * r * 0.24, y = cy + r * 0.7;
+          for (let j = 0; j < 16; j++) {
+            x += Math.sin(j * 0.6 + k * 1.3 + frame2 * 0.8) * 1.4;
+            y += 1.7;
+            const t = Math.max(1, Math.round(3.5 - j / 5));
+            p.rect(
+              Math.round(x),
+              Math.round(y),
+              t,
+              t,
+              j % 4 === 3 ? a.belly ?? "#ff5a8a" : j % 2 ? m : d
+            );
+          }
+        }
       p.ellipse(ox, cy, r, r, "#e8e0e0");
-      p.ellipse(ox + 1, cy, r * 0.55, r * 0.55, a.belly ?? "#b36cff");
-      p.ellipse(ox + 1, cy, r * 0.25, r * 0.35, "#0a0610");
-      p.rect(Math.round(ox - r * 0.5), Math.round(cy - r * 0.6), 2, 1, "#ffffff");
-      for (let i = 0; i < 4; i++)
+      for (let y = Math.round(cy - r); y <= cy + r; y++)
+        for (let x = Math.round(ox - r); x <= ox + r; x++)
+          if (p.alpha(x, y) && (x - ox) * 0.6 + (y - cy) * 0.8 > r * 0.55) p.set(x, y, "#b8a8b0");
+      for (let i = 0; i < 6; i++) {
+        const ang = i / 6 * Math.PI * 2 + 0.4;
         p.line(
-          Math.round(ox - r + 1),
-          cy + i - 1,
-          Math.round(ox - r - 4 - (i + frame2) % 3),
-          cy + i * 2 - 2,
-          "#a02a3a"
+          Math.round(ox + Math.cos(ang) * r * 0.95),
+          Math.round(cy + Math.sin(ang) * r * 0.95),
+          Math.round(ox + Math.cos(ang + 0.2) * r * 0.6),
+          Math.round(cy + Math.sin(ang + 0.2) * r * 0.6),
+          "#c84a5a"
         );
+      }
+      const iris = a.belly ?? "#b36cff";
+      p.ellipse(ox + 1, cy, r * 0.58, r * 0.58, shade(iris, -0.35));
+      p.ellipse(ox + 1, cy, r * 0.5, r * 0.5, iris);
+      p.ellipse(ox + 1, cy, r * 0.12 + 0.5, r * 0.36, a.eye ?? "#0a0610");
+      p.rect(
+        Math.round(ox - r * 0.45),
+        Math.round(cy - r * 0.55),
+        Math.max(2, Math.round(r / 8)),
+        Math.max(1, Math.round(r / 16)),
+        "#ffffff"
+      );
       return;
     }
     if (parts.has("ghost")) {
@@ -8604,7 +8702,7 @@
   };
   function mobSprite(key, a, frame2) {
     return cached(`mob:${key}:${frame2}`, () => {
-      const W = Math.round(a.w * (a.tpl === "flyer" ? 1.2 : 1.6)) + 8, H = a.h + 14, ox = Math.round(W / 2), oy = H - 1;
+      const below = a.tpl === "floater" ? Math.round(a.h * 0.5) : 0, W = Math.round(a.w * (a.tpl === "flyer" ? 1.2 : 1.6)) + 8, H = a.h + 14 + below, ox = Math.round(W / 2), oy = H - 1 - below;
       return sprite(W, H, ox, oy, (p) => PAINT[a.tpl](p, a, frame2, ox, oy));
     });
   }
@@ -8670,6 +8768,16 @@
       );
       blit(c, bang, x, by);
     }
+  }
+  var portraits = /* @__PURE__ */ new Map();
+  function mobPortrait(type) {
+    let url = portraits.get(type);
+    if (!url) {
+      const art2 = MOBS3[type] ?? MOBS3.wolf;
+      url = mobSprite(type, art2, 0).cv.toDataURL();
+      portraits.set(type, url);
+    }
+    return url;
   }
 
   // src/renderer/effects.ts
@@ -10570,9 +10678,10 @@
         return rocky(x, y, 16, 29);
       }
       case "void": {
-        if (h < 0.02) return s.accent ?? 4;
+        if (h < 0.015) return s.accent ?? 4;
         const swirl = Math.abs(pnoise(x, y, 16, 31) - 0.5);
-        return swirl < 0.04 ? 3 : n > 0.55 ? 1 : 2;
+        if (swirl < 0.035) return 3;
+        return rocky(x, y, 16, 33) === 0 ? 0 : n > 0.55 ? 1 : 2;
       }
       case "obsidian": {
         if (wrap(x * 3 + y * 5, 23) === 0) return s.accent ?? 4;
@@ -15552,7 +15661,7 @@
   }
   function renderNotes(left, right) {
     const biome = game.biome(), t = game.s.tutorial, current2 = TUTORIAL[t.step];
-    left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface; beneath them the upper and lower mines, and below those, hell.</p><canvas id="atlas-map" class="atlas-map" width="420" height="300" aria-label="Side elevation of the nine regions and the depths below"></canvas><h3>Current ground \xB7 ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(", ")}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
+    left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface, the mines and hell beneath, four dungeons, and three worlds behind the Rift.</p><canvas id="atlas-map" class="atlas-map" width="300" height="150" aria-label="Side elevation of the regions, depths, dungeons, and dimensions"></canvas><h3>Current ground \xB7 ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(", ")}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
     right.innerHTML = `<h2>Lessons &amp; sightings</h2><p class="lede">${current2 ? current2[0] + " \xB7 " + Math.min(current2[2], t.tally[current2[1]] || 0) + "/" + current2[2] : "The first field lessons are complete."}</p><ol class="objective-list">${TUTORIAL.map(([label], i) => `<li class="${i < t.step ? "done" : i === t.step ? "current" : ""}">${label}</li>`).join("")}</ol><h3>Expedition chapters</h3><ol class="objective-list">${CHAPTERS.map(([label], i) => `<li class="${i < game.s.chapter ? "done" : i === game.s.chapter ? "current" : ""}">${label}</li>`).join("")}</ol><h3>Biome ledger</h3>${BIOMES.map((b) => `<div class="biome-entry ${b.id === biome.id ? "current" : ""}"><strong>${b.name}</strong><small>${b.note}</small></div>`).join("")}<h3>Controls</h3><p>A / D move \xB7 W / Space jump and climb \xB7 S descend \xB7 E gather or interact \xB7 F strike \xB7 R / click mine \xB7 G fish \xB7 J / I journal \xB7 M map \xB7 Esc pause \xB7 1\u20135 turn pages.</p>`;
     left.querySelector("[data-save]").onclick = () => {
       game.save();
@@ -15570,86 +15679,78 @@
     };
     drawAtlas();
   }
+  var bestiary = () => Object.keys(MOBS).map((id) => ({ id, kills: game.s.tutorial.tally["kill:" + id] ?? 0 })).sort((a, b) => Number(!!MOBS[a.id].boss) - Number(!!MOBS[b.id].boss));
+  var atlasLand = null;
   function drawAtlas() {
     const map = $("atlas-map"), ink = map.getContext("2d");
-    const w = map.width, h = map.height;
-    ink.fillStyle = "#ddcfaa";
+    const w = map.width, h = map.height, worldH = 112;
+    ink.imageSmoothingEnabled = false;
+    ink.fillStyle = "#d8caa4";
     ink.fillRect(0, 0, w, h);
-    ink.strokeStyle = "#8e795e";
-    ink.lineWidth = 1;
-    for (let y = 20; y < h; y += 25) {
-      ink.beginPath();
-      ink.moveTo(0, y);
-      ink.lineTo(w, y);
-      ink.stroke();
-    }
-    const X = (x) => x / WORLD_W * w, Y = (y) => y / WORLD_H * (h - 30) + 14;
-    const step = WORLD_W / 420;
-    const bands = [
-      [LAYERS[1].top, LAYERS[2].top, "#8a8667"],
-      [LAYERS[2].top, LAYERS[3].top, "#6f7483"],
-      [LAYERS[3].top, LAYERS[4].top, "#8d5a4a"],
-      [LAYERS[4].top, WORLD_H, "#6e3434"]
-    ];
-    for (const [top, bottom, color] of bands) {
-      ink.fillStyle = color;
-      ink.beginPath();
-      ink.moveTo(0, Y(bottom));
-      for (let x = 0; x <= WORLD_W; x += step) ink.lineTo(X(x), Y(Math.max(top, surfaceAt(x))));
-      ink.lineTo(w, Y(bottom));
-      ink.fill();
-    }
-    ink.strokeStyle = "#f1dfb3";
-    ink.lineWidth = 1.6;
-    for (let level = 1; level <= CAVE_LEVELS; level++) {
-      ink.beginPath();
-      for (let x = 0; x <= WORLD_W; x += step) {
-        const xx = X(x), yy = Y(caveY(x, level));
-        if (!x) ink.moveTo(xx, yy);
-        else ink.lineTo(xx, yy);
+    const X = (x) => Math.floor(x / OVERWORLD_W * w), Y = (y) => Math.floor(y / WORLD_H * worldH) + 4;
+    const dot = (x, y, c) => {
+      ink.fillStyle = c;
+      ink.fillRect(x, y, 1, 1);
+    };
+    if (atlasLand) ink.drawImage(atlasLand, 0, 0);
+    else {
+      for (let px = 0; px < w; px++) {
+        const x = (px + 0.5) / w * OVERWORLD_W, top = Y(surfaceAt(x));
+        for (let py = top; py < worldH + 4; py++) {
+          const y = (py - 4 + 0.5) / worldH * WORLD_H;
+          const cave2 = caveAt(x, y), lava = lavaAt(x, y);
+          dot(
+            px,
+            py,
+            lava ? "#e8702a" : cave2 ? "#c8b890" : y >= LAYERS[4].top ? "#6e3434" : y >= LAYERS[3].top ? "#8d5a4a" : y >= LAYERS[2].top ? "#6f7483" : py === top ? ART[biomeAt(x, 0).id]?.grass[1] ?? "#6a8a4a" : "#8a8667"
+          );
+        }
       }
-      ink.stroke();
+      atlasLand = document.createElement("canvas");
+      atlasLand.width = w;
+      atlasLand.height = h;
+      atlasLand.getContext("2d").drawImage(map, 0, 0);
     }
-    ink.fillStyle = "#2b1a18";
-    ink.beginPath();
-    for (let x = 0; x <= WORLD_W; x += step) ink.lineTo(X(x), Y(underworldCeiling(x)));
-    for (let x = WORLD_W; x >= 0; x -= step) ink.lineTo(X(x), Y(underworldFloor(x)));
-    ink.fill();
-    ink.fillStyle = "#e8702a";
-    for (let x = 0; x <= WORLD_W; x += step)
-      if (underworldFloor(x) > LAVA_Y)
-        ink.fillRect(X(x), Y(LAVA_Y), 1.2, Y(underworldFloor(x)) - Y(LAVA_Y));
-    ink.strokeStyle = "#3a2a1a";
-    ink.lineWidth = 1;
-    for (const shaft of SHAFTS) {
-      ink.beginPath();
-      ink.moveTo(X(shaft.x), Y(shaft.top));
-      ink.lineTo(X(shaft.x), Y(shaft.bottom));
-      ink.stroke();
+    for (const d of DUNGEONS) {
+      const x0 = X(d.tx0 * TILE), x1 = X((d.tx0 + d.cols) * TILE), y0 = Y(d.ty0 * TILE), y1 = Y((d.ty0 + d.rows) * TILE), seen = game.s.discoveries.includes(d.def.id);
+      ink.fillStyle = seen ? GROUND[d.def.brick]?.base ?? "#555" : "#5a5048";
+      ink.fillRect(x0, y0, x1 - x0, y1 - y0);
+      ink.fillStyle = "#2e2419";
+      ink.fillRect(x0, y0, x1 - x0, 1);
+      ink.fillRect(x0, y1 - 1, x1 - x0, 1);
+      ink.fillRect(x0, y0, 1, y1 - y0);
+      ink.fillRect(x1 - 1, y0, 1, y1 - y0);
+      if (game.s.bosses[d.def.boss]) dot(Math.floor((x0 + x1) / 2), y1 - 3, "#fff0a0");
     }
-    ink.font = 'italic 10px "EB Garamond", Georgia, serif';
-    ink.textAlign = "left";
-    ink.fillStyle = "#f5ead0";
-    for (const layer of LAYERS.slice(2)) ink.fillText(layer.name, 4, Y(layer.top) + 11);
-    ink.font = 'bold 10px "EB Garamond", Georgia, serif';
-    ink.textAlign = "center";
-    ink.fillStyle = "#322c24";
-    SIDE_ORDER.forEach((id, i) => {
-      const x = BIOME_CENTERS[id][0];
-      ink.fillText(
-        BIOMES.find((b) => b.id === id).name.slice(0, 4).toUpperCase(),
-        X(x),
-        Y(surfaceAt(x)) - (i % 2 ? 26 : 13)
-      );
+    const dimY = worldH + 10, dimW = Math.floor((w - 16) / 3);
+    DIMENSIONS.forEach((dim, i) => {
+      const x0 = 4 + i * (dimW + 4), seen = game.s.discoveries.includes(dim.id), colors = {
+        mycelia: ["#1c3a3a", "#58e0d0"],
+        skyreach: ["#8ab8e0", "#f4f4f8"],
+        void: ["#1a0f2a", "#b36cff"]
+      };
+      const [bg, fg] = colors[dim.id];
+      ink.fillStyle = seen ? bg : "#8a7a5a";
+      ink.fillRect(x0, dimY, dimW, h - dimY - 4);
+      if (seen)
+        for (let k = 0; k < 14; k++)
+          dot(x0 + 2 + k * 37 % (dimW - 4), dimY + 2 + k * 23 % (h - dimY - 8), fg);
+      ink.fillStyle = "#2e2419";
+      ink.fillRect(x0, dimY, dimW, 1);
+      ink.fillRect(x0, h - 5, dimW, 1);
+      if (regionAt(game.s.player.x) === dim.id) {
+        const px = x0 + Math.floor((game.s.player.x - dim.start) / (dim.end - dim.start) * dimW);
+        ink.fillStyle = "#a34d3f";
+        ink.fillRect(px - 1, dimY + 4, 3, 3);
+      }
     });
-    const px = X(game.s.player.x), py = Y(game.s.player.y);
-    ink.beginPath();
-    ink.arc(px, py, 5, 0, 7);
-    ink.fillStyle = "#a34d3f";
-    ink.fill();
-    ink.font = "18px Caveat, cursive";
-    ink.textAlign = "left";
-    ink.fillText("you", Math.min(w - 24, px + 8), py - 7);
+    if (regionAt(game.s.player.x) === "overworld") {
+      const px = X(game.s.player.x), py = Y(game.s.player.y);
+      ink.fillStyle = "#1a1410";
+      ink.fillRect(px - 2, py - 2, 5, 5);
+      ink.fillStyle = "#e8475a";
+      ink.fillRect(px - 1, py - 1, 3, 3);
+    }
   }
   function renderBeasts(left, right) {
     const a = game.s.altar, cfg = BOSSES[a.level - 1], owned = game.s.structures.some((st) => st.type === "effergy"), near = !!game.near("effergy", 135);
@@ -15658,7 +15759,9 @@
       cfg.rewards
     ).map(([id, n]) => `${n} ${pretty(id)}`).join(
       " \xB7 "
-    )} \xB7 ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? "disabled" : ""}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? "disabled" : ""}>UPGRADE \xB7 ${a.level === 1 ? 100 : 250} XP</button>` : ""}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ""}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p>`;
+    )} \xB7 ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? "disabled" : ""}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? "disabled" : ""}>UPGRADE \xB7 ${a.level === 1 ? 100 : 250} XP</button>` : ""}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ""}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p><h3>Bestiary \xB7 ${bestiary().filter((b) => b.kills).length} / ${Object.keys(MOBS).length}</h3><div class="book-list">${bestiary().map(
+      (b) => `<div class="book-row"><div class="with-icon"><span class="icon-slot portrait"><img src="${b.kills ? mobPortrait(b.id) : ""}" alt="" ${b.kills ? "" : "hidden"}></span><div><strong>${b.kills ? MOBS[b.id].name : "???"}</strong><small>${b.kills ? (MOBS[b.id].boss ? "Slain " + b.kills + "\xD7" : b.kills + " slain") + " \xB7 " + MOBS[b.id].hp + " health" : "Not yet met"}</small></div></div></div>`
+    ).join("")}</div>`;
     const attune = right.querySelector("[data-attune]"), upgrade = right.querySelector("[data-upgrade]");
     if (attune)
       attune.onclick = () => {
