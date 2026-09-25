@@ -101,7 +101,7 @@ export class Combat extends System {
   }
   /** Harms a creature through its defense, knocks it back, and kills it at zero. */
   hurtMob(a: Animal, amount: number, from: Point, magic = false, w?: WeaponStats) {
-    if (a.deadUntil || a.settler) return 0;
+    if (a.deadUntil || a.settler || a.hidden) return 0;
     if (
       a.type === 'boss' &&
       (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier
@@ -433,6 +433,20 @@ export class Combat extends System {
           if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
             continue;
           b.hit.add(a.id);
+          // Mirrors turn some shots back on the shooter.
+          if (MOBS[a.type]?.behave === 'mirror' && this.game.rng() < 0.3) {
+            this.spawn(
+              b.kind,
+              { x: b.x, y: b.y },
+              Math.atan2(p.y - 26 - b.y, p.x - b.x),
+              520,
+              b.damage * 0.5,
+              'mob',
+            );
+            this.game.event('burst', a.x, a.y - 20, '#ffffff');
+            spent = true;
+            break;
+          }
           this.hurtMob(
             a,
             b.damage,

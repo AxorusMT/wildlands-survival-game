@@ -41,6 +41,7 @@ const LAYER_TRACKS: Record<string, string> = {
   emberheart: 'emberheart',
   garden: 'garden',
   fractured: 'fractured',
+  mycelial: 'mycelia',
 };
 /** Each dungeon's own music; the Citadel keeps the throne-room theme of lower hell. */
 const DUNGEON_TRACKS: Record<string, string> = {

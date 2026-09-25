@@ -1745,6 +1745,19 @@ Object.assign(MOBS, {
     top: 98,
   },
 } satisfies Record<string, MobArt>);
+Object.assign(MOBS, {
+  spore_titan: {
+    tpl: 'biped',
+    body: '#6a5a8a',
+    belly: '#58e0d0',
+    eye: '#c0fff4',
+    w: 34,
+    h: 50,
+    parts: ['cap', 'armor'],
+    top: 62,
+    light: [0.25, 0.6, 0.55],
+  },
+} satisfies Record<string, MobArt>);
 // The settlers: townsfolk in their own colours.
 const SKINS = [
   '#d8a47c',

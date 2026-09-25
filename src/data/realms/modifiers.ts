@@ -11,6 +11,20 @@ export interface RealmMod {
 }
 export const MODS: RealmMod[] = [
   { id: 'bountiful', name: 'Bountiful', text: 'More to gather', kind: 'boon', loot: 0.1 },
+  {
+    id: 'toxic_air',
+    name: 'Toxic air',
+    text: 'The air burns the lungs: stamina and health drain without a respirator',
+    kind: 'bane',
+    loot: 0.3,
+  },
+  {
+    id: 'silent',
+    name: 'Silent',
+    text: 'No music plays, and monsters hear you from half again as far',
+    kind: 'bane',
+    loot: 0.2,
+  },
   { id: 'rich_veins', name: 'Rich veins', text: 'Ore lies thick', kind: 'boon', loot: 0.15 },
   { id: 'treasure', name: 'Treasure trove', text: 'Extra chests', kind: 'boon', loot: 0.15 },
   { id: 'lucky', name: 'Lucky', text: 'Loot +50%', kind: 'boon', loot: 0.5 },

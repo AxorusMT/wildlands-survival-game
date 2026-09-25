@@ -59,6 +59,8 @@ const state = {
   shelf: null as Structure | null,
   /** The research desk open on the Pack page. */
   research: null as Structure | null,
+  /** A wandering merchant's stall open on the Pack page. */
+  merchant: null as Structure | null,
   armourySel: 'iron_sword',
   camera: { x: 0, y: 0 },
   lastFrame: performance.now(),
@@ -339,6 +341,15 @@ function doInteract() {
     if (result.action === 'rift') {
       state.tab = 'atlas';
       state.atlasView = 'rift';
+      toggleJournal(true);
+    }
+    if (result.action === 'merchant') {
+      state.merchant = result.structure ?? null;
+      state.research = null;
+      state.shelf = null;
+      state.larder = null;
+      state.tab = 'pack';
+      sound('open');
       toggleJournal(true);
     }
     if (result.action === 'research') {
@@ -650,6 +661,32 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
       )
       .join('') || '<p>Only the journal remains. Gather what the meadow offers.</p>'
   }`;
+  const stall = state.merchant;
+  if (stall) {
+    const tier = Number(stall.kind) || 1;
+    left.innerHTML = `<h2>A wandering merchant</h2><p class="lede">“Everything has a price, and I am the only one out here charging it.” You carry ${game.count('coin')} marks.</p><div class="book-list">${
+      (stall.larder ?? [])
+        .filter((e) => e.qty > 0)
+        .map(
+          (e) =>
+            `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${e.qty} left · ${game.pocket.price(e.id, tier)} marks</small></div></div><button data-buy="${e.id}" ${game.count('coin') >= game.pocket.price(e.id, tier) || game.dev.god ? '' : 'disabled'}>BUY</button></div>`,
+        )
+        .join('') || '<p>“Sold out. Come back to another realm.”</p>'
+    }</div><div class="book-actions"><button class="quiet" data-close-stall>CLOSE</button></div>`;
+    left.querySelectorAll<HTMLButtonElement>('[data-buy]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          const r = game.pocket.buy(stall, b.dataset.buy ?? '');
+          if (!r.ok) message(r.reason);
+          renderJournal();
+          updateUI(true);
+        }),
+    );
+    left.querySelector<HTMLButtonElement>('[data-close-stall]')!.onclick = () => {
+      state.merchant = null;
+      renderJournal();
+    };
+  }
   const desk = state.research;
   if (desk) {
     const tally = game.s.tutorial.tally,
@@ -1603,6 +1640,19 @@ function wardText(ward: string) {
   const all = [...sets, ...charms];
   return all.length ? ` <em>Ward: ${all.join(' or ')}.</em>` : '';
 }
+/** How much of a realm has been done: visited, tiers cleared, its relic, and its creatures. */
+function realmCompletion(id: string) {
+  const rec = game.pocket.record(id),
+    page = D.CODEX.find((p) => p.id === id),
+    [have, need] = page ? game.skills.page(page) : [0, 1];
+  const parts = [
+    rec.visits ? 1 : 0,
+    Math.min(1, rec.best / (id === 'fractured' ? 10 : D.MAX_TIER)) * 3,
+    rec.relic ? 1 : 0,
+    need ? have / need : 0,
+  ];
+  return Math.round((parts.reduce((a, b) => a + b, 0) / 6) * 100);
+}
 function renderAtlas(left: HTMLElement, right: HTMLElement) {
   const pocket = game.pocket,
     open = game.s.pocket,
@@ -1613,8 +1663,9 @@ function renderAtlas(left: HTMLElement, right: HTMLElement) {
       ? `<div class="note-block">Open now: <strong>${D.templateOf(open)?.name}</strong> · Tier ${tier(open.tier)}${open.mods.length ? ' · ' + open.mods.map((m) => D.modById(m)?.name).join(', ') : ''}${open.cleared ? ' · its master is slain' : ''}.</div>`
       : ''
   }<h3>Realms</h3><div class="book-list">${D.REALMS.map((r) => {
-    const rec = pocket.record(r.id);
-    return `<div class="book-row ${state.atlasRealm === r.id ? 'selected' : ''}"><div class="with-icon">${icon(r.key)}<div><strong>${r.name}</strong><small>Band ${tier(r.band)} · ${rec.visits ? 'best tier ' + (rec.best ? tier(rec.best) : '—') : 'unvisited'}${rec.relic ? ' · relic found' : ''}</small></div></div><div><span class="qty">×${game.count(r.key)}</span><button data-realm="${r.id}">VIEW</button></div></div>`;
+    const rec = pocket.record(r.id),
+      pct = realmCompletion(r.id);
+    return `<div class="book-row ${state.atlasRealm === r.id ? 'selected' : ''}"><div class="with-icon">${icon(r.key)}<div><strong>${r.name}${rec.visits ? ` <span class="qty">${pct}%</span>` : ''}</strong><small>Band ${tier(r.band)} · ${rec.visits ? 'best tier ' + (rec.best ? tier(rec.best) : '—') : 'unvisited'}${rec.relic ? ' · relic found' : ''}</small></div></div><div><span class="qty">×${game.count(r.key)}</span><button data-realm="${r.id}">VIEW</button></div></div>`;
   }).join(
     '',
   )}</div><div class="book-actions"><button class="quiet" data-view-rift>THE RIFT GATE ›</button></div>`;
@@ -2017,19 +2068,22 @@ function frame(now: number) {
       state.lastAuto = game.s.elapsed;
     }
   }
+  const hush = game.pocket.here() && game.pocket.has('silent') && !game.bosses.active();
   Audio.setScene(
-    musicScene({
-      playing: state.playing,
-      dead: game.s.dead,
-      boss: !!game.s.altar.activeBoss || !!game.bosses.active(),
-      bossType: game.bosses.active()?.type ?? null,
-      dungeon: D.dungeonAt(game.s.player.x, game.s.player.y - 20)?.def.id ?? null,
-      layer: game.layer().id,
-      weather: game.s.weather,
-      biome: game.biome().id,
-      night: game.isNight(),
-      town: game.town.townNear(),
-    }),
+    hush
+      ? 'silence'
+      : musicScene({
+          playing: state.playing,
+          dead: game.s.dead,
+          boss: !!game.s.altar.activeBoss || !!game.bosses.active(),
+          bossType: game.bosses.active()?.type ?? null,
+          dungeon: D.dungeonAt(game.s.player.x, game.s.player.y - 20)?.def.id ?? null,
+          layer: game.layer().id,
+          weather: game.s.weather,
+          biome: game.biome().id,
+          night: game.isNight(),
+          town: game.town.townNear(),
+        }),
   );
   Audio.setMuffled(state.playing && state.journal);
   drawWorld();

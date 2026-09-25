@@ -285,6 +285,8 @@ export const ICONS: Record<string, [Tpl, string, string?]> = {
   queen_jelly: ['bottle', '#ffe8a0'],
   topaz: ['gem', '#f0b040'],
   // Band II and III realms.
+  mycelial_fragment: ['scroll', '#58e0d0'],
+  mycelial_key: ['key', '#58e0d0'],
   glasswood_fragment: ['scroll', '#a8d8f0'],
   marches_fragment: ['scroll', '#d8ceb4'],
   barrow_fragment: ['scroll', '#b8883a'],
@@ -311,6 +313,9 @@ export const ICONS: Record<string, [Tpl, string, string?]> = {
   garden_key: ['key', '#8ad070'],
   diving_bell: ['crate', '#5a9ac0'],
   fracture_shard: ['crystal', '#d8a0ff'],
+  lore_tablet: ['scroll', '#8b8f8a'],
+  cairn: ['lump', '#8b8f8a'],
+  merchant_stall: ['crate', '#c85a4a'],
   tinkers_bench: ['crate', '#8a6440'],
   artisan_bench: ['crate', '#6a3a2a'],
   rift_forge: ['crate', '#b36cff'],

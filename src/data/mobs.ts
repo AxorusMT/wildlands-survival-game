@@ -33,6 +33,8 @@ export interface MobSpec {
   respawn: number;
   /** Disease its bite may pass on. */
   disease?: [string, number];
+  /** A special way of fighting (see BEHAVIOURS). */
+  behave?: Behaviour;
   /** Sound family (sfx.ts voices). */
   voice?: string;
   /** Wakes only at night on the surface. */
@@ -2119,6 +2121,31 @@ Object.assign(MOBS, {
     respawn: 0,
   },
 } satisfies Record<string, MobSpec>);
+// The Mycelial Deep's roaming elite.
+Object.assign(MOBS, {
+  spore_titan: {
+    name: 'Spore titan',
+    hp: 1800,
+    damage: 46,
+    speed: [26, 90],
+    move: 'walker',
+    sight: 700,
+    reach: 66,
+    cooldown: 1.6,
+    defense: 22,
+    ranged: {
+      projectile: 'spore_cloud',
+      range: 460,
+      speed: 260,
+      damage: 30,
+      count: 4,
+      spread: 0.3,
+    },
+    loot: [L('myconite_ore', 4, 8), L('mycelial_fragment', 1, 2), L('glowcap', 3, 6)],
+    respawn: 600,
+    disease: ['spore_lung', 0.2],
+  },
+} satisfies Record<string, MobSpec>);
 // Settlers walk about their homes and never fight.
 for (const st of SETTLERS)
   MOBS[st.id] = {
@@ -2139,7 +2166,7 @@ export const BOSS_SHRINES: Record<string, { item: string; place: string; music: 
   rime_colossus: { item: 'frost_key', place: 'frost_keep', music: 'boss' },
   pharaoh: { item: 'tomb_key', place: 'tomb', music: 'boss' },
   archdemon: { item: 'cinder_key', place: 'citadel', music: 'boss_hell' },
-  sporemother: { item: 'spore_lure', place: 'mycelia', music: 'boss' },
+  sporemother: { item: 'spore_lure', place: 'mycelial', music: 'boss' },
   tempest_roc: { item: 'storm_totem', place: 'skyreach', music: 'boss' },
   unmaker: { item: 'void_seal', place: 'void', music: 'final_boss' },
   orchard_mother: { item: 'orchard_key', place: 'orchard', music: 'boss' },
@@ -2157,6 +2184,37 @@ export const BOSS_SHRINES: Record<string, { item: string; place: string; music: 
   anvil_god: { item: 'emberheart_key', place: 'emberheart', music: 'boss' },
   four_faced_warden: { item: 'garden_key', place: 'garden', music: 'boss' },
 };
+/**
+ * Ways of fighting beyond walking, flying, and biting: keep away and shoot (kite), burrow and burst
+ * up beneath you (burrow), reel you in (tether), turn your shots back (mirror), fall apart into two
+ * (split), and come in numbers (swarm).
+ */
+export type Behaviour = 'kite' | 'burrow' | 'tether' | 'mirror' | 'split' | 'swarm';
+const BEHAVIOURS: Record<Behaviour, string[]> = {
+  kite: [
+    'bog_shaman',
+    'tax_collector',
+    'cantor',
+    'brass_sentry',
+    'steppe_raider',
+    'skeleton_archer',
+  ],
+  burrow: ['ivory_beetle', 'pearl_crab', 'mole_guard', 'gutter_rat', 'amber_beetle'],
+  tether: ['abyss_angler', 'jelly_bell', 'lumen_wisp'],
+  mirror: ['glass_golem', 'lens_golem', 'crystal_warden', 'mirage_djinn'],
+  split: ['glassling', 'gilded_slime', 'rot_toad', 'slag_slime', 'rotfruit_slime', 'spore_slime'],
+  swarm: [
+    'fever_mosquito',
+    'carrion_crow',
+    'frost_moth',
+    'petal_moth',
+    'moon_moth',
+    'orchard_wasp',
+    'spore_bat',
+  ],
+};
+for (const [b, ids] of Object.entries(BEHAVIOURS) as [Behaviour, string[]][])
+  for (const id of ids) if (MOBS[id]) MOBS[id].behave = b;
 export const isAggressive = (type: string) => type === 'boss' || (MOBS[type]?.sight ?? 0) > 0;
 export const mobName = (type: string) => MOBS[type]?.name ?? type;
 /** Which boss guards each sigil. */
@@ -2298,4 +2356,5 @@ export const VOICES: Record<string, string> = {
   the_leviathan: 'serpent',
   anvil_god: 'golem',
   four_faced_warden: 'knight',
+  spore_titan: 'golem',
 };

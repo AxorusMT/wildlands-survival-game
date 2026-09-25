@@ -80,10 +80,25 @@ export class Wildlife extends System {
     }
     animal.deadUntil =
       this.game.s.elapsed +
-      (animal.type === 'boss' || spec?.boss || animal.minion || animal.echo
+      (animal.type === 'boss' || spec?.boss || animal.minion || animal.echo || animal.split
         ? 999999
         : (spec?.respawn ?? 120));
     this.game.pocket.echo(animal);
+    // Splitters fall apart into two lesser halves, once.
+    if (spec?.behave === 'split' && !animal.split && !animal.minion && !animal.echo) {
+      for (const dx of [-20, 20]) {
+        this.game.world.addAnimal(animal.type, animal.x + dx, animal.y - 10, {
+          body: true,
+          vx: dx * 4,
+          vy: -200,
+          split: true,
+        });
+        const c = this.game.s.animals[this.game.s.animals.length - 1];
+        c.maxHp = c.hp = Math.max(10, Math.round(animal.maxHp * 0.35));
+        c.deadUntil = 0;
+      }
+      this.game.event('burst', animal.x, animal.y - 20, '#c8f0e0');
+    }
     if (animal.type === 'boss') {
       const cfg = BOSSES[this.game.s.altar.level - 1];
       for (const [id, qty] of Object.entries(cfg.rewards)) this.game.add(id, qty);
@@ -353,7 +368,7 @@ export class Wildlife extends System {
     if (!spec) return;
     const t = s.elapsed,
       d = dist(a, p),
-      hunting = spec.sight > 0 && d < spec.sight && !s.dead,
+      hunting = spec.sight > 0 && d < spec.sight * this.game.pocket.sightScale(a) && !s.dead,
       face = Math.sign(p.x - a.x) || 1,
       stunned = (a.fx?.stun ?? 0) > t,
       pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1),
@@ -374,6 +389,28 @@ export class Wildlife extends System {
           }
           a.vx = Math.cos(a.angle) * walk;
         }
+        // Kiters keep their distance and shoot.
+        if (hunting && spec.behave === 'kite' && d < (spec.ranged?.range ?? 300) * 0.45)
+          a.vx = -face * run;
+        // Burrowers sink into the ground, tunnel toward you, and burst up beneath you.
+        if (hunting && spec.behave === 'burrow') {
+          if (!a.hidden && t > (a.timers.burrow ?? t + 1) && a.grounded) {
+            a.hidden = true;
+            a.timers.surface = t + 1.8;
+            this.game.event('dig', a.x, a.y, '1');
+          }
+          a.timers.burrow ??= t + 4 + this.game.rng() * 3;
+          if (a.hidden) {
+            a.vx = face * run * 1.6;
+            if (t > (a.timers.surface ?? 0)) {
+              a.hidden = false;
+              a.vy = -380;
+              a.timers.burrow = t + 6 + this.game.rng() * 3;
+              this.game.event('dig', a.x, a.y, '1');
+              this.game.sound('crumble', a.x, a.y, 0.7);
+            }
+          }
+        } else a.hidden = false;
         // Chasers jump up ledges toward a player above them.
         if (
           hunting &&
@@ -427,7 +464,9 @@ export class Wildlife extends System {
       this.moveBody(a, dt, true);
     }
     if (Math.abs(a.vx ?? 0) > 5) a.angle = (a.vx ?? 0) > 0 ? 0 : Math.PI;
-    if (!hunting || stunned) return;
+    if (!hunting || stunned || a.hidden) return;
+    // Tethers reel you in.
+    if (spec.behave === 'tether' && d > 60 && d < 300) p.x += Math.sign(a.x - p.x) * 45 * dt;
     // Contact: touching a monster hurts.
     const cy = a.y - 22;
     if (

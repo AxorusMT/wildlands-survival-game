@@ -210,6 +210,8 @@ export const RECIPES: Recipe[] = (
     ['warren_key', { warren_fragment: 3 }, 'waystone', 3],
     // Band II keys are made from Band I spoils; Band III keys from Band II.
     ['glasswood_fragment', { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, 'workbench', 5],
+    ['mycelial_fragment', { glowcap: 6, kiln_ingot: 1, tide_pearl: 1 }, 'workbench', 5],
+    ['mycelial_key', { mycelial_fragment: 3 }, 'waystone', 5],
     ['marches_fragment', { bone: 10, kiln_ingot: 2, crab_shell: 3 }, 'workbench', 5],
     ['barrow_fragment', { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, 'forge', 7],
     ['saltflats_fragment', { salt: 10, prism_glass: 3, marrow_ingot: 2 }, 'forge', 7],

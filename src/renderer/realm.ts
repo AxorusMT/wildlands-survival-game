@@ -136,6 +136,19 @@ export function drawRealmAir(
       }
     }
   }
+  // A spore bloom: a green haze and drifting motes.
+  const spores = g.pocket.sporeLevel();
+  if (spores > 0) {
+    const guard = g.equipment.has('breath') || g.equipment.has('spores') ? 0.4 : 1;
+    c.fillStyle = `rgba(90, 200, 170, ${(spores * 0.22 * guard).toFixed(2)})`;
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = `rgba(190, 255, 235, ${(spores * 0.8).toFixed(2)})`;
+    for (let i = 0; i < 90; i++) {
+      const x = Math.floor((((hash(i, 51) * w + Math.sin(t + i) * 10) % w) + w) % w),
+        y = Math.floor((((hash(i, 52) * h - t * (6 + hash(i, 53) * 8)) % h) + h) % h);
+      c.fillRect(x, y, 1, 1);
+    }
+  }
   // The hymn: a cold blue haze and drifting notes.
   const hymn = g.pocket.hymnLevel();
   if (hymn > 0) {

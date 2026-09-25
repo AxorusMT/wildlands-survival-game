@@ -52,7 +52,8 @@ export interface RealmHazard {
     | 'curse'
     | 'pressure'
     | 'magma'
-    | 'seasons';
+    | 'seasons'
+    | 'spores';
   name: string;
   /** What it does, for the Atlas and the banner. */
   text: string;

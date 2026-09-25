@@ -5,6 +5,8 @@ import { NODES, nodeForm } from '../../data/resources.ts';
 import { STORAGE } from '../../data/food.ts';
 import { RULES } from '../rules.ts';
 
+import { LORE } from '../../data/lore.ts';
+
 import { System } from './System.ts';
 
 export class Interaction extends System {
@@ -117,6 +119,17 @@ export class Interaction extends System {
         this.game.sound('place', st.x, st.y, 0.7);
         this.game.say('Fed the campfire with wood.', 'good');
       } else return { ok: false, reason: 'One wood refuels the campfire.' };
+    } else if (st.type === 'lore_tablet') {
+      const i = Number(st.kind) || 0,
+        first = !(this.game.s.tutorial.tally['lore:' + i] > 0);
+      this.game.progress.record('lore:' + i);
+      if (first) this.game.skills.gain(10);
+      this.game.sound('page', st.x, st.y);
+      this.game.say(`The tablet reads: “${LORE[i % LORE.length]}”`, 'ink');
+    } else if (st.type === 'cairn') {
+      this.game.say('Stones piled with care. Something lies sealed in the rock below.', 'ink');
+    } else if (st.type === 'merchant_stall') {
+      return { ok: true, action: 'merchant', structure: st };
     } else if (st.type === 'research_desk') {
       return { ok: true, action: 'research', structure: st };
     } else if (st.type === 'distiller') {

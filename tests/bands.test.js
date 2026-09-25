@@ -27,7 +27,7 @@ const BAND23 = [
 ];
 
 test('every realm is complete: creatures, boss, keys, relic, music, and codex page', () => {
-  assert.equal(D.REALMS.length, 15);
+  assert.equal(D.REALMS.length, 16);
   for (const tpl of D.WHOLE_REALMS) {
     for (const m of tpl.mobs) assert.ok(D.MOBS[m.type], `${tpl.id} mob ${m.type}`);
     assert.ok(D.MOBS[tpl.boss]?.boss, `${tpl.id} boss`);
@@ -406,4 +406,98 @@ test('tier twelve is forged from fracture shards, and a shard reforges well', ()
   assert.ok(g.armoury.reforge('iron_sword', true).ok);
   assert.equal(g.count('fracture_shard'), 2);
   assert.ok(g.s.armoury.iron_sword.q >= before);
+});
+
+test('the Mycelial Deep in template form: the Rift Gate Deep is its seed 0', () => {
+  const zero = D.myceliaGeometry(0);
+  for (let x = 100; x < D.DIM_WIDTH - 100; x += 173)
+    for (let y = 500; y < 3000; y += 97)
+      assert.equal(zero.tile(x, y), D.dimensionTile('mycelia', x, y));
+  const tpl = D.realmById('mycelial');
+  assert.equal(tpl.boss, 'sporemother');
+  const g = fresh();
+  g.command('realm mycelial 1');
+  const seed = g.s.pocket.seed;
+  while (D.sporeBloom(g.s.elapsed, seed) < 1) g.s.elapsed += 1;
+  assert.ok(g.pocket.sporeLevel() > 0.9);
+  g.s.vitals.stamina = 100;
+  g.pocket.update(2);
+  assert.ok(g.s.vitals.stamina < 100, 'spores sting');
+  g.add('respirator');
+  g.equipment.wear('respirator');
+  g.s.vitals.stamina = 100;
+  g.pocket.update(2);
+  assert.equal(g.s.vitals.stamina, 100, 'the respirator keeps them out');
+});
+
+test('realms hold lore tablets, a hidden vault under a cairn, and sometimes a merchant', () => {
+  let merchant = null;
+  for (let seed = 1; seed < 12 && !merchant; seed++) {
+    const g = new Game(seed);
+    g.command('realm orchard 1');
+    const tablet = g.s.structures.find((st) => st.type === 'lore_tablet' && inside(st));
+    assert.ok(tablet, 'a tablet');
+    g.s.player.x = tablet.x;
+    g.s.player.y = tablet.y;
+    assert.ok(g.interact().ok);
+    assert.ok(Object.keys(g.s.tutorial.tally).some((k) => k.startsWith('lore:')));
+    const cairn = g.s.structures.find((st) => st.type === 'cairn' && inside(st));
+    if (cairn) {
+      const chests = g.s.structures.filter(
+        (st) => st.type === 'dungeon_chest' && inside(st) && st.y > cairn.y + 100,
+      );
+      assert.ok(chests.length >= 1, 'a vault chest below the cairn');
+    }
+    const stall = g.s.structures.find((st) => st.type === 'merchant_stall' && inside(st));
+    if (stall) {
+      merchant = stall;
+      const item = stall.larder[0].id;
+      g.add('coin', 5000);
+      const coins = g.count('coin');
+      assert.ok(g.pocket.buy(stall, item).ok);
+      assert.ok(g.count(item) >= 1);
+      assert.ok(g.count('coin') < coins);
+    }
+  }
+  assert.ok(merchant, 'merchants turn up');
+});
+
+test('Toxic air burns without a respirator; Silent realms carry every sound', () => {
+  const g = fresh();
+  g.command('realm orchard 1');
+  g.s.pocket.mods = ['toxic_air', 'silent'];
+  const hp = g.s.vitals.health;
+  g.pocket.update(5);
+  assert.ok(g.s.vitals.health < hp);
+  const crab = g.s.animals.find((a) => inside(a));
+  assert.equal(g.pocket.sightScale(crab), 1.5);
+});
+
+test('creatures fight in new ways: split, swarm, kite, burrow, tether, mirror', () => {
+  assert.equal(D.MOBS.glassling.behave, 'split');
+  assert.equal(D.MOBS.fever_mosquito.behave, 'swarm');
+  assert.equal(D.MOBS.bog_shaman.behave, 'kite');
+  assert.equal(D.MOBS.ivory_beetle.behave, 'burrow');
+  assert.equal(D.MOBS.abyss_angler.behave, 'tether');
+  assert.equal(D.MOBS.glass_golem.behave, 'mirror');
+  const g = fresh();
+  g.command('realm glasswood 1');
+  const slime = g.s.animals.find((a) => a.type === 'glassling' && inside(a));
+  const n = g.s.animals.length;
+  g.wildlife.kill(slime);
+  const halves = g.s.animals.slice(n).filter((a) => a.type === 'glassling');
+  assert.equal(halves.length, 2);
+  assert.ok(halves.every((h) => h.split && h.maxHp < slime.maxHp));
+  const before = g.s.animals.length;
+  g.wildlife.kill(halves[0]);
+  assert.equal(g.s.animals.length, before, 'halves do not split again');
+  // A tether reels you in.
+  const t = fresh();
+  t.command('realm undertow 1');
+  const angler = t.s.animals.find((a) => a.type === 'abyss_angler' && inside(a));
+  t.s.player.x = angler.x - 200;
+  t.s.player.y = angler.y;
+  const px = t.s.player.x;
+  t.wildlife.step(angler, 0.5);
+  assert.ok(t.s.player.x > px);
 });

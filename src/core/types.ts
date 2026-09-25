@@ -205,6 +205,10 @@ export interface Animal extends Point {
   hunter?: boolean;
   /** Split from a slain monster in an Echoing realm; does not split again or return. */
   echo?: boolean;
+  /** Burrowed out of sight (and out of reach) for the moment. */
+  hidden?: boolean;
+  /** Already split once (a split creature's halves do not split again). */
+  split?: boolean;
   hitAt?: number;
   howlAt?: number;
   howlCue?: number;

@@ -319,6 +319,8 @@ export const ITEMS: Record<string, ItemSpec> = {
   queens_mandible: ["Queen's mandible", 'accessory'],
   queen_jelly: ['Royal jelly', 'trophy'],
   // ── Band II and III realms ──
+  mycelial_fragment: ['Mycelial key fragment', 'key'],
+  mycelial_key: ['Mycelial Deep key', 'key'],
   glasswood_fragment: ['Glasswood key fragment', 'key'],
   marches_fragment: ['Marches key fragment', 'key'],
   barrow_fragment: ['Barrow key fragment', 'key'],
@@ -392,6 +394,9 @@ export const ITEMS: Record<string, ItemSpec> = {
   emberheart_key: ['Emberheart key', 'key'],
   garden_key: ['Garden of Lost Seasons key', 'key'],
   diving_bell: ['Diving bell', 'structure'],
+  lore_tablet: ['Lore tablet', 'structure'],
+  cairn: ['Cairn', 'structure'],
+  merchant_stall: ["Wanderer's stall", 'structure'],
   respirator: ['Respirator', 'accessory'],
   // The Feverlands.
   plague_ivory: ['Plague ivory', 'ore'],

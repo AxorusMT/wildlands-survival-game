@@ -648,6 +648,38 @@ Object.assign(STATIC, {
       p.rect(8, 16, 14, 6, '#bfe3ee');
       p.rect(9, 17, 5, 2, '#ffffff');
     }),
+  // Exploration: lore tablets, cairns over hidden vaults, and wandering merchants.
+  lore_tablet: () =>
+    sprite(22, 30, 11, 29, (p) => {
+      p.rect(3, 4, 16, 26, '#8b8f8a');
+      p.ellipse(11, 5, 8, 4, '#8b8f8a');
+      p.rect(3, 4, 1, 26, '#a8aca8');
+      for (let y = 9; y < 26; y += 4) p.line(6, y, 16, y, '#5a5e5a');
+      p.rect(8, 6, 6, 2, '#d8b848');
+    }),
+  cairn: () =>
+    sprite(20, 16, 10, 15, (p) => {
+      p.ellipse(10, 13, 9, 3, '#7c7a74');
+      p.ellipse(10, 9, 6, 3, '#8b8f8a');
+      p.ellipse(10, 5, 4, 2, '#a8aca8');
+      p.ellipse(10, 2, 2, 2, '#8b8f8a');
+    }),
+  merchant_stall: () =>
+    sprite(40, 40, 20, 39, (p) => {
+      p.rect(2, 8, 36, 4, '#c85a4a');
+      for (let x = 2; x < 38; x += 8) p.rect(x, 8, 4, 4, '#f0e0c0');
+      p.rect(4, 12, 2, 28, '#6a4a30');
+      p.rect(34, 12, 2, 28, '#6a4a30');
+      p.rect(2, 26, 36, 4, '#8a6440');
+      p.rect(8, 22, 4, 4, '#e8577a');
+      p.rect(14, 23, 3, 3, '#8fe3df');
+      p.rect(28, 22, 5, 4, '#d8b848');
+      // The merchant: hooded, a lantern at the belt.
+      p.rect(18, 16, 6, 10, '#5a4a6a');
+      p.rect(19, 13, 4, 4, '#d8a47c');
+      p.rect(18, 12, 6, 2, '#5a4a6a');
+      p.rect(23, 20, 2, 3, '#ffd070');
+    }),
   // A diving bell on the seabed: air for the Undertow.
   diving_bell: () =>
     sprite(34, 40, 17, 39, (p) => {
@@ -692,6 +724,7 @@ function chestSprite(kind: string, open: boolean): Sprite {
     mycelia: ['#4a3f5e', '#58e0d0'],
     skyreach: ['#c8c0b0', '#f8e08a'],
     void: ['#2a1c3a', '#b36cff'],
+    mycelial: ['#4a3f5e', '#58e0d0'],
     glasswood: ['#6a88a8', '#bfe8ff'],
     marches: ['#6a6454', '#e6dcc6'],
     barrow: ['#5a4028', '#f0c870'],

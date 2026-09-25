@@ -21,3 +21,4 @@ export * from './feats.ts';
 export * from './clothing.ts';
 export * from './stations.ts';
 export * from './resist.ts';
+export * from './lore.ts';

@@ -17,6 +17,7 @@ const PORTABLE = new Set([
   'stars',
   'curse',
   'seasons',
+  'spores',
 ]);
 
 export const FRACTURED_LOOT: Loot[] = [

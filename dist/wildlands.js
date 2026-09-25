@@ -71,6 +71,7 @@
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
     LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    LORE: () => LORE,
     MASTERY_PERKS: () => MASTERY_PERKS,
     MASTERY_TITLES: () => MASTERY_TITLES,
     MAX_LEVEL: () => MAX_LEVEL,
@@ -78,6 +79,7 @@
     MAX_RENOWN: () => MAX_RENOWN,
     MAX_TIER: () => MAX_TIER,
     MEAL_BUFFS: () => MEAL_BUFFS,
+    MERCHANT_GOODS: () => MERCHANT_GOODS,
     MINE_TIER: () => MINE_TIER,
     MOBS: () => MOBS,
     MOBS_BY_SIGIL: () => MOBS_BY_SIGIL,
@@ -183,6 +185,7 @@
     meltRate: () => meltRate,
     mobName: () => mobName,
     modById: () => modById,
+    myceliaGeometry: () => myceliaGeometry,
     naturalWallKind: () => naturalWallKind,
     nodeForm: () => nodeForm,
     pocketShafts: () => pocketShafts,
@@ -204,6 +207,7 @@
     settlerById: () => settlerById,
     shelfSlots: () => shelfSlots,
     skillById: () => skillById,
+    sporeBloom: () => sporeBloom,
     starPulse: () => starPulse,
     surfaceAt: () => surfaceAt,
     syncPocket: () => syncPocket,
@@ -2794,6 +2798,8 @@
     queens_mandible: ["Queen's mandible", "accessory"],
     queen_jelly: ["Royal jelly", "trophy"],
     // ── Band II and III realms ──
+    mycelial_fragment: ["Mycelial key fragment", "key"],
+    mycelial_key: ["Mycelial Deep key", "key"],
     glasswood_fragment: ["Glasswood key fragment", "key"],
     marches_fragment: ["Marches key fragment", "key"],
     barrow_fragment: ["Barrow key fragment", "key"],
@@ -2867,6 +2873,9 @@
     emberheart_key: ["Emberheart key", "key"],
     garden_key: ["Garden of Lost Seasons key", "key"],
     diving_bell: ["Diving bell", "structure"],
+    lore_tablet: ["Lore tablet", "structure"],
+    cairn: ["Cairn", "structure"],
+    merchant_stall: ["Wanderer's stall", "structure"],
     respirator: ["Respirator", "accessory"],
     // The Feverlands.
     plague_ivory: ["Plague ivory", "ore"],
@@ -3235,6 +3244,8 @@
     ["warren_key", { warren_fragment: 3 }, "waystone", 3],
     // Band II keys are made from Band I spoils; Band III keys from Band II.
     ["glasswood_fragment", { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, "workbench", 5],
+    ["mycelial_fragment", { glowcap: 6, kiln_ingot: 1, tide_pearl: 1 }, "workbench", 5],
+    ["mycelial_key", { mycelial_fragment: 3 }, "waystone", 5],
     ["marches_fragment", { bone: 10, kiln_ingot: 2, crab_shell: 3 }, "workbench", 5],
     ["barrow_fragment", { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, "forge", 7],
     ["saltflats_fragment", { salt: 10, prism_glass: 3, marrow_ingot: 2 }, "forge", 7],
@@ -3638,23 +3649,31 @@
       return h[i] * (1 - t) + h[i + 1] * t;
     };
   }
-  var MYC = {
-    floor: profile((x) => 1700 + 190 * fbm1(x / 1100, 201) + 36 * noise1(x / 230, 202)),
-    ceiling: (x) => 560 + 150 * fbm1(x / 760, 203) + 70 * Math.abs(noise1(x / 170, 204)),
-    tunnel: (x) => 2500 + 90 * fbm1(x / 900, 205) + 20 * Math.sin(x / 160),
-    /** The Sporemother's chamber at the far end. */
-    hollow: { x0: DIM_WIDTH - 1500, x1: DIM_WIDTH - 260, top: 2150, bottom: 2780 },
-    ladders: [0.12, 0.34, 0.58, 0.8].map((f) => Math.round(DIM_WIDTH * f))
-  };
-  function myceliaTile(x, y) {
-    const floor = MYC.floor(x), ceil = MYC.ceiling(x), h = MYC.hollow;
-    const drip2 = Math.max(0, noise1(x / 60, 207) - 0.45) * 520;
-    const open = y > ceil + drip2 && y < floor || Math.abs(y - MYC.tunnel(x)) < 70 + 14 * Math.sin(x / 83) || x > h.x0 && x < h.x1 && y > h.top + 60 * Math.abs(Math.sin((x - h.x0) / 300)) && y < h.bottom || MYC.ladders.some((lx) => Math.abs(x - lx) < 44 && y > floor - 10 && y < MYC.tunnel(lx) + 40);
-    if (open) return 0;
-    if (y >= floor && y < floor + 64) return DT.mycelium;
-    if (fbm2(x / 150, y / 110, 209) > 0.7) return DT.glowshroom;
-    return DT.fungal;
+  function myceliaGeometry(seed = 0) {
+    const ch = (k) => seed ? seed % 9973 + k * 131 : k;
+    const geo = {
+      floor: profile((x) => 1700 + 190 * fbm1(x / 1100, ch(201)) + 36 * noise1(x / 230, ch(202))),
+      ceiling: (x) => 560 + 150 * fbm1(x / 760, ch(203)) + 70 * Math.abs(noise1(x / 170, ch(204))),
+      tunnel: (x) => 2500 + 90 * fbm1(x / 900, ch(205)) + 20 * Math.sin(x / 160),
+      /** The Sporemother's chamber at the far end. */
+      hollow: { x0: DIM_WIDTH - 1500, x1: DIM_WIDTH - 260, top: 2150, bottom: 2780 },
+      ladders: [0.12, 0.34, 0.58, 0.8].map((f) => Math.round(DIM_WIDTH * f)),
+      tile(x, y) {
+        const floor = geo.floor(x), ceil = geo.ceiling(x), h = geo.hollow;
+        const drip2 = Math.max(0, noise1(x / 60, ch(207)) - 0.45) * 520;
+        const open = y > ceil + drip2 && y < floor || Math.abs(y - geo.tunnel(x)) < 70 + 14 * Math.sin(x / 83) || x > h.x0 && x < h.x1 && y > h.top + 60 * Math.abs(Math.sin((x - h.x0) / 300)) && y < h.bottom || geo.ladders.some(
+          (lx) => Math.abs(x - lx) < 44 && y > floor - 10 && y < geo.tunnel(lx) + 40
+        );
+        if (open) return 0;
+        if (y >= floor && y < floor + 64) return DT.mycelium;
+        if (fbm2(x / 150, y / 110, ch(209)) > 0.7) return DT.glowshroom;
+        return DT.fungal;
+      }
+    };
+    return geo;
   }
+  var MYC = myceliaGeometry(0);
+  var myceliaTile = (x, y) => MYC.tile(x, y);
   var SKY_SEA = 3900;
   var ISLANDS = (() => {
     const out = [];
@@ -4555,7 +4574,8 @@
     "fever",
     "stars",
     "curse",
-    "seasons"
+    "seasons",
+    "spores"
   ]);
   var FRACTURED_LOOT = [
     ["fracture_shard", 2, 4, 1],
@@ -5341,13 +5361,93 @@
     build: build10
   };
 
+  // src/data/realms/mycelial.ts
+  function sporeBloom(t, seed = 0) {
+    const cycle = 60, phase = (t + seed % 59) % cycle;
+    return phase > cycle - 12 ? Math.min(1, (phase - (cycle - 12)) / 3, (cycle - phase) / 3) : 0;
+  }
+  function build11(seed) {
+    const m = myceliaGeometry(seed || 1), arena = Math.round((m.hollow.x0 + m.hollow.x1) / 2);
+    return {
+      tile: (x, y) => x < 64 || x > DIM_WIDTH - 64 ? 27 : m.tile(x, y),
+      surface: () => 0,
+      floors: [m.floor, m.floor, m.tunnel],
+      ladders: m.ladders.map((x) => ({ x, top: m.floor(x) - 4, bottom: m.tunnel(x) + 30 })),
+      arrive: 520,
+      arena,
+      arenaFloor: () => m.hollow.bottom
+    };
+  }
+  var MYCELIAL = {
+    id: "mycelial",
+    name: "Mycelial Deep",
+    band: 2,
+    note: "The Mycelial Deep, regrown from a new seed for every expedition. Spore blooms fill the air every minute; the Sporemother waits in the Heart Hollow.",
+    sky: "cavern",
+    temp: 19,
+    ambient: [0.08, 0.16, 0.15],
+    daylight: 0,
+    wall: 20,
+    hazard: {
+      id: "spores",
+      name: "Spore blooms",
+      text: "Every minute the fungus blooms and the air fills with spores that sting and settle in the lungs. A respirator keeps them out.",
+      ward: "breath"
+    },
+    fragment: "mycelial_fragment",
+    key: "mycelial_key",
+    material: "myconite_ore",
+    relic: "mycelial_charm",
+    boss: "sporemother",
+    elite: "spore_titan",
+    music: "mycelia",
+    ores: ["myconite_ore", "crystal"],
+    nodes: [
+      ["glowcap", 5],
+      ["mushroom", 3],
+      ["myconite_ore", 4],
+      ["shroom_wood", 3],
+      ["crystal", 2],
+      ["emerald", 1]
+    ],
+    nodeCount: 70,
+    mobs: [
+      { type: "shroomling", weight: 4 },
+      { type: "spore_slime", weight: 3 },
+      { type: "mycelid", weight: 2 },
+      { type: "spore_bat", weight: 3, air: true }
+    ],
+    mobCount: 38,
+    chests: 4,
+    chestLoot: [
+      ["mycelial_fragment", 1, 2, 0.6],
+      ["glasswood_fragment", 1, 1, 0.3],
+      ["myconite_ore", 4, 8, 0.8],
+      ["lungwort_tea", 1, 2, 0.6],
+      ["healing_draught", 2, 3, 1],
+      ["life_crystal", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "mycelia",
+      name: "Mycelial Deep",
+      x: 3,
+      y: 0,
+      color: "#3a6a64",
+      shade: "#58c8b8",
+      temp: 19,
+      note: "A cavern world lit by fungus.",
+      resources: ["glowcap", "mushroom", "myconite_ore", "shroom_wood"]
+    },
+    build: build11
+  };
+
   // src/data/realms/orchard.ts
   var BRINESOIL = 30;
   function tideLevel(geo, t) {
     const phase = t / 150 * Math.PI * 2;
     return geo.tideMid + Math.sin(phase) * 70 + Math.sin(phase * 2.7) * 12;
   }
-  function build11(seed) {
+  function build12(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable(
@@ -5442,13 +5542,13 @@
       note: "A sunken fruit country under a restless tide.",
       resources: ["brinewood", "bog_apple", "reeds", "clay", "herb"]
     },
-    build: build11
+    build: build12
   };
 
   // src/data/realms/saltflats.ts
   var SALTCRUST = 42;
   var SALTGLASS_ROCK = 43;
-  function build12(seed) {
+  function build13(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable((x) => {
@@ -5548,7 +5648,7 @@
       note: "A dead sea turned to a white plain.",
       resources: ["saltglass", "salt", "cactus_fruit"]
     },
-    build: build12,
+    build: build13,
     extra(geo, ctx2) {
       for (let i = 0; i < 6 + ctx2.tier; i++) {
         const lx = 700 + ctx2.rng() * (RW - 1400), x = ctx2.x0 + lx;
@@ -5565,7 +5665,7 @@
     const cycle = 200, phase = (t + seed % 97) % cycle;
     return phase > cycle - 60 ? Math.min(1, (phase - (cycle - 60)) / 8, (cycle - phase) / 8) : 0;
   }
-  function build13(seed) {
+  function build14(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable((x) => {
@@ -5661,7 +5761,7 @@
       note: "Burnt grassland where old kilns smoulder.",
       resources: ["cinderflax", "kilnstone_ore", "coal", "sulfur"]
     },
-    build: build13,
+    build: build14,
     extra(geo, ctx2) {
       for (const f of [0.26, 0.5, 0.74]) {
         const x = ctx2.x0 + RW * f + 90;
@@ -5673,7 +5773,7 @@
   // src/data/realms/warren.ts
   var WARREN_EARTH = 33;
   var AMBERSTONE = 34;
-  function build14(seed) {
+  function build15(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 950;
     const lane = (base, k) => walkable((x) => base + 170 * fbm1(x / 1300, s(k)) + 30 * noise1(x / 260, s(k + 1)));
@@ -5777,12 +5877,26 @@
       note: "A realm that is all burrow.",
       resources: ["burrow_amber", "mushroom", "gold_ore", "iron_ore"]
     },
-    build: build14
+    build: build15
   };
 
   // src/data/realms/modifiers.ts
   var MODS = [
     { id: "bountiful", name: "Bountiful", text: "More to gather", kind: "boon", loot: 0.1 },
+    {
+      id: "toxic_air",
+      name: "Toxic air",
+      text: "The air burns the lungs: stamina and health drain without a respirator",
+      kind: "bane",
+      loot: 0.3
+    },
+    {
+      id: "silent",
+      name: "Silent",
+      text: "No music plays, and monsters hear you from half again as far",
+      kind: "bane",
+      loot: 0.2
+    },
     { id: "rich_veins", name: "Rich veins", text: "Ore lies thick", kind: "boon", loot: 0.15 },
     { id: "treasure", name: "Treasure trove", text: "Extra chests", kind: "boon", loot: 0.15 },
     { id: "lucky", name: "Lucky", text: "Loot +50%", kind: "boon", loot: 0.5 },
@@ -5880,6 +5994,7 @@
     ORCHARD,
     STEPPE,
     WARREN,
+    MYCELIAL,
     GLASSWOOD,
     MARCHES,
     BARROW,
@@ -8527,6 +8642,30 @@
       respawn: 0
     }
   });
+  Object.assign(MOBS, {
+    spore_titan: {
+      name: "Spore titan",
+      hp: 1800,
+      damage: 46,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 66,
+      cooldown: 1.6,
+      defense: 22,
+      ranged: {
+        projectile: "spore_cloud",
+        range: 460,
+        speed: 260,
+        damage: 30,
+        count: 4,
+        spread: 0.3
+      },
+      loot: [L2("myconite_ore", 4, 8), L2("mycelial_fragment", 1, 2), L2("glowcap", 3, 6)],
+      respawn: 600,
+      disease: ["spore_lung", 0.2]
+    }
+  });
   for (const st of SETTLERS)
     MOBS[st.id] = {
       name: `${st.name} ${st.title}`,
@@ -8545,7 +8684,7 @@
     rime_colossus: { item: "frost_key", place: "frost_keep", music: "boss" },
     pharaoh: { item: "tomb_key", place: "tomb", music: "boss" },
     archdemon: { item: "cinder_key", place: "citadel", music: "boss_hell" },
-    sporemother: { item: "spore_lure", place: "mycelia", music: "boss" },
+    sporemother: { item: "spore_lure", place: "mycelial", music: "boss" },
     tempest_roc: { item: "storm_totem", place: "skyreach", music: "boss" },
     unmaker: { item: "void_seal", place: "void", music: "final_boss" },
     orchard_mother: { item: "orchard_key", place: "orchard", music: "boss" },
@@ -8563,6 +8702,31 @@
     anvil_god: { item: "emberheart_key", place: "emberheart", music: "boss" },
     four_faced_warden: { item: "garden_key", place: "garden", music: "boss" }
   };
+  var BEHAVIOURS = {
+    kite: [
+      "bog_shaman",
+      "tax_collector",
+      "cantor",
+      "brass_sentry",
+      "steppe_raider",
+      "skeleton_archer"
+    ],
+    burrow: ["ivory_beetle", "pearl_crab", "mole_guard", "gutter_rat", "amber_beetle"],
+    tether: ["abyss_angler", "jelly_bell", "lumen_wisp"],
+    mirror: ["glass_golem", "lens_golem", "crystal_warden", "mirage_djinn"],
+    split: ["glassling", "gilded_slime", "rot_toad", "slag_slime", "rotfruit_slime", "spore_slime"],
+    swarm: [
+      "fever_mosquito",
+      "carrion_crow",
+      "frost_moth",
+      "petal_moth",
+      "moon_moth",
+      "orchard_wasp",
+      "spore_bat"
+    ]
+  };
+  for (const [b, ids] of Object.entries(BEHAVIOURS))
+    for (const id of ids) if (MOBS[id]) MOBS[id].behave = b;
   var isAggressive = (type) => type === "boss" || (MOBS[type]?.sight ?? 0) > 0;
   var mobName = (type) => MOBS[type]?.name ?? type;
   var MOBS_BY_SIGIL = {
@@ -8701,7 +8865,8 @@
     pauper_king: "ghoul",
     the_leviathan: "serpent",
     anvil_god: "golem",
-    four_faced_warden: "knight"
+    four_faced_warden: "knight",
+    spore_titan: "golem"
   };
 
   // src/data/food.ts
@@ -9472,6 +9637,16 @@
       bonusText: "+4% damage"
     },
     {
+      id: "lore",
+      name: "Lore tablets",
+      group: "Lore",
+      prefix: "lore:",
+      entries: [],
+      count: 20,
+      bonus: { realmLoot: 0.05, xp: 0.05 },
+      bonusText: "Realm loot +5%; +5% renown"
+    },
+    {
       id: "studies",
       name: "Studies",
       group: "Lore",
@@ -9527,6 +9702,7 @@
     engine_heart: ["stamina"],
     mirage_crown: ["damage10"],
     hymnal_core: ["defense3"],
+    mycelial_charm: ["regen", "breath"],
     rot_mask: ["plagueward", "regen"],
     astrolabe: ["starward", "mana40"],
     pauper_crown: ["goldward", "damage10"],
@@ -10542,6 +10718,57 @@
     holy: { text: "The undead strike 10% softer" },
     storm: { text: "+3% speed" }
   };
+
+  // src/data/lore.ts
+  var LORE = [
+    "We came through the stone in a line of forty. The stone let us keep twelve.",
+    "The first key was made by a smith who did not know what it opened. She opened it anyway.",
+    "Every realm was once a place like the meadow. Something folded it away and kept it.",
+    "The Orchard drowned the year the tide forgot to go out. The trees learned to breathe salt.",
+    "Do not trust the kilns of the Steppe. They are warm because something inside is still working.",
+    "The Warren Queen is not cruel. She is hungry, and the whole Warren is her mouth.",
+    "Glass remembers every light that passed through it. The Lumen Stag is what the Glasswood remembers.",
+    "The giants did not die in the Marches. They lay down there to wait, and the waiting rotted them.",
+    "The Barrow was built to keep time for the dead. It has not missed a beat in nine hundred years.",
+    "On the salt flats you will see a friend waving. Do not go to them. You came alone.",
+    "The Choir sings to keep the cold asleep. When it stops, you will wish it had kept singing.",
+    "In the Feverlands, even the flowers are sick. Especially the flowers.",
+    "The Astronomer counted every star, then drowned the sky so none could leave.",
+    "The Pauper King taxed his people until they were gold, then he taxed the gold.",
+    "Breathe before the Undertow. Breathe again at every bell. Breathe for those who forgot.",
+    "The Anvil God made the first ingot. Everything forged since is a copy of a copy of it.",
+    "The Garden keeps the seasons it stole. Do not ask whose they were.",
+    "Where two realms touch they fray, and from the fraying come the shards.",
+    "The Waystones are older than the wildlands. We only learned how to knock.",
+    "Relics are not treasure. They are what a realm could not bear to lose.",
+    "Every great foe was a keeper once. Keepers forget what they were keeping.",
+    "If you read this, the stone is still standing, and so are you. Keep going.",
+    "Twelve tiers of steel, and the last is not steel at all.",
+    "The dead in the Crypt dream of the meadow. So do we.",
+    "Fire, frost, venom, void, holy, storm: learn what each thing fears, and bring it.",
+    "We carved these tablets for whoever came after. We were not sure anyone would.",
+    "A full pack is a slow pack. A slow pack is a dead pack.",
+    "Cold keeps food; nothing else does for long. Carry ice, and carry it well.",
+    "Rest when you can. The realms do not.",
+    "The last expedition went through the Fractured seam and did not come back. They are still walking."
+  ];
+  var MERCHANT_GOODS = [
+    ["healing_draught", 40],
+    ["purification_tablet", 25],
+    ["bandage", 12],
+    ["antibiotic", 60],
+    ["fever_tonic", 70],
+    ["respirator", 180],
+    ["repair_kit", 80],
+    ["insulated_flask", 90],
+    ["ruby", 90],
+    ["sapphire", 90],
+    ["emerald", 90],
+    ["topaz", 110],
+    ["onyx", 110],
+    ["opal", 110],
+    ["life_crystal", 400]
+  ];
 
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -11862,7 +12089,7 @@
     }
     /** Harms a creature through its defense, knocks it back, and kills it at zero. */
     hurtMob(a, amount, from, magic = false, w) {
-      if (a.deadUntil || a.settler) return 0;
+      if (a.deadUntil || a.settler || a.hidden) return 0;
       if (a.type === "boss" && (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier) {
         this.game.say("Ordinary steel glances off the Direwolf. Obsidian is required.", "danger");
         return 0;
@@ -12085,6 +12312,19 @@
             if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
               continue;
             b.hit.add(a.id);
+            if (MOBS[a.type]?.behave === "mirror" && this.game.rng() < 0.3) {
+              this.spawn(
+                b.kind,
+                { x: b.x, y: b.y },
+                Math.atan2(p.y - 26 - b.y, p.x - b.x),
+                520,
+                b.damage * 0.5,
+                "mob"
+              );
+              this.game.event("burst", a.x, a.y - 20, "#ffffff");
+              spent = true;
+              break;
+            }
             this.hurtMob(
               a,
               b.damage,
@@ -13934,6 +14174,16 @@
           this.game.sound("place", st.x, st.y, 0.7);
           this.game.say("Fed the campfire with wood.", "good");
         } else return { ok: false, reason: "One wood refuels the campfire." };
+      } else if (st.type === "lore_tablet") {
+        const i = Number(st.kind) || 0, first = !(this.game.s.tutorial.tally["lore:" + i] > 0);
+        this.game.progress.record("lore:" + i);
+        if (first) this.game.skills.gain(10);
+        this.game.sound("page", st.x, st.y);
+        this.game.say(`The tablet reads: \u201C${LORE[i % LORE.length]}\u201D`, "ink");
+      } else if (st.type === "cairn") {
+        this.game.say("Stones piled with care. Something lies sealed in the rock below.", "ink");
+      } else if (st.type === "merchant_stall") {
+        return { ok: true, action: "merchant", structure: st };
       } else if (st.type === "research_desk") {
         return { ok: true, action: "research", structure: st };
       } else if (st.type === "distiller") {
@@ -14495,6 +14745,8 @@
     goldWas = -1;
     magmaWas = false;
     seasonWas = "";
+    bloomWas = false;
+    toxicWas = false;
     hymnWas = false;
     sunWas = false;
     ventAt = 0;
@@ -14537,6 +14789,10 @@
       if (!i || !inPocket(x)) return 1;
       const sk = this.game.skills.stats();
       return TIER_SCALE.loot(i.tier) + i.mods.reduce((n, m) => n + (modById(m)?.loot ?? 0), 0) + sk.realmLoot + (sk.treasureSense ? 0.2 : 0);
+    }
+    /** Silent realms carry every sound: monsters notice you from further off. */
+    sightScale(a) {
+      return this.has("silent") && inPocket(a.x) ? 1.5 : 1;
     }
     speedScale(a) {
       return this.has("frenzied") && inPocket(a.x) ? 1.3 : 1;
@@ -14700,6 +14956,9 @@
         if (!clear(lx)) continue;
         const m = weighted(rng2, mobs), y = spot(lx);
         ctx2.mob(m.type, x0 + lx, m.air ? y - 140 - rng2() * 80 : y);
+        if (MOBS[m.type]?.behave === "swarm")
+          for (const dx of [-40, 40])
+            ctx2.mob(m.type, x0 + lx + dx, (m.air ? y - 140 : y) - rng2() * 60);
       }
       const nChests = tpl.chests + (mods.has("treasure") ? 3 : 0) + (this.game.skills.flag("treasureSense") ? 2 : 0);
       for (let i = 0; i < nChests; i++) {
@@ -14723,7 +14982,84 @@
         const lx = RW * f + (rng2() - 0.5) * 400;
         if (clear(lx)) g.realms.furnish("shrine", x0 + lx, spot(lx));
       }
+      for (const f of [0.22, 0.52]) {
+        const lx = RW * f + (rng2() - 0.5) * 500;
+        if (clear(lx))
+          g.realms.furnish("lore_tablet", x0 + lx, spot(lx), {
+            kind: String(Math.floor(rng2() * LORE.length))
+          });
+      }
+      if (rng2() < 0.5) {
+        const lx = RW * (0.35 + rng2() * 0.3);
+        if (clear(lx)) this.merchant(x0 + lx, spot(lx), rng2, tpl, inst.tier);
+      }
+      this.vault(geo, rng2, x0);
       tpl.extra?.(geo, ctx2);
+    }
+    /** A wandering merchant's stall: a few goods, and the next band's fragments. */
+    merchant(x, y, rng2, tpl, tier) {
+      const stock = [];
+      const goods = [...MERCHANT_GOODS];
+      for (let i = 0; i < 4 && goods.length; i++) {
+        const [id] = goods.splice(Math.floor(rng2() * goods.length), 1)[0];
+        stock.push({ id, qty: 1 + Math.floor(rng2() * 3) });
+      }
+      const next = REALMS.filter((r) => r.band === tpl.band + 1);
+      if (next.length) stock.push({ id: next[Math.floor(rng2() * next.length)].fragment, qty: 2 });
+      const st = this.game.realms.furnish("merchant_stall", x, y, { kind: String(tier) });
+      st.larder = stock;
+    }
+    /** What a merchant asks for an item. */
+    price(id, tier) {
+      const base = MERCHANT_GOODS.find(([g]) => g === id)?.[1] ?? 150;
+      return Math.round(base * (1 + 0.2 * (tier - 1)));
+    }
+    /** Buys one of an item from a merchant's stall. */
+    buy(st, id) {
+      const e = st.larder?.find((x) => x.id === id && x.qty > 0);
+      if (!e) return { ok: false, reason: "Sold out." };
+      const cost = this.price(id, Number(st.kind) || 1);
+      if (!this.game.dev.god) {
+        if (this.game.count("coin") < cost) return { ok: false, reason: `It costs ${cost} marks.` };
+        this.game.remove("coin", cost);
+      }
+      e.qty--;
+      this.game.add(id);
+      this.game.sound("coin", st.x, st.y);
+      this.game.say(`Bought ${itemName(id).toLowerCase()} for ${cost} marks.`, "good");
+      return { ok: true };
+    }
+    /** Carves a sealed room into solid rock beneath a floor, with a rich chest, and a cairn above. */
+    vault(geo, rng2, x0) {
+      const s = this.game.s;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const lx = 900 + rng2() * (RW - 2400), floor = geo.floors[0](lx), tx0 = Math.floor((x0 + lx) / TILE) - 3, ty0 = Math.floor((floor + 170) / TILE);
+        let solid = true;
+        for (let ty = ty0 - 2; ty <= ty0 + 4 && solid; ty++)
+          for (let tx = tx0 - 2; tx <= tx0 + 8 && solid; tx++)
+            if (!s.tiles[ty * TILE_COLS + tx]) solid = false;
+        if (!solid) continue;
+        for (let ty = ty0; ty < ty0 + 3; ty++)
+          for (let tx = tx0; tx < tx0 + 7; tx++) {
+            s.tiles[ty * TILE_COLS + tx] = 0;
+            s.tileEdits[ty * TILE_COLS + tx] = 0;
+          }
+        const cx = (tx0 + 3.5) * TILE, cy = (ty0 + 3) * TILE - 1;
+        this.chest(
+          cx,
+          cy,
+          [
+            ["healing_draught", 2, 4, 1],
+            ["life_crystal", 1, 1, 0.5],
+            ["gold_ingot", 3, 6, 0.8],
+            ["fracture_shard", 1, 2, 0.15],
+            ...templateOf(this.inst())?.chestLoot ?? []
+          ],
+          rng2
+        );
+        this.game.realms.furnish("cairn", x0 + lx, this.game.floorNear(x0 + lx, floor - 30));
+        return;
+      }
     }
     /** A realm shrine: a blessing for a few minutes, once. */
     pray(st) {
@@ -14831,6 +15167,12 @@
     /** Whether the fever-dream is scrambling what the record shows. */
     dreaming() {
       return this.game.ailments.showing().some((a) => a.id === "fever_dream") && !this.game.equipment.has("plagueward");
+    }
+    /** Strength of a Mycelial spore bloom where the player is. */
+    sporeLevel() {
+      const r = activeRealm();
+      if (!r || r.tpl.hazard.id !== "spores" || !this.here()) return 0;
+      return sporeBloom(this.game.s.elapsed, r.inst.seed);
     }
     /** Whether the player wades in the Marches' mire. */
     inMire() {
@@ -15031,6 +15373,27 @@
         if (this.inMagma() && !fx.has("forgeward")) {
           v.health = clamp(v.health - dt * 16 * hard, 0, this.game.maxHealth());
           if (this.game.rng() < dt * 0.3) this.game.ailments.contract("burn", true);
+        }
+      }
+      if (inst.mods.includes("toxic_air") && !fx.has("breath")) {
+        v.stamina = clamp(v.stamina - dt * 1.2 * hard, 0, 100);
+        v.health = clamp(v.health - dt * 0.25 * hard, 0, this.game.maxHealth());
+        if (!this.toxicWas)
+          this.game.say("The air here burns your lungs. A respirator would help.", "danger");
+        this.toxicWas = true;
+      }
+      if (tpl.hazard.id === "spores") {
+        const bloom = this.sporeLevel() > 0.5, guarded = fx.has("breath") || fx.has("spores");
+        if (bloom && !this.bloomWas)
+          this.game.say(
+            guarded ? "The fungus blooms; your mask keeps the spores out." : "The fungus blooms! Spores fill the air.",
+            guarded ? "good" : "danger"
+          );
+        this.bloomWas = bloom;
+        if (bloom && !guarded) {
+          v.stamina = clamp(v.stamina - dt * 2.5 * hard, 0, 100);
+          if (this.game.rng() < dt * 0.015 * hard * this.diseaseScale())
+            this.game.ailments.contract("spore_lung");
         }
       }
       if (tpl.hazard.id === "seasons") {
@@ -16583,8 +16946,22 @@
         this.game.event("burst", animal.x, animal.y - 20, "#fff4e0");
         return;
       }
-      animal.deadUntil = this.game.s.elapsed + (animal.type === "boss" || spec?.boss || animal.minion || animal.echo ? 999999 : spec?.respawn ?? 120);
+      animal.deadUntil = this.game.s.elapsed + (animal.type === "boss" || spec?.boss || animal.minion || animal.echo || animal.split ? 999999 : spec?.respawn ?? 120);
       this.game.pocket.echo(animal);
+      if (spec?.behave === "split" && !animal.split && !animal.minion && !animal.echo) {
+        for (const dx of [-20, 20]) {
+          this.game.world.addAnimal(animal.type, animal.x + dx, animal.y - 10, {
+            body: true,
+            vx: dx * 4,
+            vy: -200,
+            split: true
+          });
+          const c = this.game.s.animals[this.game.s.animals.length - 1];
+          c.maxHp = c.hp = Math.max(10, Math.round(animal.maxHp * 0.35));
+          c.deadUntil = 0;
+        }
+        this.game.event("burst", animal.x, animal.y - 20, "#c8f0e0");
+      }
       if (animal.type === "boss") {
         const cfg = BOSSES[this.game.s.altar.level - 1];
         for (const [id, qty] of Object.entries(cfg.rewards)) this.game.add(id, qty);
@@ -16796,7 +17173,7 @@
     stepBody(a, dt) {
       const s = this.game.s, p = s.player, spec = MOBS[a.type];
       if (!spec) return;
-      const t = s.elapsed, d = dist(a, p), hunting = spec.sight > 0 && d < spec.sight && !s.dead, face = Math.sign(p.x - a.x) || 1, stunned = (a.fx?.stun ?? 0) > t, pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1), [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace];
+      const t = s.elapsed, d = dist(a, p), hunting = spec.sight > 0 && d < spec.sight * this.game.pocket.sightScale(a) && !s.dead, face = Math.sign(p.x - a.x) || 1, stunned = (a.fx?.stun ?? 0) > t, pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1), [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace];
       a.timers ??= {};
       if (d < 900 && Math.random() < dt * 0.04) this.cry(a, "call");
       if (spec.move === "walker" || spec.move === "hopper") {
@@ -16812,6 +17189,26 @@
             }
             a.vx = Math.cos(a.angle) * walk;
           }
+          if (hunting && spec.behave === "kite" && d < (spec.ranged?.range ?? 300) * 0.45)
+            a.vx = -face * run;
+          if (hunting && spec.behave === "burrow") {
+            if (!a.hidden && t > (a.timers.burrow ?? t + 1) && a.grounded) {
+              a.hidden = true;
+              a.timers.surface = t + 1.8;
+              this.game.event("dig", a.x, a.y, "1");
+            }
+            a.timers.burrow ??= t + 4 + this.game.rng() * 3;
+            if (a.hidden) {
+              a.vx = face * run * 1.6;
+              if (t > (a.timers.surface ?? 0)) {
+                a.hidden = false;
+                a.vy = -380;
+                a.timers.burrow = t + 6 + this.game.rng() * 3;
+                this.game.event("dig", a.x, a.y, "1");
+                this.game.sound("crumble", a.x, a.y, 0.7);
+              }
+            }
+          } else a.hidden = false;
           if (hunting && a.grounded && p.y < a.y - 50 && Math.abs(p.x - a.x) < 160 && t > (a.timers.jump ?? 0)) {
             a.vy = -420;
             a.timers.jump = t + 1.2;
@@ -16851,7 +17248,8 @@
         this.moveBody(a, dt, true);
       }
       if (Math.abs(a.vx ?? 0) > 5) a.angle = (a.vx ?? 0) > 0 ? 0 : Math.PI;
-      if (!hunting || stunned) return;
+      if (!hunting || stunned || a.hidden) return;
+      if (spec.behave === "tether" && d > 60 && d < 300) p.x += Math.sign(a.x - p.x) * 45 * dt;
       const cy = a.y - 22;
       if (Math.abs(p.x - a.x) < spec.reach * 0.6 + 10 && Math.abs(p.y - 26 - cy) < spec.reach * 0.6 + 20 && t >= a.attackAt) {
         a.attackAt = t + spec.cooldown * 0.6;
@@ -17656,10 +18054,10 @@
     }
   };
   var sprites = /* @__PURE__ */ new Map();
-  function cached(key, build15) {
+  function cached(key, build16) {
     let s = sprites.get(key);
     if (!s) {
-      s = build15();
+      s = build16();
       if (sprites.size > 4e3) sprites.clear();
       sprites.set(key, s);
     }
@@ -18333,6 +18731,8 @@
     queen_jelly: ["bottle", "#ffe8a0"],
     topaz: ["gem", "#f0b040"],
     // Band II and III realms.
+    mycelial_fragment: ["scroll", "#58e0d0"],
+    mycelial_key: ["key", "#58e0d0"],
     glasswood_fragment: ["scroll", "#a8d8f0"],
     marches_fragment: ["scroll", "#d8ceb4"],
     barrow_fragment: ["scroll", "#b8883a"],
@@ -18359,6 +18759,9 @@
     garden_key: ["key", "#8ad070"],
     diving_bell: ["crate", "#5a9ac0"],
     fracture_shard: ["crystal", "#d8a0ff"],
+    lore_tablet: ["scroll", "#8b8f8a"],
+    cairn: ["lump", "#8b8f8a"],
+    merchant_stall: ["crate", "#c85a4a"],
     tinkers_bench: ["crate", "#8a6440"],
     artisan_bench: ["crate", "#6a3a2a"],
     rift_forge: ["crate", "#b36cff"],
@@ -20850,6 +21253,19 @@
       top: 98
     }
   });
+  Object.assign(MOBS3, {
+    spore_titan: {
+      tpl: "biped",
+      body: "#6a5a8a",
+      belly: "#58e0d0",
+      eye: "#c0fff4",
+      w: 34,
+      h: 50,
+      parts: ["cap", "armor"],
+      top: 62,
+      light: [0.25, 0.6, 0.55]
+    }
+  });
   var SKINS = [
     "#d8a47c",
     "#b8805a",
@@ -21742,6 +22158,7 @@
       else if (s.type === "effergy") out.push([s.x, s.y - 60, 0.85, 0.72, 1]);
       else if (s.type === "shrine" && s.crop !== "spent") out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
       else if (s.type === "diving_bell") out.push([s.x, s.y - 24, 0.6, 0.8, 0.9]);
+      else if (s.type === "merchant_stall") out.push([s.x, s.y - 20, 0.9, 0.7, 0.4]);
       else if (s.type === "hearth") out.push([s.x, s.y - 12, 1.2 * f, 0.7 * f, 0.35 * f]);
       else if (s.type === "rift_forge") out.push([s.x, s.y - 20, 0.9, 0.4, 0.9]);
       else if (s.type === "relic_shelf" && Object.keys(s.store).length)
@@ -22504,6 +22921,17 @@
           const x = Math.floor(((hash3(i, 41) * w + t * 14 * (hash3(i, 42) - 0.3)) % w + w) % w), y = Math.floor((hash3(i, 43) * h + t * (18 + hash3(i, 44) * 20)) % h);
           c.fillRect(x, y, season.id === "winter" ? 1 : 2, 1);
         }
+      }
+    }
+    const spores = g.pocket.sporeLevel();
+    if (spores > 0) {
+      const guard = g.equipment.has("breath") || g.equipment.has("spores") ? 0.4 : 1;
+      c.fillStyle = `rgba(90, 200, 170, ${(spores * 0.22 * guard).toFixed(2)})`;
+      c.fillRect(0, 0, w, h);
+      c.fillStyle = `rgba(190, 255, 235, ${(spores * 0.8).toFixed(2)})`;
+      for (let i = 0; i < 90; i++) {
+        const x = Math.floor(((hash3(i, 51) * w + Math.sin(t + i) * 10) % w + w) % w), y = Math.floor(((hash3(i, 52) * h - t * (6 + hash3(i, 53) * 8)) % h + h) % h);
+        c.fillRect(x, y, 1, 1);
       }
     }
     const hymn = g.pocket.hymnLevel();
@@ -23349,6 +23777,34 @@
       p.rect(8, 16, 14, 6, "#bfe3ee");
       p.rect(9, 17, 5, 2, "#ffffff");
     }),
+    // Exploration: lore tablets, cairns over hidden vaults, and wandering merchants.
+    lore_tablet: () => sprite(22, 30, 11, 29, (p) => {
+      p.rect(3, 4, 16, 26, "#8b8f8a");
+      p.ellipse(11, 5, 8, 4, "#8b8f8a");
+      p.rect(3, 4, 1, 26, "#a8aca8");
+      for (let y = 9; y < 26; y += 4) p.line(6, y, 16, y, "#5a5e5a");
+      p.rect(8, 6, 6, 2, "#d8b848");
+    }),
+    cairn: () => sprite(20, 16, 10, 15, (p) => {
+      p.ellipse(10, 13, 9, 3, "#7c7a74");
+      p.ellipse(10, 9, 6, 3, "#8b8f8a");
+      p.ellipse(10, 5, 4, 2, "#a8aca8");
+      p.ellipse(10, 2, 2, 2, "#8b8f8a");
+    }),
+    merchant_stall: () => sprite(40, 40, 20, 39, (p) => {
+      p.rect(2, 8, 36, 4, "#c85a4a");
+      for (let x = 2; x < 38; x += 8) p.rect(x, 8, 4, 4, "#f0e0c0");
+      p.rect(4, 12, 2, 28, "#6a4a30");
+      p.rect(34, 12, 2, 28, "#6a4a30");
+      p.rect(2, 26, 36, 4, "#8a6440");
+      p.rect(8, 22, 4, 4, "#e8577a");
+      p.rect(14, 23, 3, 3, "#8fe3df");
+      p.rect(28, 22, 5, 4, "#d8b848");
+      p.rect(18, 16, 6, 10, "#5a4a6a");
+      p.rect(19, 13, 4, 4, "#d8a47c");
+      p.rect(18, 12, 6, 2, "#5a4a6a");
+      p.rect(23, 20, 2, 3, "#ffd070");
+    }),
     // A diving bell on the seabed: air for the Undertow.
     diving_bell: () => sprite(34, 40, 17, 39, (p) => {
       p.ellipse(17, 16, 15, 15, "#8a6a3a");
@@ -23388,6 +23844,7 @@
       mycelia: ["#4a3f5e", "#58e0d0"],
       skyreach: ["#c8c0b0", "#f8e08a"],
       void: ["#2a1c3a", "#b36cff"],
+      mycelial: ["#4a3f5e", "#58e0d0"],
       glasswood: ["#6a88a8", "#bfe8ff"],
       marches: ["#6a6454", "#e6dcc6"],
       barrow: ["#5a4028", "#f0c870"],
@@ -24331,7 +24788,21 @@
     for (const s of g.s.structures)
       if (s.type !== "rift_gate" && s.type !== "portal" && on(s))
         drawStructure(a, g, s, sx(s), sy(s), t);
-    for (const m of g.s.animals) if (!m.deadUntil && on(m)) drawAnimal(a, g, m, sx(m), sy(m), t);
+    for (const m of g.s.animals) {
+      if (m.deadUntil || !on(m)) continue;
+      if (m.hidden) {
+        a.fillStyle = "rgba(120, 96, 64, 0.9)";
+        for (let i = 0; i < 5; i++)
+          a.fillRect(
+            Math.round(sx(m) + Math.sin(t * 20 + i * 2) * 6),
+            Math.round(sy(m) - 1 - i % 2),
+            2,
+            1
+          );
+        continue;
+      }
+      drawAnimal(a, g, m, sx(m), sy(m), t);
+    }
     drawDrops(a, g, ax, ay, w, h, t);
     if (!menu2) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
     drawProjectiles(a, g, ax, ay, w, h);
@@ -26379,7 +26850,7 @@
       this.ctx = ctx2;
       this.out = out;
       const k = kit(ctx2);
-      const bed = (name, build15) => {
+      const bed = (name, build16) => {
         const g = ctx2.createGain();
         g.gain.value = 0;
         const n = ctx2.createBufferSource();
@@ -26387,7 +26858,7 @@
         n.loop = true;
         n.playbackRate.value = 0.97 + Object.keys(this.beds).length * 0.013;
         n.start();
-        build15(n).connect(g).connect(out);
+        build16(n).connect(g).connect(out);
         this.beds[name] = g;
       };
       bed("rain", (n) => {
@@ -29185,6 +29656,12 @@
   }
   function switchTo(id, now) {
     if (!player) return;
+    if (id === "silence") {
+      deck?.stop(now, 2.5);
+      deck = void 0;
+      current = id;
+      return;
+    }
     const quick = id === "boss" || id === "fallen";
     deck?.stop(now, quick ? 0.8 : 2.5);
     deck = player.play(TRACKS[id] ?? TRACKS.meadow, now + 0.08, current ? quick ? 0.25 : 1.5 : 0);
@@ -29285,7 +29762,8 @@
     undertow: "undertow",
     emberheart: "emberheart",
     garden: "garden",
-    fractured: "fractured"
+    fractured: "fractured",
+    mycelial: "mycelia"
   };
   var DUNGEON_TRACKS = {
     crypt: "dungeon",
@@ -29432,6 +29910,8 @@
     shelf: null,
     /** The research desk open on the Pack page. */
     research: null,
+    /** A wandering merchant's stall open on the Pack page. */
+    merchant: null,
     armourySel: "iron_sword",
     camera: { x: 0, y: 0 },
     lastFrame: performance.now(),
@@ -29687,6 +30167,15 @@
       if (result.action === "rift") {
         state.tab = "atlas";
         state.atlasView = "rift";
+        toggleJournal(true);
+      }
+      if (result.action === "merchant") {
+        state.merchant = result.structure ?? null;
+        state.research = null;
+        state.shelf = null;
+        state.larder = null;
+        state.tab = "pack";
+        sound("open");
         toggleJournal(true);
       }
       if (result.action === "research") {
@@ -29956,6 +30445,25 @@
         return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, "")}</small>` : ""}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
+    const stall = state.merchant;
+    if (stall) {
+      const tier = Number(stall.kind) || 1;
+      left.innerHTML = `<h2>A wandering merchant</h2><p class="lede">\u201CEverything has a price, and I am the only one out here charging it.\u201D You carry ${game.count("coin")} marks.</p><div class="book-list">${(stall.larder ?? []).filter((e) => e.qty > 0).map(
+        (e) => `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${e.qty} left \xB7 ${game.pocket.price(e.id, tier)} marks</small></div></div><button data-buy="${e.id}" ${game.count("coin") >= game.pocket.price(e.id, tier) || game.dev.god ? "" : "disabled"}>BUY</button></div>`
+      ).join("") || "<p>\u201CSold out. Come back to another realm.\u201D</p>"}</div><div class="book-actions"><button class="quiet" data-close-stall>CLOSE</button></div>`;
+      left.querySelectorAll("[data-buy]").forEach(
+        (b) => b.onclick = () => {
+          const r = game.pocket.buy(stall, b.dataset.buy ?? "");
+          if (!r.ok) message(r.reason);
+          renderJournal();
+          updateUI(true);
+        }
+      );
+      left.querySelector("[data-close-stall]").onclick = () => {
+        state.merchant = null;
+        renderJournal();
+      };
+    }
     const desk = state.research;
     if (desk) {
       const tally = game.s.tutorial.tally, fresh = [...new Set(game.s.inventory.map((e) => e.id))].filter(
@@ -30628,12 +31136,22 @@
     const all2 = [...sets, ...charms];
     return all2.length ? ` <em>Ward: ${all2.join(" or ")}.</em>` : "";
   }
+  function realmCompletion(id) {
+    const rec = game.pocket.record(id), page = CODEX.find((p) => p.id === id), [have, need] = page ? game.skills.page(page) : [0, 1];
+    const parts = [
+      rec.visits ? 1 : 0,
+      Math.min(1, rec.best / (id === "fractured" ? 10 : MAX_TIER)) * 3,
+      rec.relic ? 1 : 0,
+      need ? have / need : 0
+    ];
+    return Math.round(parts.reduce((a, b) => a + b, 0) / 6 * 100);
+  }
   function renderAtlas(left, right) {
     const pocket = game.pocket, open = game.s.pocket, stone = pocket.waystoneNear();
     const tier = (t) => tierName(t);
     left.innerHTML = `<h2>The Atlas</h2><p class="lede">Each realm lies behind its own key. Turn one in a Waystone and the realm is built anew: its tier sets how hard it bites and how much it gives.</p>${open ? `<div class="note-block">Open now: <strong>${templateOf(open)?.name}</strong> \xB7 Tier ${tier(open.tier)}${open.mods.length ? " \xB7 " + open.mods.map((m) => modById(m)?.name).join(", ") : ""}${open.cleared ? " \xB7 its master is slain" : ""}.</div>` : ""}<h3>Realms</h3><div class="book-list">${REALMS.map((r2) => {
-      const rec2 = pocket.record(r2.id);
-      return `<div class="book-row ${state.atlasRealm === r2.id ? "selected" : ""}"><div class="with-icon">${icon(r2.key)}<div><strong>${r2.name}</strong><small>Band ${tier(r2.band)} \xB7 ${rec2.visits ? "best tier " + (rec2.best ? tier(rec2.best) : "\u2014") : "unvisited"}${rec2.relic ? " \xB7 relic found" : ""}</small></div></div><div><span class="qty">\xD7${game.count(r2.key)}</span><button data-realm="${r2.id}">VIEW</button></div></div>`;
+      const rec2 = pocket.record(r2.id), pct = realmCompletion(r2.id);
+      return `<div class="book-row ${state.atlasRealm === r2.id ? "selected" : ""}"><div class="with-icon">${icon(r2.key)}<div><strong>${r2.name}${rec2.visits ? ` <span class="qty">${pct}%</span>` : ""}</strong><small>Band ${tier(r2.band)} \xB7 ${rec2.visits ? "best tier " + (rec2.best ? tier(rec2.best) : "\u2014") : "unvisited"}${rec2.relic ? " \xB7 relic found" : ""}</small></div></div><div><span class="qty">\xD7${game.count(r2.key)}</span><button data-realm="${r2.id}">VIEW</button></div></div>`;
     }).join(
       ""
     )}</div><div class="book-actions"><button class="quiet" data-view-rift>THE RIFT GATE \u203A</button></div>`;
@@ -30892,8 +31410,9 @@
         state.lastAuto = game.s.elapsed;
       }
     }
+    const hush = game.pocket.here() && game.pocket.has("silent") && !game.bosses.active();
     Audio.setScene(
-      musicScene({
+      hush ? "silence" : musicScene({
         playing: state.playing,
         dead: game.s.dead,
         boss: !!game.s.altar.activeBoss || !!game.bosses.active(),

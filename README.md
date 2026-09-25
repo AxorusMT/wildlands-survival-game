@@ -162,15 +162,35 @@ The world changes as you work it. Chopped trees topple and leave stumps that slo
   - **Too late:** rabies serum works only before rabies takes hold.
   - **Immunity:** many leave you immune for a while, and a field vaccine guards against tetanus, rabies and cholera.
 
-  | Group            | Ailments                                                    |
-  | ---------------- | ----------------------------------------------------------- |
-  | Food and water   | Dysentery, fever, food poisoning, tapeworm, cholera, scurvy |
-  | Wounds and bites | Infected wounds, blood poisoning, tetanus, rabies, venom    |
-  | Exposure         | Hypothermia, frostbite, heatstroke, pneumonia               |
-  | The realms       | Spore lung, void rot                                        |
-  | Injuries         | Bleeding, fractures, burns                                  |
+  | Group            | Ailments                                                                           |
+  | ---------------- | ---------------------------------------------------------------------------------- |
+  | Food and water   | Dysentery, fever, food poisoning, tapeworm, cholera, scurvy                        |
+  | Wounds and bites | Infected wounds, blood poisoning, tetanus, rabies, venom                           |
+  | Exposure         | Hypothermia, frostbite, heatstroke, pneumonia                                      |
+  | The realms       | Spore lung, void rot, glass cough, marrow rot, fever-dream, gold sickness, rickets |
+  | Injuries         | Bleeding, fractures, burns                                                         |
 
   Each ailment has its own treatment: bandages, splints, salves, teas, serums, and the older remedies. The **Vitals** page lists every ailment with its stage, symptoms, treatment and time left. A strip of ailments on the HUD shows their stages at a glance.
+
+- **Clothing:** worn in three layers apart from armour: under, mid and outer. There are eleven garments, from linen underlayers to the rime parka and ember mantle. Each keeps out some cold, heat or rain, and wears through in hard weather until it is mended at a workbench.
+- **Wear and mending:**
+  - weapons blunt with use, and a worn-out weapon strikes for half;
+  - tools dull with use, and a worn-out tool will not cut its tier;
+  - nothing is lost, and everything is mended at its station (the Wardrobe lists what needs it);
+  - a **repair kit** patches the weapon in hand anywhere.
+- **Water, further:**
+  - waterskins and flasks make each drink go further;
+  - water in the pack freezes in hard cold unless it is in an insulated flask;
+  - purification tablets clean three draughts at once;
+  - a **distiller** boils brackish and wild water with wood.
+- **Preserving, further:**
+  - a smoking rack makes smoked fish;
+  - a canning kettle makes canned stew and fruit that barely rot;
+  - an ice harvester cuts ice wherever it freezes;
+  - a cold box stops the ice in your pack from melting.
+- **Diet:** food falls into seven groups: meat, fish, grain, fruit, greens, fungus and sweets. Four or more kinds in recent meals keep you strong, while the same food meal after meal leaves you malnourished.
+- **Darkness:** twenty minutes without sunlight brings on rickets, which sunlight or fish oil cures. The miner's lamp burns resin in the dark.
+- **Weight:** everything weighs something. Carry more than your pack holds (120 kg, more with a satchel, pack or expedition frame) and you slow down and tire.
 
 ### Dungeons
 
@@ -218,6 +238,21 @@ Beyond the Rift lie realms that are built anew every time you enter.
 - **Tiers I–V:** each tier gives monsters more health and harm and gives more loot. Clearing a tier's boss unlocks the next one.
 - **Modifiers:** a realm rolls one modifier per tier above I. Boons include Bountiful, Rich veins, Treasure trove, Lucky and Low gravity. Banes include Fortified, Savage, Swarming, Frenzied, Hunted, Hungering, Frostbound, Scorched, Starless, Unstable, Blighted and Echoing. Every modifier adds to the loot.
 - **Inside each realm:** you'll find resources, chests, two shrines that each grant a blessing once, a roaming elite, and the boss's altar. The first boss kill in each realm wins its **relic**.
+- **Exploring:**
+  - lore tablets: 30 fragments of the realms' history, which fill a Codex page;
+  - a hidden vault sealed in the rock under each cairn;
+  - a wandering merchant in about half of all expeditions, selling rare goods and the next band's key fragments.
+- **More modifiers:** Toxic air (needs a respirator) and Silent (no music, and monsters hear you from further off).
+- **How creatures fight:**
+  - **kite:** keeps its distance and shoots;
+  - **burrow:** sinks into the ground and bursts up beneath you;
+  - **tether:** reels you in;
+  - **mirror:** turns your shots back;
+  - **split:** falls apart into two;
+  - **swarm:** never comes alone.
+- **Completion:** the Atlas shows how much of each realm you have done.
+- **Resistances:** each creature resists some kinds of harm and fears others, and its Codex entry says which. The weapon's infusion sets the kind of harm, so choose it for the realm.
+- **The Mycelial Deep:** it now exists in template form too. The Deep beyond the Rift Gate is its seed 0, and Waystone expeditions regrow it with spore blooms (a respirator keeps them out).
 
 | Realm                      | Hazard                                                                          | Signature                                         | Gear                                                                                   | Boss and relic                                                              |
 | -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -332,6 +367,22 @@ Nothing here resets. The world is persistent, and so is everything you learn in 
   Finishing a page grants a lasting bonus.
 
 - **The relic shelf** is built at the workbench. Relics set on it (the realm bosses' prizes and great trophies) lend their gifts wherever you are. It holds three relics, four at renown 20 and five at renown 40.
+
+### Stations, study, and mastery
+
+- **Station lines:** each upgrade does everything the stations below it did, adds recipes, and makes finer weapons.
+
+  | Line     | Stations                                   | New at the top                 |
+  | -------- | ------------------------------------------ | ------------------------------ |
+  | Benches  | workbench → tinker's bench → artisan bench | Repair kits, packs, whetstones |
+  | Forges   | furnace → forge → starforge → rift forge   | Ascended ingots and tier 12    |
+  | Medicine | apothecary → laboratory                    | Panacea                        |
+  | Fires    | campfire → hearth → kitchen                | A fire that needs no feeding   |
+
+- **Research desk:** study an item to learn what it goes into (and, for a weapon, how it can evolve). Each study earns renown.
+- **Mastery perks:** at mastery 10 each weapon family learns a move of its own. For example, spears get a leaping thrust from the air, blade finishers heal, the bow's fifth arrow is free and the staff looses an extra bolt. At mastery 20 the weapon glints in your hand.
+- **Armour forge:** the Armoury has an Armour tab. Each piece levels to +5, takes gems in its sockets (two in a chestplate) and one infusion.
+- **Compare:** each weapon's Armoury page compares it with the one in hand.
 
 ### Feats and titles
 

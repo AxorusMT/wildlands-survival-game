@@ -10,6 +10,7 @@ import { OBSERVATORY } from './observatory.ts';
 import { UNDERTOW } from './undertow.ts';
 import { GLASSWOOD } from './glasswood.ts';
 import { MARCHES } from './marches.ts';
+import { MYCELIAL } from './mycelial.ts';
 import { ORCHARD } from './orchard.ts';
 import { SALTFLATS } from './saltflats.ts';
 import { STEPPE } from './steppe.ts';
@@ -26,6 +27,7 @@ export { hymnAt } from './choir.ts';
 export type { MarchesGeometry } from './marches.ts';
 export { FEVER_BITES, FEVER_CHANCE } from './feverlands.ts';
 export { starPulse } from './observatory.ts';
+export { sporeBloom } from './mycelial.ts';
 export { AIR_SECONDS, type UndertowGeometry } from './undertow.ts';
 export { magmaLevel, type EmberGeometry } from './emberheart.ts';
 export { SEASONS, SEASON_SECONDS, seasonAt } from './garden.ts';
@@ -35,6 +37,7 @@ export const REALMS: RealmTemplate[] = [
   ORCHARD,
   STEPPE,
   WARREN,
+  MYCELIAL,
   GLASSWOOD,
   MARCHES,
   BARROW,

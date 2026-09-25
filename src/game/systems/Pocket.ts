@@ -3,9 +3,11 @@ import { seededRandom } from '../../core/random.ts';
 import type { Animal, GameResult, Structure } from '../../core/types.ts';
 import { BUFFS } from '../../data/gear.ts';
 import { itemName } from '../../data/items.ts';
+import { LORE, MERCHANT_GOODS } from '../../data/lore.ts';
 import { MOBS } from '../../data/mobs.ts';
 import {
   MAX_TIER,
+  REALMS,
   RW,
   tierName,
   templateOf,
@@ -17,6 +19,7 @@ import {
   hymnAt,
   magmaLevel,
   seasonAt,
+  sporeBloom,
   starPulse,
   modById,
   realmById,
@@ -76,6 +79,8 @@ export class Pocket extends System {
   private goldWas = -1;
   private magmaWas = false;
   private seasonWas = '';
+  private bloomWas = false;
+  private toxicWas = false;
   private hymnWas = false;
   private sunWas = false;
   private ventAt = 0;
@@ -130,6 +135,10 @@ export class Pocket extends System {
       sk.realmLoot +
       (sk.treasureSense ? 0.2 : 0)
     );
+  }
+  /** Silent realms carry every sound: monsters notice you from further off. */
+  sightScale(a: Animal) {
+    return this.has('silent') && inPocket(a.x) ? 1.5 : 1;
   }
   speedScale(a: Animal) {
     return this.has('frenzied') && inPocket(a.x) ? 1.3 : 1;
@@ -320,6 +329,10 @@ export class Pocket extends System {
       const m = weighted(rng, mobs),
         y = spot(lx);
       ctx.mob(m.type, x0 + lx, m.air ? y - 140 - rng() * 80 : y);
+      // Swarmers never come alone.
+      if (MOBS[m.type]?.behave === 'swarm')
+        for (const dx of [-40, 40])
+          ctx.mob(m.type, x0 + lx + dx, (m.air ? y - 140 : y) - rng() * 60);
     }
     // Chests, more of them in a Treasure trove.
     const nChests =
@@ -350,7 +363,92 @@ export class Pocket extends System {
       const lx = RW * f + (rng() - 0.5) * 400;
       if (clear(lx)) g.realms.furnish('shrine', x0 + lx, spot(lx));
     }
+    // Lore tablets left by those who went before.
+    for (const f of [0.22, 0.52]) {
+      const lx = RW * f + (rng() - 0.5) * 500;
+      if (clear(lx))
+        g.realms.furnish('lore_tablet', x0 + lx, spot(lx), {
+          kind: String(Math.floor(rng() * LORE.length)),
+        });
+    }
+    // A wandering merchant, in about half of all expeditions.
+    if (rng() < 0.5) {
+      const lx = RW * (0.35 + rng() * 0.3);
+      if (clear(lx)) this.merchant(x0 + lx, spot(lx), rng, tpl, inst.tier);
+    }
+    // A hidden vault sealed in the rock below, marked by a cairn above.
+    this.vault(geo, rng, x0);
     tpl.extra?.(geo, ctx);
+  }
+  /** A wandering merchant's stall: a few goods, and the next band's fragments. */
+  private merchant(x: number, y: number, rng: () => number, tpl: { band: number }, tier: number) {
+    const stock: { id: string; qty: number }[] = [];
+    const goods = [...MERCHANT_GOODS];
+    for (let i = 0; i < 4 && goods.length; i++) {
+      const [id] = goods.splice(Math.floor(rng() * goods.length), 1)[0];
+      stock.push({ id, qty: 1 + Math.floor(rng() * 3) });
+    }
+    const next = REALMS.filter((r) => r.band === tpl.band + 1);
+    if (next.length) stock.push({ id: next[Math.floor(rng() * next.length)].fragment, qty: 2 });
+    const st = this.game.realms.furnish('merchant_stall', x, y, { kind: String(tier) });
+    st.larder = stock;
+  }
+  /** What a merchant asks for an item. */
+  price(id: string, tier: number) {
+    const base = MERCHANT_GOODS.find(([g]) => g === id)?.[1] ?? 150;
+    return Math.round(base * (1 + 0.2 * (tier - 1)));
+  }
+  /** Buys one of an item from a merchant's stall. */
+  buy(st: Structure, id: string): GameResult {
+    const e = st.larder?.find((x) => x.id === id && x.qty > 0);
+    if (!e) return { ok: false, reason: 'Sold out.' };
+    const cost = this.price(id, Number(st.kind) || 1);
+    if (!this.game.dev.god) {
+      if (this.game.count('coin') < cost) return { ok: false, reason: `It costs ${cost} marks.` };
+      this.game.remove('coin', cost);
+    }
+    e.qty--;
+    this.game.add(id);
+    this.game.sound('coin', st.x, st.y);
+    this.game.say(`Bought ${itemName(id).toLowerCase()} for ${cost} marks.`, 'good');
+    return { ok: true };
+  }
+  /** Carves a sealed room into solid rock beneath a floor, with a rich chest, and a cairn above. */
+  private vault(geo: { floors: ((x: number) => number)[] }, rng: () => number, x0: number) {
+    const s = this.game.s;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const lx = 900 + rng() * (RW - 2400),
+        floor = geo.floors[0](lx),
+        tx0 = Math.floor((x0 + lx) / TILE) - 3,
+        ty0 = Math.floor((floor + 170) / TILE);
+      // Only in solid rock, with rock all round.
+      let solid = true;
+      for (let ty = ty0 - 2; ty <= ty0 + 4 && solid; ty++)
+        for (let tx = tx0 - 2; tx <= tx0 + 8 && solid; tx++)
+          if (!s.tiles[ty * TILE_COLS + tx]) solid = false;
+      if (!solid) continue;
+      for (let ty = ty0; ty < ty0 + 3; ty++)
+        for (let tx = tx0; tx < tx0 + 7; tx++) {
+          s.tiles[ty * TILE_COLS + tx] = 0;
+          s.tileEdits[ty * TILE_COLS + tx] = 0;
+        }
+      const cx = (tx0 + 3.5) * TILE,
+        cy = (ty0 + 3) * TILE - 1;
+      this.chest(
+        cx,
+        cy,
+        [
+          ['healing_draught', 2, 4, 1],
+          ['life_crystal', 1, 1, 0.5],
+          ['gold_ingot', 3, 6, 0.8],
+          ['fracture_shard', 1, 2, 0.15],
+          ...(templateOf(this.inst()!)?.chestLoot ?? []),
+        ],
+        rng,
+      );
+      this.game.realms.furnish('cairn', x0 + lx, this.game.floorNear(x0 + lx, floor - 30));
+      return;
+    }
   }
   /** A realm shrine: a blessing for a few minutes, once. */
   pray(st: Structure): GameResult {
@@ -467,6 +565,12 @@ export class Pocket extends System {
       this.game.ailments.showing().some((a) => a.id === 'fever_dream') &&
       !this.game.equipment.has('plagueward')
     );
+  }
+  /** Strength of a Mycelial spore bloom where the player is. */
+  sporeLevel() {
+    const r = activeRealm();
+    if (!r || r.tpl.hazard.id !== 'spores' || !this.here()) return 0;
+    return sporeBloom(this.game.s.elapsed, r.inst.seed);
   }
   /** Whether the player wades in the Marches' mire. */
   inMire() {
@@ -707,6 +811,32 @@ export class Pocket extends System {
       if (this.inMagma() && !fx.has('forgeward')) {
         v.health = clamp(v.health - dt * 16 * hard, 0, this.game.maxHealth());
         if (this.game.rng() < dt * 0.3) this.game.ailments.contract('burn', true);
+      }
+    }
+    // Toxic air: without a respirator, every breath burns.
+    if (inst.mods.includes('toxic_air') && !fx.has('breath')) {
+      v.stamina = clamp(v.stamina - dt * 1.2 * hard, 0, 100);
+      v.health = clamp(v.health - dt * 0.25 * hard, 0, this.game.maxHealth());
+      if (!this.toxicWas)
+        this.game.say('The air here burns your lungs. A respirator would help.', 'danger');
+      this.toxicWas = true;
+    }
+    // Spore blooms: the air fills; spores sting and settle in unguarded lungs.
+    if (tpl.hazard.id === 'spores') {
+      const bloom = this.sporeLevel() > 0.5,
+        guarded = fx.has('breath') || fx.has('spores');
+      if (bloom && !this.bloomWas)
+        this.game.say(
+          guarded
+            ? 'The fungus blooms; your mask keeps the spores out.'
+            : 'The fungus blooms! Spores fill the air.',
+          guarded ? 'good' : 'danger',
+        );
+      this.bloomWas = bloom;
+      if (bloom && !guarded) {
+        v.stamina = clamp(v.stamina - dt * 2.5 * hard, 0, 100);
+        if (this.game.rng() < dt * 0.015 * hard * this.diseaseScale())
+          this.game.ailments.contract('spore_lung');
       }
     }
     // The Garden: the year turns.
