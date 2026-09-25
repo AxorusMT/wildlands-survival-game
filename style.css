@@ -1329,3 +1329,76 @@ button:focus-visible {
     font-size: 16px;
   }
 }
+
+/* Field console (toggle with the backquote key). */
+#dev-console {
+  position: absolute;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  width: min(760px, calc(100vw - 32px));
+  z-index: 40;
+  background: rgba(24, 28, 24, 0.94);
+  border: 1px solid #8e795e;
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  color: #efe6cc;
+  font:
+    13px/1.45 ui-monospace,
+    'SFMono-Regular',
+    Menlo,
+    Consolas,
+    monospace;
+}
+#dev-console.hidden {
+  display: none;
+}
+#dev-console header {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(142, 121, 94, 0.5);
+  font:
+    600 12px/1 'EB Garamond',
+    Georgia,
+    serif;
+  letter-spacing: 0.18em;
+  color: #d8c49a;
+}
+#dev-console header span {
+  margin-left: 10px;
+  letter-spacing: 0.02em;
+  font-weight: 400;
+  color: #9d967f;
+}
+#dev-log {
+  max-height: 190px;
+  overflow-y: auto;
+  padding: 8px 12px;
+  white-space: pre-wrap;
+}
+#dev-log .cmd {
+  color: #9d967f;
+}
+#dev-log .err {
+  color: #f08c74;
+}
+#dev-log .ok {
+  color: #b9d8a2;
+}
+.dev-prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(142, 121, 94, 0.5);
+}
+.dev-prompt span {
+  color: #d8c49a;
+}
+#dev-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #fff6de;
+  font: inherit;
+}

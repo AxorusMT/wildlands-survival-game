@@ -34,7 +34,7 @@ export function track(id: number, x: number, y: number, hp: number, t: number): 
   let m = motion.get(id);
   if (!m) {
     if (motion.size > 600) motion.clear();
-    m = { x, y, walk: 0, move: 0, hp, hurt: -9 };
+    m = { x, y, sy: y, t, walk: 0, move: 0, hp, hurt: -9 };
     motion.set(id, m);
   }
   const dx = Math.abs(x - m.x);
@@ -44,6 +44,11 @@ export function track(id: number, x: number, y: number, hp: number, t: number): 
   if (hp < m.hp) m.hurt = t;
   m.hp = hp;
   m.x = x;
+  // Walkers stand on whole tiles, so their feet jump a tile at each step of a slope; the drawn
+  // height glides after them instead. Big moves (respawns) snap.
+  const dt = Math.min(0.1, Math.max(0, t - m.t));
+  m.t = t;
+  m.sy = Math.abs(y - m.sy) > 80 ? y : m.sy + (y - m.sy) * Math.min(1, dt * 16);
   m.y = y;
   return m;
 }
@@ -467,7 +472,7 @@ export function drawAnimal(c: Canvas2D, g: RenderGame, a: Animal, x: number, y: 
     boss = a.type === 'boss',
     hurt = t - m.hurt < 0.16;
   c.save();
-  c.translate(x + (hurt ? Math.sin(t * 90) * 2 : 0), y + 1);
+  c.translate(x + (hurt ? Math.sin(t * 90) * 2 : 0), y + 1 + (m.sy - a.y));
   if (a.type !== 'bat' && a.type !== 'ember_bat')
     ellipse(
       c,

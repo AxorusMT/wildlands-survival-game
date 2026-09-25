@@ -33,6 +33,7 @@ export class Interaction extends System {
     if (near.type === 'cache') {
       const c = near.object;
       c.opened = true;
+      this.game.sound('open', c.x, c.y);
       const deep: Record<string, [string, string]> = {
         lower_mines: ['iron_ingot', 'crystal'],
         upper_hell: ['steel_ingot', 'obsidian'],
@@ -69,11 +70,13 @@ export class Interaction extends System {
       this.game.s.vitals.fatigue = clamp(this.game.s.vitals.fatigue - 32, 0, RULES.maxVital);
       this.game.s.vitals.stamina = 100;
       this.game.s.elapsed += 90;
+      this.game.sound('rest');
       this.game.say('Rested beneath the open sky. Fatigue eases.', 'good');
     } else if (st.type === 'campfire') {
       if (this.game.count('wood')) {
         this.game.remove('wood');
         st.fuel += RULES.campfireRefuel;
+        this.game.sound('place', st.x, st.y, 0.7);
         this.game.say('Fed the campfire with wood.', 'good');
       } else return { ok: false, reason: 'One wood refuels the campfire.' };
     } else if (st.type === 'icebox') {
@@ -93,8 +96,10 @@ export class Interaction extends System {
       this.game.remove('resin');
       st.fuel += RULES.lanternRefuel;
       this.game.say('Lantern refueled with resin.', 'good');
-    } else if (st.type === 'chest') return { ok: true, action: 'chest', structure: st };
-    else if (st.type === 'farm_plot') {
+    } else if (st.type === 'chest') {
+      this.game.sound('open', st.x, st.y);
+      return { ok: true, action: 'chest', structure: st };
+    } else if (st.type === 'farm_plot') {
       if (st.crop && this.game.s.elapsed - st.plantedAt >= RULES.cropGrowthSeconds) {
         this.game.add(st.crop, 5);
         this.game.say('Harvested ' + itemName(st.crop) + '.', 'good');
@@ -117,7 +122,9 @@ export class Interaction extends System {
     if (!water) return { ok: false, reason: 'Stand by a pool to fish.' };
     if (this.game.s.vitals.stamina < 9) return { ok: false, reason: 'Too tired to fish.' };
     this.game.s.vitals.stamina -= 9;
+    this.game.sound('cast');
     if (this.game.rng() < RULES.fishSuccessChance) {
+      this.game.sound('catch', water.x, water.y);
       this.game.add('raw_fish');
       this.game.say('Caught a fish. Cook it before eating.', 'good');
       return { ok: true, caught: true };
@@ -183,6 +190,17 @@ export class Interaction extends System {
     const form = nodeForm(node.kind),
       s = this.game.s;
     node.hitAt = s.elapsed;
+    this.game.sound(
+      form === 'tree'
+        ? 'chop'
+        : form === 'mineral'
+          ? 'pick'
+          : form === 'water'
+            ? 'splash'
+            : 'pluck',
+      node.x,
+      node.y - 20,
+    );
     if (form === 'water') {
       const qty = roll();
       this.game.add('wild_water', qty);
@@ -211,12 +229,14 @@ export class Interaction extends System {
       // The stump waits a long while before a sapling takes its place.
       node.depletedUntil = s.elapsed + spec.regen * RULES.treeRegrowthFactor;
       this.game.event('fell', node.x, node.y, node.kind, dir);
+      this.game.sound('creak', node.x, node.y - 40);
       this.game.drops.spawn(node.kind, qty, node.x + dir * 70, node.y - 24, RULES.treeFallSeconds);
       this.game.say('Timber! The tree comes down.', 'good');
     } else {
       const index = s.nodes.indexOf(node);
       if (index >= 0) s.nodes.splice(index, 1);
       this.game.event('crumble', node.x, node.y, node.kind);
+      this.game.sound('crumble', node.x, node.y);
       this.game.drops.spawn(node.kind, qty, node.x, node.y - 12);
       this.game.say('The ' + itemName(node.kind).toLowerCase() + ' breaks apart.', 'good');
     }

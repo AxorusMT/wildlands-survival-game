@@ -140,25 +140,23 @@ export function drawSky(
     c.fillStyle = col;
     c.beginPath();
     c.moveTo(-10, h + 5);
-    const trees = [];
-    for (let sx = -16; sx <= w + 16; sx += 8) {
-      const wx = sx + cam.x * d + layer * 1000;
-      const ya = skylineHeight(A.skyline, wx, layer),
-        yb = skylineHeight(B.skyline, wx, layer);
-      const yy = base - lerp(ya, yb, k);
-      c.lineTo(sx, yy);
-      if (layer >= 1 && sx % 24 === 0) trees.push([sx, yy]);
-    }
+    const shift = cam.x * d + layer * 1000,
+      ridge = (wx: number) =>
+        base - lerp(skylineHeight(A.skyline, wx, layer), skylineHeight(B.skyline, wx, layer), k);
+    for (let sx = -16; sx <= w + 16; sx += 8) c.lineTo(sx, ridge(sx + shift));
     c.lineTo(w + 10, h + 5);
     c.closePath();
     c.fill();
-    if (base < h)
-      for (const [sx, yy] of trees) {
-        const wx = sx + cam.x * d + layer * 1000,
-          kind = H(Math.floor(wx / 24), layer, 8) < k ? B.trees : A.trees;
+    // Trees belong to fixed slots along the ridge, so they scroll with it instead of being
+    // re-picked for each screen column as the camera moves (which made them flicker).
+    if (layer >= 1 && base < h)
+      for (let slot = Math.floor((shift - 16) / 24); slot * 24 - shift <= w + 16; slot++) {
+        const wx = slot * 24,
+          kind = H(slot, layer, 8) < k ? B.trees : A.trees;
         if (!kind || vnoise(wx / 150, layer + 20) < 0.42) continue;
-        const size = (14 + H(Math.floor(wx / 24), layer, 9) * 16) * (0.7 + layer * 0.25);
-        skylineTree(c, kind, sx + (H(Math.floor(wx / 24), 3) - 0.5) * 10, yy + 2, size);
+        const size = (14 + H(slot, layer, 9) * 16) * (0.7 + layer * 0.25),
+          tx = wx + (H(slot, 3) - 0.5) * 10;
+        skylineTree(c, kind, tx - shift, ridge(tx) + 2, size);
       }
     c.fillRect(-10, base + 40, w + 20, h);
   }

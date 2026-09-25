@@ -50,6 +50,17 @@ export class Terrain extends System {
       cy = ty * TILE + TILE / 2,
       spec = TILE_YIELD[kind] ?? { item: 'stone' };
     this.game.event('dig', cx, cy, String(kind));
+    this.game.sound(
+      kind === 5
+        ? 'dig_ice'
+        : kind >= 9
+          ? 'dig_hell'
+          : kind === 2 || kind === 6 || kind === 8
+            ? 'dig_stone'
+            : 'dig_soil',
+      cx,
+      cy,
+    );
     this.game.drops.spawn(spec.item, 1, cx, cy);
     if (spec.bonus && this.game.rng() < spec.bonus[1]) {
       this.game.drops.spawn(spec.bonus[0], 1, cx, cy);

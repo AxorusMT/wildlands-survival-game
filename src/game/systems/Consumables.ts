@@ -15,6 +15,7 @@ export class Consumables extends System {
       rotten = this.game.itemState(entry) === 'rotten';
     if (WEAPONS[id]) {
       this.game.s.player.weapon = id;
+      this.game.sound('equip');
       this.game.say(itemName(id) + ' equipped.');
       return { ok: true };
     }
@@ -29,6 +30,7 @@ export class Consumables extends System {
     if (wear) {
       const key = wear;
       this.game.s.player[key] = !this.game.s.player[key];
+      this.game.sound('wear');
       this.game.say(itemName(id) + (this.game.s.player[key] ? ' worn.' : ' stowed.'));
       return { ok: true };
     }
@@ -106,6 +108,9 @@ export class Consumables extends System {
       }
     } else return { ok: false, reason: 'This item is a crafting material.' };
     this.game.remove(id);
+    this.game.sound(
+      food[id] ? 'eat' : id === 'wild_water' || id === 'boiled_water' ? 'drink' : 'medicine',
+    );
     this.game.say(
       (rotten ? 'Consumed spoiled ' : 'Used ') + itemName(id).toLowerCase() + '.',
       rotten ? 'danger' : 'good',

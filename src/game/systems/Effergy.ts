@@ -6,12 +6,13 @@ import { uniqueId } from '../ids.ts';
 import { System } from './System.ts';
 
 export class Effergy extends System {
-  summonBoss() {
-    const altar = this.game.s.structures.find((st) => st.type === 'effergy');
+  /** Calls the Direwolf beside the altar, or at `at` when summoned from the field console. */
+  summonBoss(at?: { x: number; y: number }) {
+    const altar = at ?? this.game.s.structures.find((st) => st.type === 'effergy');
     if (!altar) return;
     const cfg = BOSSES[this.game.s.altar.level - 1];
-    const x = clamp(altar.x + 145, 40, WORLD_W - 40),
-      y = this.game.groundTopAt(x) - 1;
+    const x = clamp(altar.x + (at ? 0 : 145), 40, WORLD_W - 40),
+      y = at ? this.game.floorNear(x, at.y - 20) : this.game.groundTopAt(x) - 1;
     const boss = {
       id: uniqueId(),
       type: 'boss',
@@ -28,6 +29,7 @@ export class Effergy extends System {
       deadUntil: 0,
       warning: 2,
       phase: 0,
+      ...(at ? { walkY: at.y } : {}),
     };
     this.game.s.animals.push(boss);
     this.game.s.altar.activeBoss = boss.id;
@@ -38,7 +40,8 @@ export class Effergy extends System {
         type: 'wolf',
         companion: true,
         x: cx,
-        y: this.game.groundTopAt(cx) - 1,
+        y: at ? this.game.floorNear(cx, at.y - 20) : this.game.groundTopAt(cx) - 1,
+        ...(at ? { walkY: at.y } : {}),
         homeX: altar.x,
         homeY: altar.y,
         hp: 66,
@@ -52,6 +55,7 @@ export class Effergy extends System {
       });
     }
     this.game.say('The ' + cfg.name + ' answers the Effergy. Two wolves follow it.', 'danger');
+    this.game.sound('boss', x, y - 40, 1.5);
   }
   attune(mob = 'wolf') {
     if (mob !== 'wolf')

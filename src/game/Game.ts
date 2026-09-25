@@ -16,6 +16,7 @@ import { RULES } from './rules.ts';
 
 import { Consumables } from './systems/Consumables.ts';
 import { Crafting } from './systems/Crafting.ts';
+import { Dev, newDevState } from './systems/Dev.ts';
 import { Drops } from './systems/Drops.ts';
 import { Effergy } from './systems/Effergy.ts';
 import { Environment } from './systems/Environment.ts';
@@ -39,6 +40,8 @@ export class Game {
   messages!: GameMessage[];
   /** Passing events for effects and sound; not saved. */
   events: WorldEvent[] = [];
+  /** Field-console switches for this session; not saved. */
+  dev = newDevState();
 
   readonly terrain = new Terrain(this);
   readonly environment = new Environment(this);
@@ -52,6 +55,7 @@ export class Game {
   readonly wildlife = new Wildlife(this);
   readonly effergy = new Effergy(this);
   readonly drops = new Drops(this);
+  readonly devtools = new Dev(this);
   readonly world = new WorldGenerator(this);
   readonly saves = new SaveSystem(this);
 
@@ -137,11 +141,16 @@ export class Game {
     for (const a of this.s.animals) this.wildlife.step(a, dt);
     this.drops.step(dt);
     this.survival.update(dt);
+    this.devtools.sustain();
   }
 
-  event(type: WorldEvent['type'], x: number, y: number, kind: string, dir?: number) {
-    this.events.push({ type, x, y, kind, dir });
+  event(type: WorldEvent['type'], x: number, y: number, kind: string, dir?: number, v?: number) {
+    this.events.push({ type, x, y, kind, dir, v });
     if (this.events.length > 64) this.events.shift();
+  }
+  /** A sound effect at a place in the world (the player's position by default). */
+  sound(name: string, x = this.s.player.x, y = this.s.player.y - 20, v = 1) {
+    this.event('sfx', x, y, name, undefined, v);
   }
   /** Hands over and clears the events since the last call. */
   takeEvents() {
@@ -237,6 +246,14 @@ export class Game {
   }
 
   // ─── Making and using things ──────────────────────────────────────────────
+  /** Whether a recipe can be made right now (station, fuel, and materials, or a console unlock). */
+  canCraft(id: string) {
+    return this.crafting.check(id) === null;
+  }
+  /** Runs a field-console command and returns the lines to print. */
+  command(line: string) {
+    return this.devtools.run(line);
+  }
   craft(id: string): GameResult {
     return this.crafting.craft(id);
   }

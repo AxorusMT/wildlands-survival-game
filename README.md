@@ -30,6 +30,35 @@ The soundtrack is fifteen one-minute looping tracks, synthesised live by the bro
 
 Surface changes wait a moment before the music follows, so walking along a border does not flip tracks. The menu, boss, and death tracks cut in straight away. Music is muffled while the journal is open over the game.
 
+## Sound
+
+Sound effects are synthesised live too (`src/audio/sfx.ts`), and are panned and faded by where they happen:
+
+- **You:** footsteps that change with the ground (grass, soil, stone, sand, snow, mud, ash), jumps, landings, strikes, hurt, burning, and death.
+- **Your work:** axe chops, the creak and crash of a falling tree, pick strikes, rock crumbling, digging, picking plants, pickups, crafting (hammering, the anvil at a forge or furnace, sizzling at a campfire, bubbling at the apothecary), placing, eating, drinking, medicine, equipping, dressing, fishing, and opening caches and chests.
+- **Creatures:** each has its own call, attack cry, and hurt cry. Deer bleat as they bolt, wolves howl and snarl, boars grunt, bats squeak, scorpions click and hiss, ember bats crackle, and hellhounds roar.
+- **Ambience:** rain, storm thunder and wind, birdsong by day, crickets at night, surf on the coast, campfire crackle, cave drips, the rumble of hell, and bubbling lava.
+
+## Field console
+
+Press ` (backquote) during play to open the field console. Tab completes commands and names, and ↑/↓ recalls earlier lines. Console switches last for the session and are not saved.
+
+| Command                                 | Effect                                                          |
+| --------------------------------------- | --------------------------------------------------------------- |
+| `give <item> [qty]`                     | Put items in the pack (`give obsidian pick 2`)                  |
+| `items [filter]`, `recipes [filter]`    | List item and recipe ids                                        |
+| `unlock <recipe\|all>`, `lock …`        | Make recipes craftable anywhere, without materials              |
+| `god`                                   | No damage; every need stays met                                 |
+| `noclip`                                | Fly through rock with WASD                                      |
+| `speed <x>`                             | Scale movement speed                                            |
+| `summon <mob> [count]`                  | deer, wolf, boar, bat, scorpion, ember_bat, hellhound, direwolf |
+| `kill [radius\|all]`                    | Slay nearby creatures                                           |
+| `heal`                                  | Restore every vital and cure illness                            |
+| `tp <x [y] \| region \| layer>`         | Teleport, e.g. `tp alpine` or `tp lower_hell`                   |
+| `time <hh:mm\|dawn\|noon\|dusk\|night>` | Set the time of day                                             |
+| `weather <clear\|cloudy\|rain\|storm>`  | Change the weather                                              |
+| `pos`, `help`, `clear`                  | Where you are, the command list, and clear the log              |
+
 ## Controls
 
 | Key / mouse                  | Action                                                          |
@@ -42,6 +71,7 @@ Surface changes wait a moment before the music follows, so walking along a borde
 | R or left click solid ground | Mine a nearby tile                                              |
 | G                            | Fish while near water with a fishing rod                        |
 | J, I, or Tab                 | Open or close the animated journal                              |
+| ` (backquote)                | Open or close the field console (developer commands)            |
 | M                            | Open Field Notes and the world map                              |
 | 1–5                          | Change journal pages                                            |
 | Left click in the world      | Place the selected structure within reach                       |

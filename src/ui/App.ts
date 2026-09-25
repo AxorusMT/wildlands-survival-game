@@ -3,6 +3,8 @@ import { Game } from '../game/Game.ts';
 import { draw, spawnEffects } from '../renderer/Renderer.ts';
 import { Audio } from '../audio/Audio.ts';
 import { musicScene } from '../audio/scenes.ts';
+import { SILENCE, type AmbienceLevels } from '../audio/sfx.ts';
+import { DevConsole } from './Console.ts';
 import type { GameMessage, Structure, Vitals } from '../core/types.ts';
 
 declare global {
@@ -38,6 +40,8 @@ const state = {
   lastUI: 0,
   lastAuto: 0,
   seenMessage: null as GameMessage | null,
+  lastAmbience: 0,
+  nextThunder: 0,
 };
 const UI_RULES = {
   seedRange: 1_000_000,
@@ -212,7 +216,7 @@ function doInteract() {
   const result = game.interact();
   if (!result.ok) message(result.reason);
   else {
-    sound(result.action === 'beasts' ? 'boss' : result.action === 'recipes' ? 'page' : 'gather');
+    if (result.action === 'beasts' || result.action === 'recipes') sound('page');
     if (result.action === 'beasts') {
       state.tab = 'beasts';
       toggleJournal(true);
@@ -236,17 +240,26 @@ function doInteract() {
 }
 function doAttack() {
   const r = game.attack();
-  if (r.ok) sound(r.hit ? 'hit' : 'page');
-  else if (r.reason && r.reason !== 'Recovering from the last strike.') message(r.reason);
+  if (!r.ok && r.reason && r.reason !== 'Recovering from the last strike.') message(r.reason);
   updateUI(true);
 }
 function doMine(x: number, y: number) {
   const r = game.mineTileAt(x, y);
-  if (r.ok) sound('mine');
-  else message(r.reason);
+  if (!r.ok) message(r.reason);
   updateUI(true);
 }
+const devConsole = new DevConsole(game, () => {
+  if (state.journal) renderJournal();
+  updateUI(true);
+});
 addEventListener('keydown', (e) => {
+  if (e.code === 'Backquote' && state.playing) {
+    e.preventDefault();
+    keys.clear();
+    devConsole.toggle();
+    return;
+  }
+  if (devConsole.open) return;
   const key = e.key.toLowerCase();
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'tab'].includes(key))
     e.preventDefault();
@@ -288,11 +301,10 @@ addEventListener('keydown', (e) => {
   if (key === 'g') {
     const r = game.fish();
     if (!r.ok) message(r.reason);
-    else sound('fish');
     updateUI(true);
   }
   if (key === ' ' || key === 'w' || key === 'arrowup') {
-    if (game.jump()) sound('jump');
+    game.jump();
   }
 });
 addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
@@ -305,7 +317,6 @@ canvas.addEventListener('click', (e) => {
       y = e.clientY - rect.top + state.camera.y;
     const r = game.place(game.s.placing, x, y);
     if (!r.ok) message(r.reason);
-    else sound('craft');
     updateUI(true);
   } else {
     const rect = canvas.getBoundingClientRect(),
@@ -419,7 +430,7 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
         if (!r.ok) message(r.reason);
         else {
           state.farm = null;
-          sound('craft');
+          sound('pluck');
           renderJournal();
         }
       }),
@@ -463,7 +474,7 @@ function renderRecipes(left: HTMLElement, right: HTMLElement) {
   right.innerHTML = `<h2>Recipes</h2><p class="lede">Select a recipe, then make it when its station and materials are within reach.</p>${recipes
     .map(
       (r, i) =>
-        `${i === 0 || recipes[i - 1].tier !== r.tier ? `<h3 class="recipe-group">Tier ${r.tier} · ${['', 'First fire', 'Copper age', 'Iron age', 'Forgework', 'Black glass', 'Effergy'][r.tier]}</h3>` : ''}<div class="recipe-row"><div class="recipe-head"><strong>${pretty(r.id)}</strong><button data-craft="${r.id}" ${!game.canAfford(r.cost) || (r.station && !game.near(r.station)) || (r.id === 'effergy' && (game.count('effergy') || game.s.structures.some((st) => st.type === 'effergy'))) ? 'disabled' : ''}>MAKE</button></div><small>${Object.entries(
+        `${i === 0 || recipes[i - 1].tier !== r.tier ? `<h3 class="recipe-group">Tier ${r.tier} · ${['', 'First fire', 'Copper age', 'Iron age', 'Forgework', 'Black glass', 'Effergy'][r.tier]}</h3>` : ''}<div class="recipe-row"><div class="recipe-head"><strong>${pretty(r.id)}</strong><button data-craft="${r.id}" ${game.canCraft(r.id) ? '' : 'disabled'}>${game.dev.unlocked.has(r.id) ? 'MAKE ✦' : 'MAKE'}</button></div><small>${Object.entries(
           r.cost,
         )
           .map(([id, n]) => `${n} ${pretty(id).toLowerCase()}`)
@@ -479,7 +490,6 @@ function renderRecipes(left: HTMLElement, right: HTMLElement) {
         const r = game.craft(b.dataset.craft ?? '');
         if (!r.ok) message(r.reason);
         else {
-          sound('craft');
           if (game.s.placing) toggleJournal(false);
           else {
             renderJournal();
@@ -753,14 +763,12 @@ function updateUI(force = false) {
     setTimeout(() => {
       if (state.seenMessage === msg) $('toast').classList.remove('visible');
     }, 3000);
-    if (msg.tone === 'danger') sound('hurt');
     if (msg.tone === 'victory') sound('victory');
   }
   if (game.s.dead) {
     $('death').classList.remove('hidden');
     state.journal = false;
     $('journal').classList.add('hidden');
-    sound('hurt');
   }
 }
 function camera() {
@@ -768,7 +776,60 @@ function camera() {
   state.camera.x = clamp(p.x - innerWidth / 2, 0, Math.max(0, D.WORLD_W - innerWidth));
   state.camera.y = clamp(p.y - innerHeight / 2, 0, Math.max(0, D.WORLD_H - innerHeight));
 }
-function drawWorld() {
+/** How loud each ambient bed should be for where the player stands. */
+function ambienceLevels(): AmbienceLevels {
+  const p = game.s.player,
+    layer = game.layer().id,
+    biome = game.biome().id,
+    surface = layer === 'surface',
+    weather = game.s.weather,
+    wet = weather === 'rain' ? 0.7 : weather === 'storm' ? 1 : 0,
+    day = !game.isNight();
+  let fire = 0;
+  for (const st of game.s.structures)
+    if (st.type === 'campfire' && st.fuel > 0)
+      fire = Math.max(fire, 1 - Math.hypot(st.x - p.x, st.y - p.y) / 420);
+  let lava = 0;
+  if (layer.endsWith('hell')) {
+    let nearest = Infinity;
+    for (let dx = -14; dx <= 14; dx += 2)
+      for (let dy = -8; dy <= 8; dy += 2) {
+        const x = p.x + dx * D.TILE,
+          y = p.y + dy * D.TILE;
+        if (D.lavaAt(x, y)) nearest = Math.min(nearest, Math.hypot(x - p.x, y - p.y));
+      }
+    lava = clamp(1 - nearest / 520, 0, 1);
+  }
+  return {
+    rain: surface ? wet * (game.sheltered() ? 0.5 : 1) : 0,
+    wind: surface
+      ? weather === 'storm'
+        ? 1
+        : ['tundra', 'alpine', 'taiga'].includes(biome)
+          ? 0.6
+          : 0.12
+      : 0,
+    fire,
+    lava,
+    cave: layer.endsWith('mines') ? 1 : layer === 'upper_hell' ? 0.3 : 0,
+    hell: layer === 'upper_hell' ? 0.55 : layer === 'lower_hell' ? 1 : 0,
+    birds:
+      surface && day && !wet && ['meadow', 'forest', 'coast', 'marsh', 'taiga'].includes(biome)
+        ? 0.8
+        : 0,
+    surf: surface && biome === 'coast' ? clamp(1 - p.x / 1600, 0, 1) : 0,
+    night: surface && !day && !wet ? 0.8 : 0,
+  };
+}
+/** Thunder rolls now and then while a storm is overhead. */
+function maybeThunder(now: number) {
+  if (game.s.weather !== 'storm' || game.layer().id !== 'surface' || now < state.nextThunder)
+    return;
+  state.nextThunder = now + 7000 + Math.random() * 14000;
+  const p = game.s.player;
+  Audio.effect('thunder', { x: p.x + (Math.random() - 0.5) * 900, y: p.y - 150 }, 1.6);
+}
+function drawWorld(now = performance.now()) {
   camera();
   if (!state.playing) {
     state.camera.x = clamp(
@@ -786,11 +847,18 @@ function drawWorld() {
   if (events.length) {
     spawnEffects(game, events);
     for (const e of events)
-      if (e.type === 'fell') setTimeout(() => sound('fell'), 950);
-      else if (e.type === 'crumble') sound('crumble');
-      else if (e.type === 'pickup') sound('pickup');
-      else if (e.type === 'sizzle') sound('sizzle');
+      if (e.type === 'sfx') Audio.effect(e.kind, e, e.v);
+      else if (e.type === 'fell')
+        setTimeout(() => Audio.effect('timber', { x: e.x + (e.dir ?? 1) * 70, y: e.y }), 950);
   }
+  if (state.playing) {
+    Audio.setListener(game.s.player.x, game.s.player.y - 20);
+    if (now - state.lastAmbience > 250) {
+      state.lastAmbience = now;
+      Audio.setAmbience(ambienceLevels());
+      maybeThunder(now);
+    }
+  } else Audio.setAmbience(SILENCE);
   draw(ctx, game, state.camera, innerWidth, innerHeight, !state.playing);
 }
 function frame(now: number) {

@@ -53,6 +53,7 @@ export class Drops extends System {
           s.drops.splice(i, 1);
           this.game.add(d.item, d.qty);
           this.game.event('pickup', d.x, d.y, d.item);
+          this.game.sound('pickup', d.x, d.y, 0.8);
           this.game.say('+' + d.qty + ' ' + itemName(d.item), 'good');
           continue;
         }
@@ -90,6 +91,7 @@ export class Drops extends System {
       if (lavaAt(d.x, d.y)) {
         s.drops.splice(i, 1);
         this.game.event('sizzle', d.x, d.y, d.item);
+        this.game.sound('sizzle', d.x, d.y);
         continue;
       }
       // Stacks of the same thing lying together join up.

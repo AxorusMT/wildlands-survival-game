@@ -101,9 +101,11 @@ export interface Drop extends Point {
 }
 /** A passing event for the renderer and audio: felling, crumbling, chips, pickups. */
 export interface WorldEvent extends Point {
-  type: 'chip' | 'fell' | 'crumble' | 'dig' | 'pickup' | 'sizzle';
+  type: 'chip' | 'fell' | 'crumble' | 'dig' | 'pickup' | 'sizzle' | 'sfx';
   kind: string;
   dir?: number;
+  /** Loudness for sound events, around 1. */
+  v?: number;
 }
 export interface Animal extends Point {
   id: number;
@@ -122,6 +124,12 @@ export interface Animal extends Point {
   tunnel?: number;
   underground?: boolean;
   companion?: boolean;
+  /** Height a summoned walker keeps to, so it stays on the floor where it was called. */
+  walkY?: number;
+  /** Height a summoned flier hovers around. */
+  hoverY?: number;
+  /** A deer that has bolted keeps running until it is well clear. */
+  fleeing?: boolean;
   hitAt?: number;
   howlAt?: number;
   howlCue?: number;
