@@ -5,6 +5,9 @@ import { NODES, nodeForm } from '../../data/resources.ts';
 import { STORAGE } from '../../data/food.ts';
 import { RULES } from '../rules.ts';
 
+import { LORE } from '../../data/lore.ts';
+import { STATIONS } from '../../data/tutorial.ts';
+
 import { System } from './System.ts';
 
 export class Interaction extends System {
@@ -18,6 +21,7 @@ export class Interaction extends System {
         .filter(
           (st) =>
             st.type !== 'torch' &&
+            st.type !== 'bramble' &&
             !st.type.startsWith('trap_') &&
             !(st.type === 'dungeon_chest' && st.crop === 'open'),
         )
@@ -84,8 +88,11 @@ export class Interaction extends System {
       this.game.realms.socket();
       return { ok: true, action: 'rift', structure: st };
     }
-    if (st.type === 'portal')
+    if (st.type === 'portal') {
+      if (this.game.pocket.inCourse() && this.game.pocket.here(st.x))
+        return this.game.pocket.finishCourse(st.kind === 'course');
       return this.game.pocket.here(st.x) ? this.game.pocket.leave() : this.game.realms.goHome();
+    }
     if (st.type === 'waystone') return { ok: true, action: 'atlas', structure: st };
     if (st.type === 'shrine') return this.game.pocket.pray(st);
     if (st.type === 'kiln') return { ok: false, reason: 'An old kiln. It still smelts ore.' };
@@ -117,6 +124,52 @@ export class Interaction extends System {
         this.game.sound('place', st.x, st.y, 0.7);
         this.game.say('Fed the campfire with wood.', 'good');
       } else return { ok: false, reason: 'One wood refuels the campfire.' };
+    } else if (st.type === 'lore_tablet') {
+      const i = Number(st.kind) || 0,
+        first = !(this.game.s.tutorial.tally['lore:' + i] > 0);
+      this.game.progress.record('lore:' + i);
+      if (first) this.game.skills.gain(10);
+      this.game.sound('page', st.x, st.y);
+      this.game.say(`The tablet reads: “${LORE[i % LORE.length]}”`, 'ink');
+    } else if (st.type === 'signpost') {
+      const i = Number(st.kind) || 0;
+      this.game.progress.record('sign:' + i);
+      this.game.sound('page', st.x, st.y);
+      this.game.say(STATIONS[i]?.sign ?? 'The sign is weathered blank.', 'ink');
+    } else if (st.type === 'cairn') {
+      this.game.say('Stones piled with care. Something lies sealed in the rock below.', 'ink');
+    } else if (st.type === 'merchant_stall') {
+      return { ok: true, action: 'merchant', structure: st };
+    } else if (st.type === 'research_desk') {
+      return { ok: true, action: 'research', structure: st };
+    } else if (st.type === 'distiller') {
+      // Boils and condenses brackish and wild water into clean, a wood for every two.
+      const n = Math.min(
+        this.game.count('brackish_water') + this.game.count('wild_water'),
+        this.game.count('wood') * 2,
+      );
+      if (!n)
+        return {
+          ok: false,
+          reason: 'The distiller needs brackish or wild water, and wood to heat it.',
+        };
+      let done = 0;
+      for (const bad of ['brackish_water', 'wild_water'])
+        while (done < n && this.game.count(bad)) {
+          this.game.remove(bad);
+          this.game.add('boiled_water');
+          done++;
+        }
+      this.game.remove('wood', Math.ceil(done / 2));
+      this.game.sound('sizzle', st.x, st.y, 0.7);
+      this.game.say(`Distilled ${done} clean water.`, 'good');
+    } else if (st.type === 'ice_harvester') {
+      const ice = st.store.ice ?? 0;
+      if (!ice) return { ok: false, reason: 'No ice yet. It cuts ice only where it freezes.' };
+      this.game.add('ice', ice);
+      st.store.ice = 0;
+      this.game.sound('dig_ice', st.x, st.y, 0.7);
+      this.game.say(`Took ${ice} ice from the harvester.`, 'good');
     } else if (st.type === 'relic_shelf') {
       return { ok: true, action: 'shelf', structure: st };
     } else if (STORAGE[st.type]) {
@@ -218,6 +271,10 @@ export class Interaction extends System {
       };
     if (v.stamina < 7) return { ok: false, reason: 'Too exhausted to gather. Rest or wait.' };
     v.stamina -= 7;
+    if (spec.tool) {
+      const tool = this.game.bestTool(spec.tool);
+      if (tool) this.game.durability.use(tool, 2);
+    }
     v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
     v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
     // Foragers turn up a little more; each gather earns a little renown.

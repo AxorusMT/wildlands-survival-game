@@ -22,6 +22,9 @@ export const FOOD: Record<string, [calories: number, protein: number, vitamins: 
   herb: [2, 0, 8],
   sunbloom: [10, 1, 12],
   frost_lily: [6, 0, 18],
+  smoked_fish: [30, 26, 2],
+  canned_stew: [40, 18, 10],
+  canned_fruit: [24, 0, 18],
   // Preserves.
   salted_meat: [34, 28, 0],
   salted_fish: [28, 24, 1],

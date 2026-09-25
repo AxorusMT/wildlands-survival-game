@@ -69,34 +69,48 @@ function profile(fn: (x: number) => number) {
 }
 
 // ── The Mycelial Deep: one vast glowing cavern, a tunnel below it, and the Heart Hollow ────────
-export const MYC = {
-  floor: profile((x) => 1700 + 190 * fbm1(x / 1100, 201) + 36 * noise1(x / 230, 202)),
-  ceiling: (x: number) => 560 + 150 * fbm1(x / 760, 203) + 70 * Math.abs(noise1(x / 170, 204)),
-  tunnel: (x: number) => 2500 + 90 * fbm1(x / 900, 205) + 20 * Math.sin(x / 160),
-  /** The Sporemother's chamber at the far end. */
-  hollow: { x0: DIM_WIDTH - 1500, x1: DIM_WIDTH - 260, top: 2150, bottom: 2780 },
-  ladders: [0.12, 0.34, 0.58, 0.8].map((f) => Math.round(DIM_WIDTH * f)),
-};
-function myceliaTile(x: number, y: number): number {
-  const floor = MYC.floor(x),
-    ceil = MYC.ceiling(x),
-    h = MYC.hollow;
-  // Stalactites hang from the ceiling here and there.
-  const drip = Math.max(0, noise1(x / 60, 207) - 0.45) * 520;
-  const open =
-    (y > ceil + drip && y < floor) ||
-    Math.abs(y - MYC.tunnel(x)) < 70 + 14 * Math.sin(x / 83) ||
-    (x > h.x0 &&
-      x < h.x1 &&
-      y > h.top + 60 * Math.abs(Math.sin((x - h.x0) / 300)) &&
-      y < h.bottom) ||
-    MYC.ladders.some((lx) => Math.abs(x - lx) < 44 && y > floor - 10 && y < MYC.tunnel(lx) + 40);
-  if (open) return 0;
-  if (y >= floor && y < floor + 64) return DT.mycelium;
-  // Glowing shelf fungus lines the walls in places.
-  if (fbm2(x / 150, y / 110, 209) > 0.7) return DT.glowshroom;
-  return DT.fungal;
+/**
+ * The Mycelial Deep's shape, from a seed. Seed 0 is the Deep beyond the Rift Gate, exactly as it
+ * has always been; other seeds regrow it for Waystone expeditions (see realms/mycelial.ts).
+ */
+export function myceliaGeometry(seed = 0) {
+  // Noise channels: the Rift Gate's Deep keeps its original channels, others shift with the seed.
+  const ch = (k: number) => (seed ? (seed % 9973) + k * 131 : k);
+  const geo = {
+    floor: profile((x) => 1700 + 190 * fbm1(x / 1100, ch(201)) + 36 * noise1(x / 230, ch(202))),
+    ceiling: (x: number) =>
+      560 + 150 * fbm1(x / 760, ch(203)) + 70 * Math.abs(noise1(x / 170, ch(204))),
+    tunnel: (x: number) => 2500 + 90 * fbm1(x / 900, ch(205)) + 20 * Math.sin(x / 160),
+    /** The Sporemother's chamber at the far end. */
+    hollow: { x0: DIM_WIDTH - 1500, x1: DIM_WIDTH - 260, top: 2150, bottom: 2780 },
+    ladders: [0.12, 0.34, 0.58, 0.8].map((f) => Math.round(DIM_WIDTH * f)),
+    tile(x: number, y: number): number {
+      const floor = geo.floor(x),
+        ceil = geo.ceiling(x),
+        h = geo.hollow;
+      // Stalactites hang from the ceiling here and there.
+      const drip = Math.max(0, noise1(x / 60, ch(207)) - 0.45) * 520;
+      const open =
+        (y > ceil + drip && y < floor) ||
+        Math.abs(y - geo.tunnel(x)) < 70 + 14 * Math.sin(x / 83) ||
+        (x > h.x0 &&
+          x < h.x1 &&
+          y > h.top + 60 * Math.abs(Math.sin((x - h.x0) / 300)) &&
+          y < h.bottom) ||
+        geo.ladders.some(
+          (lx) => Math.abs(x - lx) < 44 && y > floor - 10 && y < geo.tunnel(lx) + 40,
+        );
+      if (open) return 0;
+      if (y >= floor && y < floor + 64) return DT.mycelium;
+      // Glowing shelf fungus lines the walls in places.
+      if (fbm2(x / 150, y / 110, ch(209)) > 0.7) return DT.glowshroom;
+      return DT.fungal;
+    },
+  };
+  return geo;
 }
+export const MYC = myceliaGeometry(0);
+const myceliaTile = (x: number, y: number) => MYC.tile(x, y);
 
 // ── Skyreach: floating islands over a sea of cloud ─────────────────────────────────────────────
 export interface Island {

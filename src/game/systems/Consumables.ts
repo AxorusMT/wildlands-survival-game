@@ -1,6 +1,7 @@
 import { clamp } from '../../core/math.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { FOOD, MEAL_BUFFS, RAW } from '../../data/food.ts';
+import { CLOTHING, WATERSKINS } from '../../data/clothing.ts';
 import { ACCESSORIES, ARMOR, BLOCKS, BUFFS } from '../../data/gear.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import { RULES } from '../rules.ts';
@@ -36,7 +37,59 @@ export class Consumables extends System {
       return { ok: true };
     }
     if (id === 'fishing_rod') return this.game.fish();
-    if (ARMOR[id] || ACCESSORIES[id]) return this.game.equipment.wear(id);
+    if (ARMOR[id] || ACCESSORIES[id] || CLOTHING[id]) return this.game.equipment.wear(id);
+    // A repair kit mends half the wear of the weapon in hand, anywhere.
+    if (id === 'repair_kit') {
+      const w = this.game.s.player.weapon;
+      if (!this.game.durability.wear(w))
+        return { ok: false, reason: 'Your weapon needs no mending.' };
+      const wear = this.game.s.wear!;
+      wear[w] = Math.max(0, wear[w] - 50);
+      this.game.remove('repair_kit');
+      this.game.sound('craft_anvil');
+      this.game.say(`${itemName(w)} patched up in the field.`, 'good');
+      return { ok: true };
+    }
+    // An artisan's whetstone raises the weapon in hand one grade, up to Masterwork.
+    if (id === 'whetstone') {
+      const w = this.game.s.player.weapon;
+      if (!WEAPONS[w] || w === 'fists') return { ok: false, reason: 'Hold a weapon to hone.' };
+      const e = this.game.armoury.entry(w);
+      if (e.q >= 3) return { ok: false, reason: 'It is already as fine as honing can make it.' };
+      this.game.armoury.record(w).q = e.q + 1;
+      this.game.remove('whetstone');
+      this.game.sound('crystal');
+      this.game.say(`Honed: ${this.game.armoury.title(w)}.`, 'victory');
+      return { ok: true };
+    }
+    // A panacea eases every ailment a stage.
+    if (id === 'panacea') {
+      const list = this.game.ailments.list().filter((a) => a.stage > 0);
+      if (!list.length) return { ok: false, reason: 'Nothing ails you.' };
+      for (const a of list) {
+        a.stage--;
+        if (a.stage <= 0) this.game.ailments.cure(a.id);
+      }
+      this.game.remove('panacea');
+      this.game.sound('medicine');
+      this.game.say('The panacea eases every ailment.', 'good');
+      return { ok: true };
+    }
+    // A purification tablet makes up to three draughts of doubtful water safe.
+    if (id === 'purification_tablet') {
+      let n = 0;
+      for (const bad of ['brackish_water', 'wild_water'])
+        while (n < 3 && this.game.count(bad)) {
+          this.game.remove(bad);
+          this.game.add('boiled_water');
+          n++;
+        }
+      if (!n) return { ok: false, reason: 'You carry no wild or brackish water to purify.' };
+      this.game.remove('purification_tablet');
+      this.game.sound('potion');
+      this.game.say(`Purified ${n} water${n > 1 ? 's' : ''}.`, 'good');
+      return { ok: true };
+    }
     const drunk = this.game.equipment.drink(id);
     if (drunk) return drunk;
     if (BLOCKS[id] !== undefined || id === 'torch') {
@@ -69,13 +122,17 @@ export class Consumables extends System {
         if (chance(0.12)) ail.contract('tapeworm', false, 'food');
       }
       this.game.progress.record('eat:' + id);
+      this.game.survival.ate(id);
       const buff = MEAL_BUFFS[id];
       if (buff && worth >= 0.65) {
         this.game.equipment.addBuff(buff[0], buff[1] * (1 + this.game.skills.get('meals')));
         this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, 'good');
       }
     } else if (ITEMS[id]?.[1] === 'water') {
-      v.hydration = clamp(v.hydration + (state === 'rotten' ? 15 : 27), 0, RULES.maxVital);
+      // A waterskin makes each drink go further.
+      const skin = this.game.equipment.waterskin(),
+        more = 1 + (skin ? WATERSKINS[skin].drink : 0);
+      v.hydration = clamp(v.hydration + (state === 'rotten' ? 15 : 27) * more, 0, RULES.maxVital);
       if (id === 'wild_water' && chance(0.38)) ail.contract('dysentery', false, 'water');
       if (id === 'brackish_water') {
         if (chance(0.45)) ail.contract('cholera', false, 'water');

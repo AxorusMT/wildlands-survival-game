@@ -160,6 +160,18 @@ export const MINE_TIER: Record<number, number> = {
   43: 5,
   44: 0,
   45: 6,
+  46: 0,
+  47: 7,
+  48: 7,
+  49: 7,
+  50: 6,
+  51: 7,
+  52: 0,
+  53: 8,
+  54: 8,
+  55: 7,
+  56: 0,
+  57: 7,
 };
 /** What each ground kind yields, and an occasional bonus find. */
 export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number] }> = {
@@ -204,6 +216,18 @@ export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number]
   43: { item: 'saltglass_rock', bonus: ['saltglass', 0.25] },
   44: { item: 'rimesnow', bonus: ['ice', 0.2] },
   45: { item: 'choirstone', bonus: ['rime_silver_ore', 0.12] },
+  46: { item: 'fever_loam', bonus: ['fever_bloom', 0.05] },
+  47: { item: 'plague_rock', bonus: ['plague_ivory', 0.14] },
+  48: { item: 'starglass', bonus: ['astral_lens', 0.2] },
+  49: { item: 'observatory_stone', bonus: ['fallen_star', 0.02] },
+  50: { item: 'sewer_brick', bonus: ['coin', 0.2] },
+  51: { item: 'crown_rock', bonus: ['crown_gold', 0.3] },
+  52: { item: 'abyss_sand', bonus: ['tide_pearl', 0.05] },
+  53: { item: 'pearl_rock', bonus: ['abyssal_pearl', 0.14] },
+  54: { item: 'heartstone_block', bonus: ['heartstone', 0.3] },
+  55: { item: 'slag', bonus: ['coal', 0.2] },
+  56: { item: 'bloom_loam', bonus: ['seasonbloom', 0.05] },
+  57: { item: 'seasonstone', bonus: ['emerald', 0.03] },
 };
 
 // ─── Regions ──────────────────────────────────────────────────────────────────
@@ -550,7 +574,11 @@ function spanIndex(x: number) {
 }
 export function biomeAt(x: number, y: number): Biome {
   const dim = dimensionAt(x);
-  if (dim === POCKET) return activeRealm()?.tpl.biome ?? BETWEEN;
+  if (dim === POCKET) {
+    const r = activeRealm();
+    if (!r) return BETWEEN;
+    return r.tpl.biomeAt?.(x - POCKET.start) ?? r.tpl.biome;
+  }
   if (dim) return BIOMES.find((b) => b.id === dim.id)!;
   const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
   const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;

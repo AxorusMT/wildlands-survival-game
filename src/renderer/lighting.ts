@@ -25,6 +25,12 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
     if (g.heldItem() === 'torch')
       out.push([p.x + (Math.cos(p.face) >= 0 ? 16 : -16), p.y - 40, 1.2, 0.9, 0.55]);
   }
+  // Emberheart's magma lights the cavern above it.
+  if (!menu && g.pocket.waterKind() === 'magma' && g.pocket.here()) {
+    const level = g.pocket.waterLevel()!;
+    for (let x = Math.floor((p.x - 900) / 160) * 160; x < p.x + 900; x += 160)
+      out.push([x, level - 10, 1.1, 0.5, 0.15]);
+  }
   for (const b of g.combat.projectiles) {
     const spec = PROJECTILES[b.kind];
     if (!spec?.glow) continue;
@@ -51,6 +57,10 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
     else if (s.type === 'furnace' || s.type === 'forge') out.push([s.x, s.y - 20, 1.0, 0.6, 0.3]);
     else if (s.type === 'effergy') out.push([s.x, s.y - 60, 0.85, 0.72, 1.0]);
     else if (s.type === 'shrine' && s.crop !== 'spent') out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
+    else if (s.type === 'diving_bell') out.push([s.x, s.y - 24, 0.6, 0.8, 0.9]);
+    else if (s.type === 'merchant_stall') out.push([s.x, s.y - 20, 0.9, 0.7, 0.4]);
+    else if (s.type === 'hearth') out.push([s.x, s.y - 12, 1.2 * f, 0.7 * f, 0.35 * f]);
+    else if (s.type === 'rift_forge') out.push([s.x, s.y - 20, 0.9, 0.4, 0.9]);
     else if (s.type === 'relic_shelf' && Object.keys(s.store).length)
       out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
     else if (s.type === 'kiln') out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);
@@ -70,6 +80,9 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
     else if (n.kind === 'prism_glass') out.push([n.x, n.y - 12, 0.4, 0.7, 0.95]);
     else if (n.kind === 'saltglass') out.push([n.x, n.y - 12, 0.8, 0.5, 0.55]);
     else if (n.kind === 'lumen_moss') out.push([n.x, n.y - 8, 0.6, 0.65, 0.3]);
+    else if (n.kind === 'astral_lens') out.push([n.x, n.y - 12, 0.45, 0.5, 1]);
+    else if (n.kind === 'heartstone') out.push([n.x, n.y - 12, 0.9, 0.4, 0.12]);
+    else if (n.kind === 'abyssal_pearl') out.push([n.x, n.y - 12, 0.5, 0.7, 0.8]);
   }
   for (const a of g.s.animals) {
     if (a.deadUntil) continue;

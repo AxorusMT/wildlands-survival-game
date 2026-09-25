@@ -1,5 +1,6 @@
 import type { GameResult, Structure } from '../../core/types.ts';
 import { CODEX, RELIC_EFFECTS, shelfSlots, type CodexPage } from '../../data/codex.ts';
+import { FEATS, featById } from '../../data/feats.ts';
 import { itemName } from '../../data/items.ts';
 import { MOBS } from '../../data/mobs.ts';
 import { RECIPES } from '../../data/recipes.ts';
@@ -25,6 +26,7 @@ const ZERO = (): SkillStats =>
     [
       ...new Set(SKILLS.flatMap((n) => Object.keys(n.stats))),
       ...CODEX.flatMap((p) => Object.keys(p.bonus)),
+      ...FEATS.flatMap((f) => Object.keys(f.perk)),
     ].map((k) => [k, 0]),
   ) as unknown as SkillStats;
 
@@ -161,7 +163,12 @@ export class Skills extends System {
 
   // ─── Everything added up ───────────────────────────────────────────────────
   stats(): SkillStats {
-    const key = this.meta.skills.join(',') + '|' + Math.floor(this.game.s.elapsed / 2);
+    const key =
+      this.meta.skills.join(',') +
+      '|' +
+      (this.meta.feats?.length ?? 0) +
+      '|' +
+      Math.floor(this.game.s.elapsed / 2);
     if (this.cache?.key === key) return this.cache.stats;
     const out = ZERO();
     const add = (st: Partial<SkillStats>) => {
@@ -172,8 +179,16 @@ export class Skills extends System {
       if (n) add(n.stats);
     }
     for (const p of CODEX) if (this.pageDone(p)) add(p.bonus);
+    for (const id of this.meta.feats ?? []) {
+      const f = featById(id);
+      if (f) add(f.perk);
+    }
     this.cache = { key, stats: out };
     return out;
+  }
+  /** Forgets the cached totals (after a feat, say). */
+  refresh() {
+    this.cache = null;
   }
   get(k: SkillKey) {
     return this.stats()[k] ?? 0;

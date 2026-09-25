@@ -35,8 +35,12 @@ import { Physics } from './systems/Physics.ts';
 import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
+import { STATION_LINES } from '../data/stations.ts';
+import { Feats } from './systems/Feats.ts';
 import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
+import { Durability } from './systems/Durability.ts';
+import { ArmourForge } from './systems/ArmourForge.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Town } from './systems/Town.ts';
 import { Wildlife } from './systems/Wildlife.ts';
@@ -64,6 +68,8 @@ export class Game {
   readonly interaction = new Interaction(this);
   readonly consumables = new Consumables(this);
   readonly survival = new Survival(this);
+  readonly durability = new Durability(this);
+  readonly armourForge = new ArmourForge(this);
   readonly ailments = new Ailments(this);
   readonly larder = new Larder(this);
   readonly physics = new Physics(this);
@@ -74,6 +80,7 @@ export class Game {
   readonly combat = new Combat(this);
   readonly armoury = new Armoury(this);
   readonly skills = new Skills(this);
+  readonly feats = new Feats(this);
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
   readonly pocket = new Pocket(this);
@@ -87,8 +94,8 @@ export class Game {
     this.newGame(seed);
   }
 
-  /** Starts a fresh expedition from a seed. */
-  newGame(seed: number = RULES.defaultSeed): this {
+  /** Starts a fresh expedition from a seed, in the Training Grounds if asked. */
+  newGame(seed: number = RULES.defaultSeed, opts: { tutorial?: boolean } = {}): this {
     this.rng = seededRandom(seed);
     // A fresh world starts with the pocket strip empty.
     setActiveRealm(null);
@@ -162,7 +169,7 @@ export class Game {
       pocket: null,
       realms: {},
       armoury: {},
-      meta: { renown: 0, skills: [], mastery: {} },
+      meta: { renown: 0, skills: [], mastery: {}, feats: [] },
       placing: null,
       dead: false,
       lastSave: Date.now(),
@@ -172,7 +179,14 @@ export class Game {
     this.combat.projectiles = [];
     this.world.generate();
     this.s.player.y = this.groundTopAt(RULES.spawnX) + 1;
-    this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
+    // The expedition sets out in plain clothes: a linen underlayer and a hide vest.
+    for (const id of ['linen_underlayer', 'hide_vest']) {
+      this.inventory.add(id, 1);
+      this.equipment.wear(id);
+    }
+    this.messages = [];
+    if (opts.tutorial) this.pocket.startCourse();
+    else this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
     return this;
   }
 
@@ -191,8 +205,10 @@ export class Game {
     this.equipment.update(dt);
     this.realms.update(dt);
     this.pocket.update(dt);
+    this.feats.update();
     this.town.update(dt);
     this.ailments.update(dt);
+    this.durability.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
   }
@@ -230,10 +246,17 @@ export class Game {
   }
   near(type: string, radius = 110) {
     // The old kilns of the Ashen Steppe still burn hot enough to smelt.
-    const ok = (t: string) => t === type || (type === 'furnace' && t === 'kiln');
+    // Upgraded stations do the work of the ones below them.
+    const ok = (t: string) =>
+      t === type || (type === 'furnace' && t === 'kiln') || !!STATION_LINES[t]?.includes(type);
     return this.s.structures.find((st) => ok(st.type) && dist(st, this.s.player) <= radius);
   }
   nearLitFire() {
+    // A hearth or a kitchen keeps its fire without feeding.
+    const hearth = this.s.structures.find(
+      (st) => (st.type === 'hearth' || st.type === 'kitchen') && dist(st, this.s.player) <= 155,
+    );
+    if (hearth) return hearth;
     const f = this.near('campfire', 155);
     return f && f.fuel > 0 ? f : null;
   }
@@ -323,6 +346,9 @@ export class Game {
   }
   toolTier(kind: string) {
     return this.inventory.toolTier(kind);
+  }
+  bestTool(kind: string) {
+    return this.inventory.bestTool(kind);
   }
   use(id: string): GameResult {
     return this.consumables.use(id);

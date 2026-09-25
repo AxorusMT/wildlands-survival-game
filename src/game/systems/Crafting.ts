@@ -6,6 +6,9 @@ import { TILE, TILE_ROWS, WORLD_H, dimensionAt, regionBounds } from '../../data/
 import { uniqueId } from '../ids.ts';
 import { RULES } from '../rules.ts';
 
+import { RESEARCH_RENOWN, STATION_QUALITY } from '../../data/stations.ts';
+import { EVOLUTIONS, WEAPON_CLASS } from '../../data/weapons.ts';
+
 import { System } from './System.ts';
 
 /** Small things that stand close together inside a home. */
@@ -41,6 +44,31 @@ export class Crafting extends System {
     if (!this.game.canAfford(r.cost)) return 'More materials are needed.';
     return null;
   }
+  /** Studies an item at a research desk: it is used up, and its uses are revealed. */
+  study(id: string) {
+    if (!this.game.near('research_desk') && !this.game.dev.god)
+      return { ok: false, reason: 'Study at a research desk.' };
+    if (!this.game.count(id)) return { ok: false, reason: 'You carry none to study.' };
+    if ((this.game.s.tutorial.tally['study:' + id] ?? 0) > 0)
+      return { ok: false, reason: 'You have already studied it.' };
+    this.game.remove(id);
+    this.game.progress.record('study:' + id);
+    this.game.skills.gain(RESEARCH_RENOWN);
+    const uses = RECIPES.filter((r) => r.cost[id]).map((r) => itemName(r.id).toLowerCase());
+    const evo = WEAPON_CLASS[id] ? EVOLUTIONS[WEAPON_CLASS[id][0]] : null;
+    this.game.sound('page');
+    this.game.say(
+      `Studied ${itemName(id).toLowerCase()}.` +
+        (uses.length
+          ? ` It goes into ${uses.slice(0, 6).join(', ')}${uses.length > 6 ? ', and more' : ''}.`
+          : '') +
+        (evo
+          ? ` At +5 it may become ${evo[0].map((e) => e.name).join(' or ')}; at +10, ${evo[1].map((e) => e.name).join(' or ')}.`
+          : ''),
+      'good',
+    );
+    return { ok: true, reveals: uses };
+  }
   private free(id: string) {
     return this.game.dev.unlocked.has(id);
   }
@@ -50,7 +78,15 @@ export class Crafting extends System {
     const r = RECIPES.find((r) => r.id === id)!;
     if (!this.free(id))
       for (const [item, qty] of Object.entries(r.cost)) this.game.remove(item, qty);
+    // Finer stations turn out finer weapons.
+    this.game.armoury.craftLuck = Math.max(
+      1,
+      ...Object.entries(STATION_QUALITY)
+        .filter(([st]) => this.game.near(st) && this.game.near(st)!.type === st)
+        .map(([, k]) => k),
+    );
     this.game.add(id, r.yield ?? 1);
+    this.game.armoury.craftLuck = 1;
     this.game.sound(
       r.station === 'forge' || r.station === 'furnace'
         ? 'craft_anvil'

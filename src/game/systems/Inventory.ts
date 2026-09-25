@@ -1,6 +1,7 @@
 import type { InventoryEntry } from '../../core/types.ts';
 import { ITEMS } from '../../data/items.ts';
 import { TOOL_TIERS } from '../../data/resources.ts';
+import { BASE_CAPACITY, CATEGORY_WEIGHT, PACKS, WEIGHT_OVERRIDE } from '../../data/stations.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -57,9 +58,43 @@ export class Inventory extends System {
   canAfford(cost: Record<string, number>) {
     return Object.entries(cost).every(([id, n]) => this.count(id) >= n);
   }
+  /** Kilograms carried. */
+  load() {
+    let kg = 0;
+    for (const e of this.game.s.inventory) {
+      const cat = ITEMS[e.id]?.[1] ?? 'material';
+      kg += e.qty * (WEIGHT_OVERRIDE[e.id] ?? CATEGORY_WEIGHT[cat] ?? 0.2);
+    }
+    return kg;
+  }
+  /** Kilograms the pack can hold without slowing you: a base, plus the best pack carried. */
+  capacity() {
+    return (
+      BASE_CAPACITY +
+      Math.max(0, ...Object.entries(PACKS).map(([id, kg]) => (this.count(id) ? kg : 0)))
+    );
+  }
+  /** How far over capacity you are, 0 when within it. */
+  overload() {
+    return Math.max(0, this.load() / this.capacity() - 1);
+  }
+  /** The best unbroken tool of a kind carried, which is the one that wears with use. */
+  bestTool(kind: string) {
+    let best: string | null = null,
+      tier = 0;
+    for (const [id, [tool, t]] of Object.entries(TOOL_TIERS))
+      if (tool === kind && this.count(id) && !this.game.durability.broken(id) && t > tier) {
+        best = id;
+        tier = t;
+      }
+    return best;
+  }
   toolTier(kind: string) {
     return Object.entries(TOOL_TIERS).reduce(
-      (best, [id, [tool, tier]]) => (tool === kind && this.count(id) ? Math.max(best, tier) : best),
+      (best, [id, [tool, tier]]) =>
+        tool === kind && this.count(id) && !this.game.durability.broken(id)
+          ? Math.max(best, tier)
+          : best,
       0,
     );
   }

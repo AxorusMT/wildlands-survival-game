@@ -5,6 +5,8 @@ import { itemName } from '../../data/items.ts';
 import { MOBS, mobName } from '../../data/mobs.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import { TILE } from '../../data/world.ts';
+import { PERK_LEVEL } from '../../data/skills.ts';
+import { resistOf, type DamageKind } from '../../data/resist.ts';
 import { UNDEAD, infusionById } from '../../data/weapons.ts';
 import { RULES } from '../rules.ts';
 import type { WeaponStats } from './Armoury.ts';
@@ -51,6 +53,11 @@ const SHOT_DISEASE: Record<string, [string, number]> = {
 export class Combat extends System {
   projectiles: Projectile[] = [];
   private combo = 0;
+  private shots = 0;
+  /** Whether mastery of a family has reached its perk. */
+  perk(family: string) {
+    return this.game.skills.mastery(family) >= PERK_LEVEL;
+  }
   private lastSwing = -9;
 
   // ─── Taking and dealing damage ─────────────────────────────────────────────
@@ -94,7 +101,7 @@ export class Combat extends System {
   }
   /** Harms a creature through its defense, knocks it back, and kills it at zero. */
   hurtMob(a: Animal, amount: number, from: Point, magic = false, w?: WeaponStats) {
-    if (a.deadUntil || a.settler) return 0;
+    if (a.deadUntil || a.settler || a.hidden) return 0;
     if (
       a.type === 'boss' &&
       (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier
@@ -123,6 +130,11 @@ export class Combat extends System {
       if (magic && w.magic) k *= 1 + w.magic;
     }
     if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+    // What it resists, and what it fears.
+    const kind: DamageKind = (w?.infusion as DamageKind) ?? (magic ? 'arcane' : 'physical');
+    k *= 1 - (resistOf(a.type)[kind] ?? 0);
+    // Battleaxe mastery: bleeding foes take more from everything.
+    if ((a.fx?.bleed?.[0] ?? 0) > t && this.perk('battleaxe')) k *= 1.15;
     const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1,
       pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === 'void' ? 0.5 : 0)),
       armour = (spec?.defense ?? 0) * cracked * (1 - pierce),
@@ -136,7 +148,14 @@ export class Combat extends System {
     a.warning = 0;
     const dir = Math.sign(a.x - from.x) || 1;
     if (!spec?.boss && a.type !== 'boss') {
-      a.x += dir * 12;
+      // Greatsword and crossbow mastery throw foes back.
+      const shove =
+        w &&
+        ((w.family === 'greatsword' && this.perk('greatsword')) ||
+          (w.family === 'crossbow' && this.perk('crossbow')))
+          ? 36
+          : 12;
+      a.x += dir * shove;
       if (a.body) a.vy = Math.min(a.vy ?? 0, -140);
     }
     this.game.event('damage', a.x, a.y - bodyHeight(a) * 2, String(taken), crit ? 2 : 0);
@@ -167,8 +186,13 @@ export class Combat extends System {
     if (w.infusion === 'venom') dot('poison', 0.22, 4);
     if (w.infusion === 'frost') fx.slow = t + 3;
     if (w.stagger && !great) fx.stun = t + 0.5;
+    else if (w.stagger && this.perk('warhammer')) fx.stun = t + 0.25;
+    if (w.family === 'greatsword' && !great && this.perk('greatsword')) fx.stun = t + 0.3;
     if (w.sunder) fx.sunder = t + w.sunder;
-    if (w.mark) fx.mark = [t + (w.mark > 0.2 ? 8 : 4), w.mark];
+    if (w.mark) {
+      const whip = this.perk('whip');
+      fx.mark = [t + (w.mark > 0.2 ? 8 : 4) * (whip ? 2 : 1), w.mark + (whip ? 0.05 : 0)];
+    }
     if (w.heal) this.game.equipment.heal(taken * w.heal);
     // Storm: lightning leaps to the nearest other foe.
     if (w.infusion === 'storm' && this.game.rng() < 0.3) {
@@ -186,11 +210,14 @@ export class Combat extends System {
   // ─── The player's weapons ──────────────────────────────────────────────────
   /** A melee swing in the facing direction: hits every creature within the arc. */
   swing(weaponId = this.game.s.player.weapon) {
+    this.game.durability.use(weaponId);
     const s = this.game.s,
       p = s.player,
       w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : 'fists'),
       face = Math.cos(p.face) >= 0 ? 1 : -1;
-    const reach = w.reach * 1.15,
+    // Spear mastery: a leaping thrust from the air.
+    const leap = w.family === 'spear' && !p.grounded && this.perk('spear');
+    const reach = w.reach * 1.15 + (leap ? 24 : 0),
       wide = w.family === 'greatsword' ? 1.5 : 1,
       centre = { x: p.x, y: p.y - 26 };
     const targets = s.animals.filter((a) => {
@@ -207,8 +234,13 @@ export class Combat extends System {
     this.combo = s.elapsed - this.lastSwing < 1.3 ? this.combo + 1 : 1;
     this.lastSwing = s.elapsed;
     const combo = w.family === 'blade' && this.combo % 3 === 0 ? w.combo : 1,
-      damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1);
-    if (combo > 1 && targets.length) this.game.event('burst', p.x + face * 30, p.y - 30, '#fff0a0');
+      damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1) * (leap ? 1.4 : 1);
+    if (combo > 1 && targets.length) {
+      this.game.event('burst', p.x + face * 30, p.y - 30, '#fff0a0');
+      // Blade mastery: a finisher that lands heals you.
+      if (this.perk('blade')) this.game.equipment.heal(this.game.maxHealth() * 0.03);
+    }
+    if (leap && targets.length) this.game.event('burst', p.x + face * 40, p.y - 20, '#dfe3e6');
     for (const a of targets) this.hurtMob(a, damage, p, false, w);
     if (targets.length === 1) {
       const a = targets[0];
@@ -233,6 +265,7 @@ export class Combat extends System {
       spec = RANGED[weaponId];
     if (!spec) return { ok: false, reason: 'That is not a ranged weapon.' };
     const w = this.game.armoury.stats(weaponId);
+    this.game.durability.use(weaponId);
     let damage = w.damage || 10,
       kind = spec.projectile,
       extra: Partial<Projectile> = { weapon: w };
@@ -247,7 +280,11 @@ export class Combat extends System {
           sk.ammoSave +
           (sk.quiverMaster ? 0.3 : 0) +
           (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === 'ranger' ? 0.25 : 0);
-      if (this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
+      // Bow mastery: every fifth arrow is free, and flies through more.
+      this.shots++;
+      const fifth = w.family === 'bow' && this.perk('bow') && this.shots % 5 === 0;
+      if (fifth) extra.pierce = (extra.pierce ?? 0) + 2;
+      if (!fifth && this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
       damage += AMMO[arrow].damage;
       if (AMMO[arrow].effect === 'fire') extra.fire = true;
       if (AMMO[arrow].effect === 'pierce') extra.pierce = 3;
@@ -255,8 +292,10 @@ export class Combat extends System {
       kind = spec.projectile === 'bolt' ? 'bolt' : arrow === 'arrow' ? 'arrow' : arrow;
       this.game.sound('bow');
     } else {
-      const cost = Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
-      if (!this.game.equipment.spendMana(cost)) {
+      // Tome mastery: a tenth of casts cost nothing.
+      const free = w.family === 'tome' && this.perk('tome') && this.game.rng() < 0.1;
+      const cost = free ? 0 : Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
+      if (cost && !this.game.equipment.spendMana(cost)) {
         // Overchannel: out of mana, the spell draws on your life instead.
         if (!this.game.skills.flag('overchannel') || s.vitals.health <= cost * 0.6 + 5)
           return { ok: false, reason: 'Not enough mana.' };
@@ -270,10 +309,15 @@ export class Combat extends System {
       bonusShots =
         (this.game.rng() < this.game.skills.get('extraShot') ? 1 : 0) +
         (spec.kind === 'bow' && this.game.skills.flag('quiverMaster') ? 1 : 0),
-      count = (spec.count ?? 1) + w.count + bonusShots,
+      count =
+        (spec.count ?? 1) +
+        w.count +
+        bonusShots +
+        (w.family === 'staff' && this.perk('staff') ? 1 : 0),
       spread = spec.spread ?? (w.count || bonusShots ? 0.1 : 0),
       pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
     if (w.homing) extra.homing = w.homing;
+    if (w.family === 'tome' && this.perk('tome')) extra.homing = (extra.homing ?? 3) + 2;
     extra.pierce = pierce;
     for (let i = 0; i < count; i++) {
       const a = angle + (i - (count - 1) / 2) * spread;
@@ -389,6 +433,20 @@ export class Combat extends System {
           if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
             continue;
           b.hit.add(a.id);
+          // Mirrors turn some shots back on the shooter.
+          if (MOBS[a.type]?.behave === 'mirror' && this.game.rng() < 0.3) {
+            this.spawn(
+              b.kind,
+              { x: b.x, y: b.y },
+              Math.atan2(p.y - 26 - b.y, p.x - b.x),
+              520,
+              b.damage * 0.5,
+              'mob',
+            );
+            this.game.event('burst', a.x, a.y - 20, '#ffffff');
+            spent = true;
+            break;
+          }
           this.hurtMob(
             a,
             b.damage,

@@ -11,6 +11,7 @@ import {
 } from '../../data/gear.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { RELIC_EFFECTS } from '../../data/codex.ts';
+import { CLOTHING, WATERSKINS } from '../../data/clothing.ts';
 import { WALLS } from '../../data/town.ts';
 import { TOOL_TIERS, WEAPONS } from '../../data/resources.ts';
 
@@ -86,7 +87,22 @@ export class Equipment extends System {
         this.game.say(itemName(id) + ' taken off.');
       } else {
         p.armor[piece.slot] = id;
+        this.game.progress.record('wear:' + id);
         this.game.say(itemName(id) + ' worn.', 'good');
+      }
+      this.game.sound('wear');
+      return { ok: true };
+    }
+    const garment = CLOTHING[id];
+    if (garment) {
+      p.clothing ??= {};
+      if (p.clothing[garment.layer] === id) {
+        delete p.clothing[garment.layer];
+        this.game.say(itemName(id) + ' taken off.');
+      } else {
+        p.clothing[garment.layer] = id;
+        this.game.progress.record('wear:' + id);
+        this.game.say(`${itemName(id)} worn · ${garment.text.toLowerCase()}.`, 'good');
       }
       this.game.sound('wear');
       return { ok: true };
@@ -114,6 +130,31 @@ export class Equipment extends System {
     const armor = Object.values(p.armor ?? {}).filter(has) as string[];
     return { armor, accessories: this.game.s.accessories.filter(has) };
   }
+  /** Clothing worn and still in the pack. */
+  clothes(): string[] {
+    const c = this.game.s.player.clothing ?? {};
+    return [c.under, c.mid, c.outer].filter((id): id is string => !!id && this.game.count(id) > 0);
+  }
+  /** What worn clothing keeps out (worn-through clothing keeps nothing). */
+  clothingShield() {
+    let insul = 0,
+      heat = 0,
+      water = 0;
+    for (const id of this.clothes()) {
+      if (this.game.durability.broken(id)) continue;
+      const g = CLOTHING[id];
+      insul += g.insul;
+      heat += g.heat;
+      water += g.water;
+    }
+    return { insul, heat, water: Math.min(0.9, water) };
+  }
+  /** The best waterskin carried, if any. */
+  waterskin() {
+    return Object.keys(WATERSKINS)
+      .filter((id) => this.game.count(id) > 0)
+      .sort((a, b) => WATERSKINS[b].drink - WATERSKINS[a].drink)[0];
+  }
   /** The set whose three pieces are all worn, if any. */
   fullSet(): string | null {
     const { armor } = this.worn();
@@ -126,7 +167,12 @@ export class Equipment extends System {
     const out = new Set<string>(),
       set = this.fullSet();
     if (set) out.add(ARMOR_SETS.find((x) => x.key === set)!.bonus);
-    for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
+    for (const id of this.worn().accessories) {
+      // A miner's lamp gives no light once its resin is spent.
+      if (id === 'miners_lamp' && (this.game.s.lampFuel ?? 1) <= 0 && !this.game.count('resin'))
+        continue;
+      for (const e of ACCESSORIES[id].effects) out.add(e);
+    }
     for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add('buff:' + id);
     // Relics set on a shelf at camp lend their gifts wherever you are.
     for (const id of this.game.shelvedRelics()) for (const e of RELIC_EFFECTS[id] ?? []) out.add(e);
@@ -152,6 +198,10 @@ export class Equipment extends System {
     // Realm sets: bonewalker plate and amberguard add to the ward they carry.
     if (this.fullSet() === 'bonewalker') d += 3;
     if (this.fullSet() === 'amberguard') d += 2;
+    if (this.fullSet() === 'leviathan') d += 3;
+    if (this.fullSet() === 'forgeborn') d += 4;
+    // Worked armour: levels and onyx.
+    d += this.game.armourForge.totals().defense;
     // A Phalanx spear or Juggernaut hammer guards you while it is your ready weapon.
     d += this.game.armoury.stats(this.game.s.player.weapon).defense;
     return d;
@@ -165,6 +215,7 @@ export class Equipment extends System {
     if (fx.has('buff:wrath')) k += 0.15;
     if (fx.has('buff:fiery') || fx.has('buff:feasted')) k += 0.1;
     if (magic && (fx.has('mana40') || fx.has('magic15'))) k += 0.15;
+    k += this.game.armourForge.totals().damage;
     return k;
   }
   speedBonus() {
@@ -178,6 +229,7 @@ export class Equipment extends System {
       (fx.has('cold') ? 0.1 : 0) +
       (fx.has('buff:sweet') ? 0.1 : 0) +
       (this.fullSet() === 'saltwarden' || this.fullSet() === 'ashwalker' ? 0.1 : 0) +
+      this.game.armourForge.totals().speed +
       this.game.skills.get('speed') -
       (this.game.skills.flag('juggernaut') ? 0.1 : 0) +
       (this.game.skills.flag('wanderer') ? 0.15 : 0)
@@ -197,7 +249,8 @@ export class Equipment extends System {
     return (
       (this.game.s.maxMana || CRYSTALS.baseMana) +
       (fx.has('mana40') || fx.has('arcanist') ? 40 : 0) +
-      this.game.skills.get('maxMana')
+      this.game.skills.get('maxMana') +
+      this.game.armourForge.totals().mana
     );
   }
   heal(amount: number) {
@@ -272,7 +325,8 @@ export class Equipment extends System {
       this.maxMana(),
     );
     let regen = 0;
-    if (fx.has('regen')) regen += 0.6;
+    if (fx.has('regen') || this.fullSet() === 'druid') regen += 0.6;
+    regen += this.game.armourForge.totals().regen;
     if (fx.has('buff:regeneration')) regen += 1.2;
     if (fx.has('spores')) regen += 0.5;
     if (fx.has('home')) regen += 0.35;

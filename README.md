@@ -116,6 +116,32 @@ The game automatically saves to browser local storage every 40 seconds and when 
 
 For a quick starting route: gather wood, stone, and fiber in the meadow; make a stone axe and pickaxe; find flint and make a spear; place a campfire; collect water at a blue pool and boil it at the fire. The field task in the upper right follows this route live.
 
+### The Training Grounds
+
+A new expedition starts in the **Training Grounds**, a short hand-laid course, unless you untick _Start in the Training Grounds_ when creating the world. The same page also takes an optional world seed: a number, or any words.
+
+The course has eleven stations, each with a signpost. The HUD shows the lesson you are on, with its sign's text beneath it. In order, the stations teach:
+
+1. moving;
+2. jumping and climbing ladders;
+3. gathering and crafting a stone axe, a pickaxe and a campfire;
+4. collecting, boiling and drinking water;
+5. mining copper;
+6. fighting and hunting, then cooking and eating;
+7. stowing food in an icebox;
+8. treating bleeding from the brambles with a bandage from the chest;
+9. wearing and mending clothes;
+10. what Waystones and realm keys do;
+11. what the journal holds: Skills, the Codex, Feats and the Atlas.
+
+The course is also where you leave it:
+
+- **Finishing:** the portal at the far end takes you to the meadow. You keep everything you made, and the field tasks there catch up with what you have already done.
+- **Skipping:** press E twice at the portal where you arrived, or use _Leave the Training Grounds_ on the journal's Notes page.
+- **Falling:** if you fall on the course, you wake at its start.
+
+In the field console, `realm course` enters the course or leaves it.
+
 ## Progression
 
 Stone → copper → iron → steel → obsidian → hellstone → myconite → starmetal → voidsteel. Tool tiers gate ore and hard ground. Nine wide biomes form a 30,000 × 4,480 side-view overworld. Each region has its own lie of the land (flat marsh and tundra, rolling meadow and forest, hilly taiga, alpine peaks, desert dunes, terraced badlands mesas), and each border has its own feature: a lagoon, a river valley, ridges, a frozen lake, an escarpment, and a canyon. Every slope stays walkable.
@@ -152,6 +178,13 @@ The world changes as you work it. Chopped trees topple and leave stumps that slo
   | Warm belly | The cold bites less         |
   | Feasted    | Well fed and fiery together |
 
+- **Exposure:** being wet chills you, and it chills you hardest when the air is cold, so a rainy summer night is uncomfortable rather than deadly.
+  - **Hypothermia** sets in after about a minute and a half with your body below 34.6°.
+  - **Frostbite** needs freezing air as well.
+  - **Pneumonia** takes five minutes of being soaked and chilled.
+
+  A new expedition starts dressed in a linen underlayer and a hide vest.
+
 - **Vitamins:** fruit, greens and preserves keep your vitamins up. Run out for long and scurvy sets in.
 - **Water:** wild water can carry dysentery, so boil it. Water in the generated realms is **brackish** and can carry cholera; only a **water filter** makes it safe.
 - **Ailments:** twenty diseases and injuries, each following the same course:
@@ -162,15 +195,35 @@ The world changes as you work it. Chopped trees topple and leave stumps that slo
   - **Too late:** rabies serum works only before rabies takes hold.
   - **Immunity:** many leave you immune for a while, and a field vaccine guards against tetanus, rabies and cholera.
 
-  | Group            | Ailments                                                    |
-  | ---------------- | ----------------------------------------------------------- |
-  | Food and water   | Dysentery, fever, food poisoning, tapeworm, cholera, scurvy |
-  | Wounds and bites | Infected wounds, blood poisoning, tetanus, rabies, venom    |
-  | Exposure         | Hypothermia, frostbite, heatstroke, pneumonia               |
-  | The realms       | Spore lung, void rot                                        |
-  | Injuries         | Bleeding, fractures, burns                                  |
+  | Group            | Ailments                                                                           |
+  | ---------------- | ---------------------------------------------------------------------------------- |
+  | Food and water   | Dysentery, fever, food poisoning, tapeworm, cholera, scurvy                        |
+  | Wounds and bites | Infected wounds, blood poisoning, tetanus, rabies, venom                           |
+  | Exposure         | Hypothermia, frostbite, heatstroke, pneumonia                                      |
+  | The realms       | Spore lung, void rot, glass cough, marrow rot, fever-dream, gold sickness, rickets |
+  | Injuries         | Bleeding, fractures, burns                                                         |
 
   Each ailment has its own treatment: bandages, splints, salves, teas, serums, and the older remedies. The **Vitals** page lists every ailment with its stage, symptoms, treatment and time left. A strip of ailments on the HUD shows their stages at a glance.
+
+- **Clothing:** worn in three layers apart from armour: under, mid and outer. There are eleven garments, from linen underlayers to the rime parka and ember mantle. Each keeps out some cold, heat or rain, and wears through in hard weather until it is mended at a workbench.
+- **Wear and mending:**
+  - weapons blunt with use, and a worn-out weapon strikes for half;
+  - tools dull with use, and a worn-out tool will not cut its tier;
+  - nothing is lost, and everything is mended at its station (the Wardrobe lists what needs it);
+  - a **repair kit** patches the weapon in hand anywhere.
+- **Water, further:**
+  - waterskins and flasks make each drink go further;
+  - water in the pack freezes in hard cold unless it is in an insulated flask;
+  - purification tablets clean three draughts at once;
+  - a **distiller** boils brackish and wild water with wood.
+- **Preserving, further:**
+  - a smoking rack makes smoked fish;
+  - a canning kettle makes canned stew and fruit that barely rot;
+  - an ice harvester cuts ice wherever it freezes;
+  - a cold box stops the ice in your pack from melting.
+- **Diet:** food falls into seven groups: meat, fish, grain, fruit, greens, fungus and sweets. Four or more kinds in recent meals keep you strong, while the same food meal after meal leaves you malnourished.
+- **Darkness:** twenty minutes without sunlight brings on rickets, which sunlight or fish oil cures. The miner's lamp burns resin in the dark.
+- **Weight:** everything weighs something. Carry more than your pack holds (120 kg, more with a satchel, pack or expedition frame) and you slow down and tire.
 
 ### Dungeons
 
@@ -213,22 +266,54 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 Beyond the Rift lie realms that are built anew every time you enter.
 
 - **Waystones:** craft one at a workbench from stone, iron ingots and crystal, and set it down in the wildlands. Use it to open the **Atlas** page.
-- **Keys:** each realm needs its own key. Three key fragments make a key at a Waystone. You can craft fragments, buy some from the Tinker, or find them in the realms. Band II fragments are made from Band I spoils, and Band III fragments from Band II spoils, so the realms open in order.
+- **Keys:** each realm needs its own key. Three key fragments make a key at a Waystone. You can craft fragments, buy some from the Tinker, or find them in the realms. Each band's fragments are made from the spoils of the band before, so the realms open in order: Band I and II at the workbench, III at the forge, IV and V at the starforge. A **respirator** (workbench) triples your breath underwater.
 - **Opening a realm:** turning a key builds the realm from a fresh seed in a strip of its own, and you arrive beside a portal home. The realm stays open until you turn another key.
 - **Tiers I–V:** each tier gives monsters more health and harm and gives more loot. Clearing a tier's boss unlocks the next one.
 - **Modifiers:** a realm rolls one modifier per tier above I. Boons include Bountiful, Rich veins, Treasure trove, Lucky and Low gravity. Banes include Fortified, Savage, Swarming, Frenzied, Hunted, Hungering, Frostbound, Scorched, Starless, Unstable, Blighted and Echoing. Every modifier adds to the loot.
 - **Inside each realm:** you'll find resources, chests, two shrines that each grant a blessing once, a roaming elite, and the boss's altar. The first boss kill in each realm wins its **relic**.
+- **Exploring:**
+  - lore tablets: 30 fragments of the realms' history, which fill a Codex page;
+  - a hidden vault sealed in the rock under each cairn;
+  - a wandering merchant in about half of all expeditions, selling rare goods and the next band's key fragments.
+- **More modifiers:** Toxic air (needs a respirator) and Silent (no music, and monsters hear you from further off).
+- **How creatures fight:**
+  - **kite:** keeps its distance and shoots;
+  - **burrow:** sinks into the ground and bursts up beneath you;
+  - **tether:** reels you in;
+  - **mirror:** turns your shots back;
+  - **split:** falls apart into two;
+  - **swarm:** never comes alone.
+- **Completion:** the Atlas shows how much of each realm you have done.
+- **Resistances:** each creature resists some kinds of harm and fears others, and its Codex entry says which. The weapon's infusion sets the kind of harm, so choose it for the realm.
+- **The Mycelial Deep:** it now exists in template form too, as a Band III realm. Its fragments are made at a forge from glowcaps, prism glass and a marrow ingot, and its keys at the seventh Waystone tier. The Deep beyond the Rift Gate is its seed 0, and Waystone expeditions regrow it with spore blooms (a respirator keeps them out).
 
-| Realm                   | Hazard                                                                          | Signature                                         | Gear                                                                                 | Boss and relic                                               |
-| ----------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Drowned Orchard         | The tide rises and falls; wading slows and chills you                           | Brinewood, tide pearls, crab shell                | Tidecaller set (swim freely), tidecaller spear, brine wand                           | The Orchard Mother · Tide conch                              |
-| Ashen Steppe            | Ash storms choke and blind in the open                                          | Cinderflax, kilnstone, old kilns that still smelt | Ashwalker set (storm-proof), kiln greataxe, ember sling                              | The Kiln Beast · Kiln heart                                  |
-| Hollow Warren           | Cave-ins: dust, then falling rock                                               | Burrow amber, beetle carapace                     | Amberguard set (sense cave-ins), amber repeater, amber pickaxe                       | The Warren Queen, who burrows · Queen's mandible             |
-| Glasswood (II)          | Shardfall: a glint in the canopy, then falling glass that cuts                  | Prism glass, lumen moss                           | Prismweave set (shards glance off; magic +10%), prism wand, shard glaive             | The Lumen Stag · Lumen antler                                |
-| Bone Marches (II)       | The marrow mire slows, soaks and can bring on marrow rot                        | Marrow-iron, bone                                 | Bonewalker set (mire-proof; +3 defense), bonecleaver, vertebra whip                  | The Ossuary Hydra, which regrows unless burned · Hydra tooth |
-| Clockwork Barrow (III)  | Steam vents blast on a rhythm along the halls                                   | Brass gears and ingots                            | Gearwright set (vents cannot scald; ranged +10%), brass repeater, piston hammer      | The Engine Saint · Saint's cog                               |
-| Salt Flats of Oru (III) | The white sun parches the open flats by day; mirages look like real foes        | Saltglass, salt                                   | Saltwarden set (sun-proof; reveals mirages; +10% speed), mirage blade, saltglass bow | The Mirage Tyrant, who splits into copies · Tyrant's eye     |
-| Frozen Choir (III)      | The hymn: every 90 s you slow and freeze unless by a fire. Food never rots here | Rime silver, frost lilies, bell bronze            | Choirsilver set (hymn-proof; +6° cold resistance), choir stave, bellhammer           | The Hymnal · Hymnal bell                                     |
+| Realm                      | Hazard                                                                          | Signature                                         | Gear                                                                                   | Boss and relic                                                              |
+| -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Drowned Orchard            | The tide rises and falls; wading slows and chills you                           | Brinewood, tide pearls, crab shell                | Tidecaller set (swim freely), tidecaller spear, brine wand                             | The Orchard Mother · Tide conch                                             |
+| Ashen Steppe               | Ash storms choke and blind in the open                                          | Cinderflax, kilnstone, old kilns that still smelt | Ashwalker set (storm-proof), kiln greataxe, ember sling                                | The Kiln Beast · Kiln heart                                                 |
+| Hollow Warren              | Cave-ins: dust, then falling rock                                               | Burrow amber, beetle carapace                     | Amberguard set (sense cave-ins), amber repeater, amber pickaxe                         | The Warren Queen, who burrows · Queen's mandible                            |
+| Glasswood (II)             | Shardfall: a glint in the canopy, then falling glass that cuts                  | Prism glass, lumen moss                           | Prismweave set (shards glance off; magic +10%), prism wand, shard glaive               | The Lumen Stag · Lumen antler                                               |
+| Bone Marches (II)          | The marrow mire slows, soaks and can bring on marrow rot                        | Marrow-iron, bone                                 | Bonewalker set (mire-proof; +3 defense), bonecleaver, vertebra whip                    | The Ossuary Hydra, which regrows unless burned · Hydra tooth                |
+| Clockwork Barrow (III)     | Steam vents blast on a rhythm along the halls                                   | Brass gears and ingots                            | Gearwright set (vents cannot scald; ranged +10%), brass repeater, piston hammer        | The Engine Saint · Saint's cog                                              |
+| Salt Flats of Oru (III)    | The white sun parches the open flats by day; mirages look like real foes        | Saltglass, salt                                   | Saltwarden set (sun-proof; reveals mirages; +10% speed), mirage blade, saltglass bow   | The Mirage Tyrant, who splits into copies · Tyrant's eye                    |
+| Frozen Choir (III)         | The hymn: every 90 s you slow and freeze unless by a fire. Food never rots here | Rime silver, frost lilies, bell bronze            | Choirsilver set (hymn-proof; +6° cold resistance), choir stave, bellhammer             | The Hymnal · Hymnal bell                                                    |
+| Feverlands (IV)            | Every bite may carry a disease; the fever-dream scrambles your HUD              | Plague ivory, fever bloom                         | Plague doctor set (bites carry nothing; sickness resisted), venom blade, plague censer | The Mother of Rot, who leaps and floods the field with toads · Rot mask     |
+| Sunken Observatory (IV)    | Low gravity; star pulses gather overhead and crash down                         | Astral lens                                       | Astral set (pulses pass through; magic +10%), astral tome, star spear                  | The Astronomer, who turns the sky over · Astrolabe                          |
+| Gutter of Kings (IV)       | Cursed gold: picking it up risks gold sickness. Ten vaults of loot              | Crown gold, coin                                  | Gilded set (curse-proof; +25% marks), gilded greatblade, thief's whip                  | The Pauper King, who taxes your purse to heal · Pauper's crown              |
+| The Undertow (V)           | All underwater: 40 s of breath, refilled at diving bells                        | Abyssal pearl                                     | Leviathan set (breathe and swim freely; +3 defense), leviathan harpoon, tidebreaker    | The Leviathan · Leviathan scale                                             |
+| Emberheart (V)             | Magma rises through the lower ledges every two minutes                          | Heartstone                                        | Forgeborn set (magma- and lava-proof; +4 defense), anvil maul, heartfire staff         | The Anvil God · Anvil spark                                                 |
+| Garden of Lost Seasons (V) | The season turns every 150 s: summer scorches, autumn rots, winter freezes      | Seasonbloom                                       | Druid set (seasons cannot touch you; regenerate), season bow, thornlash                | The Four-Faced Warden, whose attacks change with its face · Seed of Seasons |
+
+### The Fractured Realms
+
+Beyond Band V the realms come apart. **Fracture shards** drop from the great foes of Band V, and four of them make a **Fractured key**.
+
+- **Splicing:** each Fractured expedition joins two realms at a seam, with a shaft and ladder between them.
+- **Hazard and creatures:** it borrows one realm's hazard and gathers creatures from both.
+- **The great foe:** it calls a boss from any realm, empowered with half again its health.
+- **Tiers never end:** the Atlas counts them in Roman numerals, and each tier scales monsters and loot further.
+- **Rewards:** shards drop in plenty. They forge **Ascended ingots** for the twelfth weapon tier. In the Armoury a shard can reforge a weapon, rolling its quality twice and keeping the better.
+- **Relic:** the Prism of worlds.
 
 ### Homes and the town
 
@@ -243,7 +328,7 @@ Beyond the Rift lie realms that are built anew every time you enter.
 
 ### The weapon hierarchy
 
-One table in `src/data/weapons.ts` governs every weapon: eleven material tiers by ten families. The **Armoury**, reached from the Gear page, shows the whole grid and which weapons you have found.
+One table in `src/data/weapons.ts` governs every weapon: twelve material tiers by ten families. The **Armoury**, reached from the Gear page, shows the whole grid and which weapons you have found.
 
 | Tier | Material  | Tier | Material   |
 | ---- | --------- | ---- | ---------- |
@@ -252,7 +337,7 @@ One table in `src/data/weapons.ts` governs every weapon: eleven material tiers b
 | 3    | Iron      | 9    | Starmetal  |
 | 4    | Steel     | 10   | Voidsteel  |
 | 5    | Obsidian  | 11   | Riftforged |
-| 6    | Hellstone |      |            |
+| 6    | Hellstone | 12   | Ascended   |
 
 | Family     | Its gift at every tier                                |
 | ---------- | ----------------------------------------------------- |
@@ -274,6 +359,8 @@ Each weapon also has its own upgrade line:
 - **Evolutions:** at +5 and again at +10 you choose one of two paths for the family. For example, a battleaxe can become Serrated or Balanced, then Reaper or Berserk; a bow can gain Volley or become a Sniper.
 - **Infusions:** fire (burning), frost (slows), venom (poison), void (ignores half of armour), holy (+50% against the undead) and storm (lightning leaps to a second foe).
 - **Gems:** ruby (damage), sapphire (magic), emerald (critical hits), topaz (speed), onyx (armour piercing) and opal (life drain). Topaz, onyx and opal are found in the realms.
+
+Ranged families (bow, crossbow and staff) hit a little softer than melee to pay for their safety. The balance tests hold each band's great foes to between about 12 s and a minute for a +5 Common melee weapon of that band's tier, and to about 15–90 s for a ranged one. A weapon from the band before takes far longer.
 
 Signature weapons, such as the Tidecaller spear and the Hellrazor, belong to a family and tier but stand outside the grid.
 
@@ -316,9 +403,29 @@ Nothing here resets. The world is persistent, and so is everything you learn in 
 
 - **The relic shelf** is built at the workbench. Relics set on it (the realm bosses' prizes and great trophies) lend their gifts wherever you are. It holds three relics, four at renown 20 and five at renown 40.
 
+### Stations, study, and mastery
+
+- **Station lines:** each upgrade does everything the stations below it did, adds recipes, and makes finer weapons.
+
+  | Line     | Stations                                   | New at the top                 |
+  | -------- | ------------------------------------------ | ------------------------------ |
+  | Benches  | workbench → tinker's bench → artisan bench | Repair kits, packs, whetstones |
+  | Forges   | furnace → forge → starforge → rift forge   | Ascended ingots and tier 12    |
+  | Medicine | apothecary → laboratory                    | Panacea                        |
+  | Fires    | campfire → hearth → kitchen                | A fire that needs no feeding   |
+
+- **Research desk:** study an item to learn what it goes into (and, for a weapon, how it can evolve). Each study earns renown.
+- **Mastery perks:** at mastery 10 each weapon family learns a move of its own. For example, spears get a leaping thrust from the air, blade finishers heal, the bow's fifth arrow is free and the staff looses an extra bolt. At mastery 20 the weapon glints in your hand.
+- **Armour forge:** the Armoury has an Armour tab. Each piece levels to +5, takes gems in its sockets (two in a chestplate) and one infusion.
+- **Compare:** each weapon's Armoury page compares it with the one in hand.
+
+### Feats and titles
+
+Sixty-three feats (Beasts › The Codex › Feats) record what the expedition has done. They fall into seven groups: hunting, great foes, wayfaring, survival, making, arms and renown. Each shows its progress. Completing one grants a small permanent perk and a title, such as _the Blooded_, _Walker of Worlds_ or _the Realmbreaker_. The title you choose to wear shows beside your renown on the HUD.
+
 ### Gear, potions, and crystals
 
-- **Armour:** thirty-four sets (copper, iron, silver, gold, the eight realm sets, the twelve archetype sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
+- **Armour:** forty sets (copper, iron, silver, gold, the fourteen realm sets, the twelve archetype sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
 - **Accessories:** three can be worn at once, including double jumps, gliding, speed, regeneration, light, lava resistance and more.
 - **Ranged weapons:** bows fire arrows (plain, fire, crystal), and staves spend mana: embers, bone shards, icicles, homing sun bolts, spores and void beams.
 - **Healing:** healing draughts heal instantly and bring on a short potion sickness.
@@ -326,7 +433,7 @@ Nothing here resets. The world is persistent, and so is everything you learn in 
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 422 recipes and 582 items (144 weapons), and 101 kinds of creature including 15 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 467 recipes and 659 items (156 weapons), and 143 kinds of creature including 21 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 
@@ -334,7 +441,7 @@ All diseases and treatments are fictional game mechanics, not medical advice.
 
 Run `npm test` with a recent Node.js release. It checks:
 
-- the tutorial, crafting and ore gates, illness, spoilage, offline saves, farming, side-view physics and mining;
+- the Training Grounds (its layout, lessons, brambles, portals, saving, and staying out of the Atlas), the tutorial, crafting and ore gates, illness, spoilage, offline saves, farming, side-view physics and mining;
 - Effergy placement, Direwolf hunts, rewards and upgrades;
 - the dungeons (loot, traps, guardians, altars and brick);
 - boss fights and sigils, the Rift Gate, travel and portals home, and every dimension's walls, life and boss;
@@ -343,6 +450,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the weapon hierarchy: a complete, ever-stronger grid, quality, the anvil and evolutions, family mechanics, infusions and gems, crossbows and tomes;
 - generated realms: seeds, keys and tiers, furnishing, modifiers, hazards, bosses and relics, and saving an open realm;
 - homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
+- balance: time to kill for every band and family, bands gated in order, how long food keeps in the warm and in cold storage, and a night spent in the open;
 - save migration from every earlier layout;
 - the music and sound.
 

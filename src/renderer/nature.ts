@@ -320,6 +320,8 @@ const PLANT_KINDS = new Set([
   'cinderflax',
   'lumen_moss',
   'frost_lily',
+  'fever_bloom',
+  'seasonbloom',
   'berry',
   'herb',
   'fiber',
@@ -423,6 +425,24 @@ function plantSprite(kind: string, stage: number, art: RegionArt): Sprite {
           if (!bare) p.set(x, 12, '#f0f8a0');
         }
         break;
+      case 'fever_bloom':
+        p.line(9, 15, 9, 7, '#4a5a2a');
+        if (!bare) {
+          p.ellipse(9, 6, 4, 3, '#e8f070');
+          p.set(9, 6, '#c8584a');
+        }
+        break;
+      case 'seasonbloom':
+        p.line(9, 15, 9, 6, '#5a7a3a');
+        if (!bare)
+          for (const [x, y, c] of [
+            [6, 6, '#8ad070'],
+            [12, 6, '#f0c850'],
+            [6, 10, '#d8703a'],
+            [12, 10, '#bfe0ff'],
+          ] as const)
+            p.rect(x, y, 2, 2, c);
+        break;
       case 'frost_lily':
         p.line(9, 15, 9, 8, '#5a7a8a');
         p.ellipse(7, 13, 3, 1, '#6a8a9a');
@@ -495,6 +515,12 @@ export const MINERALS: Record<string, Mineral> = {
   brass_gear: { rock: '#5a4a34', fleck: '#f0c870', shine: '#fff0a0' },
   saltglass: { rock: '#c8c0b4', crystal: '#f0c0c8', glow: true },
   rime_silver_ore: { rock: '#5a6a7a', fleck: '#e8f4ff', shine: '#ffffff' },
+  plague_ivory: { rock: '#5a6a3a', fleck: '#e6dcc6', shine: '#ffffff' },
+  astral_lens: { rock: '#2a2e50', crystal: '#9ab0ff', glow: true },
+  crown_gold: { rock: '#5a4a2a', fleck: '#f0c850', shine: '#fff0a0' },
+  abyssal_pearl: { rock: '#3a4a5a', crystal: '#e8f8ff', glow: true },
+  heartstone: { rock: '#3a1a10', crystal: '#ff8a3a', glow: true },
+  fracture_shard: { rock: '#2a1c3a', crystal: '#e0c0ff', glow: true },
   coal: { rock: '#5a5a5e', fleck: '#1c1c20', shine: '#8a8a96' },
   ice: { rock: '#8fb8d0', crystal: '#dff4ff' },
   obsidian: { rock: '#3a3448', crystal: '#2a2433', shine: '#9a8ac0' },

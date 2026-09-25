@@ -1,4 +1,5 @@
 import { CHAPTERS, TUTORIAL } from '../../data/progression.ts';
+import { COURSE } from '../../data/tutorial.ts';
 import { dungeonAt } from '../../data/world.ts';
 
 import { System } from './System.ts';
@@ -7,10 +8,26 @@ export class Progress extends System {
   record(key: string, qty = 1) {
     this.game.s.tutorial.tally[key] = (this.game.s.tutorial.tally[key] || 0) + qty;
     this.game.skills.noted(key, qty);
+    this.game.feats.check();
+    this.advanceCourse();
     this.advanceTutorial();
     this.advanceChapter();
   }
+  /** The Training Grounds' lessons, while you are on the course. */
+  advanceCourse() {
+    const t = this.game.s.tutorial;
+    if (!this.game.pocket.inCourse() || t.course === undefined) return;
+    let step = t.course;
+    while (step < COURSE.length) {
+      const [, key, n] = COURSE[step];
+      if ((t.tally[key] || 0) < n) break;
+      step++;
+      if (step < COURSE.length) this.game.say('Lesson learned · next: ' + COURSE[step][0], 'good');
+    }
+    t.course = step;
+  }
   advanceTutorial() {
+    if (this.game.pocket.inCourse()) return;
     let step = this.game.s.tutorial.step;
     while (step < TUTORIAL.length) {
       const [, key, n] = TUTORIAL[step];

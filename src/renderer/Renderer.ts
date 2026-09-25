@@ -230,7 +230,22 @@ export function draw(
   for (const s of g.s.structures)
     if (s.type !== 'rift_gate' && s.type !== 'portal' && on(s))
       drawStructure(a, g, s, sx(s), sy(s), t);
-  for (const m of g.s.animals) if (!m.deadUntil && on(m)) drawAnimal(a, g, m, sx(m), sy(m), t);
+  for (const m of g.s.animals) {
+    if (m.deadUntil || !on(m)) continue;
+    // A burrowed creature shows only as dirt stirring where it tunnels.
+    if (m.hidden) {
+      a.fillStyle = 'rgba(120, 96, 64, 0.9)';
+      for (let i = 0; i < 5; i++)
+        a.fillRect(
+          Math.round(sx(m) + Math.sin(t * 20 + i * 2) * 6),
+          Math.round(sy(m) - 1 - (i % 2)),
+          2,
+          1,
+        );
+      continue;
+    }
+    drawAnimal(a, g, m, sx(m), sy(m), t);
+  }
   drawDrops(a, g, ax, ay, w, h, t);
   if (!menu) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
   drawProjectiles(a, g, ax, ay, w, h);

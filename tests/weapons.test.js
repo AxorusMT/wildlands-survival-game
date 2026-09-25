@@ -21,10 +21,10 @@ const dummy = (g, type = 'skeleton') => {
   return a;
 };
 
-test('the hierarchy is complete: ten families by eleven tiers, stronger at every tier', () => {
+test('the hierarchy is complete: ten families by twelve tiers, stronger at every tier', () => {
   assert.equal(D.FAMILIES.length, 10);
-  assert.equal(D.TIERS.length, 11);
-  assert.equal(D.GRID.length, 110);
+  assert.equal(D.TIERS.length, 12);
+  assert.equal(D.GRID.length, 120);
   for (const w of D.GRID) {
     assert.ok(D.WEAPONS[w.id], `${w.id} stats`);
     assert.ok(D.ITEMS[w.id], `${w.id} item`);
@@ -198,4 +198,44 @@ test('the armoury is kept in the field record', () => {
   const back = fresh();
   back.load(mem);
   assert.equal(back.armoury.title('gold_broadsword'), 'Mythic Gold broadsword +3');
+});
+
+test('creatures resist some kinds of harm and fear others, so the infusion matters', () => {
+  assert.ok(D.resistOf('kiln_golem').fire > 0.3);
+  assert.ok(D.resistOf('kiln_golem').frost < 0);
+  assert.ok(D.resistOf('choir_wraith').frost > 0.3);
+  assert.ok(D.resistOf('skeleton').venom > 0.3, 'the dead cannot be poisoned');
+  assert.match(D.resistText('kiln_golem'), /resists .*fire.*weak to .*frost/);
+  const hit = (inf) => {
+    const g = new Game(5);
+    g.add('iron_sword');
+    if (inf) g.s.armoury.iron_sword.inf = inf;
+    g.world.addAnimal('kiln_golem', g.s.player.x + 30, g.s.player.y);
+    const a = g.s.animals.at(-1);
+    a.hp = a.maxHp = 99999;
+    g.rng = () => 0.99;
+    return g.combat.hurtMob(a, 200, g.s.player, false, g.armoury.stats('iron_sword'));
+  };
+  assert.ok(hit('frost') > hit(null) && hit(null) > hit('fire'));
+});
+
+test('armour climbs to +5, takes gems and an infusion', () => {
+  const g = new Game(6);
+  g.command('god');
+  for (const p of ['iron_helmet', 'iron_chestplate', 'iron_greaves']) {
+    g.add(p);
+    g.equipment.wear(p);
+  }
+  const def = g.equipment.defense();
+  for (let i = 0; i < 5; i++) assert.ok(g.armourForge.upgrade('iron_chestplate').ok);
+  assert.equal(g.armourForge.upgrade('iron_chestplate').ok, false, 'no further');
+  assert.equal(g.equipment.defense(), def + 5);
+  assert.ok(g.armourForge.socket('iron_chestplate', 'onyx').ok);
+  assert.ok(g.armourForge.socket('iron_chestplate', 'ruby').ok);
+  assert.equal(g.armourForge.socket('iron_chestplate', 'opal').ok, false, 'two sockets');
+  assert.equal(g.equipment.defense(), def + 6);
+  assert.ok(g.equipment.damageBonus() > 1.02);
+  assert.ok(g.armourForge.infuse('iron_helmet', 'fire').ok);
+  g.dev.god = false;
+  assert.equal(g.ailments.contract('burn', true), false, 'burns cannot take hold');
 });

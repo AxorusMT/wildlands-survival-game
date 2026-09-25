@@ -531,6 +531,199 @@ Object.assign(STATIC, {
       p.rect(8, 12, 6, 7, '#2a2630');
       p.shadeEdges(0.2, -0.3);
     }),
+  // Station upgrades.
+  tinkers_bench: () =>
+    sprite(36, 22, 18, 21, (p) => {
+      p.rect(0, 6, 36, 4, '#8a6440');
+      p.rect(0, 6, 36, 1, '#b08a5a');
+      p.rect(2, 10, 3, 12, '#6a4a30');
+      p.rect(31, 10, 3, 12, '#6a4a30');
+      p.rect(6, 12, 24, 3, '#6a4a30');
+      p.rect(4, 2, 6, 4, '#a8a4a0');
+      p.rect(14, 3, 3, 3, '#d0844a');
+      p.rect(22, 1, 8, 5, '#5a5e64');
+      p.set(25, 2, '#f0c850');
+    }),
+  artisan_bench: () =>
+    sprite(40, 26, 20, 25, (p) => {
+      p.rect(0, 8, 40, 5, '#6a3a2a');
+      p.rect(0, 8, 40, 1, '#a86a4a');
+      for (const x of [2, 35]) p.rect(x, 13, 3, 13, '#4a2a1a');
+      p.rect(6, 16, 28, 3, '#4a2a1a');
+      p.rect(4, 2, 10, 6, '#f0c850');
+      p.rect(5, 3, 8, 1, '#fff0a0');
+      p.rect(18, 4, 3, 4, '#8fe3df');
+      p.rect(26, 0, 10, 8, '#dfe3e6');
+      p.rect(27, 1, 3, 2, '#ffffff');
+    }),
+  rift_forge: () =>
+    sprite(44, 40, 22, 39, (p) => {
+      p.rect(2, 12, 40, 28, '#2a1c3a');
+      p.rect(2, 12, 40, 2, '#6a4a8a');
+      p.rect(12, 20, 20, 14, '#140a22');
+      p.ellipse(22, 27, 7, 5, '#ff6ad5');
+      p.ellipse(22, 27, 4, 3, '#ffe0f8');
+      p.rect(8, 0, 6, 12, '#3a2a4a');
+      p.rect(30, 0, 6, 12, '#3a2a4a');
+      for (const x of [4, 38]) p.rect(x, 16, 2, 20, '#b36cff');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  laboratory: () =>
+    sprite(36, 28, 18, 27, (p) => {
+      p.rect(0, 14, 36, 4, '#6a6a70');
+      p.rect(2, 18, 3, 10, '#4a4a50');
+      p.rect(31, 18, 3, 10, '#4a4a50');
+      p.ellipse(8, 9, 4, 5, '#bfe8ff');
+      p.rect(7, 2, 2, 4, '#bfe8ff');
+      p.rect(6, 9, 5, 4, '#58e0d0');
+      p.rect(16, 4, 3, 10, '#dfe3e6');
+      p.rect(16, 9, 3, 5, '#e8577a');
+      p.ellipse(27, 10, 5, 4, '#bfe8ff');
+      p.rect(24, 10, 7, 3, '#e8f070');
+    }),
+  hearth: () =>
+    sprite(38, 34, 19, 33, (p) => {
+      p.rect(0, 10, 38, 24, '#8b8f8a');
+      for (let y = 12; y < 34; y += 5)
+        for (let x = (y % 10 ? 0 : 4) + 1; x < 37; x += 8) p.rect(x, y, 7, 1, '#6a6e6a');
+      p.rect(9, 18, 20, 16, '#1c1410');
+      p.ellipse(19, 30, 7, 4, '#ff8a3a');
+      p.ellipse(19, 30, 4, 2, '#ffe070');
+      p.rect(13, 0, 12, 10, '#7a7e7a');
+      p.rect(0, 10, 38, 2, '#a8aca8');
+    }),
+  research_desk: () =>
+    sprite(34, 26, 17, 25, (p) => {
+      p.rect(0, 10, 34, 4, '#6a4a30');
+      p.rect(0, 10, 34, 1, '#8a6440');
+      p.rect(2, 14, 3, 12, '#4a3020');
+      p.rect(29, 14, 3, 12, '#4a3020');
+      p.rect(4, 5, 12, 5, '#e8dcc0');
+      p.line(10, 5, 10, 9, '#b8a080');
+      p.rect(20, 2, 3, 8, '#b8b0a0');
+      p.ellipse(21, 2, 3, 2, '#bfe8ff');
+      p.rect(26, 6, 5, 4, '#8fe3df');
+    }),
+  // Keeping and cleaning: the distiller, the smoking rack, the canning kettle, the ice harvester.
+  distiller: () =>
+    sprite(28, 30, 14, 29, (p) => {
+      p.rect(2, 20, 14, 10, '#6a4a30');
+      p.ellipse(9, 16, 7, 7, '#c8804a');
+      p.ellipse(8, 14, 3, 3, '#e8a878');
+      p.line(14, 10, 24, 6, '#c8804a');
+      p.line(24, 6, 24, 22, '#c8804a');
+      p.rect(20, 22, 8, 8, '#8fb0c0');
+      p.rect(21, 23, 6, 3, '#bfe8ff');
+      p.rect(4, 26, 10, 2, '#ff8a3a');
+    }),
+  smoking_rack: () =>
+    sprite(30, 30, 15, 29, (p) => {
+      p.rect(2, 2, 2, 28, '#6a4a30');
+      p.rect(26, 2, 2, 28, '#6a4a30');
+      p.rect(2, 2, 26, 2, '#8a6440');
+      for (const x of [7, 13, 19]) {
+        p.rect(x, 4, 4, 9, '#9a4a3a');
+        p.rect(x, 4, 4, 2, '#c8784a');
+      }
+      p.rect(6, 24, 18, 4, '#5a5a5e');
+      for (let y = 14; y < 24; y += 3) p.set(13 + (y % 2), y, '#b8b0a0');
+    }),
+  canning_kettle: () =>
+    sprite(26, 24, 13, 23, (p) => {
+      p.ellipse(13, 14, 11, 9, '#5a5e64');
+      p.rect(2, 14, 22, 8, '#5a5e64');
+      p.rect(3, 6, 20, 2, '#8a8e94');
+      p.rect(9, 1, 8, 5, '#3a3e44');
+      p.rect(0, 22, 26, 2, '#3a2a1c');
+      for (const x of [6, 12, 18]) p.rect(x, 16, 3, 4, '#c8a060');
+    }),
+  ice_harvester: () =>
+    sprite(30, 28, 15, 27, (p) => {
+      p.rect(0, 22, 30, 6, '#6a6660');
+      p.rect(4, 2, 3, 20, '#8a6440');
+      p.rect(23, 2, 3, 20, '#8a6440');
+      p.rect(4, 2, 22, 3, '#a8a4a0');
+      p.rect(12, 5, 6, 10, '#c8ccd0');
+      p.rect(13, 15, 4, 2, '#e8ecf0');
+      p.rect(8, 16, 14, 6, '#bfe3ee');
+      p.rect(9, 17, 5, 2, '#ffffff');
+    }),
+  // Exploration: lore tablets, cairns over hidden vaults, and wandering merchants.
+  lore_tablet: () =>
+    sprite(22, 30, 11, 29, (p) => {
+      p.rect(3, 4, 16, 26, '#8b8f8a');
+      p.ellipse(11, 5, 8, 4, '#8b8f8a');
+      p.rect(3, 4, 1, 26, '#a8aca8');
+      for (let y = 9; y < 26; y += 4) p.line(6, y, 16, y, '#5a5e5a');
+      p.rect(8, 6, 6, 2, '#d8b848');
+    }),
+  signpost: () =>
+    sprite(26, 30, 13, 29, (p) => {
+      p.rect(11, 8, 4, 22, '#6a4a2c');
+      p.rect(12, 8, 1, 22, '#8a6440');
+      p.rect(1, 3, 24, 11, '#9a7048');
+      p.rect(1, 3, 24, 1, '#c09060');
+      p.rect(1, 13, 24, 1, '#6a4a2c');
+      for (const y of [6, 9]) p.line(5, y, 20, y, '#5a3c22');
+    }),
+  bramble: () =>
+    sprite(34, 22, 17, 21, (p) => {
+      p.ellipse(17, 15, 16, 7, '#3e5a2c');
+      p.ellipse(11, 11, 8, 6, '#4e6e34');
+      p.ellipse(23, 12, 9, 6, '#4a6a30');
+      for (const [x, y] of [
+        [4, 12],
+        [9, 6],
+        [16, 5],
+        [24, 7],
+        [30, 11],
+        [13, 14],
+        [21, 15],
+      ])
+        p.rect(x, y, 2, 1, '#d8c8a0');
+      for (const [x, y] of [
+        [8, 13],
+        [19, 9],
+        [27, 14],
+      ])
+        p.rect(x, y, 2, 2, '#a02a3a');
+    }),
+  cairn: () =>
+    sprite(20, 16, 10, 15, (p) => {
+      p.ellipse(10, 13, 9, 3, '#7c7a74');
+      p.ellipse(10, 9, 6, 3, '#8b8f8a');
+      p.ellipse(10, 5, 4, 2, '#a8aca8');
+      p.ellipse(10, 2, 2, 2, '#8b8f8a');
+    }),
+  merchant_stall: () =>
+    sprite(40, 40, 20, 39, (p) => {
+      p.rect(2, 8, 36, 4, '#c85a4a');
+      for (let x = 2; x < 38; x += 8) p.rect(x, 8, 4, 4, '#f0e0c0');
+      p.rect(4, 12, 2, 28, '#6a4a30');
+      p.rect(34, 12, 2, 28, '#6a4a30');
+      p.rect(2, 26, 36, 4, '#8a6440');
+      p.rect(8, 22, 4, 4, '#e8577a');
+      p.rect(14, 23, 3, 3, '#8fe3df');
+      p.rect(28, 22, 5, 4, '#d8b848');
+      // The merchant: hooded, a lantern at the belt.
+      p.rect(18, 16, 6, 10, '#5a4a6a');
+      p.rect(19, 13, 4, 4, '#d8a47c');
+      p.rect(18, 12, 6, 2, '#5a4a6a');
+      p.rect(23, 20, 2, 3, '#ffd070');
+    }),
+  // A diving bell on the seabed: air for the Undertow.
+  diving_bell: () =>
+    sprite(34, 40, 17, 39, (p) => {
+      p.ellipse(17, 16, 15, 15, '#8a6a3a');
+      p.rect(2, 16, 30, 20, '#8a6a3a');
+      p.ellipse(17, 16, 12, 12, '#b8883a');
+      p.rect(5, 16, 24, 18, '#b8883a');
+      p.rect(0, 34, 34, 6, '#5a4028');
+      p.rect(10, 12, 14, 12, '#3a5a6a');
+      p.rect(11, 13, 5, 4, '#bfe8ff');
+      for (const x of [4, 29]) for (let y = 18; y < 34; y += 5) p.set(x, y, '#f0c870');
+      p.rect(15, 0, 4, 3, '#5a4028');
+    }),
   // A brass grille over a steam pipe (the Clockwork Barrow's traps).
   steam_vent: () =>
     sprite(30, 6, 15, 5, (p) => {
@@ -562,11 +755,18 @@ function chestSprite(kind: string, open: boolean): Sprite {
     mycelia: ['#4a3f5e', '#58e0d0'],
     skyreach: ['#c8c0b0', '#f8e08a'],
     void: ['#2a1c3a', '#b36cff'],
+    mycelial: ['#4a3f5e', '#58e0d0'],
     glasswood: ['#6a88a8', '#bfe8ff'],
     marches: ['#6a6454', '#e6dcc6'],
     barrow: ['#5a4028', '#f0c870'],
     saltflats: ['#b4a48e', '#f0c0c8'],
     choir: ['#5a6a7a', '#dfeaf6'],
+    feverlands: ['#4a5a2a', '#e6dcc6'],
+    observatory: ['#2a2e50', '#9ab0ff'],
+    gutter: ['#5a4a2a', '#f0c850'],
+    undertow: ['#2a4a5a', '#bfe8ff'],
+    emberheart: ['#3a1a10', '#ff8a3a'],
+    garden: ['#4a6a3a', '#f0a0c0'],
   };
   const [body, metal] = trim[kind] ?? ['#7a5a3c', '#d8b848'];
   return cached(`dchest:${kind}:${open}`, () =>

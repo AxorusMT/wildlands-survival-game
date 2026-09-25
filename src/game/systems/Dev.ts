@@ -272,17 +272,24 @@ export class Dev extends System {
     },
     realm: {
       usage: 'realm <id> [tier] | realm home | realm close',
-      help: 'Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir) at a tier and step in, go home, or collapse it.',
+      help: 'Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden, fractured) at a tier and step in, go home, or collapse it. `realm course` enters or leaves the Training Grounds.',
       run: ([id, tier]) => {
         const pocket = this.game.pocket;
         if (id === 'home') return pocket.leave().ok ? ['Home.'] : ['! No realm is open.'];
+        if (id === 'course') {
+          if (pocket.inCourse())
+            return pocket.finishCourse(false, false).ok ? ['Course left.'] : [];
+          pocket.startCourse();
+          return ['Into the Training Grounds.'];
+        }
         if (id === 'close') {
           pocket.close();
           return ['The realm collapses.'];
         }
         const tpl = REALMS.find((r) => r.id === id);
-        if (!tpl) return ['! Usage: realm <' + REALMS.map((r) => r.id).join('|') + '> [1-5]'];
-        const t = Math.max(1, Math.min(5, Number(tier) || 1)),
+        if (!tpl)
+          return ['! Usage: realm <' + REALMS.map((r) => r.id).join('|') + '|course> [1-5]'];
+        const t = Math.max(1, Math.min(tpl.id === 'fractured' ? 999 : 5, Number(tier) || 1)),
           rec = pocket.record(tpl.id),
           god = this.game.dev.god;
         rec.best = Math.max(rec.best, t - 1);
@@ -331,7 +338,7 @@ export class Dev extends System {
             : cmd === 'summon'
               ? MOBS
               : cmd === 'realm'
-                ? [...REALMS.map((r) => r.id), 'home', 'close']
+                ? [...REALMS.map((r) => r.id), 'home', 'close', 'course']
                 : cmd === 'tp'
                   ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES]
                   : cmd === 'time'

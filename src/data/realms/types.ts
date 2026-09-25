@@ -38,7 +38,23 @@ export interface RealmCtx {
 }
 
 export interface RealmHazard {
-  id: 'tide' | 'ash' | 'cavein' | 'shards' | 'mire' | 'traps' | 'sun' | 'hymn';
+  id:
+    | 'tide'
+    | 'ash'
+    | 'cavein'
+    | 'shards'
+    | 'mire'
+    | 'traps'
+    | 'sun'
+    | 'hymn'
+    | 'fever'
+    | 'stars'
+    | 'curse'
+    | 'pressure'
+    | 'magma'
+    | 'seasons'
+    | 'spores'
+    | 'none';
   name: string;
   /** What it does, for the Atlas and the banner. */
   text: string;
@@ -51,6 +67,8 @@ export interface RealmTemplate {
   name: string;
   /** Difficulty band, I to V. */
   band: number;
+  /** A hand-laid course (the Training Grounds): no scatter, no great foe, only its own set pieces. */
+  course?: boolean;
   note: string;
   /** Open sky, or rock overhead. */
   sky: 'open' | 'cavern';
@@ -81,6 +99,8 @@ export interface RealmTemplate {
   /** Region data for the HUD, temperature, and the journal. */
   biome: Biome;
   build(seed: number): RealmGeometry;
+  /** The region at a local x, when a realm is made of more than one (the Fractured Realms). */
+  biomeAt?(lx: number): Biome;
   /** Anything beyond the common scatter: set pieces, vaults, and landmarks. */
   extra?(geo: RealmGeometry, ctx: RealmCtx): void;
 }

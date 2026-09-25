@@ -86,9 +86,11 @@ export class Armoury extends System {
     return [r ? (r.kind === 'bow' ? 'bow' : 'staff') : 'blade', tier];
   }
   /** First time a weapon comes into the pack: roll its quality. */
+  /** Quality luck from the station a weapon is being made at (set while crafting). */
+  craftLuck = 1;
   acquire(id: string, luck = 1) {
     if (!WEAPONS[id] || id === 'fists' || this.all[id]) return;
-    const q = rollQuality(this.game.rng, luck);
+    const q = rollQuality(this.game.rng, Math.max(luck, this.craftLuck));
     this.all[id] = { q, lvl: 0, gems: [], evo: [] };
     this.game.progress.record('weapon:' + id);
     this.game.progress.record('family:' + this.classOf(id)[0]);
@@ -140,12 +142,22 @@ export class Armoury extends System {
       (melee ? sk.meleeDmg : 0) +
       (heavy ? sk.heavyDmg : 0) +
       (shooter ? sk.rangedDmg + (set === 'gearwright' ? 0.1 : 0) : 0) +
-      (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === 'prismweave' ? 0.1 : 0) : 0) +
+      (magic
+        ? sk.magicDmg +
+          (sk.elementalist ? 0.15 : 0) +
+          (set === 'prismweave' || set === 'astral' ? 0.1 : 0)
+        : 0) +
       mastery * 0.01 +
       (mastery >= 20 ? 0.1 : 0);
     const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
     const damage =
-      base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
+      base[1] *
+      QUALITIES[e.q].mult *
+      (1 + LEVEL_DAMAGE * e.lvl) *
+      (1 + (m.dmg ?? 0)) *
+      lift *
+      // A blunted weapon strikes for half until mended.
+      (this.game.durability.broken(id) ? 0.5 : 1);
     return {
       id,
       family,
@@ -157,6 +169,7 @@ export class Armoury extends System {
         0.05 +
         (m.crit ?? 0) +
         sk.crit +
+        this.game.armourForge.totals().crit +
         (mastery >= 10 ? 0.05 : 0) +
         (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === 'ranger' ? 0.1 : 0),
       count: m.count ?? 0,
@@ -203,7 +216,7 @@ export class Armoury extends System {
     for (const [k, n] of Object.entries(cost)) this.game.remove(k, n);
     return true;
   }
-  private record(id: string) {
+  record(id: string) {
     return (this.all[id] ??= { ...DEFAULT, gems: [], evo: [] });
   }
   /** Whether the weapon waits on a choice of evolution before it can climb further. */
@@ -253,14 +266,23 @@ export class Armoury extends System {
     return { ok: true };
   }
   /** Rerolls quality at the anvil. */
-  reforge(id: string): GameResult {
+  /** Rerolls quality. A fracture shard stands in for the materials and rolls twice, keeping the better. */
+  reforge(id: string, catalyst = false): GameResult {
     const why = this.owned(id) ?? this.atAnvil(id);
     if (why) return { ok: false, reason: why };
     const [, tier] = this.classOf(id),
-      cost = reforgeCost(tier);
-    if (!this.pay(cost)) return { ok: false, reason: 'Reforging needs more materials and marks.' };
+      cost = catalyst ? { fracture_shard: 1 } : reforgeCost(tier);
+    if (!this.pay(cost))
+      return {
+        ok: false,
+        reason: catalyst
+          ? 'You need a fracture shard.'
+          : 'Reforging needs more materials and marks.',
+      };
     const e = this.record(id);
-    e.q = rollQuality(this.game.rng, 1.2);
+    e.q = catalyst
+      ? Math.max(rollQuality(this.game.rng, 1.6), rollQuality(this.game.rng, 1.6), e.q)
+      : rollQuality(this.game.rng, 1.2);
     e.gems = e.gems.slice(0, QUALITIES[e.q].sockets);
     this.game.sound('craft_anvil');
     this.game.say(`Reforged: ${this.title(id)}.`, e.q >= 3 ? 'victory' : 'good');

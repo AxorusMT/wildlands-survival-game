@@ -127,6 +127,16 @@ export const TIERS: WeaponTier[] = [
     color: '#ff6ad5',
     glow: '#ffb0ec',
   },
+  {
+    tier: 12,
+    mat: 'ascended',
+    name: 'Ascended',
+    bar: 'ascended_ingot',
+    station: 'rift_forge',
+    base: 300,
+    color: '#e8d8ff',
+    glow: '#ffffff',
+  },
 ];
 export const tierOf = (t: number) => TIERS[Math.max(0, Math.min(TIERS.length - 1, t - 1))];
 
@@ -228,7 +238,7 @@ export const FAMILIES: WeaponFamily[] = [
     name: 'Bow',
     text: 'Arrows at range; the arrow adds its own damage',
     ranged: 'bow',
-    dmg: 0.55,
+    dmg: 0.62,
     reach: 0,
     pace: 1,
     suffix: 'bow',
@@ -240,7 +250,7 @@ export const FAMILIES: WeaponFamily[] = [
     name: 'Crossbow',
     text: 'Slow to load; its bolts hit hard and pass through',
     ranged: 'bow',
-    dmg: 0.95,
+    dmg: 1.06,
     reach: 0,
     pace: 1,
     suffix: 'crossbow',
@@ -252,7 +262,7 @@ export const FAMILIES: WeaponFamily[] = [
     name: 'Staff',
     text: 'Mana shaped into bolts',
     ranged: 'magic',
-    dmg: 0.62,
+    dmg: 0.66,
     reach: 0,
     pace: 1,
     suffix: 'staff',
@@ -312,6 +322,18 @@ export const SIGNATURE: Record<string, [FamilyId, number]> = {
   saltglass_bow: ['bow', 8],
   choir_stave: ['staff', 9],
   bellhammer: ['warhammer', 9],
+  venom_blade: ['blade', 9],
+  plague_censer: ['tome', 9],
+  astral_tome: ['tome', 10],
+  star_spear: ['spear', 10],
+  gilded_greatblade: ['greatsword', 10],
+  thiefs_whip: ['whip', 9],
+  leviathan_harpoon: ['spear', 11],
+  tidebreaker: ['crossbow', 11],
+  anvil_maul: ['warhammer', 11],
+  heartfire_staff: ['staff', 11],
+  season_bow: ['bow', 11],
+  thornlash: ['whip', 11],
   ruby_staff: ['staff', 3],
   emerald_staff: ['staff', 3],
   sapphire_staff: ['staff', 4],
@@ -474,7 +496,7 @@ export function reforgeCost(tier: number): Record<string, number> {
 }
 /** The station that works a tier's weapons. */
 export const anvilFor = (tier: number) =>
-  tier >= 8 ? 'starforge' : tier >= 4 ? 'forge' : 'workbench';
+  tier >= 12 ? 'rift_forge' : tier >= 8 ? 'starforge' : tier >= 4 ? 'forge' : 'workbench';
 
 // ── Evolutions: a choice at +5 and another at +10 ──────────────────────────────────────────────
 export interface WeaponMods {
@@ -696,6 +718,8 @@ export const UNDEAD = new Set([
   'choir_wraith',
   'cantor',
   'grand_cantor',
+  'drowned_diver',
+  'plague_knight',
 ]);
 
 // ── Gems ────────────────────────────────────────────────────────────────────────────────────

@@ -12,11 +12,23 @@ const wear = (g, set) => {
     g.equipment.wear(`${set}_${piece}`);
   }
 };
-const BAND23 = ['glasswood', 'marches', 'barrow', 'saltflats', 'choir'];
+const BAND23 = [
+  'glasswood',
+  'marches',
+  'barrow',
+  'saltflats',
+  'choir',
+  'feverlands',
+  'observatory',
+  'gutter',
+  'undertow',
+  'emberheart',
+  'garden',
+];
 
 test('every realm is complete: creatures, boss, keys, relic, music, and codex page', () => {
-  assert.equal(D.REALMS.length, 8);
-  for (const tpl of D.REALMS) {
+  assert.equal(D.REALMS.length, 16);
+  for (const tpl of D.WHOLE_REALMS) {
     for (const m of tpl.mobs) assert.ok(D.MOBS[m.type], `${tpl.id} mob ${m.type}`);
     assert.ok(D.MOBS[tpl.boss]?.boss, `${tpl.id} boss`);
     assert.ok(D.MOBS[tpl.elite], `${tpl.id} elite`);
@@ -40,12 +52,29 @@ test('every realm is complete: creatures, boss, keys, relic, music, and codex pa
     // Its set, and its signature weapons, sit in the hierarchy.
     assert.ok(D.ARMOR_SETS.some((s) => s.bonus === tpl.hazard.ward));
   }
-  for (const w of ['prism_wand', 'bonecleaver', 'brass_repeater', 'mirage_blade', 'bellhammer'])
+  for (const w of [
+    'prism_wand',
+    'bonecleaver',
+    'brass_repeater',
+    'mirage_blade',
+    'bellhammer',
+    'venom_blade',
+    'astral_tome',
+    'gilded_greatblade',
+    'leviathan_harpoon',
+    'anvil_maul',
+    'season_bow',
+  ])
     assert.ok(D.SIGNATURE[w] && D.WEAPONS[w] && D.RECIPES.some((r) => r.id === w), w);
   // Band II keys come from Band I spoils; Band III from Band II.
   const cost = (id) => D.RECIPES.find((r) => r.id === id).cost;
   assert.ok(cost('glasswood_fragment').tide_pearl);
   assert.ok(cost('choir_fragment').marrow_ingot);
+  assert.ok(cost('feverlands_fragment').rime_silver);
+  assert.ok(cost('undertow_fragment').plague_ivory);
+  // Bands rise in order.
+  for (const id of ['feverlands', 'observatory', 'gutter']) assert.equal(D.realmById(id).band, 4);
+  for (const id of ['undertow', 'emberheart', 'garden']) assert.equal(D.realmById(id).band, 5);
 });
 
 test('the new realms open, furnish themselves, and their great foes answer', () => {
@@ -217,4 +246,258 @@ test('polish: realm set extras come from the full set, not the relic that shares
   const armour = (g) => g.equipment.worn().armor.reduce((n, id) => n + D.ARMOR[id].defense, 0);
   assert.equal(amber.equipment.defense(), base.equipment.defense() + armour(amber) + 2);
   assert.ok(ash.equipment.speedBonus() > base.equipment.speedBonus() + 0.09);
+});
+
+test('Feverlands bites carry sickness, and the fever-dream scrambles the record', () => {
+  const g = fresh();
+  g.command('realm feverlands 1');
+  let caught = 0;
+  for (let i = 0; i < 60; i++) {
+    g.s.ailments = [];
+    g.pocket.feverBite();
+    caught += g.s.ailments.length;
+  }
+  assert.ok(caught > 5 && caught < 40, `${caught} of 60`);
+  g.s.ailments = [{ id: 'fever_dream', stage: 2, next: 9999, since: 0 }];
+  assert.ok(g.pocket.dreaming());
+  wear(g, 'plaguedoctor');
+  assert.equal(g.pocket.dreaming(), false);
+  g.s.ailments = [];
+  for (let i = 0; i < 40; i++) g.pocket.feverBite();
+  assert.equal(g.s.ailments.length, 0, 'the plague doctor is untouched');
+});
+
+test('the Observatory is light, and its star pulses gather, then fall', () => {
+  const g = fresh();
+  g.command('realm observatory 1');
+  assert.ok(g.pocket.gravityScale() < 1);
+  g.s.player.y = g.groundTopAt(g.s.player.x) + 1;
+  const seed = g.s.pocket.seed;
+  while (D.starPulse(g.s.elapsed, seed) <= 0 || g.s.elapsed < 30) g.s.elapsed += 1;
+  g.pocket.update(0.1);
+  assert.equal(g.pocket.pendingCaveIn()?.kind, 'star');
+  g.s.elapsed += 3;
+  g.pocket.update(0.1);
+  assert.ok(g.combat.projectiles.some((b) => b.kind === 'star_pulse' && b.damage > 0));
+});
+
+test('cursed gold sickens hoarders in the Gutter; the gilded are safe', () => {
+  const g = fresh();
+  g.command('realm gutter 1');
+  assert.ok(g.s.structures.filter((st) => st.type === 'dungeon_chest' && inside(st)).length >= 8);
+  g.pocket.update(0.1);
+  for (let i = 0; i < 80 && !g.ailments.has('gold_sickness'); i++) {
+    g.add('coin', 10);
+    g.pocket.update(0.1);
+  }
+  assert.ok(g.ailments.has('gold_sickness'));
+  const w = fresh();
+  w.command('realm gutter 1');
+  wear(w, 'gilded');
+  w.pocket.update(0.1);
+  for (let i = 0; i < 80; i++) {
+    w.add('coin', 10);
+    w.pocket.update(0.1);
+  }
+  assert.equal(w.ailments.has('gold_sickness'), false);
+});
+
+test('in the Undertow you swim, your breath runs out, and diving bells restore it', () => {
+  const g = fresh();
+  g.command('realm undertow 1');
+  const p = g.s.player;
+  p.invuln = 0;
+  assert.ok(g.pocket.submerged());
+  assert.ok(g.s.structures.some((st) => st.type === 'diving_bell' && inside(st)));
+  p.x += 400;
+  p.y = g.groundTopAt(p.x);
+  for (const st of g.s.structures) if (st.type === 'diving_bell') st.x = 0;
+  g.pocket.update(10);
+  assert.ok(g.pocket.air()[0] < 31);
+  const hp = g.s.vitals.health;
+  g.pocket.update(40);
+  assert.ok(g.s.vitals.health < hp, 'drowning');
+  const bell = g.s.structures.find((st) => st.type === 'diving_bell');
+  bell.x = p.x;
+  bell.y = p.y;
+  g.pocket.update(5);
+  assert.ok(g.pocket.air()[0] > 30);
+  wear(g, 'leviathan');
+  assert.equal(g.pocket.air(), null);
+  assert.equal(g.pocket.submerged(), false);
+});
+
+test('Emberheart magma rises through the low ledge and burns', () => {
+  const g = fresh();
+  g.command('realm emberheart 1');
+  const geo = D.activeRealm().geo;
+  assert.equal(D.magmaLevel(geo, 10), geo.low);
+  assert.ok(Math.abs(D.magmaLevel(geo, 90) - geo.high) < 1);
+  g.s.elapsed = Math.ceil(g.s.elapsed / 120) * 120 + 90;
+  const p = g.s.player;
+  p.y = geo.high + 200;
+  assert.ok(g.pocket.inMagma());
+  const hp = g.s.vitals.health;
+  g.pocket.update(1);
+  assert.ok(g.s.vitals.health < hp - 5);
+  wear(g, 'forgeborn');
+  const hp2 = g.s.vitals.health;
+  g.pocket.update(1);
+  assert.equal(g.s.vitals.health, hp2);
+});
+
+test('the Garden turns through four seasons that change the air', () => {
+  const g = fresh();
+  g.command('realm garden 1');
+  const seed = g.s.pocket.seed;
+  const seen = new Map();
+  for (let t = 0; t < D.SEASON_SECONDS * 4; t += 30) {
+    g.s.elapsed = t;
+    seen.set(D.seasonAt(t, seed).id, g.temperature());
+  }
+  assert.equal(seen.size, 4);
+  assert.ok(seen.get('summer') > seen.get('winter') + 40);
+});
+
+test('the Fractured Realms splice two realms, borrow a hazard, and never run out of tiers', () => {
+  const a = D.fracture(424242),
+    b = D.fracture(424242);
+  assert.equal(a, b, 'the same seed, the same splice');
+  assert.match(a.name, /Fractured .* · /);
+  assert.ok(D.WHOLE_REALMS.some((r) => r.boss === a.boss));
+  const geo = a.build(424242);
+  const mid = D.RW / 2;
+  assert.equal(geo.tile(mid, geo.floors[0](mid) - 40), 0, 'the seam is open');
+  assert.ok(geo.ladders.some((l) => Math.abs(l.x - mid) < 1));
+  assert.equal(D.tierName(14), 'XIV');
+  assert.ok(D.rollMods(40, () => 0.5).length <= 6);
+  const g = fresh();
+  g.pocket.record('fractured').best = 11;
+  assert.equal(g.pocket.maxTier('fractured'), 12);
+  assert.equal(g.pocket.maxTier('orchard'), 1);
+  g.command('realm fractured 12');
+  assert.equal(g.s.pocket.realm, 'fractured');
+  assert.equal(g.s.pocket.tier, 12);
+  assert.ok(g.s.animals.filter(inside).length > 20);
+  const altar = g.s.structures.find((st) => st.type === 'boss_altar' && inside(st));
+  assert.equal(altar.kind, D.templateOf(g.s.pocket).boss);
+  g.s.player.x = altar.x - 200;
+  g.s.player.y = altar.y;
+  assert.ok(g.bosses.summon(altar).ok);
+  const boss = g.bosses.active();
+  assert.ok(boss.maxHp > D.MOBS[boss.type].hp * D.TIER_SCALE.hp(12) * 1.4, 'empowered');
+});
+
+test('tier twelve is forged from fracture shards, and a shard reforges well', () => {
+  assert.equal(D.TIERS.at(-1).mat, 'ascended');
+  assert.ok(D.WEAPONS.ascended_sword && D.RECIPES.some((r) => r.id === 'ascended_sword'));
+  assert.ok(D.RECIPES.find((r) => r.id === 'ascended_ingot').cost.fracture_shard);
+  assert.ok(D.RECIPES.find((r) => r.id === 'fractured_key').cost.fracture_shard);
+  assert.ok(D.MOBS.the_leviathan.loot.some(([id]) => id === 'fracture_shard'));
+  const g = fresh();
+  g.command('god');
+  g.add('iron_sword');
+  g.add('fracture_shard', 3);
+  const before = g.s.armoury.iron_sword.q;
+  g.dev.god = false;
+  g.add('workbench');
+  const x = g.s.player.x + 40;
+  g.place('workbench', x, g.groundTopAt(x));
+  assert.ok(g.armoury.reforge('iron_sword', true).ok);
+  assert.equal(g.count('fracture_shard'), 2);
+  assert.ok(g.s.armoury.iron_sword.q >= before);
+});
+
+test('the Mycelial Deep in template form: the Rift Gate Deep is its seed 0', () => {
+  const zero = D.myceliaGeometry(0);
+  for (let x = 100; x < D.DIM_WIDTH - 100; x += 173)
+    for (let y = 500; y < 3000; y += 97)
+      assert.equal(zero.tile(x, y), D.dimensionTile('mycelia', x, y));
+  const tpl = D.realmById('mycelial');
+  assert.equal(tpl.boss, 'sporemother');
+  const g = fresh();
+  g.command('realm mycelial 1');
+  const seed = g.s.pocket.seed;
+  while (D.sporeBloom(g.s.elapsed, seed) < 1) g.s.elapsed += 1;
+  assert.ok(g.pocket.sporeLevel() > 0.9);
+  g.s.vitals.stamina = 100;
+  g.pocket.update(2);
+  assert.ok(g.s.vitals.stamina < 100, 'spores sting');
+  g.add('respirator');
+  g.equipment.wear('respirator');
+  g.s.vitals.stamina = 100;
+  g.pocket.update(2);
+  assert.equal(g.s.vitals.stamina, 100, 'the respirator keeps them out');
+});
+
+test('realms hold lore tablets, a hidden vault under a cairn, and sometimes a merchant', () => {
+  let merchant = null;
+  for (let seed = 1; seed < 12 && !merchant; seed++) {
+    const g = new Game(seed);
+    g.command('realm orchard 1');
+    const tablet = g.s.structures.find((st) => st.type === 'lore_tablet' && inside(st));
+    assert.ok(tablet, 'a tablet');
+    g.s.player.x = tablet.x;
+    g.s.player.y = tablet.y;
+    assert.ok(g.interact().ok);
+    assert.ok(Object.keys(g.s.tutorial.tally).some((k) => k.startsWith('lore:')));
+    const cairn = g.s.structures.find((st) => st.type === 'cairn' && inside(st));
+    if (cairn) {
+      const chests = g.s.structures.filter(
+        (st) => st.type === 'dungeon_chest' && inside(st) && st.y > cairn.y + 100,
+      );
+      assert.ok(chests.length >= 1, 'a vault chest below the cairn');
+    }
+    const stall = g.s.structures.find((st) => st.type === 'merchant_stall' && inside(st));
+    if (stall) {
+      merchant = stall;
+      const item = stall.larder[0].id;
+      g.add('coin', 5000);
+      const coins = g.count('coin');
+      assert.ok(g.pocket.buy(stall, item).ok);
+      assert.ok(g.count(item) >= 1);
+      assert.ok(g.count('coin') < coins);
+    }
+  }
+  assert.ok(merchant, 'merchants turn up');
+});
+
+test('Toxic air burns without a respirator; Silent realms carry every sound', () => {
+  const g = fresh();
+  g.command('realm orchard 1');
+  g.s.pocket.mods = ['toxic_air', 'silent'];
+  const hp = g.s.vitals.health;
+  g.pocket.update(5);
+  assert.ok(g.s.vitals.health < hp);
+  const crab = g.s.animals.find((a) => inside(a));
+  assert.equal(g.pocket.sightScale(crab), 1.5);
+});
+
+test('creatures fight in new ways: split, swarm, kite, burrow, tether, mirror', () => {
+  assert.equal(D.MOBS.glassling.behave, 'split');
+  assert.equal(D.MOBS.fever_mosquito.behave, 'swarm');
+  assert.equal(D.MOBS.bog_shaman.behave, 'kite');
+  assert.equal(D.MOBS.ivory_beetle.behave, 'burrow');
+  assert.equal(D.MOBS.abyss_angler.behave, 'tether');
+  assert.equal(D.MOBS.glass_golem.behave, 'mirror');
+  const g = fresh();
+  g.command('realm glasswood 1');
+  const slime = g.s.animals.find((a) => a.type === 'glassling' && inside(a));
+  const n = g.s.animals.length;
+  g.wildlife.kill(slime);
+  const halves = g.s.animals.slice(n).filter((a) => a.type === 'glassling');
+  assert.equal(halves.length, 2);
+  assert.ok(halves.every((h) => h.split && h.maxHp < slime.maxHp));
+  const before = g.s.animals.length;
+  g.wildlife.kill(halves[0]);
+  assert.equal(g.s.animals.length, before, 'halves do not split again');
+  // A tether reels you in.
+  const t = fresh();
+  t.command('realm undertow 1');
+  const angler = t.s.animals.find((a) => a.type === 'abyss_angler' && inside(a));
+  t.s.player.x = angler.x - 200;
+  t.s.player.y = angler.y;
+  const px = t.s.player.x;
+  t.wildlife.step(angler, 0.5);
+  assert.ok(t.s.player.x > px);
 });

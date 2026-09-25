@@ -11,6 +11,20 @@ export interface RealmMod {
 }
 export const MODS: RealmMod[] = [
   { id: 'bountiful', name: 'Bountiful', text: 'More to gather', kind: 'boon', loot: 0.1 },
+  {
+    id: 'toxic_air',
+    name: 'Toxic air',
+    text: 'The air burns the lungs: stamina and health drain without a respirator',
+    kind: 'bane',
+    loot: 0.3,
+  },
+  {
+    id: 'silent',
+    name: 'Silent',
+    text: 'No music plays, and monsters hear you from half again as far',
+    kind: 'bane',
+    loot: 0.2,
+  },
   { id: 'rich_veins', name: 'Rich veins', text: 'Ore lies thick', kind: 'boon', loot: 0.15 },
   { id: 'treasure', name: 'Treasure trove', text: 'Extra chests', kind: 'boon', loot: 0.15 },
   { id: 'lucky', name: 'Lucky', text: 'Loot +50%', kind: 'boon', loot: 0.5 },
@@ -71,7 +85,7 @@ export function rollMods(tier: number, rng: () => number): string[] {
   const pool = [...MODS],
     out: string[] = [];
   const clash: Record<string, string> = { frostbound: 'scorched', scorched: 'frostbound' };
-  while (out.length < Math.max(0, tier - 1) && pool.length) {
+  while (out.length < Math.min(6, Math.max(0, tier - 1)) && pool.length) {
     const m = pool.splice(Math.floor(rng() * pool.length), 1)[0];
     if (clash[m.id] && out.includes(clash[m.id])) continue;
     out.push(m.id);
@@ -87,3 +101,24 @@ export const TIER_SCALE = {
 };
 export const MAX_TIER = 5;
 export const TIER_NAMES = ['', 'I', 'II', 'III', 'IV', 'V'];
+/** A tier as a Roman numeral, however high it climbs (the Fractured Realms never end). */
+export function tierName(n: number) {
+  const R: [number, string][] = [
+    [1000, 'M'],
+    [900, 'CM'],
+    [500, 'D'],
+    [400, 'CD'],
+    [100, 'C'],
+    [90, 'XC'],
+    [50, 'L'],
+    [40, 'XL'],
+    [10, 'X'],
+    [9, 'IX'],
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ];
+  let out = '';
+  for (const [v, s] of R) while (n >= v) ((out += s), (n -= v));
+  return out;
+}

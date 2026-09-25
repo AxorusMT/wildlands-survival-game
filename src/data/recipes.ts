@@ -210,6 +210,8 @@ export const RECIPES: Recipe[] = (
     ['warren_key', { warren_fragment: 3 }, 'waystone', 3],
     // Band II keys are made from Band I spoils; Band III keys from Band II.
     ['glasswood_fragment', { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, 'workbench', 5],
+    ['mycelial_fragment', { glowcap: 6, prism_glass: 2, marrow_ingot: 1 }, 'forge', 7],
+    ['mycelial_key', { mycelial_fragment: 3 }, 'waystone', 7],
     ['marches_fragment', { bone: 10, kiln_ingot: 2, crab_shell: 3 }, 'workbench', 5],
     ['barrow_fragment', { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, 'forge', 7],
     ['saltflats_fragment', { salt: 10, prism_glass: 3, marrow_ingot: 2 }, 'forge', 7],
@@ -219,6 +221,19 @@ export const RECIPES: Recipe[] = (
     ['barrow_key', { barrow_fragment: 3 }, 'waystone', 7],
     ['saltflats_key', { saltflats_fragment: 3 }, 'waystone', 7],
     ['choir_key', { choir_fragment: 3 }, 'waystone', 7],
+    // Band IV keys from Band III spoils; Band V from Band IV.
+    ['feverlands_fragment', { brass_ingot: 2, saltglass: 3, rime_silver: 2 }, 'starforge', 9],
+    ['observatory_fragment', { rime_silver: 3, prism_glass: 4, brass_ingot: 2 }, 'starforge', 9],
+    ['gutter_fragment', { gold_ingot: 6, brass_ingot: 2, saltglass: 2 }, 'starforge', 9],
+    ['undertow_fragment', { plague_ivory: 3, astral_lens: 2, crown_gold: 2 }, 'starforge', 10],
+    ['emberheart_fragment', { crown_gold: 3, astral_lens: 2, hellstone_ingot: 4 }, 'starforge', 10],
+    ['garden_fragment', { plague_ivory: 3, fever_bloom: 4, astral_lens: 2 }, 'starforge', 10],
+    ['feverlands_key', { feverlands_fragment: 3 }, 'waystone', 9],
+    ['observatory_key', { observatory_fragment: 3 }, 'waystone', 9],
+    ['gutter_key', { gutter_fragment: 3 }, 'waystone', 9],
+    ['undertow_key', { undertow_fragment: 3 }, 'waystone', 10],
+    ['emberheart_key', { emberheart_fragment: 3 }, 'waystone', 10],
+    ['garden_key', { garden_fragment: 3 }, 'waystone', 10],
     // The Drowned Orchard.
     ['tidecaller_spear', { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, 'workbench', 4],
     ['brine_wand', { brinewood: 6, tide_pearl: 4, crystal: 2 }, 'workbench', 4],
@@ -251,6 +266,82 @@ export const RECIPES: Recipe[] = (
     ['rime_silver', { rime_silver_ore: 3, coal: 1 }, 'furnace', 7],
     ['choir_stave', { rime_silver: 10, frost_lily: 4, crystal: 4 }, 'starforge', 9],
     ['bellhammer', { rime_silver: 12, bell_bronze: 4, wood: 3 }, 'starforge', 9],
+    ['respirator', { iron_ingot: 4, reeds: 6, crystal: 2, hide: 2 }, 'workbench', 5],
+    // Clothing, in three layers.
+    ['linen_underlayer', { fiber: 8 }, 'workbench', 1],
+    ['wool_underlayer', { hide: 3, fiber: 4 }, 'workbench', 2],
+    ['silk_underlayer', { silk: 6 }, 'workbench', 3],
+    ['hide_vest', { hide: 5, fiber: 2 }, 'workbench', 1],
+    ['fur_jerkin', { hide: 8, fiber: 4 }, 'workbench', 2],
+    ['linen_shirt', { fiber: 10 }, 'workbench', 1],
+    ['oilskin_coat', { fiber: 8, resin: 4 }, 'workbench', 2],
+    ['fur_cloak', { hide: 12, fiber: 4 }, 'workbench', 3],
+    ['desert_robe', { fiber: 12, silk: 2 }, 'workbench', 2],
+    ['rime_parka', { hide: 10, frost_shard: 4, silk: 4 }, 'workbench', 6],
+    ['ember_mantle', { cinderflax: 10, ashcloth: 4 }, 'workbench', 4],
+    // Water: skins and flasks, tablets, and the distiller.
+    ['waterskin', { hide: 3, fiber: 2 }, null, 1],
+    ['insulated_flask', { copper_ingot: 3, hide: 2 }, 'workbench', 2],
+    ['rime_flask', { rime_silver: 3, frost_shard: 2 }, 'forge', 7],
+    ['purification_tablet', { salt: 2, crystal: 1, herb: 1 }, 'apothecary', 3, 3],
+    ['distiller', { copper_ingot: 4, glass: 2, clay: 4 }, 'workbench', 3],
+    ['fish_oil', { raw_fish: 3, boiled_water: 1 }, 'apothecary', 3, 2],
+    // Preserving: smoke, cans, and ice.
+    ['smoking_rack', { wood: 10, stone: 6, fiber: 4 }, 'workbench', 1],
+    ['smoked_fish', { raw_fish: 2, wood: 1 }, 'smoking_rack', 1],
+    ['canning_kettle', { iron_ingot: 6, copper_ingot: 4, clay: 4 }, 'workbench', 3],
+    [
+      'canned_stew',
+      { potato: 2, raw_meat: 1, copper_ingot: 1, boiled_water: 1 },
+      'canning_kettle',
+      3,
+      2,
+    ],
+    ['canned_fruit', { berry: 4, honey: 1, copper_ingot: 1 }, 'canning_kettle', 3, 2],
+    ['ice_harvester', { iron_ingot: 4, wood: 10, stone: 10 }, 'workbench', 3],
+    ['cold_box', { wood: 10, hide: 2, clay: 4 }, 'workbench', 2],
+    // Station upgrades: each does the work of those below, and more.
+    ['tinkers_bench', { wood: 20, iron_ingot: 6, copper_ingot: 4 }, 'workbench', 3],
+    ['artisan_bench', { wood: 20, gold_ingot: 6, crystal: 4, silk: 4 }, 'tinkers_bench', 6],
+    ['rift_forge', { voidsteel_ingot: 8, void_essence: 4, obsidian: 12 }, 'starforge', 10],
+    ['laboratory', { glass: 10, crystal: 4, gold_ingot: 4 }, 'apothecary', 6],
+    ['hearth', { stone: 30, clay: 10, wood: 6 }, 'workbench', 2],
+    ['research_desk', { wood: 16, glass: 4, crystal: 2 }, 'workbench', 3],
+    ['repair_kit', { iron_ingot: 2, fiber: 4, resin: 2 }, 'tinkers_bench', 3],
+    ['whetstone', { crystal: 3, gold_ingot: 2, sapphire: 1 }, 'artisan_bench', 6],
+    ['panacea', { fever_bloom: 2, lumen_moss: 2, fish_oil: 1 }, 'laboratory', 8],
+    // Packs: more room, and the carrying goes easier.
+    ['satchel', { hide: 4, fiber: 6 }, 'workbench', 1],
+    ['pack', { hide: 8, silk: 4, iron_ingot: 2 }, 'tinkers_bench', 3],
+    ['expedition_frame', { hide: 10, steel_ingot: 4, silk: 8 }, 'artisan_bench', 6],
+    // The Fractured Realms: shards open them, and forge the twelfth tier.
+    ['fractured_key', { fracture_shard: 4 }, 'waystone', 11],
+    [
+      'ascended_ingot',
+      { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 },
+      'rift_forge',
+      12,
+    ],
+    // The Feverlands.
+    ['venom_blade', { plague_ivory: 10, venom: 6, gold_ingot: 2 }, 'starforge', 9],
+    ['plague_censer', { plague_ivory: 8, fever_bloom: 6, silk: 4 }, 'starforge', 9],
+    ['fever_tonic', { fever_bloom: 3, boiled_water: 1 }, 'apothecary', 8],
+    // The Sunken Observatory.
+    ['astral_tome', { astral_lens: 10, silk: 6, fallen_star: 3 }, 'starforge', 10],
+    ['star_spear', { astral_lens: 8, starmetal_ingot: 4, wood: 3 }, 'starforge', 10],
+    // The Gutter of Kings.
+    ['gilded_greatblade', { crown_gold: 14, gold_ingot: 4, hide: 2 }, 'starforge', 10],
+    ['thiefs_whip', { crown_gold: 8, silk: 6, hide: 2 }, 'starforge', 9],
+    ['purging_salts', { salt: 4, herb: 2, crystal: 1 }, 'apothecary', 8],
+    // The Undertow.
+    ['leviathan_harpoon', { abyssal_pearl: 12, voidsteel_ingot: 3, wood: 3 }, 'starforge', 11],
+    ['tidebreaker', { abyssal_pearl: 12, voidsteel_ingot: 3, silk: 4 }, 'starforge', 11],
+    // Emberheart.
+    ['anvil_maul', { heartstone: 14, voidsteel_ingot: 3, wood: 3 }, 'starforge', 11],
+    ['heartfire_staff', { heartstone: 10, ruby: 3, crystal: 4 }, 'starforge', 11],
+    // The Garden of Lost Seasons.
+    ['season_bow', { seasonbloom: 10, wood: 6, silk: 4 }, 'starforge', 11],
+    ['thornlash', { seasonbloom: 12, hide: 3, silk: 3 }, 'starforge', 11],
     // ── Armour ──
     ...ARMOR_RECIPES,
     // ── The weapon hierarchy, and infusions ──

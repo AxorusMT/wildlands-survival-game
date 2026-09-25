@@ -45,8 +45,19 @@ export class Ailments extends System {
     if (source && sk.ironGut >= 1) return false;
     if (source === 'spoiled' && sk.ironGut > 0) return false;
     if (id === 'frostbite' && sk.coldBlooded) return false;
+    // Infused armour keeps some harms from taking hold.
+    const inf = this.game.armourForge.totals().infusions;
+    if (
+      (id === 'burn' && inf.has('fire')) ||
+      (id === 'poisoning' && inf.has('venom')) ||
+      (id === 'void_rot' && inf.has('void'))
+    )
+      return false;
     // Hale bodies and a wayfarer's kit sometimes shrug a sickness off.
-    const resist = sk.disease + (this.game.equipment.has('wayfarer') ? 0.2 : 0);
+    const resist =
+      sk.disease +
+      (this.game.equipment.has('wayfarer') ? 0.2 : 0) +
+      (this.game.equipment.fullSet() === 'plaguedoctor' ? 0.15 : 0);
     if (!now && def.kind !== 'injury' && this.game.rng() < Math.min(0.7, resist)) return false;
     // An iron gut shrugs off half of what it eats and drinks.
     if (
@@ -219,6 +230,7 @@ export class Ailments extends System {
     if (id === 'hypothermia') return v.bodyTemp > 36.2;
     if (id === 'heatstroke') return v.bodyTemp < 38.2;
     if (id === 'scurvy') return v.vitamins > 45;
+    if (id === 'rickets') return this.game.survival.sunlit();
     return false;
   }
   /** Cold, heat, wet cold, and a diet without greens bring on ailments of their own. */
@@ -231,10 +243,13 @@ export class Ailments extends System {
           this.contract(id, id !== 'pneumonia');
         }
       };
-    hold('cold', v.bodyTemp < 34.6, 60, 'hypothermia');
-    hold('freeze', v.bodyTemp < 33.4, 45, 'frostbite');
+    hold('cold', v.bodyTemp < 34.6, 90, 'hypothermia');
+    // Frostbite needs freezing air, not just a chilled body.
+    hold('freeze', v.bodyTemp < 33.4 && this.game.temperature() < 0, 45, 'frostbite');
     hold('heat', v.bodyTemp > 39.2, 60, 'heatstroke');
-    hold('wetcold', v.wetness > 60 && v.bodyTemp < 35.8, 120, 'pneumonia');
+    hold('wetcold', v.wetness > 60 && v.bodyTemp < 35.5, 300, 'pneumonia');
     hold('greens', v.vitamins < 10, 240, 'scurvy');
+    // Twenty minutes without sunlight bends the bones.
+    hold('dark', !this.game.survival.sunlit(), 1200, 'rickets');
   }
 }

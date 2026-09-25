@@ -65,6 +65,13 @@ function start() {
 }
 function switchTo(id: string, now: number) {
   if (!player) return;
+  // A Silent realm: the music fades away entirely.
+  if (id === 'silence') {
+    deck?.stop(now, 2.5);
+    deck = undefined;
+    current = id;
+    return;
+  }
   const quick = id === 'boss' || id === 'fallen';
   deck?.stop(now, quick ? 0.8 : 2.5);
   deck = player.play(TRACKS[id] ?? TRACKS.meadow, now + 0.08, current ? (quick ? 0.25 : 1.5) : 0);

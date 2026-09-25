@@ -205,6 +205,10 @@ export interface Animal extends Point {
   hunter?: boolean;
   /** Split from a slain monster in an Echoing realm; does not split again or return. */
   echo?: boolean;
+  /** Burrowed out of sight (and out of reach) for the moment. */
+  hidden?: boolean;
+  /** Already split once (a split creature's halves do not split again). */
+  split?: boolean;
   hitAt?: number;
   howlAt?: number;
   howlCue?: number;
@@ -247,6 +251,8 @@ export interface Player extends Point {
   invuln: number;
   /** Worn armour, by slot: item ids. */
   armor?: { head?: string; body?: string; legs?: string };
+  /** Clothing worn in three layers, apart from armour. */
+  clothing?: { under?: string; mid?: string; outer?: string };
   /** When the held item was last used, for its animation. */
   usedAt?: number;
   /** Aim angle from level toward the cursor, up negative (radians). */
@@ -300,7 +306,8 @@ export interface GameState {
   tileEdits: Record<number, number>;
   drops: Drop[];
   effects: unknown[];
-  tutorial: { step: number; tally: Record<string, number> };
+  /** Field lessons: the overworld step, every tally, and the Training Grounds lesson (if on the course). */
+  tutorial: { step: number; tally: Record<string, number>; course?: number };
   chapter: number;
   discoveries: string[];
   altar: Altar;
@@ -325,7 +332,22 @@ export interface GameState {
   /** Each settler's home, by settler id: the seat of their room. */
   town: { homes: Record<string, { x: number; y: number }> };
   /** Lasting progress: renown earned, skills learned, and damage dealt with each weapon family. */
-  meta?: { renown: number; skills: string[]; mastery: Record<string, number> };
+  /** Armour's levels, gems, and infusions. */
+  armourMods?: Record<string, { lvl: number; gems: string[]; inf?: string }>;
+  /** How worn each weapon, tool, and garment is (0 to 100). */
+  wear?: Record<string, number>;
+  /** Seconds of light left in the miner's lamp. */
+  lampFuel?: number;
+  /** The kinds of food in the last few meals. */
+  diet?: string[];
+  meta?: {
+    renown: number;
+    skills: string[];
+    mastery: Record<string, number>;
+    /** Feats earned, and the one whose title is worn. */
+    feats?: string[];
+    title?: string;
+  };
   /** Every weapon kind owned: its quality, level, infusion, gems, and evolutions. */
   armoury?: Record<string, { q: number; lvl: number; inf?: string; gems: string[]; evo: string[] }>;
   /** The generated realm open in the pocket strip, if any. */
