@@ -82,6 +82,8 @@
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
     LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    LOADOUTS: () => LOADOUTS,
+    LOADOUT_ALIASES: () => LOADOUT_ALIASES,
     LORE: () => LORE,
     MASTERY_PERKS: () => MASTERY_PERKS,
     MASTERY_TITLES: () => MASTERY_TITLES,
@@ -11097,6 +11099,89 @@
     ["life_crystal", 400]
   ];
 
+  // src/data/loadouts.ts
+  var LOADOUTS = {
+    early: {
+      tier: 3,
+      q: 1,
+      lvl: 2,
+      gems: [],
+      armourLvl: 0,
+      accessories: ["cloud_jar"],
+      health: 160,
+      mana: 60,
+      supplies: [
+        ["healing_draught", 8],
+        ["bandage", 5],
+        ["torch", 20]
+      ],
+      note: "Iron-age kit for the first dungeons."
+    },
+    mid: {
+      tier: 6,
+      q: 2,
+      lvl: 5,
+      inf: "fire",
+      gems: ["ruby"],
+      armourLvl: 2,
+      accessories: ["cloud_jar", "magma_stone", "band_of_vigor"],
+      health: 220,
+      mana: 100,
+      supplies: [
+        ["healing_draught", 15],
+        ["mana_draught", 5],
+        ["bandage", 5]
+      ],
+      note: "Band I\u2013II realms and hell."
+    },
+    late: {
+      tier: 9,
+      q: 3,
+      lvl: 8,
+      inf: "holy",
+      gems: ["ruby", "emerald"],
+      armourLvl: 4,
+      accessories: ["demon_wings", "wind_boots", "band_of_vigor"],
+      health: 300,
+      mana: 160,
+      supplies: [
+        ["greater_healing", 15],
+        ["mana_draught", 10],
+        ["ironskin_potion", 3]
+      ],
+      note: "Band III\u2013IV realms."
+    },
+    endgame: {
+      tier: 12,
+      q: 4,
+      lvl: 10,
+      // The Unmaker and its shades are weak to holy light and shrug off void.
+      inf: "holy",
+      gems: ["ruby", "emerald", "onyx"],
+      armourLvl: 5,
+      armourInf: "void",
+      accessories: ["demon_wings", "wind_boots", "band_of_vigor"],
+      health: 400,
+      mana: 200,
+      supplies: [
+        ["greater_healing", 30],
+        ["mana_draught", 15],
+        ["ironskin_potion", 5],
+        ["regeneration_potion", 5],
+        ["wrath_potion", 5],
+        ["swiftness_potion", 5],
+        ["void_seal", 1]
+      ],
+      note: "Tier XII, Mythic +10, holy-infused: ready for the Unmaker."
+    }
+  };
+  var LOADOUT_ALIASES = {
+    unmaker: "endgame",
+    final: "endgame",
+    start: "early",
+    hell: "mid"
+  };
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -14067,6 +14152,11 @@
           ];
         }
       },
+      gear: {
+        usage: "gear <early|mid|late|endgame>",
+        help: "Equip a ready-made kit for a stage of the journey (endgame: ready for the Unmaker).",
+        run: ([name]) => this.gear((name ?? "").toLowerCase())
+      },
       give: {
         usage: "give <item> [qty]",
         help: "Put items straight into the pack.",
@@ -14284,11 +14374,70 @@
       if (!cmd) return [`! Unknown command "${name}". Type help.`];
       return cmd.run(args);
     }
+    /**
+     * Equips a kit: the strongest armour set of its tier (upgraded and infused), a greatsword,
+     * bow and staff of its tier (quality, level, infusion and gems set), accessories, health and
+     * mana, and supplies on the quick slots.
+     */
+    gear(name) {
+      const key = LOADOUT_ALIASES[name] ?? name, kit2 = LOADOUTS[key];
+      if (!kit2) return [`! Usage: gear <${Object.keys(LOADOUTS).join("|")}>`];
+      const g = this.game, s = g.s, p = s.player;
+      const set = ARMOR_SETS.filter((st) => st.tier <= kit2.tier).map((st) => ({ st, pieces: Object.keys(ARMOR).filter((id) => ARMOR[id].set === st.key) })).filter((x) => x.pieces.length === 3).sort(
+        (a, b) => b.st.defense.reduce((n, d) => n + d, 0) - a.st.defense.reduce((n, d) => n + d, 0)
+      )[0];
+      p.armor = {};
+      s.armourMods ??= {};
+      for (const id of set?.pieces ?? []) {
+        if (!g.count(id)) g.add(id);
+        g.equipment.wear(id);
+        s.armourMods[id] = {
+          lvl: kit2.armourLvl,
+          gems: [],
+          ...kit2.armourInf ? { inf: kit2.armourInf } : {}
+        };
+      }
+      const weapons = ["greatsword", "bow", "staff"].map(
+        (family) => GRID.find((w) => w.family === family && w.tier === kit2.tier).id
+      );
+      s.armoury ??= {};
+      for (const id of weapons) {
+        if (!g.count(id)) g.add(id);
+        s.armoury[id] = {
+          q: kit2.q,
+          lvl: kit2.lvl,
+          gems: kit2.gems.slice(0, QUALITIES[kit2.q].sockets),
+          evo: [],
+          ...kit2.inf ? { inf: kit2.inf } : {}
+        };
+      }
+      s.accessories = [];
+      for (const id of kit2.accessories) {
+        if (!g.count(id)) g.add(id);
+        g.equipment.wear(id);
+      }
+      s.maxHealth = Math.max(CRYSTALS.baseHealth, kit2.health);
+      s.maxMana = kit2.mana;
+      s.mana = kit2.mana;
+      Object.assign(s.vitals, { health: s.maxHealth, hydration: 100, calories: 100, stamina: 100 });
+      for (const [id, qty] of kit2.supplies) g.add(id, Math.max(0, qty - g.count(id)));
+      const heal = kit2.supplies.find(([id]) => id.includes("heal"))?.[0];
+      [...weapons, heal].forEach((id, i) => id && g.equipment.assign(i, id));
+      g.equipment.select(0);
+      g.say(`Kitted out: ${key}.`, "good");
+      return [
+        `Equipped the ${key} kit \xB7 ${kit2.note}`,
+        `  Armour: ${set ? set.st.name : "none"} (+${kit2.armourLvl}${kit2.armourInf ? ", " + kit2.armourInf : ""})`,
+        `  Weapons: ${weapons.map((id) => itemName(id)).join(", ")} \xB7 ${QUALITIES[kit2.q].name} +${kit2.lvl}${kit2.inf ? ", " + kit2.inf : ""}`,
+        `  Accessories: ${kit2.accessories.map((id) => itemName(id)).join(", ")}`,
+        `  Health ${s.maxHealth} \xB7 mana ${kit2.mana}`
+      ];
+    }
     /** Completions for the word being typed: commands first, then that command's arguments. */
     complete(line) {
       const words = line.split(/\s+/), last = (words[words.length - 1] ?? "").toLowerCase();
       if (words.length <= 1) return Object.keys(this.commands).filter((c) => c.startsWith(last));
-      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close", "course"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
+      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "gear" ? [...Object.keys(LOADOUTS), ...Object.keys(LOADOUT_ALIASES)] : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close", "course"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
       return words.length === 2 ? pool.filter((id) => id.startsWith(last)) : [];
     }
     /** Godmode keeps every need met; called each tick. */

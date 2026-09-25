@@ -14,6 +14,9 @@ import {
   underworldFloor,
 } from '../../data/world.ts';
 import { REALMS } from '../../data/realms/index.ts';
+import { LOADOUTS, LOADOUT_ALIASES } from '../../data/loadouts.ts';
+import { ARMOR, ARMOR_SETS, CRYSTALS } from '../../data/gear.ts';
+import { GRID, QUALITIES } from '../../data/weapons.ts';
 import { uniqueId } from '../ids.ts';
 import { RULES } from '../rules.ts';
 import { ANIMAL_HP } from '../WorldGenerator.ts';
@@ -83,6 +86,11 @@ export class Dev extends System {
           ...Object.values(this.commands).map((c) => `  ${c.usage.padEnd(28)} ${c.help}`),
         ];
       },
+    },
+    gear: {
+      usage: 'gear <early|mid|late|endgame>',
+      help: 'Equip a ready-made kit for a stage of the journey (endgame: ready for the Unmaker).',
+      run: ([name]) => this.gear((name ?? '').toLowerCase()),
     },
     give: {
       usage: 'give <item> [qty]',
@@ -324,6 +332,76 @@ export class Dev extends System {
     return cmd.run(args);
   }
 
+  /**
+   * Equips a kit: the strongest armour set of its tier (upgraded and infused), a greatsword,
+   * bow and staff of its tier (quality, level, infusion and gems set), accessories, health and
+   * mana, and supplies on the quick slots.
+   */
+  private gear(name: string): string[] {
+    const key = LOADOUT_ALIASES[name] ?? name,
+      kit = LOADOUTS[key];
+    if (!kit) return [`! Usage: gear <${Object.keys(LOADOUTS).join('|')}>`];
+    const g = this.game,
+      s = g.s,
+      p = s.player;
+    // Armour: the set of this tier or below that guards best, whole.
+    const set = ARMOR_SETS.filter((st) => st.tier <= kit.tier)
+      .map((st) => ({ st, pieces: Object.keys(ARMOR).filter((id) => ARMOR[id].set === st.key) }))
+      .filter((x) => x.pieces.length === 3)
+      .sort(
+        (a, b) => b.st.defense.reduce((n, d) => n + d, 0) - a.st.defense.reduce((n, d) => n + d, 0),
+      )[0];
+    p.armor = {};
+    s.armourMods ??= {};
+    for (const id of set?.pieces ?? []) {
+      if (!g.count(id)) g.add(id);
+      g.equipment.wear(id);
+      s.armourMods[id] = {
+        lvl: kit.armourLvl,
+        gems: [],
+        ...(kit.armourInf ? { inf: kit.armourInf } : {}),
+      };
+    }
+    // Weapons: one to strike with, one to shoot, one to cast.
+    const weapons = ['greatsword', 'bow', 'staff'].map(
+      (family) => GRID.find((w) => w.family === family && w.tier === kit.tier)!.id,
+    );
+    s.armoury ??= {};
+    for (const id of weapons) {
+      if (!g.count(id)) g.add(id);
+      s.armoury[id] = {
+        q: kit.q,
+        lvl: kit.lvl,
+        gems: kit.gems.slice(0, QUALITIES[kit.q].sockets),
+        evo: [],
+        ...(kit.inf ? { inf: kit.inf } : {}),
+      };
+    }
+    // Accessories, health, mana, and a full belly.
+    s.accessories = [];
+    for (const id of kit.accessories) {
+      if (!g.count(id)) g.add(id);
+      g.equipment.wear(id);
+    }
+    s.maxHealth = Math.max(CRYSTALS.baseHealth, kit.health);
+    s.maxMana = kit.mana;
+    s.mana = kit.mana;
+    Object.assign(s.vitals, { health: s.maxHealth, hydration: 100, calories: 100, stamina: 100 });
+    for (const [id, qty] of kit.supplies) g.add(id, Math.max(0, qty - g.count(id)));
+    // The quick slots: weapons first, then healing.
+    const heal = kit.supplies.find(([id]) => id.includes('heal'))?.[0];
+    [...weapons, heal].forEach((id, i) => id && g.equipment.assign(i, id));
+    g.equipment.select(0);
+    g.say(`Kitted out: ${key}.`, 'good');
+    return [
+      `Equipped the ${key} kit · ${kit.note}`,
+      `  Armour: ${set ? set.st.name : 'none'} (+${kit.armourLvl}${kit.armourInf ? ', ' + kit.armourInf : ''})`,
+      `  Weapons: ${weapons.map((id) => itemName(id)).join(', ')} · ${QUALITIES[kit.q].name} +${kit.lvl}${kit.inf ? ', ' + kit.inf : ''}`,
+      `  Accessories: ${kit.accessories.map((id) => itemName(id)).join(', ')}`,
+      `  Health ${s.maxHealth} · mana ${kit.mana}`,
+    ];
+  }
+
   /** Completions for the word being typed: commands first, then that command's arguments. */
   complete(line: string): string[] {
     const words = line.split(/\s+/),
@@ -337,17 +415,19 @@ export class Dev extends System {
             ? ['all', ...RECIPES.map((r) => r.id)]
             : cmd === 'summon'
               ? MOBS
-              : cmd === 'realm'
-                ? [...REALMS.map((r) => r.id), 'home', 'close', 'course']
-                : cmd === 'tp'
-                  ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES]
-                  : cmd === 'time'
-                    ? Object.keys(TIMES)
-                    : cmd === 'weather'
-                      ? WEATHERS
-                      : cmd === 'help'
-                        ? Object.keys(this.commands)
-                        : [];
+              : cmd === 'gear'
+                ? [...Object.keys(LOADOUTS), ...Object.keys(LOADOUT_ALIASES)]
+                : cmd === 'realm'
+                  ? [...REALMS.map((r) => r.id), 'home', 'close', 'course']
+                  : cmd === 'tp'
+                    ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES]
+                    : cmd === 'time'
+                      ? Object.keys(TIMES)
+                      : cmd === 'weather'
+                        ? WEATHERS
+                        : cmd === 'help'
+                          ? Object.keys(this.commands)
+                          : [];
     return words.length === 2 ? pool.filter((id) => id.startsWith(last)) : [];
   }
 

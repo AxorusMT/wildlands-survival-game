@@ -74,22 +74,23 @@ Sound effects are synthesised live too (`src/audio/sfx.ts`), and are panned and 
 
 Press ` (backquote) during play to open the field console. Tab completes commands and names, and ↑/↓ recalls earlier lines. Console switches last for the session and are not saved.
 
-| Command                                  | Effect                                                             |
-| ---------------------------------------- | ------------------------------------------------------------------ |
-| `give <item> [qty]`                      | Put items in the pack (`give obsidian pick 2`)                     |
-| `items [filter]`, `recipes [filter]`     | List item and recipe ids                                           |
-| `unlock <recipe\|all>`, `lock …`         | Make recipes craftable anywhere, without materials                 |
-| `god`                                    | No damage; every need stays met                                    |
-| `noclip`                                 | Fly through rock with WASD                                         |
-| `speed <x>`                              | Scale movement speed                                               |
-| `summon <mob> [count]`                   | Any creature or boss, e.g. `summon skeleton 3`, `summon unmaker`   |
-| `kill [radius\|all]`                     | Slay nearby creatures                                              |
-| `heal`                                   | Restore every vital and cure illness                               |
-| `tp <x [y] \| region \| layer \| place>` | `tp alpine`, `tp lower_hell`, `tp crypt`, `tp skyreach`, …         |
-| `time <hh:mm\|dawn\|noon\|dusk\|night>`  | Set the time of day                                                |
-| `weather <clear\|cloudy\|rain\|storm>`   | Change the weather                                                 |
-| `realm <id> [tier]`, `realm home\|close` | Open a generated realm (`realm warren 3`), go home, or collapse it |
-| `pos`, `help`, `clear`                   | Where you are, the command list, and clear the log                 |
+| Command                                  | Effect                                                                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `give <item> [qty]`                      | Put items in the pack (`give obsidian pick 2`)                                                                                             |
+| `items [filter]`, `recipes [filter]`     | List item and recipe ids                                                                                                                   |
+| `unlock <recipe\|all>`, `lock …`         | Make recipes craftable anywhere, without materials                                                                                         |
+| `god`                                    | No damage; every need stays met                                                                                                            |
+| `noclip`                                 | Fly through rock with WASD                                                                                                                 |
+| `speed <x>`                              | Scale movement speed                                                                                                                       |
+| `summon <mob> [count]`                   | Any creature or boss, e.g. `summon skeleton 3`, `summon unmaker`                                                                           |
+| `gear <early\|mid\|late\|endgame>`       | Equip a ready-made kit; `gear endgame` (or `gear unmaker`) is Voidsteel armour and Mythic +10 holy tier XII weapons, ready for the Unmaker |
+| `kill [radius\|all]`                     | Slay nearby creatures                                                                                                                      |
+| `heal`                                   | Restore every vital and cure illness                                                                                                       |
+| `tp <x [y] \| region \| layer \| place>` | `tp alpine`, `tp lower_hell`, `tp crypt`, `tp skyreach`, …                                                                                 |
+| `time <hh:mm\|dawn\|noon\|dusk\|night>`  | Set the time of day                                                                                                                        |
+| `weather <clear\|cloudy\|rain\|storm>`   | Change the weather                                                                                                                         |
+| `realm <id> [tier]`, `realm home\|close` | Open a generated realm (`realm warren 3`), go home, or collapse it                                                                         |
+| `pos`, `help`, `clear`                   | Where you are, the command list, and clear the log                                                                                         |
 
 ## Controls
 
@@ -265,7 +266,7 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 
 ### The Unmaker
 
-The last great foe waits behind the altar in the Maw of the Hollow Void. You summon it with a Void Seal, or in the console with `god`, `tp void`, `summon unmaker`. It has 48,000 health.
+The last great foe waits behind the altar in the Maw of the Hollow Void. You summon it with a Void Seal, or in the console with `gear endgame`, `tp void`, `summon unmaker` (add `god` to watch it without dying). It has 48,000 health.
 
 - **The entrance.** Its entrance is timed to the four-bar build of its theme:
   - the void tears open above the altar and drinks in the light on every beat;

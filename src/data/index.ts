@@ -23,3 +23,4 @@ export * from './stations.ts';
 export * from './resist.ts';
 export * from './lore.ts';
 export * from './tutorial.ts';
+export * from './loadouts.ts';

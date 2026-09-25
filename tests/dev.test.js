@@ -108,3 +108,30 @@ test('actions make the sounds you would expect', () => {
   for (let i = 0; i < 40; i++) g.move(1, 0, 1 / 30);
   assert.ok(sounds().some((s) => s.startsWith('step_')));
 });
+
+test('gear kits you out for a stage of the journey, up to the Unmaker', () => {
+  const g = new Game(4);
+  assert.match(g.command('gear nothing')[0], /^! Usage/);
+  const lines = g.command('gear endgame');
+  assert.match(lines[0], /endgame kit/);
+  const p = g.s.player;
+  assert.deepEqual(Object.values(p.armor).sort(), [
+    'voidsteel_chestplate',
+    'voidsteel_greaves',
+    'voidsteel_helmet',
+  ]);
+  assert.equal(p.weapon, 'ascended_greatsword');
+  const e = g.armoury.entry('ascended_greatsword');
+  assert.equal(D.QUALITIES[e.q].id, 'mythic');
+  assert.equal(e.lvl, 10);
+  assert.equal(e.inf, 'holy', 'the Unmaker is weak to holy light');
+  assert.equal(g.equipment.maxHealth(), 400);
+  assert.ok(g.count('void_seal') >= 1, 'with a seal to call it');
+  assert.equal(g.s.accessories.length, 3);
+  // Kits replace one another cleanly, and "unmaker" is another name for the last.
+  g.command('gear early');
+  assert.equal(g.s.player.weapon, 'iron_greatsword');
+  assert.equal(g.s.accessories.length, 1);
+  g.command('gear unmaker');
+  assert.equal(g.s.player.weapon, 'ascended_greatsword');
+});
