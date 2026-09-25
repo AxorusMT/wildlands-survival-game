@@ -8,7 +8,7 @@ TypeScript source is in `src/`. `src/main.ts` bundles the UI, audio, simulation,
 
 ## Music
 
-The soundtrack is thirteen one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
+The soundtrack is fifteen one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
 
 | Track                     | Plays                                     |
 | ------------------------- | ----------------------------------------- |
@@ -21,8 +21,10 @@ The soundtrack is thirteen one-minute looping tracks, synthesised live by the br
 | Hoarfrost                 | Tundra, taiga, and alpine                 |
 | Mirage Caravan            | Desert and badlands                       |
 | Squall Line               | Any surface region during a storm         |
-| Lantern Glow              | The first cave layer                      |
-| Crystal Dark              | The second and third cave layers          |
+| Lantern Glow              | The upper mines                           |
+| Crystal Dark              | The lower mines                           |
+| Brimstone Forges          | Upper hell                                |
+| Throne of Cinders         | Lower hell                                |
 | Direwolf                  | An active Direwolf hunt                   |
 | What the Wild Takes       | The death page                            |
 
@@ -53,7 +55,11 @@ For a quick starting route: gather wood, stone, and fiber in the meadow; make a 
 
 ## Progression
 
-Stone → copper → iron → steel → obsidian. Tool tiers gate ore and hard ground. Nine biomes form a 10,800 × 1,920 side-view world with shifting elevation, cave entrances, and three winding underground passages. Copper comes from the forest, iron and coal from cold regions, sulfur from the desert and badlands, and obsidian from the badlands. Deer, wolves, boars, bats, and scorpions have distinct behavior and drops. There are 53 recipes and 88 items, including fishing gear, camp shelters, rain catchers, food preservation, protective clothing, lanterns, platforms, traps, and storage. A furnace smelts copper and iron; a forge makes steel and obsidian tools. Farm plots grow herb, wheat, or potato. An icebox supplied with mined ice slows nearby spoilage. The Effergy of Beasts is a costly forge craft; place it, open the **Beasts** folio, attune wolves, and complete hunts to summon each Direwolf. Only obsidian-tier or better weapons can damage a Direwolf. Existing version-one and version-two local saves are migrated when loaded.
+Stone → copper → iron → steel → obsidian → hellstone. Tool tiers gate ore and hard ground. Nine wide biomes form a 30,000 × 4,480 side-view world. Each region has its own lie of the land (flat marsh and tundra, rolling meadow and forest, hilly taiga, alpine peaks, desert dunes, terraced badlands mesas), and each border has its own feature: a lagoon, a river valley, ridges, a frozen lake, an escarpment, and a canyon. Every slope stays walkable.
+
+Below the surface the world descends through four layers, joined by ladder shafts. The **upper mines** hold three winding tunnels and the region's ores. The **lower mines** are blue-black deepstone (tier 3 pickaxe), with caverns, iron, crystal, and bats. **Upper hell** is scorched ash rock (tier 4) with pools of lava, sulfur, obsidian, and ember bats; its heat wears at your health. **Lower hell** is an open underworld of hellrock (tier 5) over lava lakes, where hellhounds hunt and hellstone glows in the rock. Without a **Cinder Ward** (obsidian, sulfur, hide, and ice at a forge) the heat kills within a minute, and lava burns even with one. Hellstone ingots make the Hellfire Blade.
+
+The world changes as you work it. Chopped trees topple and leave stumps that slowly sprout and regrow; rock and ore veins break apart and are gone for good; plants are stripped and grow back. Whatever you break or kill drops its materials on the ground, and they fly to you when you walk near. Mined tiles stay mined, and saves record only the tiles you have changed. Copper comes from the forest, iron and coal from cold regions, sulfur from the desert and badlands, and obsidian from the badlands. Deer, wolves, boars, bats, and scorpions have distinct behavior and drops. There are 56 recipes and 92 items, including fishing gear, camp shelters, rain catchers, food preservation, protective clothing, lanterns, platforms, traps, and storage. A furnace smelts copper and iron; a forge makes steel and obsidian tools. Farm plots grow herb, wheat, or potato. An icebox supplied with mined ice slows nearby spoilage. The Effergy of Beasts is a costly forge craft; place it, open the **Beasts** folio, attune wolves, and complete hunts to summon each Direwolf. Only obsidian-tier or better weapons can damage a Direwolf. Existing local saves are migrated when loaded; records from the earlier, narrower world keep the pack, camp, and progress, and move to the same place in each wider region.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 

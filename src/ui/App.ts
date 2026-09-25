@@ -1,6 +1,6 @@
 import * as D from '../data/index.ts';
 import { Game } from '../game/Game.ts';
-import { draw } from '../renderer/Renderer.ts';
+import { draw, spawnEffects } from '../renderer/Renderer.ts';
 import { Audio } from '../audio/Audio.ts';
 import { musicScene } from '../audio/scenes.ts';
 import type { GameMessage, Structure, Vitals } from '../core/types.ts';
@@ -59,7 +59,7 @@ const itemUseLabel = (id: string) =>
     ? 'PLACE'
     : D.WEAPONS[id]
       ? 'EQUIP'
-      : ['direwolf_cloak', 'hide_coat', 'explorer_boots'].includes(id)
+      : ['direwolf_cloak', 'hide_coat', 'explorer_boots', 'cinder_ward'].includes(id)
         ? 'WEAR'
         : id === 'fishing_rod'
           ? 'FISH'
@@ -541,7 +541,7 @@ function renderNotes(left: HTMLElement, right: HTMLElement) {
   const biome = game.biome(),
     t = game.s.tutorial,
     current = D.TUTORIAL[t.step];
-  left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface; three winding cave roads beneath them.</p><canvas id="atlas-map" class="atlas-map" width="420" height="240" aria-label="Side elevation of the nine regions and cave passages"></canvas><h3>Current ground · ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(', ')}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
+  left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface; beneath them the upper and lower mines, and below those, hell.</p><canvas id="atlas-map" class="atlas-map" width="420" height="300" aria-label="Side elevation of the nine regions and the depths below"></canvas><h3>Current ground · ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(', ')}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
   right.innerHTML = `<h2>Lessons &amp; sightings</h2><p class="lede">${current ? current[0] + ' · ' + Math.min(current[2], t.tally[current[1]] || 0) + '/' + current[2] : 'The first field lessons are complete.'}</p><ol class="objective-list">${D.TUTORIAL.map(([label], i) => `<li class="${i < t.step ? 'done' : i === t.step ? 'current' : ''}">${label}</li>`).join('')}</ol><h3>Expedition chapters</h3><ol class="objective-list">${D.CHAPTERS.map(([label], i) => `<li class="${i < game.s.chapter ? 'done' : i === game.s.chapter ? 'current' : ''}">${label}</li>`).join('')}</ol><h3>Biome ledger</h3>${D.BIOMES.map((b) => `<div class="biome-entry ${b.id === biome.id ? 'current' : ''}"><strong>${b.name}</strong><small>${b.note}</small></div>`).join('')}<h3>Controls</h3><p>A / D move · W / Space jump and climb · S descend · E gather or interact · F strike · R / click mine · G fish · J / I journal · M map · Esc pause · 1–5 turn pages.</p>`;
   left.querySelector<HTMLButtonElement>('[data-save]')!.onclick = () => {
     game.save();
@@ -576,17 +576,27 @@ function drawAtlas() {
   }
   const X = (x: number) => (x / D.WORLD_W) * w,
     Y = (y: number) => (y / D.WORLD_H) * (h - 30) + 14;
-  ink.fillStyle = '#8a8667';
-  ink.beginPath();
-  ink.moveTo(0, h);
-  for (let x = 0; x <= D.WORLD_W; x += 25) ink.lineTo(X(x), Y(D.surfaceAt(x)));
-  ink.lineTo(w, h);
-  ink.fill();
-  ink.strokeStyle = '#f1dfb3';
-  ink.lineWidth = 3;
-  for (let level = 1; level <= 3; level++) {
+  const step = D.WORLD_W / 420;
+  // Each depth is washed in its own ink, from earth to the red of hell.
+  const bands: [number, number, string][] = [
+    [D.LAYERS[1].top, D.LAYERS[2].top, '#8a8667'],
+    [D.LAYERS[2].top, D.LAYERS[3].top, '#6f7483'],
+    [D.LAYERS[3].top, D.LAYERS[4].top, '#8d5a4a'],
+    [D.LAYERS[4].top, D.WORLD_H, '#6e3434'],
+  ];
+  for (const [top, bottom, color] of bands) {
+    ink.fillStyle = color;
     ink.beginPath();
-    for (let x = 0; x <= D.WORLD_W; x += 35) {
+    ink.moveTo(0, Y(bottom));
+    for (let x = 0; x <= D.WORLD_W; x += step) ink.lineTo(X(x), Y(Math.max(top, D.surfaceAt(x))));
+    ink.lineTo(w, Y(bottom));
+    ink.fill();
+  }
+  ink.strokeStyle = '#f1dfb3';
+  ink.lineWidth = 1.6;
+  for (let level = 1; level <= D.CAVE_LEVELS; level++) {
+    ink.beginPath();
+    for (let x = 0; x <= D.WORLD_W; x += step) {
       const xx = X(x),
         yy = Y(D.caveY(x, level));
       if (!x) ink.moveTo(xx, yy);
@@ -594,6 +604,27 @@ function drawAtlas() {
     }
     ink.stroke();
   }
+  ink.fillStyle = '#2b1a18';
+  ink.beginPath();
+  for (let x = 0; x <= D.WORLD_W; x += step) ink.lineTo(X(x), Y(D.underworldCeiling(x)));
+  for (let x = D.WORLD_W; x >= 0; x -= step) ink.lineTo(X(x), Y(D.underworldFloor(x)));
+  ink.fill();
+  ink.fillStyle = '#e8702a';
+  for (let x = 0; x <= D.WORLD_W; x += step)
+    if (D.underworldFloor(x) > D.LAVA_Y)
+      ink.fillRect(X(x), Y(D.LAVA_Y), 1.2, Y(D.underworldFloor(x)) - Y(D.LAVA_Y));
+  ink.strokeStyle = '#3a2a1a';
+  ink.lineWidth = 1;
+  for (const shaft of D.SHAFTS) {
+    ink.beginPath();
+    ink.moveTo(X(shaft.x), Y(shaft.top));
+    ink.lineTo(X(shaft.x), Y(shaft.bottom));
+    ink.stroke();
+  }
+  ink.font = 'italic 10px "EB Garamond", Georgia, serif';
+  ink.textAlign = 'left';
+  ink.fillStyle = '#f5ead0';
+  for (const layer of D.LAYERS.slice(2)) ink.fillText(layer.name, 4, Y(layer.top) + 11);
   ink.font = 'bold 10px "EB Garamond", Georgia, serif';
   ink.textAlign = 'center';
   ink.fillStyle = '#322c24';
@@ -663,7 +694,13 @@ function updateUI(force = false) {
     $(id + '-bar').style.width = clamp(v[id], 0, 100) + '%';
     $(id + '-value').textContent = String(Math.round(v[id]));
   });
-  $('biome-name').textContent = game.biome().name.toUpperCase();
+  const layer = game.layer();
+  $('biome-name').textContent =
+    layer.id === 'surface'
+      ? game.biome().name.toUpperCase()
+      : layer.id === 'upper_mines'
+        ? game.biome().name.toUpperCase() + ' · ' + layer.name.toUpperCase()
+        : layer.name.toUpperCase();
   $('world-time').textContent = timeText();
   $('condition-line').textContent = game.vitalReasons()[0];
   $('weapon-name').textContent = pretty(game.s.player.weapon);
@@ -680,7 +717,11 @@ function updateUI(force = false) {
       near.type === 'node'
         ? near.object.kind === 'water'
           ? 'Collect wild water'
-          : 'Gather ' + pretty(near.object.kind)
+          : D.nodeForm(near.object.kind) === 'tree'
+            ? `Chop tree (${near.object.hp} more)`
+            : D.nodeForm(near.object.kind) === 'mineral'
+              ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)`
+              : 'Gather ' + pretty(near.object.kind)
         : near.type === 'cache'
           ? 'Open field cache'
           : near.object.type === 'effergy'
@@ -741,6 +782,15 @@ function drawWorld() {
       D.WORLD_H - innerHeight,
     );
   }
+  const events = game.takeEvents();
+  if (events.length) {
+    spawnEffects(game, events);
+    for (const e of events)
+      if (e.type === 'fell') setTimeout(() => sound('fell'), 950);
+      else if (e.type === 'crumble') sound('crumble');
+      else if (e.type === 'pickup') sound('pickup');
+      else if (e.type === 'sizzle') sound('sizzle');
+  }
   draw(ctx, game, state.camera, innerWidth, innerHeight, !state.playing);
 }
 function frame(now: number) {
@@ -765,7 +815,7 @@ function frame(now: number) {
       playing: state.playing,
       dead: game.s.dead,
       boss: !!game.s.altar.activeBoss,
-      depth: game.s.player.y - D.surfaceAt(game.s.player.x),
+      layer: game.layer().id,
       weather: game.s.weather,
       biome: game.biome().id,
       night: game.isNight(),

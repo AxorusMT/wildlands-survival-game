@@ -1,5 +1,5 @@
 import { clamp } from '../../core/math.ts';
-import { ENTRANCES, TILE, WORLD_H, WORLD_W, surfaceAt } from '../../data/world.ts';
+import { TILE, WORLD_H, WORLD_W, inShaft } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -33,14 +33,18 @@ export class Physics extends System {
       v = this.game.s.vitals;
     p.moving = Math.abs(dx) > 0.1;
     const tired = v.stamina < 12 || v.fatigue > 80;
+    const lava = this.game.inLava();
     const speed =
+      (lava ? 0.45 : 1) *
       (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) *
       (v.illness > 60 ? 0.82 : 1) *
       (p.boots ? 1.12 : 1);
     if (dx) p.face = dx > 0 ? 0 : Math.PI;
     p.vx = dx * speed;
-    const shaft = ENTRANCES.some((x) => Math.abs(x - p.x) < 43) && p.y > surfaceAt(p.x) - 12;
-    if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
+    const shaft = inShaft(p.x, p.y);
+    // Molten rock is thick: you sink slowly and can wade or struggle upward.
+    if (lava) p.vy = dy < 0 ? -150 : Math.min(p.vy + 240 * dt, 60);
+    else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
       if (p.grounded) this.jump();
       else {
         p.vy = -RULES.climbVelocity;

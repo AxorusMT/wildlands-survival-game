@@ -1,5 +1,6 @@
 import type { Track } from '../score.ts';
 import { boss } from './boss.ts';
+import { brimstone } from './brimstone.ts';
 import { cave } from './cave.ts';
 import { coast } from './coast.ts';
 import { cold } from './cold.ts';
@@ -11,6 +12,7 @@ import { marsh } from './marsh.ts';
 import { meadow } from './meadow.ts';
 import { menu } from './menu.ts';
 import { night } from './night.ts';
+import { pandemonium } from './pandemonium.ts';
 import { storm } from './storm.ts';
 
 /** Every track in the score, in playlist order. Each track's id is the scene that plays it. */
@@ -26,6 +28,8 @@ export const TRACK_LIST: Track[] = [
   storm,
   cave,
   depths,
+  brimstone,
+  pandemonium,
   boss,
   fallen,
 ];

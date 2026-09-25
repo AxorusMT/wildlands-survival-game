@@ -4,23 +4,26 @@ export interface MusicContext {
   playing: boolean;
   dead: boolean;
   boss: boolean;
-  /** Pixels below the surface at the player's column. */
-  depth: number;
+  /** Depth layer id: surface, upper_mines, lower_mines, upper_hell, or lower_hell. */
+  layer: string;
   weather: string;
   biome: string;
   night: boolean;
 }
 
-/** Depth below the surface where the caves begin, and where the second cave layer starts. */
-export const CAVE_DEPTH = 70;
-export const DEEP_CAVE_DEPTH = 330;
+/** Each underground layer has its own track. */
+const LAYER_TRACKS: Record<string, string> = {
+  upper_mines: 'cave',
+  lower_mines: 'depths',
+  upper_hell: 'brimstone',
+  lower_hell: 'pandemonium',
+};
 
 export function musicScene(c: MusicContext): string {
   if (!c.playing) return 'menu';
   if (c.dead) return 'fallen';
   if (c.boss) return 'boss';
-  if (c.depth > DEEP_CAVE_DEPTH) return 'depths';
-  if (c.depth > CAVE_DEPTH) return 'cave';
+  if (LAYER_TRACKS[c.layer]) return LAYER_TRACKS[c.layer];
   if (c.weather === 'storm') return 'storm';
   if (['tundra', 'taiga', 'alpine'].includes(c.biome)) return 'cold';
   if (['desert', 'badlands'].includes(c.biome)) return 'desert';

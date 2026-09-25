@@ -25,8 +25,17 @@ export const NODES: Record<string, NodeSpec> = {
   reeds: { yield: [2, 4], hp: 3, regen: 170 },
   salt: { yield: [1, 3], tool: 'pick', req: 0, hp: 2, regen: 240 },
   crystal: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 400 },
+  hellstone: { yield: [2, 3], tool: 'pick', req: 5, hp: 4, regen: 0 },
   cactus_fruit: { yield: [1, 2], hp: 2, regen: 230 },
 };
+
+/** Trees topple and regrow from the stump, minerals crumble away for good, plants are picked. */
+export type NodeForm = 'tree' | 'mineral' | 'plant' | 'water';
+export function nodeForm(kind: string): NodeForm {
+  if (kind === 'water') return 'water';
+  if (kind === 'wood' || kind === 'resin' || kind === 'honey') return 'tree';
+  return NODES[kind]?.tool === 'pick' ? 'mineral' : 'plant';
+}
 
 export const TOOL_TIERS: Record<string, ToolTier> = {
   stone_axe: ['axe', 1],
@@ -48,4 +57,5 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   steel_sword: [4, 47, 65],
   obsidian_blade: [5, 61, 67],
   eclipse_blade: [6, 85, 73],
+  hellfire_blade: [6, 76, 70],
 };

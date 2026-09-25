@@ -15,7 +15,11 @@ export class Environment extends System {
     return t < RULES.nightEndsAt || t > RULES.nightStartsAt;
   }
   temperature() {
-    const b = this.game.biome();
+    const b = this.game.biome(),
+      layer = this.game.layer();
+    // Below ground the rock sets the temperature; only the upper mines feel the region above.
+    if (layer.id === 'upper_mines') return layer.temp + b.temp * 0.25;
+    if (layer.id !== 'surface') return layer.temp;
     return (
       b.temp +
       (this.isNight() ? -8 : 0) +

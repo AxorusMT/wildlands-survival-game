@@ -1,7 +1,7 @@
 import { clamp, dist } from '../../core/math.ts';
 import type { Interactable, ResourceNode, Structure } from '../../core/types.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
-import { NODES } from '../../data/resources.ts';
+import { NODES, nodeForm } from '../../data/resources.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -33,19 +33,25 @@ export class Interaction extends System {
     if (near.type === 'cache') {
       const c = near.object;
       c.opened = true;
-      const loot = (
-        {
-          coast: ['salt', 'reeds'],
-          marsh: ['herb', 'clay'],
-          forest: ['resin', 'copper_ore'],
-          meadow: ['bread', 'flint'],
-          taiga: ['coal', 'hide'],
-          tundra: ['ice', 'iron_ore'],
-          alpine: ['crystal', 'iron_ore'],
-          desert: ['sulfur', 'cactus_fruit'],
-          badlands: ['obsidian', 'coal'],
-        } as Record<string, [string, string]>
-      )[c.biome];
+      const deep: Record<string, [string, string]> = {
+        lower_mines: ['iron_ingot', 'crystal'],
+        upper_hell: ['steel_ingot', 'obsidian'],
+      };
+      const loot = c.layer
+        ? deep[c.layer]
+        : (
+            {
+              coast: ['salt', 'reeds'],
+              marsh: ['herb', 'clay'],
+              forest: ['resin', 'copper_ore'],
+              meadow: ['bread', 'flint'],
+              taiga: ['coal', 'hide'],
+              tundra: ['ice', 'iron_ore'],
+              alpine: ['crystal', 'iron_ore'],
+              desert: ['sulfur', 'cactus_fruit'],
+              badlands: ['obsidian', 'coal'],
+            } as Record<string, [string, string]>
+          )[c.biome];
       this.game.add(loot[0], 2);
       this.game.add(loot[1], 2);
       this.game.say(
@@ -152,7 +158,8 @@ export class Interaction extends System {
     return { ok: true };
   }
   gather(node: ResourceNode) {
-    if (dist(node, this.game.s.player) > RULES.gatherReach || node.hp <= 0)
+    const p = this.game.s.player;
+    if (dist(node, p) > RULES.gatherReach || node.hp <= 0)
       return { ok: false, reason: 'Move closer to the resource.' };
     const spec = NODES[node.kind],
       v = this.game.s.vitals;
@@ -160,22 +167,59 @@ export class Interaction extends System {
     if (tier < (spec.req || 0))
       return {
         ok: false,
-        reason: itemName(node.kind) + ' requires a tier ' + spec.req + ' pickaxe.',
+        reason:
+          itemName(node.kind) +
+          ' requires a tier ' +
+          spec.req +
+          (spec.tool === 'axe' ? ' axe.' : ' pickaxe.'),
       };
     if (v.stamina < 7) return { ok: false, reason: 'Too exhausted to gather. Rest or wait.' };
     v.stamina -= 7;
     v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
     v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
-    const qty =
+    const roll = () =>
       Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) +
       (tier >= 3 ? 1 : 0);
-    const id = node.kind === 'water' ? 'wild_water' : node.kind;
-    this.game.add(id, qty);
-    if (node.kind !== 'water') {
-      node.hp--;
-      if (node.hp <= 0) node.depletedUntil = this.game.s.elapsed + spec.regen;
+    const form = nodeForm(node.kind),
+      s = this.game.s;
+    node.hitAt = s.elapsed;
+    if (form === 'water') {
+      const qty = roll();
+      this.game.add('wild_water', qty);
+      this.game.event('chip', node.x, node.y, 'water');
+      this.game.say('Gathered ' + qty + ' wild water.', 'good');
+      return { ok: true, id: 'wild_water', qty };
     }
-    this.game.say('Gathered ' + qty + ' ' + itemName(id).toLowerCase() + '.', 'good');
-    return { ok: true, id, qty };
+    this.game.event('chip', node.x, node.y - (form === 'tree' ? 26 : 10), node.kind);
+    if (form === 'plant') {
+      // Plants give a handful each pick and grow back once stripped.
+      const qty = roll();
+      node.hp--;
+      if (node.hp <= 0) node.depletedUntil = s.elapsed + spec.regen;
+      this.game.drops.spawn(node.kind, qty, node.x, node.y - 14);
+      return { ok: true, id: node.kind, qty };
+    }
+    // Trees and rock take several blows; the last one brings the whole thing down.
+    node.hp--;
+    if (node.hp > 0) return { ok: true, id: node.kind, qty: 0, hit: true };
+    let qty = 0;
+    for (let i = 0; i < spec.hp; i++) qty += roll();
+    if (form === 'tree') {
+      const dir = node.x >= p.x ? 1 : -1;
+      node.felledAt = s.elapsed;
+      node.fallDir = dir;
+      // The stump waits a long while before a sapling takes its place.
+      node.depletedUntil = s.elapsed + spec.regen * RULES.treeRegrowthFactor;
+      this.game.event('fell', node.x, node.y, node.kind, dir);
+      this.game.drops.spawn(node.kind, qty, node.x + dir * 70, node.y - 24, RULES.treeFallSeconds);
+      this.game.say('Timber! The tree comes down.', 'good');
+    } else {
+      const index = s.nodes.indexOf(node);
+      if (index >= 0) s.nodes.splice(index, 1);
+      this.game.event('crumble', node.x, node.y, node.kind);
+      this.game.drops.spawn(node.kind, qty, node.x, node.y - 12);
+      this.game.say('The ' + itemName(node.kind).toLowerCase() + ' breaks apart.', 'good');
+    }
+    return { ok: true, id: node.kind, qty };
   }
 }

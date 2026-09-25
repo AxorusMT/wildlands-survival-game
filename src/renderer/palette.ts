@@ -104,13 +104,10 @@ export const ART: Record<string, ArtStyle> = {
     flowers: [],
   },
 };
-export const BIOME_STEP = D.BIOME_CENTERS[D.SIDE_ORDER[1]][0] - D.BIOME_CENTERS[D.SIDE_ORDER[0]][0];
-export const FIRST_CENTER = D.BIOME_CENTERS[D.SIDE_ORDER[0]][0];
 // Neighbouring regions blend their skies and hills across a band around each border.
 export function blendAt(x: number): [ArtStyle, ArtStyle, number] {
-  const f = clamp((x - FIRST_CENTER) / BIOME_STEP, 0, D.SIDE_ORDER.length - 1),
-    i = Math.min(Math.floor(f), D.SIDE_ORDER.length - 2);
-  return [ART[D.SIDE_ORDER[i]], ART[D.SIDE_ORDER[i + 1]], smooth(0.3, 0.7, f - i)];
+  const [a, b, t] = D.biomeBlend(x);
+  return [ART[a], ART[b], t];
 }
 export const artAt = (x: number, y: number) => ART[D.biomeAt(x, y).id];
 // ─── Time of day ──────────────────────────────────────────────────────────

@@ -45,7 +45,10 @@ export class Survival extends System {
       if (st.fuel > 0 && ['campfire', 'icebox', 'lantern'].includes(st.type))
         st.fuel = Math.max(0, st.fuel - dt);
     for (const n of this.game.s.nodes)
-      if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) n.hp = NODES[n.kind].hp;
+      if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) {
+        n.hp = NODES[n.kind].hp;
+        delete n.felledAt;
+      }
   }
   vitalReasons() {
     const v = this.game.s.vitals,
@@ -57,6 +60,13 @@ export class Survival extends System {
     if (v.bodyTemp > 39) causes.push('Heat exposure is draining health');
     if (v.wetness > 40) causes.push('Wet clothing magnifies cold');
     if (v.fatigue > 75) causes.push('Fatigue slows movement and fighting');
+    if (this.game.inLava()) causes.push('Molten rock is burning you; climb out');
+    else if (this.heat() > 0)
+      causes.push(
+        this.game.s.player.ward
+          ? 'The Cinder Ward holds back most of the heat'
+          : 'Scorching heat; a Cinder Ward is needed below',
+      );
     if (v.illness > 30) causes.push('Illness is worsening');
     if (v.infection > 25) causes.push('Infection is worsening; wash and treat it');
     if (v.hygiene < 25) causes.push('Poor hygiene increases infection');
@@ -93,6 +103,14 @@ export class Survival extends System {
         e.qty = Math.ceil(e.qty * 0.75);
     this.game.say('You woke in the meadow. Some loose supplies were lost.', 'good');
   }
+  /** Health lost per second to the heat of the hell layers. */
+  heat() {
+    const layer = this.game.layer().id,
+      ward = this.game.s.player.ward ? 1 : 0;
+    if (layer === 'upper_hell') return RULES.upperHellHeat[ward];
+    if (layer === 'lower_hell') return RULES.lowerHellHeat[ward];
+    return 0;
+  }
   // Exposure, hunger, illness, morale, and health drift for one tick.
   update(dt: number) {
     const v = this.game.s.vitals,
@@ -122,7 +140,11 @@ export class Survival extends System {
     v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
     v.hydration = clamp(
       v.hydration -
-        dt * (0.045 + (cold > 26 ? 0.045 : 0) + (this.game.s.disease === 'dysentery' ? 0.055 : 0)),
+        dt *
+          (0.045 +
+            (cold > 26 ? 0.045 : 0) +
+            (cold > 40 ? (p.ward ? 0.05 : 0.14) : 0) +
+            (this.game.s.disease === 'dysentery' ? 0.055 : 0)),
       0,
       100,
     );
@@ -154,7 +176,7 @@ export class Survival extends System {
     const threats = this.game.s.animals.some(
       (a) =>
         !a.deadUntil &&
-        ['wolf', 'boar', 'scorpion', 'bat', 'boss'].includes(a.type) &&
+        ['wolf', 'boar', 'scorpion', 'bat', 'boss', 'ember_bat', 'hellhound'].includes(a.type) &&
         dist(a, p) < 150,
     );
     v.morale = clamp(
@@ -163,7 +185,10 @@ export class Survival extends System {
       0,
       100,
     );
+    const burning = this.game.inLava() ? RULES.lavaDamage[p.ward ? 1 : 0] : 0;
     const harm =
+      burning +
+      this.heat() +
       (v.hydration <= 0 ? 0.15 : 0) +
       (v.calories <= 0 ? 0.11 : 0) +
       (v.protein <= 0 ? 0.04 : 0) +
@@ -184,7 +209,12 @@ export class Survival extends System {
       v.health = clamp(v.health + dt * 0.018, 0, RULES.maxVital);
     if (v.health <= 0) {
       this.game.s.dead = true;
-      this.game.say('You collapsed. Your field record survives.', 'danger');
+      this.game.say(
+        burning
+          ? 'The lava took you. Your field record survives.'
+          : 'You collapsed. Your field record survives.',
+        'danger',
+      );
     }
   }
 }

@@ -24,22 +24,15 @@ import {
   glow,
   limb,
 } from './graphics.ts';
-import {
-  ART,
-  BIOME_STEP,
-  FIRST_CENTER,
-  blendAt,
-  artAt,
-  daylight,
-  duskiness,
-  overcastOf,
-} from './palette.ts';
+import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
 import { drawSky, drawClouds } from './sky.ts';
 import { drawTerrain, drawLadders } from './terrain.ts';
 import { drawNode, drawCache, drawTree, treeNode } from './resources.ts';
 import { drawStructure } from './structures.ts';
 import { drawAnimal, drawPlayer } from './actors.ts';
 import { drawLighting, drawWeather } from './atmosphere.ts';
+import { drawDrops, drawParticles } from './effects.ts';
+export { spawnEffects } from './effects.ts';
 import type { Canvas2D, RenderGame } from './types.ts';
 import type { Point } from '../core/types.ts';
 
@@ -50,7 +43,7 @@ export function draw(c: Canvas2D, g: RenderGame, cam: Point, w: number, h: numbe
   c.clearRect(0, 0, w, h);
   drawSky(c, g, cam, w, h, fx, tod);
   drawTerrain(c, g, cam, w, h);
-  drawLadders(c, cam, w);
+  drawLadders(c, cam, w, h);
   const visible = (o: Point, pad = 140) =>
     o.x > cam.x - pad && o.x < cam.x + w + pad && o.y > cam.y - 40 && o.y < cam.y + h + 220;
   for (const n of g.s.nodes)
@@ -64,7 +57,9 @@ export function draw(c: Canvas2D, g: RenderGame, cam: Point, w: number, h: numbe
     if (visible(s)) drawStructure(c, g, s, s.x - cam.x, s.y - cam.y, t);
   for (const a of g.s.animals)
     if (!a.deadUntil && visible(a)) drawAnimal(c, g, a, a.x - cam.x, a.y - cam.y, t);
+  drawDrops(c, g, cam, w, h, t);
   if (!menu) drawPlayer(c, g.s.player, g.s.player.x - cam.x, g.s.player.y - cam.y, t);
+  drawParticles(c, cam);
   drawLighting(c, g, cam, w, h, menu, tod);
   drawWeather(c, g, cam, w, h, menu, fx, tod);
   const vignette = c.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, w * 0.75);

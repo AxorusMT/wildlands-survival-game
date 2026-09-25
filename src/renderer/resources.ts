@@ -24,16 +24,7 @@ import {
   glow,
   limb,
 } from './graphics.ts';
-import {
-  ART,
-  BIOME_STEP,
-  FIRST_CENTER,
-  blendAt,
-  artAt,
-  daylight,
-  duskiness,
-  overcastOf,
-} from './palette.ts';
+import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
 import { grassBlade } from './terrain.ts';
 import type { ArtStyle, Canvas2D } from './types.ts';
 import type { FieldCache, ResourceNode } from '../core/types.ts';
@@ -261,7 +252,46 @@ export function drawPine(c: Canvas2D, s: number, seed: number, art: ArtStyle, sw
     ellipse(c, x - rx * 0.3, y - ry * 0.45, rx * 0.35, ry * 0.25, lt);
   }
 }
+/** Seconds a felled tree takes to hit the ground, and to fade once it has. */
+const FALL_SECONDS = 1.1,
+  FADE_SECONDS = 0.45;
+/** Horizontal wobble for a node that was just struck. */
+export const hitShake = (n: ResourceNode, t: number) => {
+  const since = t - (n.hitAt ?? -9);
+  return since >= 0 && since < 0.3 ? Math.sin(since * 70) * 3.2 * (1 - since / 0.3) : 0;
+};
 export function drawTree(c: Canvas2D, n: ResourceNode, x: number, y: number, t: number) {
+  const since = n.felledAt === undefined ? Infinity : t - n.felledAt;
+  if (n.hp > 0 || since >= FALL_SECONDS + FADE_SECONDS) {
+    drawStandingTree(c, n, x + hitShake(n, t), y, t, since);
+    return;
+  }
+  // Timber: the trunk tips from its base, gathering speed, bounces once, and fades.
+  drawStandingTree(c, n, x, y, t, Infinity, true);
+  const dir = n.fallDir ?? 1,
+    lie = Math.PI / 2 - 0.08,
+    p = Math.min(1, since / FALL_SECONDS),
+    after = Math.max(0, since - FALL_SECONDS),
+    angle =
+      since < FALL_SECONDS
+        ? lie * p ** 2.4
+        : lie - 0.07 * Math.sin(after * 18) * Math.exp(-after * 7);
+  c.save();
+  c.translate(x, y - 12);
+  c.rotate(dir * angle);
+  c.globalAlpha = after > 0 ? Math.max(0, 1 - after / FADE_SECONDS) : 1;
+  drawStandingTree(c, { ...n, hp: 1 }, 0, 12, t, Infinity);
+  c.restore();
+}
+function drawStandingTree(
+  c: Canvas2D,
+  n: ResourceNode,
+  x: number,
+  y: number,
+  t: number,
+  since: number,
+  stumpOnly = false,
+) {
   const art0 = artAt(n.x, n.y),
     art = art0.trees ? art0 : ART.meadow,
     s = 0.9 + H(n.id, 3) * 0.24,
@@ -269,8 +299,8 @@ export function drawTree(c: Canvas2D, n: ResourceNode, x: number, y: number, t: 
     seed = n.id * 13;
   c.save();
   c.translate(x, y);
-  ellipse(c, 0, 1, 30 * s, 5, 'rgba(20,24,18,0.22)');
-  if (n.hp <= 0) {
+  if (!stumpOnly) ellipse(c, 0, 1, 30 * s, 5, 'rgba(20,24,18,0.22)');
+  if (n.hp <= 0 || stumpOnly) {
     // A cut stump waits for regrowth.
     fillPoly(
       c,
@@ -286,6 +316,19 @@ export function drawTree(c: Canvas2D, n: ResourceNode, x: number, y: number, t: 
     );
     ellipse(c, 0, -12.5, 8, 3, '#c9a878', INK, 1.2);
     ellipse(c, 0, -12.5, 4, 1.5, '', '#a8845a', 1);
+    // A sapling sprouts beside the stump and fills out as the regrowth nears.
+    const window = n.depletedUntil - (n.felledAt ?? n.depletedUntil),
+      growth = window > 0 && since < Infinity ? since / window : 0;
+    if (!stumpOnly && growth > 0.45) {
+      const k = 0.2 + (growth - 0.45) * 1.25;
+      c.translate(10, 0);
+      c.scale(k, k);
+      const kind = n.kind === 'resin' ? 'conifer' : art.trees || 'broadleaf';
+      if (kind === 'conifer') drawConifer(c, s, seed, art, sway, !!art.snowy);
+      else if (kind === 'willow') drawWillow(c, s, seed, art, sway, t);
+      else if (kind === 'pine') drawPine(c, s, seed, art, sway);
+      else drawBroadleaf(c, s, seed, art, sway);
+    }
     c.restore();
     return;
   }
@@ -960,6 +1003,19 @@ export function drawMineral(c: Canvas2D, n: ResourceNode, x: number, y: number, 
       c.strokeRect(-r, -r, r * 2, r * 2);
       c.restore();
     }
+  } else if (k === 'hellstone') {
+    // Hellstone: black-red rock split by seams of living fire.
+    glow(c, 0, -10, 34, '#ff5a1f', 0.35 + Math.sin(t * 2.4 + n.phase) * 0.1);
+    drawRock(c, -4, 30, 22, seed, '#4a1c22');
+    drawRock(c, 11, 16, 13, seed + 3, '#5a2029');
+    for (const [x1, y1, x2, y2] of [
+      [-14, -6, -2, -15],
+      [-6, -2, 6, -12],
+      [6, -4, 14, -9],
+    ]) {
+      line(c, x1, y1, x2, y2, '#ff6a2a', 2.4);
+      line(c, x1, y1, x2, y2, '#ffd27a', 0.9);
+    }
   } else {
     drawRock(c, 0, 30, 20, seed, '#9a8d78');
   }
@@ -967,6 +1023,7 @@ export function drawMineral(c: Canvas2D, n: ResourceNode, x: number, y: number, 
 }
 export function drawNode(c: Canvas2D, n: ResourceNode, x: number, y: number, t: number) {
   const k = n.kind;
+  x += hitShake(n, t);
   if (k === 'water') drawPond(c, n, x, y, t);
   else if (
     [
