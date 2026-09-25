@@ -19,6 +19,8 @@ const LOOKAHEAD = 1.2;
 const SCENE_SETTLE = 1.5;
 /** Scenes that cut in (or out) without waiting for the scene to settle. */
 const URGENT = new Set(['menu', 'boss', 'fallen']);
+/** The Unmaker's themes cut in at once, so they land on what happens on screen. */
+const cutsIn = (id: string) => id.startsWith('unmaker');
 let ac: AudioContext | undefined;
 let master: GainNode | undefined;
 let musicGain: GainNode | undefined;
@@ -73,8 +75,14 @@ function switchTo(id: string, now: number) {
     return;
   }
   const quick = id === 'boss' || id === 'fallen';
-  deck?.stop(now, quick ? 0.8 : 2.5);
-  deck = player.play(TRACKS[id] ?? TRACKS.meadow, now + 0.08, current ? (quick ? 0.25 : 1.5) : 0);
+  // The Unmaker's theme cuts in at once, so its build lines up with the entrance on screen.
+  const cut = cutsIn(id);
+  deck?.stop(now, cut ? 0.3 : quick ? 0.8 : 2.5);
+  deck = player.play(
+    TRACKS[id] ?? TRACKS.meadow,
+    now + 0.08,
+    cut ? 0 : current ? (quick ? 0.25 : 1.5) : 0,
+  );
   current = id;
 }
 // Follows the scene and keeps the next second of music scheduled.
@@ -82,7 +90,8 @@ function tick() {
   if (!ac || !player || ac.state !== 'running') return;
   const now = ac.currentTime;
   if (desired !== current) {
-    const urgent = !current || URGENT.has(desired) || URGENT.has(current);
+    const urgent =
+      !current || URGENT.has(desired) || URGENT.has(current) || cutsIn(desired) || cutsIn(current);
     if (urgent || now - desiredSince > SCENE_SETTLE) switchTo(desired, now);
   }
   player.schedule(now + LOOKAHEAD, now);
@@ -149,6 +158,11 @@ function setVolumes(m: number, s: number) {
   if (ac && sfxBus) sfxBus.gain.setTargetAtTime(settings.sfx * 0.8, ac.currentTime, 0.05);
   localStorage.setItem('wildlands-audio', JSON.stringify(settings));
 }
+/** Silences the music for a moment (the screen has gone dark), or brings it back. */
+function setHushed(on: boolean) {
+  if (ac && musicGain)
+    musicGain.gain.setTargetAtTime(on ? 0 : musicLevel(), ac.currentTime, on ? 0.02 : 0.08);
+}
 /** Title of the track playing now, if any. */
 function nowPlaying() {
   return current ? TRACKS[current]?.title : undefined;
@@ -160,6 +174,7 @@ export const Audio = {
   setAmbience,
   setScene,
   setMuffled,
+  setHushed,
   setVolumes,
   nowPlaying,
   settings,

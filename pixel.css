@@ -1274,3 +1274,136 @@ small.spoiled {
   background: #f4ead4;
   box-sizing: border-box;
 }
+
+/* ── The Unmaker's cinematics ───────────────────────────────────────────────────────────── */
+#cinematic {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+#cinematic.hidden {
+  display: none;
+}
+.cine-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #000;
+  transition: height 0.35s steps(6);
+}
+.cine-bar.top {
+  top: 0;
+}
+.cine-bar.bottom {
+  bottom: 0;
+}
+#cinematic.bars .cine-bar {
+  height: 11vh;
+}
+.cine-flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+.cine-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 36%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+#cine-title {
+  font: 400 clamp(40px, 9vw, 112px) / 1 var(--pixel);
+  letter-spacing: 0.06em;
+  color: #fff;
+  /* The chromatic split of a hard edit. */
+  text-shadow:
+    -4px 0 #ff2a6a,
+    4px 0 #2ae8ff,
+    0 0 24px #b36cff;
+}
+#cine-title.slam {
+  animation: cine-slam 0.42s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+#cine-sub {
+  font: 400 clamp(14px, 2.2vw, 24px) var(--caps);
+  letter-spacing: 0.4em;
+  color: #ffd0f0;
+  text-shadow: 0 0 10px #ff5a8a;
+}
+#cinematic[data-mode='death'] #cine-title,
+#cinematic[data-mode='drop'] #cine-title {
+  color: #fff;
+}
+#cinematic[data-mode='phase'] #cine-title,
+#cinematic[data-mode='last'] #cine-title {
+  color: #ffe0e8;
+  text-shadow:
+    -5px 0 #ff0a2a,
+    5px 0 #7a00ff,
+    0 0 30px #ff2a4a;
+}
+#cinematic[data-mode='death'] #cine-sub {
+  color: #fff0c0;
+  text-shadow: 0 0 12px #f0c070;
+}
+@keyframes cine-slam {
+  0% {
+    transform: scale(2.6) skewX(-8deg);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  45% {
+    transform: scale(0.94) translateX(-6px);
+    opacity: 1;
+    filter: none;
+  }
+  60% {
+    transform: scale(1.03) translateX(5px);
+  }
+  100% {
+    transform: none;
+  }
+}
+.cine-skip {
+  position: absolute;
+  right: 24px;
+  bottom: calc(11vh + 12px);
+  font: 400 12px var(--caps);
+  letter-spacing: 0.2em;
+  color: #ffd0f0;
+  opacity: 0.7;
+}
+.cine-skip.hidden {
+  display: none;
+}
+#boss-hud.slam {
+  animation: cine-slam 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  #cine-title.slam,
+  #boss-hud.slam {
+    animation: none;
+  }
+}
+#shatter {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+body.shattering #hud,
+body.shattering #cinematic {
+  visibility: hidden;
+}
+body.cinematic #hud > :not(#boss-hud) {
+  opacity: 0;
+  transition: opacity 0.3s;
+}

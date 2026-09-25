@@ -102,6 +102,9 @@ export class Combat extends System {
   /** Harms a creature through its defense, knocks it back, and kills it at zero. */
   hurtMob(a: Animal, amount: number, from: Point, magic = false, w?: WeaponStats) {
     if (a.deadUntil || a.settler || a.hidden) return 0;
+    // The Unmaker cannot be touched while it enters or gathers itself, and its shades shield it.
+    if (a.type === 'unmaker') amount = this.game.unmaker.absorb(a, amount, from);
+    if (amount <= 0) return 0;
     if (
       a.type === 'boss' &&
       (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier

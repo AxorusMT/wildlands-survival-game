@@ -28,35 +28,37 @@ TypeScript source is in `src/`. `src/main.ts` bundles the UI, audio, simulation,
 
 The soundtrack is twenty-five one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
 
-| Track                     | Plays                                     |
-| ------------------------- | ----------------------------------------- |
-| Wildlands                 | Main menu                                 |
-| First Light on the Meadow | Meadow by day, and any temperate fallback |
-| Salt Wind Waltz           | Coast by day                              |
-| Under the Canopy          | Forest by day                             |
-| Lanterns Out              | Meadow, coast, and forest at night        |
-| Mire Shuffle              | Marsh                                     |
-| Hoarfrost                 | Tundra, taiga, and alpine                 |
-| Mirage Caravan            | Desert and badlands                       |
-| Squall Line               | Any surface region during a storm         |
-| Lantern Glow              | The upper mines                           |
-| Crystal Dark              | The lower mines                           |
-| Brimstone Forges          | Upper hell                                |
-| Throne of Cinders         | Lower hell                                |
-| Direwolf                  | A Direwolf hunt or a dungeon boss         |
-| What the Wild Takes       | The death page                            |
-| Halls of the Hollow King  | The Mossy Crypt and the Frost Keep        |
-| Sand and Silence          | The Sunken Tomb                           |
-| Spore Light               | The Mycelial Deep                         |
-| Above the Cloud Sea       | Skyreach                                  |
-| The Hollow Between        | The Hollow Void                           |
-| Unmaker                   | The final fight                           |
-| Lamplight on the Square   | A town of two or more settlers            |
-| Brine and Blossom         | The Drowned Orchard                       |
-| The Kiln Road             | The Ashen Steppe                          |
-| Under the Amber           | The Hollow Warren                         |
+| Track                       | Plays                                               |
+| --------------------------- | --------------------------------------------------- |
+| Wildlands                   | Main menu                                           |
+| First Light on the Meadow   | Meadow by day, and any temperate fallback           |
+| Salt Wind Waltz             | Coast by day                                        |
+| Under the Canopy            | Forest by day                                       |
+| Lanterns Out                | Meadow, coast, and forest at night                  |
+| Mire Shuffle                | Marsh                                               |
+| Hoarfrost                   | Tundra, taiga, and alpine                           |
+| Mirage Caravan              | Desert and badlands                                 |
+| Squall Line                 | Any surface region during a storm                   |
+| Lantern Glow                | The upper mines                                     |
+| Crystal Dark                | The lower mines                                     |
+| Brimstone Forges            | Upper hell                                          |
+| Throne of Cinders           | Lower hell                                          |
+| Direwolf                    | A Direwolf hunt or a dungeon boss                   |
+| What the Wild Takes         | The death page                                      |
+| Halls of the Hollow King    | The Mossy Crypt and the Frost Keep                  |
+| Sand and Silence            | The Sunken Tomb                                     |
+| Spore Light                 | The Mycelial Deep                                   |
+| Above the Cloud Sea         | Skyreach                                            |
+| The Hollow Between          | The Hollow Void                                     |
+| UNMAKER (Montagem do Vazio) | The Unmaker, phase I (two minutes, Brazilian phonk) |
+| UNMAKER II, III, IV         | Its later phases: faster and heavier at each        |
+| Wildlands (Unmade)          | Its death: a phonk turn on the title theme          |
+| Lamplight on the Square     | A town of two or more settlers                      |
+| Brine and Blossom           | The Drowned Orchard                                 |
+| The Kiln Road               | The Ashen Steppe                                    |
+| Under the Amber             | The Hollow Warren                                   |
 
-Surface changes wait a moment before the music follows, so walking along a border does not flip tracks. The menu, boss, and death tracks cut in straight away. Music is muffled while the journal is open over the game.
+Surface changes wait a moment before the music follows, so walking along a border does not flip tracks. The menu, boss, and death tracks cut in straight away, and the Unmaker's cut in on the beat of what happens on screen. Music is muffled while the journal is open over the game.
 
 ## Sound
 
@@ -72,22 +74,23 @@ Sound effects are synthesised live too (`src/audio/sfx.ts`), and are panned and 
 
 Press ` (backquote) during play to open the field console. Tab completes commands and names, and ↑/↓ recalls earlier lines. Console switches last for the session and are not saved.
 
-| Command                                  | Effect                                                             |
-| ---------------------------------------- | ------------------------------------------------------------------ |
-| `give <item> [qty]`                      | Put items in the pack (`give obsidian pick 2`)                     |
-| `items [filter]`, `recipes [filter]`     | List item and recipe ids                                           |
-| `unlock <recipe\|all>`, `lock …`         | Make recipes craftable anywhere, without materials                 |
-| `god`                                    | No damage; every need stays met                                    |
-| `noclip`                                 | Fly through rock with WASD                                         |
-| `speed <x>`                              | Scale movement speed                                               |
-| `summon <mob> [count]`                   | Any creature or boss, e.g. `summon skeleton 3`, `summon unmaker`   |
-| `kill [radius\|all]`                     | Slay nearby creatures                                              |
-| `heal`                                   | Restore every vital and cure illness                               |
-| `tp <x [y] \| region \| layer \| place>` | `tp alpine`, `tp lower_hell`, `tp crypt`, `tp skyreach`, …         |
-| `time <hh:mm\|dawn\|noon\|dusk\|night>`  | Set the time of day                                                |
-| `weather <clear\|cloudy\|rain\|storm>`   | Change the weather                                                 |
-| `realm <id> [tier]`, `realm home\|close` | Open a generated realm (`realm warren 3`), go home, or collapse it |
-| `pos`, `help`, `clear`                   | Where you are, the command list, and clear the log                 |
+| Command                                  | Effect                                                                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `give <item> [qty]`                      | Put items in the pack (`give obsidian pick 2`)                                                                                             |
+| `items [filter]`, `recipes [filter]`     | List item and recipe ids                                                                                                                   |
+| `unlock <recipe\|all>`, `lock …`         | Make recipes craftable anywhere, without materials                                                                                         |
+| `god`                                    | No damage; every need stays met                                                                                                            |
+| `noclip`                                 | Fly through rock with WASD                                                                                                                 |
+| `speed <x>`                              | Scale movement speed                                                                                                                       |
+| `summon <mob> [count]`                   | Any creature or boss, e.g. `summon skeleton 3`, `summon unmaker`                                                                           |
+| `gear <early\|mid\|late\|endgame>`       | Equip a ready-made kit; `gear endgame` (or `gear unmaker`) is Voidsteel armour and Mythic +10 holy tier XII weapons, ready for the Unmaker |
+| `kill [radius\|all]`                     | Slay nearby creatures                                                                                                                      |
+| `heal`                                   | Restore every vital and cure illness                                                                                                       |
+| `tp <x [y] \| region \| layer \| place>` | `tp alpine`, `tp lower_hell`, `tp crypt`, `tp skyreach`, …                                                                                 |
+| `time <hh:mm\|dawn\|noon\|dusk\|night>`  | Set the time of day                                                                                                                        |
+| `weather <clear\|cloudy\|rain\|storm>`   | Change the weather                                                                                                                         |
+| `realm <id> [tier]`, `realm home\|close` | Open a generated realm (`realm warren 3`), go home, or collapse it                                                                         |
+| `pos`, `help`, `clear`                   | Where you are, the command list, and clear the log                                                                                         |
 
 ## Controls
 
@@ -259,7 +262,69 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 - **Getting around:** walk, climb the ladders, or jump between islands.
 - **Gear:** each world's ore makes the next tier of tools, weapons and armour at the **Starforge**.
 - **Boss summons:** each boss is called with an item crafted from its world: the Spore lure, the Storm totem and the Void seal.
-- **The end:** the Unmaker's final fight has its own theme, and defeating it wins the Crown of the Wildlands.
+- **The end:** the Unmaker's final fight. See below.
+
+### The Unmaker
+
+The last great foe waits behind the altar in the Maw of the Hollow Void. You summon it with a Void Seal, or in the console with `gear endgame`, `tp void`, `summon unmaker` (add `god` to watch it without dying). It has 48,000 health.
+
+- **The entrance.** Its entrance is timed to the four-bar build of its theme:
+  - the void tears open above the altar and drinks in the light on every beat;
+  - it rises through the tear while the title lands one word per beat ("THE", "UN", "MAKER");
+  - the world goes grey for a beat of silence;
+  - the beat drops on the reveal, with a shockwave, a ring of light, and the boss bar slamming in.
+
+  You cannot move or be hurt while it enters. Once you have beaten it, Esc skips the entrance.
+
+- **Phases.** It has four phases and a last stand:
+
+  | Phase      | Name          | Begins at  | Its host          |
+  | ---------- | ------------- | ---------- | ----------------- |
+  | I          | The Gaze      | start      | watchers          |
+  | II         | The Swarm     | 75% health | adds void wisps   |
+  | III        | The Unweaving | 50% health | void shades       |
+  | IV         | The Collapse  | 25% health | void stalkers too |
+  | Last stand | "Unmaking"    | 10% health | all of them       |
+  - Each phase begins with a short cutscene: the world slows, the camera turns to it, it convulses, and the phase's name slams onto the screen.
+  - Each phase has its own theme, faster and heavier than the last (145, 150 and 160 BPM).
+  - While two void shades live, they take most of its wounds, so kill them first.
+
+- **It gets exponentially harder.** Its danger doubles for every 38% of health it loses, to about six times its starting level at the end. Its shots hit harder and fly faster, it fires more of them, it rests less between moves, it dodges more, and it calls its host more often.
+- **Its mind.** Its AI reads the fight rather than following a script:
+  - it leads its shots to where you will be;
+  - it sidesteps your arrows and backs off from a blade;
+  - it keeps close if you fight from range, and far if you fight up close;
+  - it marks the ground where you like to stand;
+  - it punishes healing and standing still;
+  - if you hide behind rock, it comes through the dark to find you.
+
+  Its moves:
+  - a gaze of led shots;
+  - rings of beams (counter-rotating from phase III);
+  - sweeping lances that pass through rock;
+  - a blink behind you with a point-blank blast;
+  - rift spikes erupting from marked ground;
+  - seeking orbs that burst into rings;
+  - a gravity well that drags you in;
+  - a curtain of lances with one gap, marked in white.
+
+  Every move is telegraphed.
+
+- **Its look.**
+  - **Aura and body:** an aura pulses on every beat of its theme. Shards orbit it, and more eyes open with each phase. From phase III it wears a crown of black glass horns with burning cracks, and at the end afterimages trail it.
+  - **Sky and weather:** they turn with the fight, from a violet void with a great eye watching you, to void rain, to a crimson sky raining ash, to a black storm split by lightning on the beat.
+- **Its death.**
+  - The killing blow lands with a hit-stop, and the finale starts: a phonk turn on the title theme, at the title's own tempo.
+  - The Unmaker convulses and cracks with light on every beat while its host goes out one by one.
+  - On the finale's drop it bursts in a supernova: "UNMADE".
+  - Then the fourth wall breaks. The screen cracks like a struck monitor, bleeds ink and dead lines, and falls away in pieces into "NO SIGNAL".
+  - It comes back like an old tube switching on, to a dawn breaking where the eye used to watch.
+- **Its spoils:**
+  - **Oblivion,** the strongest greatsword;
+  - **the Unmaker's Gaze,** the strongest staff (three seeking beams a cast);
+  - **the Aura of the Unmade,** +30% damage, regeneration and speed, plus a void aura that sears every foe near you;
+  - **the Heart of the Void,** which raises your health past every other limit, twice at most;
+  - fracture shards, ascended ingots, and the Crown of the Wildlands.
 
 ### Waystones and generated realms
 
@@ -450,6 +515,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the weapon hierarchy: a complete, ever-stronger grid, quality, the anvil and evolutions, family mechanics, infusions and gems, crossbows and tomes;
 - generated realms: seeds, keys and tiers, furnishing, modifiers, hazards, bosses and relics, and saving an open realm;
 - homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
+- the Unmaker: its entrance, phases and cutscenes, how it grows harder, its aim and dodging, its shades, its death, its spoils, and saving mid-entrance;
 - balance: time to kill for every band and family, bands gated in order, how long food keeps in the warm and in cold storage, and a night spent in the open;
 - save migration from every earlier layout;
 - the music and sound.

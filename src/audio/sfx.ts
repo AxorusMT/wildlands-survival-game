@@ -282,6 +282,22 @@ const SOUNDS: Record<string, Sfx> = {
     hiss(k, o, t, { freq: 3500, q: 2, peak: 0.18 * v, decay: 0.04 });
     tone(k, o, t, { from: 150, to: 90, peak: 0.12 * v, decay: 0.06 });
   },
+  // The fourth wall: a monitor cracking, its glass falling out, and an old tube switching on.
+  screen_crack: (k, o, t, v) => {
+    tone(k, o, t, { from: 90, to: 40, peak: 0.5 * v, decay: 0.4 });
+    clicks(k, o, t, 18, 0.12, 5200, 0.16 * v);
+    hiss(k, o, t, { freq: 6000, type: 'highpass', peak: 0.35 * v, decay: 0.2 });
+  },
+  shatter: (k, o, t, v) => {
+    for (let i = 0; i < 6; i++) clicks(k, o, t + i * 0.09, 12, 0.3, 3800 + i * 500, 0.1 * v);
+    hiss(k, o, t, { freq: 4500, type: 'highpass', peak: 0.3 * v, decay: 0.9 });
+    tone(k, o, t + 0.5, { from: 160, to: 60, peak: 0.2 * v, decay: 0.5 });
+  },
+  crt_on: (k, o, t, v) => {
+    tone(k, o, t, { from: 15000, to: 15600, peak: 0.05 * v, decay: 0.9 });
+    tone(k, o, t, { from: 60, to: 120, peak: 0.3 * v, decay: 0.15 });
+    hiss(k, o, t, { freq: 2000, type: 'bandpass', peak: 0.2 * v, decay: 0.3 });
+  },
   crumble: (k, o, t, v) => {
     clicks(k, o, t, 10, 0.35, 2400, 0.09 * v);
     hiss(k, o, t, { freq: 500, type: 'lowpass', peak: 0.3 * v, decay: 0.35 });

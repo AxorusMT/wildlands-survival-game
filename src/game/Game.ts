@@ -19,6 +19,7 @@ import { RULES } from './rules.ts';
 import { Ailments } from './systems/Ailments.ts';
 import { Armoury } from './systems/Armoury.ts';
 import { Bosses } from './systems/Bosses.ts';
+import { Unmaker } from './systems/Unmaker.ts';
 import { Combat } from './systems/Combat.ts';
 import { Consumables } from './systems/Consumables.ts';
 import { Crafting } from './systems/Crafting.ts';
@@ -82,6 +83,7 @@ export class Game {
   readonly skills = new Skills(this);
   readonly feats = new Feats(this);
   readonly bosses = new Bosses(this);
+  readonly unmaker = new Unmaker(this);
   readonly realms = new Realms(this);
   readonly pocket = new Pocket(this);
   readonly hands = new Hands(this);
@@ -194,6 +196,9 @@ export class Game {
   tick(dt: number) {
     if (this.s.dead) return;
     dt = clamp(dt, 0, RULES.maxTickSeconds);
+    // Hype moments slow the world; the Unmaker's own clock keeps real time with its music.
+    this.unmaker.tickClock(dt);
+    dt *= this.unmaker.timeScale();
     this.environment.advance(dt);
     this.survival.advanceDecay(dt);
     this.progress.discover();
@@ -319,13 +324,17 @@ export class Game {
     this.terrain.setTile(tx, ty, kind);
   }
   mineTileAt(x: number, y: number): GameResult {
+    if (this.unmaker.frozen()) return { ok: false, reason: '' };
     return this.terrain.mineTileAt(x, y);
   }
   jump() {
+    if (this.unmaker.frozen()) return false;
     return this.physics.jump();
   }
   move(dx: number, dy: number, dt: number) {
-    this.physics.move(dx, dy, dt);
+    // An entrance holds you where you stand.
+    if (this.unmaker.frozen()) [dx, dy] = [0, 0];
+    this.physics.move(dx, dy, dt * this.unmaker.timeScale());
   }
 
   // ─── Pack ─────────────────────────────────────────────────────────────────
@@ -373,6 +382,7 @@ export class Game {
     return this.interaction.nearestInteractable(radius);
   }
   interact(): GameResult {
+    if (this.unmaker.frozen()) return { ok: false, reason: '' };
     return this.interaction.interact();
   }
   gather(node: ResourceNode): GameResult {
@@ -407,6 +417,7 @@ export class Game {
 
   // ─── Hunting and the Effergy ──────────────────────────────────────────────
   attack(): GameResult {
+    if (this.unmaker.frozen()) return { ok: false, reason: '' };
     return this.wildlife.attack();
   }
   attune(mob?: string): GameResult {

@@ -1,4 +1,4 @@
-import { clamp } from '../../core/math.ts';
+import { clamp, dist } from '../../core/math.ts';
 import {
   ACCESSORIES,
   ARMOR,
@@ -275,6 +275,17 @@ export class Equipment extends System {
       this.game.say('Your heart grows stronger · ' + s.maxHealth + ' health.', 'victory');
       return { ok: true };
     }
+    // The Heart of the Void swells your heart past every other limit, twice at most.
+    if (id === 'void_heart') {
+      const cap = CRYSTALS.baseHealth + CRYSTALS.lifeMax + 100 + 100;
+      if (this.heart() >= cap) return { ok: false, reason: 'Even the void can add no more.' };
+      s.maxHealth = Math.min(cap, this.heart() + 50);
+      this.heal(50);
+      this.game.remove(id);
+      this.game.sound('crystal');
+      this.game.say('The void beats in your chest · ' + s.maxHealth + ' health.', 'victory');
+      return { ok: true };
+    }
     if (id === 'mana_crystal') {
       if ((s.maxMana || CRYSTALS.baseMana) >= CRYSTALS.baseMana + CRYSTALS.manaMax)
         return { ok: false, reason: 'Your mind can hold no more.' };
@@ -304,9 +315,20 @@ export class Equipment extends System {
     return { ok: true };
   }
   /** Buffs wear off, mana returns, and regenerating effects heal. */
+  private auraAt?: number;
   update(dt: number) {
     const s = this.game.s,
       fx = this.effects();
+    // The Aura of the Unmade sears every foe near you, twice a second.
+    if (fx.has('aura')) {
+      this.auraAt = (this.auraAt ?? 0) - dt;
+      if (this.auraAt <= 0) {
+        this.auraAt = 0.5;
+        for (const a of s.animals)
+          if (!a.deadUntil && !a.settler && !a.companion && dist(a, s.player) < 150)
+            this.game.combat.hurtMob(a, 40, s.player, true);
+      }
+    }
     for (const id of Object.keys(s.buffs)) {
       s.buffs[id] -= dt;
       if (s.buffs[id] <= 0) {

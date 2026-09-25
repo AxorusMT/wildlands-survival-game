@@ -109,7 +109,9 @@ export class Physics extends System {
       this.game.equipment.speedBonus() *
       this.game.dev.speed;
     if (dx) p.face = dx > 0 ? 0 : Math.PI;
-    p.vx = dx * speed;
+    p.vx = dx * speed + (p.push ?? 0);
+    // A blast's shove fades within a second.
+    if (p.push) p.push = Math.abs(p.push) < 8 ? 0 : p.push * Math.exp(-dt * 4);
     const shaft = inShaft(p.x, p.y);
     // Molten rock is thick: you sink slowly and can wade or struggle upward.
     if (lava) p.vy = dy < 0 ? -150 : Math.min(p.vy + 240 * dt, 60);

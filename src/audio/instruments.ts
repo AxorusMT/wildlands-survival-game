@@ -843,6 +843,81 @@ const sub: Instrument = {
   },
 };
 
+// ── Phonk ──────────────────────────────────────────────────────────────────────────────────
+
+/** The pitched TR-808 cowbell that carries a phonk hook: two squares a fifth-ish apart. */
+const cowbell: Instrument = {
+  voice: (k, out, t, m, _dur, v) => {
+    const f = hz(m);
+    const body = perc(k, t, 0.15 * v, 0.3),
+      tick = perc(k, t, 0.08 * v, 0.025),
+      bp = filter(k, 'bandpass', f * 1.25, 1.3);
+    osc(k, 'square', f, t, body.end).connect(bp);
+    osc(k, 'square', f * 1.48, t, body.end).connect(bp);
+    bp.connect(body.g).connect(out.node);
+    osc(k, 'square', f * 2.96, t, tick.end)
+      .connect(tick.g)
+      .connect(out.node);
+  },
+};
+
+/** A distorted 808: a sine that slides down into its note, driven hard, with a long tail. */
+const phonk808: Instrument = {
+  insert: (k) => {
+    const ws = k.ctx.createWaveShaper();
+    ws.curve = k.fuzz;
+    return insertChain(gain(k, 1.4), ws, filter(k, 'lowpass', 2800), gain(k, 0.2));
+  },
+  voice: (k, out, t, m, dur, v) => {
+    const f = hz(m);
+    const { g, end } = adsr(k, t, dur, 0.003, 0.5, 0.7, 0.3, 0.55 * v);
+    for (const [shape, level] of [
+      ['sine', 1],
+      ['square', 0.1],
+    ] as const) {
+      const o = osc(k, shape, f * 1.5, t, end),
+        lv = gain(k, level);
+      o.frequency.setValueAtTime(f * 1.5, t);
+      o.frequency.exponentialRampToValueAtTime(f, t + 0.07);
+      o.connect(lv).connect(g);
+    }
+    g.connect(out.node);
+  },
+};
+
+/** A shouted vocal chop ("ah!", "hey!"): buzzing saws falling in pitch through vowel formants. */
+const vox: Instrument = {
+  insert: (k) => {
+    const input = gain(k, 1),
+      output = gain(k, 1.4);
+    for (const [freq, q, level] of [
+      [800, 5, 1],
+      [1150, 6, 0.6],
+      [2900, 8, 0.3],
+    ]) {
+      const bp = filter(k, 'bandpass', freq, q);
+      input.connect(bp).connect(gain(k, level)).connect(output);
+    }
+    return { input, output };
+  },
+  voice: (k, out, t, m, dur, v) => {
+    const f = hz(m);
+    const { g, end } = adsr(k, t, Math.min(dur, 0.32), 0.004, 0.14, 0.55, 0.06, 0.32 * v);
+    for (const detune of [-12, 12]) {
+      const o = osc(k, 'sawtooth', f * 1.12, t, end, detune);
+      o.frequency.setValueAtTime(f * 1.12, t);
+      o.frequency.exponentialRampToValueAtTime(f * 0.92, t + 0.28);
+      o.connect(g);
+    }
+    g.connect(out.node);
+    const breath = perc(k, t, 0.05 * v, 0.07);
+    noise(k, t, breath.end)
+      .connect(filter(k, 'highpass', 3200))
+      .connect(breath.g)
+      .connect(out.node);
+  },
+};
+
 // ── Drums and effects ──────────────────────────────────────────────────────────────────────
 
 function click(
@@ -1115,6 +1190,9 @@ export const INSTRUMENTS = {
   bass,
   synthbass,
   sub,
+  cowbell,
+  phonk808,
+  vox,
   kick,
   bigkick,
   snare,

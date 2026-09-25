@@ -38,6 +38,7 @@
     COURSE_BRAMBLES: () => COURSE_BRAMBLES,
     COURSE_HOLLOW: () => COURSE_HOLLOW,
     CRYSTALS: () => CRYSTALS,
+    DEATH_SCENE: () => DEATH_SCENE,
     DIET_MEMORY: () => DIET_MEMORY,
     DIMENSIONS: () => DIMENSIONS,
     DIM_GAP: () => DIM_GAP,
@@ -50,12 +51,18 @@
     DUNGEON_DEFS: () => DUNGEON_DEFS,
     EDGE: () => EDGE,
     EFFECT_TEXT: () => EFFECT_TEXT,
+    ENTRANCE: () => ENTRANCE,
     ENTRANCES: () => ENTRANCES,
+    ENTRANCE_BARS: () => ENTRANCE_BARS,
     EVOLUTIONS: () => EVOLUTIONS,
     FAMILIES: () => FAMILIES,
     FEATS: () => FEATS,
     FEVER_BITES: () => FEVER_BITES,
     FEVER_CHANCE: () => FEVER_CHANCE,
+    FINALE_BARS: () => FINALE_BARS,
+    FINALE_BPM: () => FINALE_BPM,
+    FINALE_DROP_BARS: () => FINALE_DROP_BARS,
+    FINALE_SECONDS: () => FINALE_SECONDS,
     FOOD: () => FOOD,
     FOOD_GROUPS: () => FOOD_GROUPS,
     FRACTURED_LOOT: () => FRACTURED_LOOT,
@@ -71,9 +78,12 @@
     INFUSIONS: () => INFUSIONS,
     ISLANDS: () => ISLANDS,
     ITEMS: () => ITEMS,
+    LAST_STAND: () => LAST_STAND,
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
     LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    LOADOUTS: () => LOADOUTS,
+    LOADOUT_ALIASES: () => LOADOUT_ALIASES,
     LORE: () => LORE,
     MASTERY_PERKS: () => MASTERY_PERKS,
     MASTERY_TITLES: () => MASTERY_TITLES,
@@ -114,6 +124,8 @@
     SETTLERS: () => SETTLERS,
     SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
+    SHATTER_AT: () => SHATTER_AT,
+    SHATTER_SECONDS: () => SHATTER_SECONDS,
     SHINE_LEVEL: () => SHINE_LEVEL,
     SIDE_ORDER: () => SIDE_ORDER,
     SIGNATURE: () => SIGNATURE,
@@ -126,6 +138,7 @@
     STATION_LINES: () => STATION_LINES,
     STATION_QUALITY: () => STATION_QUALITY,
     STORAGE: () => STORAGE,
+    SUPERNOVA: () => SUPERNOVA,
     SURFACE_BAND: () => SURFACE_BAND,
     TIERS: () => TIERS,
     TIER_NAMES: () => TIER_NAMES,
@@ -140,6 +153,10 @@
     TREE_NODES: () => TREE_NODES,
     TUTORIAL: () => TUTORIAL,
     UNDEAD: () => UNDEAD,
+    UNMADE: () => UNMADE,
+    UNMAKER_BEAT: () => UNMAKER_BEAT,
+    UNMAKER_BPM: () => UNMAKER_BPM,
+    UNMAKER_PHASES: () => UNMAKER_PHASES,
     VOICES: () => VOICES,
     VOID: () => VOID,
     VOID_LADDERS: () => VOID_LADDERS,
@@ -410,6 +427,57 @@
       glow: "#e3baf7"
     }
   ];
+  var UNMAKER_BPM = 140;
+  var ENTRANCE_BARS = 4;
+  var ENTRANCE = ENTRANCE_BARS * 4 * 60 / UNMAKER_BPM;
+  var UNMAKER_BEAT = 60 / UNMAKER_BPM;
+  var UNMAKER_PHASES = [
+    { at: 1, name: "I", title: "The Gaze", bpm: 140, music: "unmaker", minions: [["watcher", 2]] },
+    {
+      at: 0.75,
+      name: "II",
+      title: "The Swarm",
+      bpm: 145,
+      music: "unmaker_2",
+      minions: [
+        ["watcher", 2],
+        ["void_wisp", 4]
+      ]
+    },
+    {
+      at: 0.5,
+      name: "III",
+      title: "The Unweaving",
+      bpm: 150,
+      music: "unmaker_3",
+      minions: [
+        ["void_shade", 2],
+        ["void_wisp", 3]
+      ]
+    },
+    {
+      at: 0.25,
+      name: "IV",
+      title: "The Collapse",
+      bpm: 160,
+      music: "unmaker_4",
+      minions: [
+        ["void_shade", 2],
+        ["void_stalker", 2],
+        ["watcher", 2]
+      ]
+    }
+  ];
+  var LAST_STAND = 0.1;
+  var FINALE_BPM = 132;
+  var FINALE_DROP_BARS = 3;
+  var FINALE_BARS = 32;
+  var FINALE_SECONDS = FINALE_BARS * 4 * 60 / FINALE_BPM;
+  var SUPERNOVA = FINALE_DROP_BARS * 4 * 60 / FINALE_BPM;
+  var UNMADE = SUPERNOVA + 0.4;
+  var SHATTER_AT = SUPERNOVA + 3.2;
+  var SHATTER_SECONDS = 5.1;
+  var DEATH_SCENE = SHATTER_AT + SHATTER_SECONDS + 2.5;
 
   // src/data/diseases.ts
   var STAGE_FORCE = [0, 0.4, 1, 1.8];
@@ -1048,6 +1116,9 @@
     iron_bow: ["bow", 3]
   };
   var SIGNATURE = {
+    // The Unmaker's: the best of their families.
+    oblivion: ["greatsword", 12],
+    unmakers_gaze: ["staff", 12],
     silver_broadsword: ["blade", 3],
     gold_broadsword: ["blade", 4],
     tidecaller_spear: ["spear", 4],
@@ -1904,6 +1975,16 @@
       spread: 0.3
     },
     void_staff: { kind: "magic", projectile: "void_beam", delay: 0.3, speed: 1100, mana: 12 },
+    // The Unmaker's own gaze, turned: three seeking beams a cast.
+    unmakers_gaze: {
+      kind: "magic",
+      projectile: "gaze_beam",
+      delay: 0.24,
+      speed: 1150,
+      mana: 10,
+      count: 3,
+      spread: 0.12
+    },
     ...GEN_RANGED
   };
   var AMMO = {
@@ -1958,6 +2039,12 @@
     shockwave: { color: "#dff6ff", glow: "#9fd8ec", life: 1.6, size: 18, pierce: 99 },
     lightning: { color: "#fff8c0", glow: "#fff0a0", life: 0.5, size: 18, pierce: 99 },
     eye_beam: { color: "#ff5a8a", glow: "#ff9ac0", life: 2.4, size: 11 },
+    // The Unmaker's: a lance that passes through rock, spikes that erupt from the floor, and
+    // slow orbs that seek you and burst.
+    void_lance: { color: "#ffd0f0", glow: "#ff5a8a", life: 1.4, size: 9, pierce: 99 },
+    rift_spike: { color: "#b36cff", glow: "#ffd0f0", life: 0.45, size: 14, pierce: 99 },
+    null_orb: { color: "#12001e", glow: "#b36cff", life: 4, size: 20, homing: 1.1 },
+    gaze_beam: { color: "#ff5a8a", glow: "#ffd0f0", life: 1.6, size: 10, homing: 3, pierce: 2 },
     flame_jet: { color: "#ffb347", glow: "#ff6a2a", life: 0.7, size: 16, fire: true, pierce: 99 },
     ...GEN_PROJECTILES
   };
@@ -2107,6 +2194,10 @@
     wildlands_crown: {
       effects: ["damage10", "defense4", "regen", "light"],
       text: "The crown of the wildlands"
+    },
+    aura_of_the_unmade: {
+      effects: ["void", "damage10", "regen", "speed10", "aura"],
+      text: "+30% damage, regenerate, +10% speed; a void aura sears every foe near you"
     }
   };
   var CRYSTALS = {
@@ -2669,6 +2760,10 @@
     band_of_vigor: ["Band of vigor", "accessory"],
     hollow_crown: ["Hollow crown", "accessory"],
     wildlands_crown: ["Crown of the Wildlands", "accessory"],
+    oblivion: ["Oblivion", "weapon"],
+    unmakers_gaze: ["The Unmaker's Gaze", "weapon"],
+    aura_of_the_unmade: ["Aura of the Unmade", "accessory"],
+    void_heart: ["Heart of the Void", "potion"],
     // ── Potions ──
     healing_draught: ["Healing draught", "potion"],
     greater_healing: ["Greater healing draught", "potion"],
@@ -3557,6 +3652,8 @@
     star_saber: [9, 152, 78],
     void_reaver: [10, 272, 86],
     rift_blade: [11, 245, 92],
+    oblivion: [12, 560, 90],
+    unmakers_gaze: [12, 250, 0],
     // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
     wooden_bow: [1, 9, 0],
     iron_bow: [3, 20, 0],
@@ -3691,9 +3788,9 @@
         const v = Math.sin((i + 1) * 127.1 + k * 311.7) * 43758.5453;
         return v - Math.floor(v);
       };
-      const cx = 560 + i * 540 + (r(1) - 0.5) * 140, half = 170 + r(2) * 190;
+      const cx = 560 + i * 540 + (r(1) - 0.5) * 140, half2 = 170 + r(2) * 190;
       top = Math.max(900, Math.min(3350, top - 120 - r(3) * 260 + (i % 4 === 3 ? 520 : 0)));
-      out.push({ cx, top, half, depth: 150 + r(4) * 200 });
+      out.push({ cx, top, half: half2, depth: 150 + r(4) * 200 });
     }
     out[out.length - 1] = { cx: DIM_WIDTH - 700, top: 820, half: 420, depth: 380 };
     return out;
@@ -6525,8 +6622,8 @@
       const border = west ? span.start : span.end, other = BIOME_SPANS[west ? i - 1 : i + 1], t = 0.5 + (x - border) / BLEND * 0.5 * (west ? 1 : -1), k = t * t * (3 - 2 * t);
       y = PROFILES[other.id](x) * (1 - k) + y * k;
     }
-    for (const [id, depth, half] of BORDER_FEATURES) {
-      const border = BIOME_SPANS.find((s) => s.id === id).end, d = (x - border) / half;
+    for (const [id, depth, half2] of BORDER_FEATURES) {
+      const border = BIOME_SPANS.find((s) => s.id === id).end, d = (x - border) / half2;
       if (Math.abs(d) < 3) y += depth * Math.exp(-d * d * 2);
     }
     return Math.max(170, Math.min(800, y));
@@ -7221,6 +7318,21 @@
       loot: [L2("void_essence", 2, 3), L2("watcher_lens", 1, 1, 0.15)],
       respawn: 110
     },
+    // The Unmaker's own shades: while two live, they bear most of its wounds.
+    void_shade: {
+      name: "Void shade",
+      hp: 2600,
+      damage: 80,
+      speed: [60, 190],
+      move: "floater",
+      sight: 900,
+      reach: 50,
+      cooldown: 2,
+      defense: 30,
+      ranged: { projectile: "eye_beam", range: 620, speed: 600, damage: 70 },
+      loot: [L2("void_essence", 2, 4)],
+      respawn: 0
+    },
     // ── Bosses of the dungeons and dimensions ──
     hollow_king: {
       name: "The Hollow King",
@@ -7346,21 +7458,28 @@
     },
     unmaker: {
       name: "The Unmaker",
-      hp: 26e3,
-      damage: 100,
-      speed: [60, 160],
+      hp: 48e3,
+      damage: 110,
+      speed: [70, 200],
       move: "floater",
       sight: 1800,
       reach: 90,
       cooldown: 1,
-      defense: 36,
+      defense: 44,
       boss: true,
       loot: [
         L2("wildlands_crown", 1),
         L2("voidsteel_ore", 20, 30),
         L2("rift_blade", 1),
         L2("void_staff", 1, 1, 0.7),
-        L2("watcher_eye", 1)
+        L2("watcher_eye", 1),
+        // The spoils of the last fight: the best there is.
+        L2("oblivion", 1),
+        L2("unmakers_gaze", 1),
+        L2("aura_of_the_unmade", 1),
+        L2("void_heart", 1),
+        L2("fracture_shard", 8, 12),
+        L2("ascended_ingot", 6, 10)
       ],
       respawn: 0
     }
@@ -8896,7 +9015,7 @@
     archdemon: { item: "cinder_key", place: "citadel", music: "boss_hell" },
     sporemother: { item: "spore_lure", place: "mycelial", music: "boss" },
     tempest_roc: { item: "storm_totem", place: "skyreach", music: "boss" },
-    unmaker: { item: "void_seal", place: "void", music: "final_boss" },
+    unmaker: { item: "void_seal", place: "void", music: "unmaker" },
     orchard_mother: { item: "orchard_key", place: "orchard", music: "boss" },
     kiln_beast: { item: "steppe_key", place: "steppe", music: "boss" },
     warren_queen: { item: "warren_key", place: "warren", music: "boss" },
@@ -10980,6 +11099,89 @@
     ["life_crystal", 400]
   ];
 
+  // src/data/loadouts.ts
+  var LOADOUTS = {
+    early: {
+      tier: 3,
+      q: 1,
+      lvl: 2,
+      gems: [],
+      armourLvl: 0,
+      accessories: ["cloud_jar"],
+      health: 160,
+      mana: 60,
+      supplies: [
+        ["healing_draught", 8],
+        ["bandage", 5],
+        ["torch", 20]
+      ],
+      note: "Iron-age kit for the first dungeons."
+    },
+    mid: {
+      tier: 6,
+      q: 2,
+      lvl: 5,
+      inf: "fire",
+      gems: ["ruby"],
+      armourLvl: 2,
+      accessories: ["cloud_jar", "magma_stone", "band_of_vigor"],
+      health: 220,
+      mana: 100,
+      supplies: [
+        ["healing_draught", 15],
+        ["mana_draught", 5],
+        ["bandage", 5]
+      ],
+      note: "Band I\u2013II realms and hell."
+    },
+    late: {
+      tier: 9,
+      q: 3,
+      lvl: 8,
+      inf: "holy",
+      gems: ["ruby", "emerald"],
+      armourLvl: 4,
+      accessories: ["demon_wings", "wind_boots", "band_of_vigor"],
+      health: 300,
+      mana: 160,
+      supplies: [
+        ["greater_healing", 15],
+        ["mana_draught", 10],
+        ["ironskin_potion", 3]
+      ],
+      note: "Band III\u2013IV realms."
+    },
+    endgame: {
+      tier: 12,
+      q: 4,
+      lvl: 10,
+      // The Unmaker and its shades are weak to holy light and shrug off void.
+      inf: "holy",
+      gems: ["ruby", "emerald", "onyx"],
+      armourLvl: 5,
+      armourInf: "void",
+      accessories: ["demon_wings", "wind_boots", "band_of_vigor"],
+      health: 400,
+      mana: 200,
+      supplies: [
+        ["greater_healing", 30],
+        ["mana_draught", 15],
+        ["ironskin_potion", 5],
+        ["regeneration_potion", 5],
+        ["wrath_potion", 5],
+        ["swiftness_potion", 5],
+        ["void_seal", 1]
+      ],
+      note: "Tier XII, Mythic +10, holy-infused: ready for the Unmaker."
+    }
+  };
+  var LOADOUT_ALIASES = {
+    unmaker: "endgame",
+    final: "endgame",
+    start: "early",
+    hell: "mid"
+  };
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -11537,6 +11739,11 @@
       if (realm) a.maxHp = a.hp = Math.round(spec.hp * this.game.pocket.hpScale());
       if (realm && s.pocket?.realm === "fractured") a.maxHp = a.hp = Math.round(a.maxHp * 1.5);
       s.animals.push(a);
+      if (boss2 === "unmaker") {
+        this.game.unmaker.begin(a);
+        this.game.say("The void tears open\u2026", "danger");
+        return { ok: true };
+      }
       this.game.event("burst", x, y - 60, "#ffffff");
       this.game.sound("boss", x, y - 40, 1.6);
       this.game.say(spec.name + " awakens!", "danger");
@@ -11548,6 +11755,7 @@
       for (const m of s.animals) if (m.minion && !m.deadUntil) m.deadUntil = s.elapsed + 999999;
       s.animals = s.animals.filter((m) => !(m.minion && m.deadUntil) && !(m === a));
       this.game.progress.record("boss:" + a.type);
+      if (a.type === "unmaker") this.game.unmaker.defeated(a);
       this.game.pocket.cleared(a);
       if (s.pocket?.realm === "fractured" && this.game.pocket.here(a.x))
         this.game.drops.spawn("fracture_shard", 3 + s.pocket.tier, a.x, a.y - 30);
@@ -11556,9 +11764,10 @@
       this.game.sound("victory", a.x, a.y);
       this.game.event("burst", a.x, a.y - 40, "#fff0a0");
     }
-    minion(type, x, y) {
+    /** Calls one of a boss's host beside it, up to `cap` at once. */
+    minion(type, x, y, cap = 6) {
       const spec = MOBS[type], s = this.game.s;
-      if (s.animals.filter((m) => m.minion && !m.deadUntil).length >= 6) return;
+      if (s.animals.filter((m) => m.minion && !m.deadUntil).length >= cap) return;
       s.animals.push({
         id: uniqueId(),
         type,
@@ -12218,36 +12427,764 @@
               this.minion("season_wolf", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
           break;
         }
-        case "unmaker": {
-          this.steer(
-            a,
-            p.x + Math.cos(t * 0.5) * 300,
-            p.y - 230 + Math.sin(t * 0.8) * 70,
-            spec.speed[1] * (rage ? 1.4 : 1),
-            dt,
-            1.4
-          );
-          if (this.due(a, "gaze", 1.6))
-            this.game.combat.mobShoot(a, "eye_beam", 620, 58, rage ? 3 : 1, 0.12);
-          if (this.due(a, "ring", rage ? 4 : 6)) this.ring(a, "eye_beam", rage ? 16 : 12, 340, 52, t);
-          if (this.due(a, "watchers", rage ? 10 : 15))
-            for (const dx of [-260, 260]) this.minion("watcher", a.x + dx, a.y - 60);
-          if (rage && this.due(a, "void", 7)) {
-            a.x = p.x + (this.game.rng() < 0.5 ? -1 : 1) * 320;
-            a.y = p.y - 240;
-            this.game.event("burst", a.x, a.y - 60, "#b36cff");
-            this.game.sound("portal", a.x, a.y, 1);
-          }
+        case "unmaker":
+          this.game.unmaker.step(a, dt);
+          if (a.intro) return;
           break;
-        }
       }
       const cy = a.y - 60, r = a.type === "unmaker" || a.type === "sporemother" ? 90 : 64;
-      if (Math.hypot(p.x - a.x, p.y - 26 - cy) < r && t >= a.attackAt) {
-        a.attackAt = t + spec.cooldown;
+      const touch = a.type === "unmaker" ? a.timers?.touch ?? 0 : a.attackAt;
+      if (Math.hypot(p.x - a.x, p.y - 26 - cy) < r && t >= touch) {
+        if (a.type === "unmaker") (a.timers ??= {}).touch = t + spec.cooldown;
+        else a.attackAt = t + spec.cooldown;
         this.game.combat.hurtPlayer(spec.damage, spec.name);
       }
       if (spec.move !== "walker" && spec.move !== "hopper" && !(a.timers?.hide && t < a.timers.hide) && this.game.tileAt(Math.floor(a.x / TILE), Math.floor((a.y - 40) / TILE)))
         a.y -= 120 * dt;
+    }
+  };
+
+  // src/game/systems/Unmaker.ts
+  var BEAT = 60 / UNMAKER_BPM;
+  var BAR = BEAT * 4;
+  var PHASE_SCENE = 3;
+  var LAST_SCENE = 2.6;
+  var DODGE = [0.3, 0.42, 0.55, 0.7];
+  var HOST_CAP = 10;
+  var Unmaker = class extends System {
+    /** Real seconds, unslowed by hype moments, for everything that keeps time with the music. */
+    clock = 0;
+    entrance = null;
+    hype = null;
+    cutscene = null;
+    /** Until when (on the clock) the finale's music plays. */
+    finaleUntil = -1;
+    /** When the current theme began (on the clock), and its tempo, for beat-synced effects. */
+    beatOrigin = 0;
+    bpm = UNMAKER_BPM;
+    actions = /* @__PURE__ */ new Map();
+    /** Where you like to stand: seconds spent in each 64 px column, fading. */
+    haunts = /* @__PURE__ */ new Map();
+    /** Recent harm by kind, fading, to learn whether you fight close or at range. */
+    ledger = { melee: 0, ranged: 0 };
+    stillFor = 0;
+    recent = [];
+    dodgeAt = 0;
+    blockedFor = 0;
+    healthWas = 0;
+    healedAt = -99;
+    // ─── Time and presentation ─────────────────────────────────────────────────
+    /** Advances the real clock; call with the unslowed tick. */
+    tickClock(dt) {
+      this.clock += dt;
+      if (this.hype && this.clock > this.hype.start + this.hype.dur) this.hype = null;
+      if (this.entrance && this.clock > this.entrance.start + ENTRANCE + 2) this.entrance = null;
+      const c = this.cutscene;
+      if (c?.kind === "death") this.dying(c);
+      if (c && this.clock > c.start + c.dur) this.cutscene = null;
+    }
+    /** The world runs slow during hype moments and cutscenes (the Unmaker itself keeps real time). */
+    timeScale() {
+      const c = this.cutscene;
+      if (c?.kind === "death") return this.clock - c.start < UNMADE ? 0.08 : 1;
+      if (c) return 0.15;
+      return this.hype ? this.hype.scale : 1;
+    }
+    /** Whether an entrance or a cutscene holds the player still. */
+    frozen() {
+      const c = this.cutscene;
+      if (c?.kind === "death" && this.clock - c.start > SHATTER_AT + SHATTER_SECONDS) return false;
+      return !!this.entrance && this.clock < this.entrance.start + ENTRANCE || !!c;
+    }
+    /** Whether the finale's music should play. */
+    finale() {
+      return this.clock < this.finaleUntil;
+    }
+    /** Beats of the current theme since it began. */
+    beat() {
+      return (this.clock - this.beatOrigin) * this.bpm / 60;
+    }
+    /** The Unmaker in the field, if it has come. */
+    foe() {
+      return this.game.s.animals.find((a) => a.type === "unmaker" && !a.deadUntil) ?? null;
+    }
+    /** The phase (0 to 3) the Unmaker is in, for the music. */
+    phase(a = this.foe()) {
+      return a?.timers?.phase ?? 0;
+    }
+    /**
+     * How dangerous it has become: 1 at full health, doubling every 38% of its health lost,
+     * to about six at the end. Everything it does scales from this.
+     */
+    intensity(a) {
+      return 2 ** (2.6 * (1 - clamp(a.hp / a.maxHp, 0, 1)));
+    }
+    /** Where the camera should look, if anywhere in particular. */
+    focus() {
+      const a = this.foe();
+      if (this.cutscene) return { x: this.cutscene.x, y: this.cutscene.y - 60 };
+      if (this.entrance && this.frozen() && a) {
+        const p = this.game.s.player;
+        return { x: (p.x + a.x) / 2, y: (p.y + a.y) / 2 - 40 };
+      }
+      return null;
+    }
+    /** How hard to shake the screen right now, 0 to 1. */
+    shake() {
+      if (this.entrance && this.frozen() && !this.cutscene) {
+        const into = this.clock - this.entrance.start;
+        return clamp((into - BAR * 2) / (BAR * 2), 0, 1) * 0.45;
+      }
+      const c = this.cutscene;
+      if (c) {
+        const into = this.clock - c.start;
+        if (c.kind === "death") {
+          if (into < 0.3) return 1;
+          if (into < SUPERNOVA) return 0.25 + into / SUPERNOVA * 0.55;
+          return clamp(1 - (into - SUPERNOVA) / 1.5, 0, 1);
+        }
+        return clamp((into - 0.3) / (c.dur - 0.5), 0, 1) * 0.6 + (into > c.dur - 0.25 ? 0.4 : 0);
+      }
+      if (!this.hype) return 0;
+      const k = 1 - (this.clock - this.hype.start) / this.hype.dur;
+      return clamp(k, 0, 1) * (this.hype.kind === "phase" ? 0.8 : 1);
+    }
+    /** What the interface should show: the entrance (by beat), a cutscene, or a hype moment. */
+    overlay() {
+      if (this.cutscene)
+        return { mode: "scene", scene: this.cutscene, t: this.clock - this.cutscene.start };
+      if (this.entrance && this.frozen()) {
+        const into = this.clock - this.entrance.start;
+        return { mode: "entrance", beat: Math.floor(into / BEAT), into };
+      }
+      if (this.hype) return { mode: "hype", hype: this.hype, t: this.clock - this.hype.start };
+      return null;
+    }
+    /** How the Unmaker should look: its phase, how dangerous it is, and how it is convulsing. */
+    look(a) {
+      const c = this.cutscene, into = c ? this.clock - c.start : 0;
+      return {
+        phase: this.phase(a),
+        intensity: this.intensity(a),
+        last: !!a.timers?.lastStand,
+        convulse: c ? clamp(into / (c.kind === "death" ? SUPERNOVA : c.dur), 0, 1) : 0,
+        dying: c?.kind === "death" ? into : -1,
+        shielded: (a.intro ?? 0) > 0 || !!c || (a.timers?.shieldUntil ?? 0) > this.game.s.elapsed
+      };
+    }
+    // ─── The entrance ──────────────────────────────────────────────────────────
+    /** Called as the Unmaker is summoned: it waits in the tear while its theme builds. */
+    begin(a) {
+      a.intro = ENTRANCE;
+      a.reveal = 0;
+      a.timers = { ...a.timers ?? {}, phase: 0 };
+      a.x = a.homeX;
+      a.y = a.homeY;
+      this.entrance = { id: a.id, start: this.clock, x: a.homeX, y: a.homeY };
+      this.hype = null;
+      this.cutscene = null;
+      this.finaleUntil = -1;
+      this.beatOrigin = this.clock;
+      this.bpm = UNMAKER_BPM;
+      this.actions.clear();
+      this.haunts.clear();
+      this.ledger = { melee: 0, ranged: 0 };
+      this.recent = [];
+      this.healthWas = this.game.s.vitals.health;
+    }
+    /** Skips the rest of the entrance (once you have seen it through before). */
+    skip() {
+      const a = this.foe();
+      if (!a || !(a.intro ?? 0) || !this.entrance || this.cutscene) return false;
+      if (!(this.game.s.bosses.unmaker > 0)) return false;
+      this.drop(a);
+      return true;
+    }
+    rise(a, dt) {
+      const p = this.game.s.player, into = ENTRANCE - (a.intro ?? 0), beat = Math.floor(into / BEAT), e = this.entrance ?? { x: a.homeX, y: a.homeY };
+      a.intro = Math.max(0, (a.intro ?? 0) - dt);
+      a.reveal = clamp((into - BAR * 2) / (BAR * 1.75), 0, 1);
+      a.x = e.x;
+      a.y = e.y + (1 - a.reveal) * 120;
+      a.vx = a.vy = 0;
+      p.invuln = Math.max(p.invuln, (a.intro ?? 0) + 1);
+      a.timers ??= {};
+      if (beat !== a.timers.introBeat) {
+        a.timers.introBeat = beat;
+        if (beat >= 4 && beat < 15)
+          this.game.event("implode", e.x, e.y - 60, beat >= 8 ? "#ff5a8a" : "#b36cff");
+        if (beat >= 8 && beat < 15) this.game.event("rays", e.x, e.y - 60, "#ffd0f0", beat - 7);
+        if (beat === 4) this.game.sound("portal", e.x, e.y, 1.2);
+        if (beat >= 12 && beat < 15) this.game.sound("boss", e.x, e.y - 40, 0.5 + (beat - 12) * 0.3);
+      }
+      if (!a.intro) this.drop(a);
+    }
+    /** The beat drops: a shockwave, a fanfare ring, and the fight is on. */
+    drop(a) {
+      const s = this.game.s;
+      a.intro = 0;
+      a.reveal = 1;
+      a.attackAt = s.elapsed + 1.2;
+      s.player.invuln = Math.max(s.player.invuln, 1.5);
+      this.shockwave(a, 560);
+      this.game.event("supernova", a.x, a.y - 60, "#ff5a8a");
+      for (let i = 0; i < 16; i++)
+        this.game.combat.spawn(
+          "eye_beam",
+          { x: a.x, y: a.y - 60 },
+          i / 16 * Math.PI * 2,
+          420,
+          0,
+          "mob"
+        );
+      this.hype = {
+        kind: "drop",
+        title: "THE UNMAKER",
+        sub: "THE END OF ALL THINGS",
+        start: this.clock,
+        dur: 1.6,
+        scale: 1,
+        x: a.x,
+        y: a.y
+      };
+      if (this.entrance) this.entrance.start = Math.min(this.entrance.start, this.clock - ENTRANCE);
+      this.game.sound("boss", a.x, a.y - 40, 1.8);
+      this.game.say("THE UNMAKER HAS COME.", "danger");
+      this.muster(a, UNMAKER_PHASES[0], true);
+    }
+    // ─── The fight ─────────────────────────────────────────────────────────────
+    step(a, dt) {
+      const s = this.game.s, t = s.elapsed;
+      a.timers ??= {};
+      if ((a.intro ?? 0) > 0) {
+        if (!this.entrance || this.entrance.id !== a.id) {
+          a.intro = 0;
+          a.reveal = 1;
+        } else return this.rise(a, dt);
+      }
+      if (this.cutscene) return this.performScene(a, dt / this.timeScale());
+      const k = this.intensity(a);
+      this.observe(dt);
+      if (this.nextPhase(a)) return;
+      const phase = a.timers.phase ?? 0;
+      if ((a.timers.shieldUntil ?? 0) > t) {
+        this.drift(a, a.x, s.player.y - 260, 80, dt);
+        return;
+      }
+      this.dodge(a, phase, k);
+      this.position(a, phase, k, dt);
+      if (this.due(a, "muster", (14 - phase * 2) / k ** 0.4))
+        this.muster(a, UNMAKER_PHASES[phase], false);
+      const act = this.actions.get(a.id);
+      if (act) this.perform(a, act, phase, k);
+      else if (t >= a.attackAt) this.choose(a, phase);
+    }
+    /**
+     * Its hide, while its shades live, lets most harm pass into them. Returns the harm that lands:
+     * none during its entrance or a cutscene, or while it gathers itself after a phase.
+     */
+    absorb(a, amount, from) {
+      const t = this.game.s.elapsed;
+      if ((a.intro ?? 0) > 0 || this.cutscene || (a.timers?.shieldUntil ?? 0) > t) return 0;
+      if (dist(from, a) > 180) this.ledger.ranged += amount;
+      else this.ledger.melee += amount;
+      const shades = this.game.s.animals.filter(
+        (m) => m.type === "void_shade" && !m.deadUntil
+      ).length;
+      return shades >= 2 ? Math.round(amount * 0.35) : shades === 1 ? Math.round(amount * 0.7) : amount;
+    }
+    /**
+     * The killing blow does not kill it outright: it holds on at the edge of death for its
+     * death scene, and only then falls. Returns true while it is not yet time to die.
+     */
+    intercept(a) {
+      if (a.timers?.unmade) return false;
+      a.hp = 1;
+      if (this.cutscene?.kind !== "death") this.startScene(a, "death", this.phase(a));
+      return true;
+    }
+    // ─── Cutscenes ─────────────────────────────────────────────────────────────
+    startScene(a, kind, n) {
+      const p = this.game.s.player, ph = UNMAKER_PHASES[n];
+      this.actions.delete(a.id);
+      this.hype = null;
+      const titles = {
+        phase: ["PHASE " + (ph?.name ?? ""), (ph?.title ?? "").toUpperCase()],
+        last: ["UNMAKING", "IT WILL NOT GO QUIETLY"],
+        death: ["UNMADE", "THE WILDLANDS ENDURE"]
+      };
+      const [title, sub2] = titles[kind];
+      const x = kind === "death" ? a.x : (a.x + p.x) / 2, y = kind === "death" ? a.y : Math.min(a.y, p.y - 200);
+      this.cutscene = {
+        kind,
+        n,
+        id: a.id,
+        start: this.clock,
+        dur: kind === "death" ? DEATH_SCENE : kind === "last" ? LAST_SCENE : PHASE_SCENE,
+        title,
+        sub: sub2,
+        x,
+        y
+      };
+      this.game.combat.projectiles = this.game.combat.projectiles.filter((b) => b.from !== "mob");
+      p.invuln = Math.max(p.invuln, this.cutscene.dur + 1.5);
+      this.game.event("implode", a.x, a.y - 60, kind === "death" ? "#ffffff" : "#ff5a8a");
+      this.game.sound("boss", a.x, a.y - 40, kind === "death" ? 2 : 1.4);
+      if (kind === "death") {
+        this.finaleUntil = this.clock + FINALE_SECONDS;
+        this.beatOrigin = this.clock;
+        this.bpm = FINALE_BPM;
+        this.game.say("The killing blow lands\u2026", "victory");
+      }
+    }
+    /** Plays the Unmaker's part in a cutscene, in real seconds. */
+    performScene(a, rdt) {
+      const c = this.cutscene, into = this.clock - c.start, beat = Math.floor(into / (60 / this.bpm));
+      a.timers ??= {};
+      a.vx = a.vy = 0;
+      if (c.kind !== "death") {
+        a.x += (c.x - a.x) * (1 - Math.exp(-rdt * 3));
+        a.y += (c.y - a.y) * (1 - Math.exp(-rdt * 3));
+        if (beat !== a.timers.sceneBeat) {
+          a.timers.sceneBeat = beat;
+          this.game.event("implode", a.x, a.y - 60, beat % 2 ? "#ff5a8a" : "#b36cff");
+          if (into > 0.8) this.game.event("rays", a.x, a.y - 60, "#ff5a8a", Math.min(8, beat));
+        }
+        if (into >= c.dur - 0.2 && !a.timers.sceneDone) {
+          a.timers.sceneDone = 1;
+          if (c.kind === "phase") this.enterPhase(a, c.n);
+          else this.lastStand(a);
+        }
+      }
+      if (into < 0.1) a.timers.sceneDone = 0;
+    }
+    /** The death scene runs on the real clock, even after the body is gone. */
+    dying(c) {
+      const into = this.clock - c.start, a = this.game.s.animals.find((m) => m.id === c.id), beat = Math.floor(into / (60 / this.bpm));
+      if (a && into < UNMADE) {
+        a.timers ??= {};
+        if (beat !== a.timers.deathBeat) {
+          a.timers.deathBeat = beat;
+          this.game.event(
+            "rays",
+            a.x,
+            a.y - 60,
+            beat % 2 ? "#ffffff" : "#ffd0f0",
+            Math.min(12, 2 + beat)
+          );
+          this.game.event("implode", a.x, a.y - 60, "#ffffff");
+          this.game.sound("crumble", a.x, a.y - 40, 0.6 + into * 0.15);
+          const minion = this.game.s.animals.find((m) => m.minion && !m.deadUntil);
+          if (minion) {
+            this.game.event("supernova", minion.x, minion.y - 20, "#b36cff");
+            minion.deadUntil = this.game.s.elapsed + 999999;
+          }
+        }
+        if (into > SUPERNOVA - 1.4) a.y -= 0.7;
+        if (into >= SUPERNOVA && !a.timers.nova) {
+          a.timers.nova = 1;
+          a.reveal = 0;
+          this.game.event("supernova", a.x, a.y - 60, "#ffffff");
+          this.game.event("shockwave", a.x, a.y - 60, "#ffffff");
+          this.game.sound("boss", a.x, a.y - 40, 2.2);
+        }
+      }
+      if (a && into >= UNMADE && !a.timers?.unmade) {
+        a.timers.unmade = 1;
+        a.hp = 0;
+        this.game.wildlife.kill(a);
+      }
+    }
+    /** The Unmaker falls (called by the boss system as it dies). */
+    defeated(a) {
+      this.actions.delete(a.id);
+      this.entrance = null;
+      for (const m of this.game.s.animals)
+        if (m.minion && !m.deadUntil) this.game.event("supernova", m.x, m.y - 20, "#ffffff");
+    }
+    // ─── Phases ────────────────────────────────────────────────────────────────
+    nextPhase(a) {
+      const frac = a.hp / a.maxHp, phase = a.timers.phase ?? 0;
+      const next = UNMAKER_PHASES[phase + 1];
+      if (next && frac <= next.at) {
+        this.startScene(a, "phase", phase + 1);
+        return true;
+      }
+      if (frac <= LAST_STAND && !a.timers.lastStand) {
+        this.startScene(a, "last", phase);
+        return true;
+      }
+      return false;
+    }
+    enterPhase(a, n) {
+      const ph = UNMAKER_PHASES[n];
+      a.timers.phase = n;
+      a.timers.shieldUntil = this.game.s.elapsed + 1.2;
+      this.shockwave(a, 620);
+      this.game.event("supernova", a.x, a.y - 60, "#ff5a8a");
+      this.hype = {
+        kind: "phase",
+        title: "PHASE " + ph.name,
+        sub: ph.title.toUpperCase(),
+        start: this.clock,
+        dur: 0.9,
+        scale: 0.4,
+        x: a.x,
+        y: a.y
+      };
+      this.beatOrigin = this.clock;
+      this.bpm = ph.bpm;
+      this.game.sound("boss", a.x, a.y - 40, 1.6);
+      this.game.say(`Phase ${ph.name} \xB7 ${ph.title}.`, "danger");
+      this.muster(a, ph, true);
+    }
+    lastStand(a) {
+      a.timers.lastStand = 1;
+      a.timers.shieldUntil = this.game.s.elapsed + 1;
+      this.shockwave(a, 620);
+      this.game.event("supernova", a.x, a.y - 60, "#ff2a4a");
+      this.hype = {
+        kind: "last",
+        title: "UNMAKING",
+        sub: "IT WILL NOT GO QUIETLY",
+        start: this.clock,
+        dur: 0.9,
+        scale: 0.4,
+        x: a.x,
+        y: a.y
+      };
+      this.game.say("The Unmaker makes its last stand!", "danger");
+      for (const ph of UNMAKER_PHASES.slice(1)) this.muster(a, ph, true);
+    }
+    /** A blast outward: shots near it are swept away and you are thrown clear. */
+    shockwave(a, r) {
+      const p = this.game.s.player, c = this.game.combat;
+      this.game.event("shockwave", a.x, a.y - 60, "#ff5a8a");
+      c.projectiles = c.projectiles.filter((b) => b.from !== "mob" || dist(b, a) > r);
+      if (dist(p, a) < r) {
+        p.push = (Math.sign(p.x - a.x) || 1) * 620;
+        p.vy = -360;
+        p.grounded = false;
+      }
+    }
+    /** Brings its host up to strength (all at once on a phase, one at a time otherwise). */
+    muster(a, ph, all2) {
+      const alive = (type) => this.game.s.animals.filter((m) => m.type === type && m.minion && !m.deadUntil).length;
+      for (const [type, want] of ph.minions) {
+        let short = want - alive(type);
+        while (short-- > 0) {
+          const side = this.game.rng() < 0.5 ? -1 : 1, x = a.x + side * (180 + this.game.rng() * 200), y = MOBS[type].move === "walker" ? this.game.floorNear(x, a.y) : a.y - 40;
+          this.game.bosses.minion(type, x, y, HOST_CAP);
+          this.game.event("implode", x, y - 20, "#b36cff");
+          if (!all2) return;
+        }
+      }
+    }
+    /** Learns your habits: where you stand, whether you keep still, when you heal. */
+    observe(dt) {
+      const s = this.game.s, p = s.player, fade = Math.exp(-dt / 20);
+      for (const [k, v] of this.haunts) this.haunts.set(k, v * fade);
+      const col = Math.floor(p.x / 64);
+      this.haunts.set(col, (this.haunts.get(col) ?? 0) + dt);
+      this.ledger.melee *= Math.exp(-dt / 25);
+      this.ledger.ranged *= Math.exp(-dt / 25);
+      this.stillFor = Math.abs(p.vx) < 30 && p.grounded ? this.stillFor + dt : 0;
+      if (s.vitals.health > this.healthWas + 4) this.healedAt = s.elapsed;
+      this.healthWas = s.vitals.health;
+    }
+    /** Whether you have been fighting mostly from range lately. */
+    ranged() {
+      return this.ledger.ranged > this.ledger.melee * 1.5 && this.ledger.ranged > 200;
+    }
+    // ─── Moving ────────────────────────────────────────────────────────────────
+    /** Sidesteps your shots, and backs off from a blade that has come too close. */
+    dodge(a, phase, k) {
+      const s = this.game.s, t = s.elapsed, chance = Math.min(0.9, DODGE[phase] * k ** 0.25);
+      if (t < this.dodgeAt) return;
+      const threat = this.game.combat.projectiles.find((b) => {
+        if (b.from !== "player") return false;
+        const dx2 = a.x - b.x, dy2 = a.y - 60 - b.y, speed = Math.hypot(b.vx, b.vy) || 1, closing = (dx2 * b.vx + dy2 * b.vy) / speed;
+        return closing > 0 && Math.hypot(dx2, dy2) / speed < 0.45;
+      });
+      let dx = 0, dy = 0;
+      if (threat && this.game.rng() < chance) {
+        const speed = Math.hypot(threat.vx, threat.vy) || 1, side = this.game.rng() < 0.5 ? -1 : 1;
+        dx = -threat.vy / speed * side * 130;
+        dy = threat.vx / speed * side * 130;
+      } else if (dist(s.player, a) < 120 && !this.ranged() && this.game.rng() < chance * 0.5) {
+        dx = Math.sign(a.x - s.player.x || 1) * 240;
+        dy = -60;
+      } else return;
+      this.game.event("burst", a.x, a.y - 60, "#b36cff");
+      a.x += dx;
+      a.y = Math.min(a.y + dy, this.game.floorNear(a.x, a.y) - 90);
+      this.game.event("burst", a.x, a.y - 60, "#ff5a8a");
+      this.dodgeAt = t + (1.8 - phase * 0.3) / k ** 0.3;
+    }
+    /** Keeps its distance for how you fight, circling, and never lets rock stand between you. */
+    position(a, phase, k, dt) {
+      const p = this.game.s.player, range = this.ranged() ? 230 : this.ledger.melee > 300 ? 430 : 330;
+      a.timers.orbit = (a.timers.orbit ?? 0) + dt * (0.5 + phase * 0.15) * k ** 0.2;
+      const orb = a.timers.orbit, tx = p.x + Math.cos(orb) * range, ty = p.y - 210 + Math.sin(orb * 1.3) * 60;
+      const speed = MOBS.unmaker.speed[1] * (1 + phase * 0.15) * k ** 0.2;
+      if (this.sees(a)) this.blockedFor = 0;
+      else {
+        this.blockedFor += dt;
+        if (this.blockedFor > 1.6 / k ** 0.3) {
+          this.blockedFor = 0;
+          this.game.event("burst", a.x, a.y - 60, "#b36cff");
+          a.x = p.x + (this.game.rng() < 0.5 ? -1 : 1) * 160;
+          a.y = p.y - 220;
+          this.game.event("implode", a.x, a.y - 60, "#ff5a8a");
+          this.game.sound("portal", a.x, a.y, 0.9);
+          return;
+        }
+      }
+      this.drift(a, tx, ty, speed, dt);
+      a.angle = p.x >= a.x ? 0 : Math.PI;
+    }
+    drift(a, tx, ty, speed, dt) {
+      const dx = tx - a.x, dy = ty - a.y, len = Math.hypot(dx, dy) || 1, k = 1 - Math.exp(-dt * 2.6);
+      a.vx = (a.vx ?? 0) + (dx / len * Math.min(speed, len * 3) - (a.vx ?? 0)) * k;
+      a.vy = (a.vy ?? 0) + (dy / len * Math.min(speed, len * 3) - (a.vy ?? 0)) * k;
+      a.x += a.vx * dt;
+      a.y += a.vy * dt;
+    }
+    /** Whether it has a clear line to you. */
+    sees(a) {
+      const p = this.game.s.player, x0 = a.x, y0 = a.y - 60, x1 = p.x, y1 = p.y - 26;
+      for (let i = 1; i < 12; i++) {
+        const x = x0 + (x1 - x0) * i / 12, y = y0 + (y1 - y0) * i / 12;
+        if (this.game.tileAt(Math.floor(x / TILE), Math.floor(y / TILE))) return false;
+      }
+      return true;
+    }
+    // ─── Choosing and making its moves ─────────────────────────────────────────
+    /**
+     * Weighs every move open to it in this phase against the moment: how far you are, whether
+     * you are in the air, standing still, hurt, or healing, and what it has just done.
+     */
+    choose(a, phase) {
+      const s = this.game.s, p = s.player, d = dist(p, a), air = !p.grounded, hurt = s.vitals.health / this.game.equipment.maxHealth() < 0.35, healing = s.elapsed - this.healedAt < 3, camping = this.stillFor > 1.4, ranged = this.ranged();
+      const weigh = [
+        ["gaze", hurt || healing ? 1.8 : 1],
+        ["ring", d < 280 ? 1.3 : 0.7]
+      ];
+      if (phase >= 1) weigh.push(["sweep", d > 260 ? 1.2 : 0.6], ["blink", ranged ? 1.5 : 0.8]);
+      if (phase >= 2) weigh.push(["pillars", camping ? 2.4 : 1], ["orbs", healing ? 1.6 : 0.9]);
+      if (phase >= 3) weigh.push(["well", ranged ? 1.6 : 0.9], ["curtain", air ? 0.6 : 1.2]);
+      let best = "gaze", score = -1;
+      for (const [id, w] of weigh) {
+        const repeat = this.recent.includes(id) ? this.recent[0] === id ? 0.2 : 0.5 : 1, v = w * repeat * (0.6 + this.game.rng() * 0.8);
+        if (v > score) [best, score] = [id, v];
+      }
+      this.recent.unshift(best);
+      this.recent.length = Math.min(this.recent.length, 3);
+      this.start(a, best, phase);
+    }
+    start(a, id, phase) {
+      const s = this.game.s, p = s.player, rng2 = this.game.rng;
+      const act = { id, t0: s.elapsed, n: 0, dur: 1 };
+      switch (id) {
+        case "gaze":
+          act.dur = 0.35 + 0.18 * (3 + phase + 2);
+          break;
+        case "ring":
+          act.dur = phase >= 2 ? 1.1 : 0.7;
+          act.angle = rng2() * Math.PI * 2;
+          break;
+        case "sweep":
+          act.dur = 1.9;
+          act.angle = this.aim({ x: a.x, y: a.y - 60 }, 900, 0.6);
+          act.dir = rng2() < 0.5 ? -1 : 1;
+          break;
+        case "blink":
+          act.dur = 0.8;
+          break;
+        case "pillars": {
+          const spots = [p.x, p.x + (p.vx ?? 0) * 0.9, this.haunt()];
+          act.spots = [];
+          for (const x of spots)
+            if (act.spots.every((q) => Math.abs(q.x - x) > 60))
+              act.spots.push({ x, y: this.game.floorNear(x, p.y - 40) });
+          act.dur = 1.3;
+          break;
+        }
+        case "orbs":
+          act.dur = 2.9;
+          act.orbs = [];
+          break;
+        case "well":
+          act.dur = 3;
+          break;
+        case "curtain":
+          act.dur = a.timers?.lastStand ? 2.4 : 1.6;
+          act.gap = p.x + (rng2() < 0.5 ? -1 : 1) * (130 + rng2() * 170);
+          break;
+      }
+      a.warning = 0.5;
+      this.actions.set(a.id, act);
+    }
+    /** Runs a move through its staged beats; each stage fires once. */
+    perform(a, act, phase, k) {
+      const s = this.game.s, p = s.player, e = s.elapsed - act.t0, c = this.game.combat, eye = { x: a.x, y: a.y - 60 }, hit = k ** 0.4, fast = k ** 0.15, more = Math.floor(Math.log2(k));
+      const stage = (i, at2) => e >= at2 && act.n <= i && (act.n = i + 1) > 0;
+      switch (act.id) {
+        case "gaze":
+          if (stage(0, 0)) this.game.event("burst", eye.x, eye.y, "#ff5a8a");
+          for (let i = 0; i < 3 + phase + more; i++)
+            if (stage(i + 1, 0.35 + i * 0.18))
+              c.spawn(
+                "eye_beam",
+                eye,
+                this.aim(eye, 660 * fast, i % 2 ? 0 : 1),
+                660 * fast,
+                58 * hit,
+                "mob"
+              );
+          break;
+        case "ring": {
+          const n = 12 + phase * 2 + more * 2;
+          if (stage(0, 0)) this.game.event("implode", eye.x, eye.y, "#ff5a8a");
+          if (stage(1, 0.5)) this.ring(eye, n, 300 * fast, 52 * hit, act.angle);
+          if (phase >= 2 && stage(2, 0.9))
+            this.ring(eye, n, 340 * fast, 52 * hit, act.angle + Math.PI / n);
+          break;
+        }
+        case "sweep":
+          if (stage(0, 0)) this.game.event("implode", eye.x, eye.y, "#ffd0f0");
+          if (e >= 0.6 && e < 1.8) {
+            const i = Math.floor((e - 0.6) / 0.06);
+            if (stage(i + 1, 0.6 + i * 0.06)) {
+              const ang = act.angle + act.dir * (-1 + i / 20 * 2);
+              c.spawn("void_lance", eye, ang, 900 * fast, 60 * hit, "mob");
+            }
+          }
+          break;
+        case "blink":
+          if (stage(0, 0)) this.game.event("implode", eye.x, eye.y, "#b36cff");
+          if (stage(1, 0.25)) {
+            const ahead = Math.sign(p.vx || Math.cos(p.face)) || 1;
+            a.x = p.x + (p.vx ?? 0) * 0.5 - ahead * 190;
+            a.y = Math.min(p.y - 150, this.game.floorNear(a.x, p.y) - 110);
+            this.game.event("burst", a.x, a.y - 60, "#ff5a8a");
+            this.game.sound("portal", a.x, a.y, 0.9);
+          }
+          if (stage(2, 0.55)) {
+            const at2 = { x: a.x, y: a.y - 60 }, ang = this.aim(at2, 700, 1);
+            for (let i = -2 - more; i <= 2 + more; i++)
+              c.spawn("eye_beam", at2, ang + i * 0.16, 700 * fast, 64 * hit, "mob");
+          }
+          break;
+        case "pillars":
+          for (let i = 0; i < 6; i++)
+            if (stage(i, i * 0.15))
+              for (const q of act.spots) this.game.event("burst", q.x, q.y, "#b36cff");
+          if (stage(6, 0.9))
+            for (const q of act.spots) {
+              this.game.event("rays", q.x, q.y, "#b36cff", 3);
+              for (const dx of [-16, 0, 16])
+                c.spawn(
+                  "rift_spike",
+                  { x: q.x + dx, y: q.y + 10 },
+                  -Math.PI / 2,
+                  900,
+                  70 * hit,
+                  "mob"
+                );
+            }
+          break;
+        case "orbs":
+          if (stage(0, 0.3))
+            for (let i = 0; i < 2 + (phase >= 3 ? 1 : 0) + more; i++) {
+              c.spawn(
+                "null_orb",
+                eye,
+                this.aim(eye, 170, 0) + (i - 1) * 0.7,
+                170 * fast,
+                45 * hit,
+                "mob"
+              );
+              act.orbs.push(c.projectiles[c.projectiles.length - 1]);
+            }
+          if (stage(1, 2.8))
+            for (const o of act.orbs) {
+              const i = c.projectiles.indexOf(o);
+              if (i < 0) continue;
+              c.projectiles.splice(i, 1);
+              this.game.event("supernova", o.x, o.y, "#b36cff");
+              this.ring(o, 8 + more * 2, 280 * fast, 44 * hit, 0);
+            }
+          break;
+        case "well": {
+          if (stage(0, 0)) this.game.event("implode", eye.x, eye.y, "#b36cff");
+          if (e > 0.4) {
+            const pull = Math.sign(a.x - p.x) * 190 * fast;
+            p.push = (p.push ?? 0) + (pull - (p.push ?? 0)) * 0.2;
+            if (Math.floor(e * 10) % 3 === 0) this.game.event("implode", p.x, p.y - 30, "#b36cff");
+          }
+          for (let i = 0; i < 5; i++)
+            if (stage(i + 1, 0.5 + i * 0.5)) this.ring(eye, 6 + more, 260 * fast, 48 * hit, i * 0.4);
+          break;
+        }
+        case "curtain": {
+          if (stage(0, 0))
+            for (let i = 0; i < 4; i++)
+              this.game.event("burst", act.gap, p.y - 40 - i * 40, "#ffffff");
+          const drop = (gap) => {
+            for (let x = p.x - 560; x <= p.x + 560; x += 56)
+              if (Math.abs(x - gap) > 70)
+                c.spawn("void_lance", { x, y: p.y - 520 }, Math.PI / 2, 520 * fast, 66 * hit, "mob");
+          };
+          if (stage(1, 0.7)) drop(act.gap);
+          if (act.dur > 2 && stage(2, 1.5)) drop(p.x + (p.x > act.gap ? -1 : 1) * 200);
+          break;
+        }
+      }
+      if (e >= act.dur) {
+        this.actions.delete(a.id);
+        a.attackAt = s.elapsed + (1.1 - phase * 0.15) * (a.timers?.lastStand ? 0.7 : 1) / k ** 0.55;
+      }
+    }
+    /** Aims at you, leading by `lead` of your motion: where a shot at `speed` will meet you. */
+    aim(from, speed, lead = 1) {
+      const p = this.game.s.player, vx = (p.vx ?? 0) * lead, vy = p.grounded ? 0 : (p.vy ?? 0) * lead * 0.5, dx = p.x - from.x, dy = p.y - 26 - from.y;
+      const qa = vx * vx + vy * vy - speed * speed, qb = 2 * (dx * vx + dy * vy), qc = dx * dx + dy * dy, disc = qb * qb - 4 * qa * qc;
+      let t = 0;
+      if (Math.abs(qa) < 1e-6) t = qb ? -qc / qb : 0;
+      else if (disc >= 0) {
+        const r = [(-qb - Math.sqrt(disc)) / (2 * qa), (-qb + Math.sqrt(disc)) / (2 * qa)].filter(
+          (x) => x > 0
+        );
+        t = r.length ? Math.min(...r) : 0;
+      }
+      t = clamp(Number.isFinite(t) ? t : 0, 0, 1.4);
+      return Math.atan2(dy + vy * t, dx + vx * t);
+    }
+    /** The column you have spent longest in lately. */
+    haunt() {
+      let best = this.game.s.player.x, most = 0;
+      for (const [col, v] of this.haunts) if (v > most) [best, most] = [col * 64 + 32, v];
+      return best;
+    }
+    ring(from, n, speed, damage, offset) {
+      for (let i = 0; i < n; i++)
+        this.game.combat.spawn(
+          "eye_beam",
+          { x: from.x, y: from.y },
+          offset + i / n * Math.PI * 2,
+          speed,
+          damage,
+          "mob"
+        );
+    }
+    due(a, name, every) {
+      const t = this.game.s.elapsed;
+      a.timers ??= {};
+      if (a.timers[name] === void 0) a.timers[name] = t + every;
+      if (t < a.timers[name]) return false;
+      a.timers[name] = t + every;
+      return true;
     }
   };
 
@@ -12300,6 +13237,8 @@
     /** Harms a creature through its defense, knocks it back, and kills it at zero. */
     hurtMob(a, amount, from, magic = false, w) {
       if (a.deadUntil || a.settler || a.hidden) return 0;
+      if (a.type === "unmaker") amount = this.game.unmaker.absorb(a, amount, from);
+      if (amount <= 0) return 0;
       if (a.type === "boss" && (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier) {
         this.game.say("Ordinary steel glances off the Direwolf. Obsidian is required.", "danger");
         return 0;
@@ -13213,6 +14152,11 @@
           ];
         }
       },
+      gear: {
+        usage: "gear <early|mid|late|endgame>",
+        help: "Equip a ready-made kit for a stage of the journey (endgame: ready for the Unmaker).",
+        run: ([name]) => this.gear((name ?? "").toLowerCase())
+      },
       give: {
         usage: "give <item> [qty]",
         help: "Put items straight into the pack.",
@@ -13430,11 +14374,70 @@
       if (!cmd) return [`! Unknown command "${name}". Type help.`];
       return cmd.run(args);
     }
+    /**
+     * Equips a kit: the strongest armour set of its tier (upgraded and infused), a greatsword,
+     * bow and staff of its tier (quality, level, infusion and gems set), accessories, health and
+     * mana, and supplies on the quick slots.
+     */
+    gear(name) {
+      const key = LOADOUT_ALIASES[name] ?? name, kit2 = LOADOUTS[key];
+      if (!kit2) return [`! Usage: gear <${Object.keys(LOADOUTS).join("|")}>`];
+      const g = this.game, s = g.s, p = s.player;
+      const set = ARMOR_SETS.filter((st) => st.tier <= kit2.tier).map((st) => ({ st, pieces: Object.keys(ARMOR).filter((id) => ARMOR[id].set === st.key) })).filter((x) => x.pieces.length === 3).sort(
+        (a, b) => b.st.defense.reduce((n, d) => n + d, 0) - a.st.defense.reduce((n, d) => n + d, 0)
+      )[0];
+      p.armor = {};
+      s.armourMods ??= {};
+      for (const id of set?.pieces ?? []) {
+        if (!g.count(id)) g.add(id);
+        g.equipment.wear(id);
+        s.armourMods[id] = {
+          lvl: kit2.armourLvl,
+          gems: [],
+          ...kit2.armourInf ? { inf: kit2.armourInf } : {}
+        };
+      }
+      const weapons = ["greatsword", "bow", "staff"].map(
+        (family) => GRID.find((w) => w.family === family && w.tier === kit2.tier).id
+      );
+      s.armoury ??= {};
+      for (const id of weapons) {
+        if (!g.count(id)) g.add(id);
+        s.armoury[id] = {
+          q: kit2.q,
+          lvl: kit2.lvl,
+          gems: kit2.gems.slice(0, QUALITIES[kit2.q].sockets),
+          evo: [],
+          ...kit2.inf ? { inf: kit2.inf } : {}
+        };
+      }
+      s.accessories = [];
+      for (const id of kit2.accessories) {
+        if (!g.count(id)) g.add(id);
+        g.equipment.wear(id);
+      }
+      s.maxHealth = Math.max(CRYSTALS.baseHealth, kit2.health);
+      s.maxMana = kit2.mana;
+      s.mana = kit2.mana;
+      Object.assign(s.vitals, { health: s.maxHealth, hydration: 100, calories: 100, stamina: 100 });
+      for (const [id, qty] of kit2.supplies) g.add(id, Math.max(0, qty - g.count(id)));
+      const heal = kit2.supplies.find(([id]) => id.includes("heal"))?.[0];
+      [...weapons, heal].forEach((id, i) => id && g.equipment.assign(i, id));
+      g.equipment.select(0);
+      g.say(`Kitted out: ${key}.`, "good");
+      return [
+        `Equipped the ${key} kit \xB7 ${kit2.note}`,
+        `  Armour: ${set ? set.st.name : "none"} (+${kit2.armourLvl}${kit2.armourInf ? ", " + kit2.armourInf : ""})`,
+        `  Weapons: ${weapons.map((id) => itemName(id)).join(", ")} \xB7 ${QUALITIES[kit2.q].name} +${kit2.lvl}${kit2.inf ? ", " + kit2.inf : ""}`,
+        `  Accessories: ${kit2.accessories.map((id) => itemName(id)).join(", ")}`,
+        `  Health ${s.maxHealth} \xB7 mana ${kit2.mana}`
+      ];
+    }
     /** Completions for the word being typed: commands first, then that command's arguments. */
     complete(line) {
       const words = line.split(/\s+/), last = (words[words.length - 1] ?? "").toLowerCase();
       if (words.length <= 1) return Object.keys(this.commands).filter((c) => c.startsWith(last));
-      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close", "course"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
+      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "gear" ? [...Object.keys(LOADOUTS), ...Object.keys(LOADOUT_ALIASES)] : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close", "course"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
       return words.length === 2 ? pool.filter((id) => id.startsWith(last)) : [];
     }
     /** Godmode keeps every need met; called each tick. */
@@ -13968,6 +14971,16 @@
         this.game.say("Your heart grows stronger \xB7 " + s.maxHealth + " health.", "victory");
         return { ok: true };
       }
+      if (id === "void_heart") {
+        const cap = CRYSTALS.baseHealth + CRYSTALS.lifeMax + 100 + 100;
+        if (this.heart() >= cap) return { ok: false, reason: "Even the void can add no more." };
+        s.maxHealth = Math.min(cap, this.heart() + 50);
+        this.heal(50);
+        this.game.remove(id);
+        this.game.sound("crystal");
+        this.game.say("The void beats in your chest \xB7 " + s.maxHealth + " health.", "victory");
+        return { ok: true };
+      }
       if (id === "mana_crystal") {
         if ((s.maxMana || CRYSTALS.baseMana) >= CRYSTALS.baseMana + CRYSTALS.manaMax)
           return { ok: false, reason: "Your mind can hold no more." };
@@ -13997,8 +15010,18 @@
       return { ok: true };
     }
     /** Buffs wear off, mana returns, and regenerating effects heal. */
+    auraAt;
     update(dt) {
       const s = this.game.s, fx = this.effects();
+      if (fx.has("aura")) {
+        this.auraAt = (this.auraAt ?? 0) - dt;
+        if (this.auraAt <= 0) {
+          this.auraAt = 0.5;
+          for (const a of s.animals)
+            if (!a.deadUntil && !a.settler && !a.companion && dist(a, s.player) < 150)
+              this.game.combat.hurtMob(a, 40, s.player, true);
+        }
+      }
       for (const id of Object.keys(s.buffs)) {
         s.buffs[id] -= dt;
         if (s.buffs[id] <= 0) {
@@ -14542,7 +15565,7 @@
       }
       v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
       v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
-      const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0) + (this.game.rng() < this.game.skills.get("gather") ? 1 : 0);
+      const roll2 = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0) + (this.game.rng() < this.game.skills.get("gather") ? 1 : 0);
       this.game.progress.record("gather:" + node.kind);
       const form = nodeForm(node.kind), s = this.game.s;
       node.hitAt = s.elapsed;
@@ -14552,7 +15575,7 @@
         node.y - 20
       );
       if (form === "water") {
-        const qty2 = roll(), id = this.game.pocket.here(node.x) ? "brackish_water" : "wild_water";
+        const qty2 = roll2(), id = this.game.pocket.here(node.x) ? "brackish_water" : "wild_water";
         this.game.add(id, qty2);
         this.game.event("chip", node.x, node.y, "water");
         this.game.say("Gathered " + qty2 + " " + itemName(id).toLowerCase() + ".", "good");
@@ -14560,7 +15583,7 @@
       }
       this.game.event("chip", node.x, node.y - (form === "tree" ? 26 : 10), node.kind);
       if (form === "plant") {
-        const qty2 = roll();
+        const qty2 = roll2();
         node.hp--;
         if (node.hp <= 0) node.depletedUntil = s.elapsed + spec.regen;
         this.game.drops.spawn(node.kind, qty2, node.x, node.y - 14);
@@ -14569,7 +15592,7 @@
       node.hp--;
       if (node.hp > 0) return { ok: true, id: node.kind, qty: 0, hit: true };
       let qty = 0;
-      for (let i = 0; i < spec.hp; i++) qty += roll();
+      for (let i = 0; i < spec.hp; i++) qty += roll2();
       if (form === "tree") {
         const dir = node.x >= p.x ? 1 : -1;
         node.felledAt = s.elapsed;
@@ -14888,7 +15911,8 @@
       const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (this.game.survival.diet().state === "malnourished" ? 0.93 : 1) * // Overloaded, you slow down: to half at twice your capacity.
       Math.max(0.5, 1 - this.game.inventory.overload() * 0.5) * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
-      p.vx = dx * speed;
+      p.vx = dx * speed + (p.push ?? 0);
+      if (p.push) p.push = Math.abs(p.push) < 8 ? 0 : p.push * Math.exp(-dt * 4);
       const shaft = inShaft(p.x, p.y);
       if (lava) p.vy = dy < 0 ? -150 : Math.min(p.vy + 240 * dt, 60);
       else if (water) {
@@ -17261,6 +18285,7 @@
         this.game.sound(voice + "_" + what, a.x, a.y - 20, a.type === "boss" || spec?.boss ? 1.6 : 1);
     }
     kill(animal) {
+      if (animal.type === "unmaker" && this.game.unmaker.intercept(animal)) return;
       if (animal.x !== void 0) {
         this.game.sound("die", animal.x, animal.y - 20);
         this.cry(animal, "hurt");
@@ -17467,7 +18492,7 @@
     }
     /** Moves a body through the tiles, sliding along walls; returns whether it hit ground. */
     moveBody(a, dt, ghost = false) {
-      const vx = a.vx ?? 0, vy = a.vy ?? 0, half = 12;
+      const vx = a.vx ?? 0, vy = a.vy ?? 0, half2 = 12;
       const [lo, hi] = regionBounds(a.homeX);
       let nx = clamp(a.x + vx * dt, lo + 30, hi - 30), landed = false;
       if (ghost) {
@@ -17475,7 +18500,7 @@
         a.y += vy * dt;
         return false;
       }
-      const blocked = (x, y) => this.solidAt(x - half, y - 4) || this.solidAt(x + half, y - 4) || this.solidAt(x, y - 30);
+      const blocked = (x, y) => this.solidAt(x - half2, y - 4) || this.solidAt(x + half2, y - 4) || this.solidAt(x, y - 30);
       if (blocked(nx, a.y)) {
         if (a.grounded && !blocked(nx, a.y - TILE)) a.y -= TILE;
         else {
@@ -17486,7 +18511,7 @@
       }
       a.x = nx;
       const ny = a.y + vy * dt;
-      if (vy > 0 && (this.solidAt(a.x - half, ny) || this.solidAt(a.x + half, ny))) {
+      if (vy > 0 && (this.solidAt(a.x - half2, ny) || this.solidAt(a.x + half2, ny))) {
         a.y = Math.floor(ny / TILE) * TILE - 1;
         a.vy = 0;
         landed = true;
@@ -17840,6 +18865,7 @@
     skills = new Skills(this);
     feats = new Feats(this);
     bosses = new Bosses(this);
+    unmaker = new Unmaker(this);
     realms = new Realms(this);
     pocket = new Pocket(this);
     hands = new Hands(this);
@@ -17947,6 +18973,8 @@
     tick(dt) {
       if (this.s.dead) return;
       dt = clamp(dt, 0, RULES.maxTickSeconds);
+      this.unmaker.tickClock(dt);
+      dt *= this.unmaker.timeScale();
       this.environment.advance(dt);
       this.survival.advanceDecay(dt);
       this.progress.discover();
@@ -18064,13 +19092,16 @@
       this.terrain.setTile(tx, ty, kind);
     }
     mineTileAt(x, y) {
+      if (this.unmaker.frozen()) return { ok: false, reason: "" };
       return this.terrain.mineTileAt(x, y);
     }
     jump() {
+      if (this.unmaker.frozen()) return false;
       return this.physics.jump();
     }
     move(dx, dy, dt) {
-      this.physics.move(dx, dy, dt);
+      if (this.unmaker.frozen()) [dx, dy] = [0, 0];
+      this.physics.move(dx, dy, dt * this.unmaker.timeScale());
     }
     // ─── Pack ─────────────────────────────────────────────────────────────────
     count(id) {
@@ -18116,6 +19147,7 @@
       return this.interaction.nearestInteractable(radius);
     }
     interact() {
+      if (this.unmaker.frozen()) return { ok: false, reason: "" };
       return this.interaction.interact();
     }
     gather(node) {
@@ -18148,6 +19180,7 @@
     }
     // ─── Hunting and the Effergy ──────────────────────────────────────────────
     attack() {
+      if (this.unmaker.frozen()) return { ok: false, reason: "" };
       return this.wildlife.attack();
     }
     attune(mob) {
@@ -19021,6 +20054,10 @@
     storm_totem: ["staff", "#bfe4ff"],
     void_seal: ["sigil", "#b36cff"],
     rift_blade: ["sword", "#d8a0ff", "#2a1c3a"],
+    oblivion: ["sword", "#ff5a8a", "#12001e"],
+    unmakers_gaze: ["staff", "#ff5a8a", "#12001e"],
+    aura_of_the_unmade: ["orb", "#b36cff"],
+    void_heart: ["orb", "#12001e"],
     frostbrand: ["sword", "#bfe8f8", "#4a6a8a"],
     hellrazor: ["sword", "#ff6a2a", "#2a0a0a"],
     sunspear: ["spear", "#f0c860"],
@@ -20528,6 +21565,17 @@
       parts: ["eye"],
       top: 24,
       light: [0.4, 0.15, 0.55]
+    },
+    void_shade: {
+      tpl: "floater",
+      body: "#1a0a24",
+      belly: "#ff5a8a",
+      eye: "#ffd0f0",
+      w: 30,
+      h: 30,
+      parts: ["eye"],
+      top: 40,
+      light: [0.5, 0.1, 0.4]
     },
     // Bosses.
     hollow_king: {
@@ -22312,7 +23360,90 @@
           ["#f4ecd8", "#ff6a5a", "#ffe070", "#ff9a4a", "#8ad060", "#d05050"][e.dir ?? 0] ?? "#f4ecd8",
           now
         );
-      else if (e.type === "burst")
+      else if (e.type === "implode") {
+        for (let i = 0; i < 26; i++) {
+          const ang = rnd() * Math.PI * 2, r = 90 + rnd() * 70, life = 0.35 + rnd() * 0.2;
+          emit(
+            {
+              x: e.x + Math.cos(ang) * r,
+              y: e.y + Math.sin(ang) * r,
+              vx: -Math.cos(ang) * r / life,
+              vy: -Math.sin(ang) * r / life,
+              kind: "spark",
+              color: e.kind || "#b36cff",
+              life,
+              gravity: 0
+            },
+            now
+          );
+        }
+      } else if (e.type === "shockwave") {
+        for (const [speed, life, size] of [
+          [220, 0.55, 3],
+          [150, 0.7, 1]
+        ])
+          emit({ x: e.x, y: e.y, kind: "wave", color: e.kind || "#ffffff", speed, life, size }, now);
+        burst(e, now, 30, () => {
+          const ang = rnd() * Math.PI * 2;
+          return {
+            kind: "dust",
+            vx: Math.cos(ang) * 420,
+            vy: Math.sin(ang) * 200,
+            color: e.kind || "#ffffff",
+            size: 3,
+            life: 0.6,
+            gravity: 0
+          };
+        });
+      } else if (e.type === "rays") {
+        const n = e.dir ?? 4;
+        for (let i = 0; i < n; i++)
+          emit(
+            {
+              x: e.x,
+              y: e.y,
+              kind: "ray",
+              angle: rnd() * Math.PI * 2,
+              speed: 120 + rnd() * 160,
+              color: e.kind || "#ffffff",
+              life: 0.45 + rnd() * 0.3,
+              gravity: 0
+            },
+            now
+          );
+      } else if (e.type === "supernova") {
+        for (const [speed, life, size] of [
+          [320, 0.8, 4],
+          [210, 1, 2],
+          [120, 1.2, 1]
+        ])
+          emit({ x: e.x, y: e.y, kind: "wave", color: e.kind || "#ffffff", speed, life, size }, now);
+        burst(e, now, 90, () => {
+          const ang = rnd() * Math.PI * 2, v = 200 + rnd() * 700;
+          return {
+            kind: "spark",
+            vx: Math.cos(ang) * v,
+            vy: Math.sin(ang) * v,
+            color: rnd() < 0.5 ? "#ffffff" : e.kind || "#ff5a8a",
+            life: 0.6 + rnd() * 0.9,
+            gravity: 120
+          };
+        });
+        for (let i = 0; i < 18; i++)
+          emit(
+            {
+              x: e.x,
+              y: e.y,
+              kind: "ray",
+              angle: i / 18 * Math.PI * 2 + rnd() * 0.2,
+              speed: 260 + rnd() * 200,
+              color: i % 2 ? "#ffffff" : e.kind || "#ffd0f0",
+              life: 0.7 + rnd() * 0.4,
+              gravity: 0
+            },
+            now
+          );
+      } else if (e.type === "burst")
         burst(e, now, 14, () => ({
           kind: "spark",
           vx: (rnd() - 0.5) * 260,
@@ -22345,6 +23476,25 @@
         c.fillRect(x + r, y, 1, 1);
         c.fillRect(x, y - r, 1, 1);
         c.fillRect(x, y + r, 1, 1);
+      } else if (p.kind === "wave") {
+        const r = Math.round((p.speed ?? 100) * age + 4), n = Math.max(16, Math.round(r * 1.2));
+        c.fillStyle = rgba(p.color, 0.9 * fade);
+        for (let k = 0; k < n; k++) {
+          const ang = k / n * Math.PI * 2;
+          c.fillRect(
+            Math.round(x + Math.cos(ang) * r),
+            Math.round(y + Math.sin(ang) * r),
+            p.size,
+            p.size
+          );
+        }
+      } else if (p.kind === "ray") {
+        const len = Math.round((p.speed ?? 150) * Math.min(1, age * 3)), dx = Math.cos(p.angle ?? 0), dy = Math.sin(p.angle ?? 0);
+        c.fillStyle = rgba(p.color, 0.85 * fade);
+        for (let k = 4; k < len; k += 1) {
+          const wdt = k < len * 0.3 ? 2 : 1;
+          c.fillRect(Math.round(x + dx * k), Math.round(y + dy * k), wdt, wdt);
+        }
       } else if (p.kind === "spark") {
         c.fillStyle = age < p.life * 0.4 ? "#fff2c0" : p.color;
         c.globalAlpha = fade;
@@ -22646,12 +23796,12 @@
           trunk(p, w / 2, h - 18, h - 1, 4, bark, seed);
           const tiers = 4;
           for (let i = 0; i < tiers; i++) {
-            const top = 2 + i * ((h - 22) / tiers), half = 5 + i * 3 + (i === tiers - 1 ? 2 : 0), bottom = top + (h - 22) / tiers + 6;
+            const top = 2 + i * ((h - 22) / tiers), half2 = 5 + i * 3 + (i === tiers - 1 ? 2 : 0), bottom = top + (h - 22) / tiers + 6;
             p.poly(
               [
                 [w / 2, top],
-                [w / 2 + half, bottom],
-                [w / 2 - half, bottom]
+                [w / 2 + half2, bottom],
+                [w / 2 - half2, bottom]
               ],
               leaves[1]
             );
@@ -22664,7 +23814,7 @@
                 else if (x > w / 2 + 1 && hash3(x, y, seed + 1) < 0.45) p.set(x, y, leaves[0]);
               }
             if (style === "snowpine") {
-              for (let x = R(w / 2 - half + 2); x < w / 2 + half - 2; x++)
+              for (let x = R(w / 2 - half2 + 2); x < w / 2 + half2 - 2; x++)
                 p.set(x, R(bottom) - 1, hash3(x, i, 9) < 0.7 ? "#f4f8fa" : "#dfeaf2");
               p.set(w / 2, R(top), "#ffffff");
             }
@@ -23310,12 +24460,12 @@
     let cv = gradients.get(key);
     if (!cv) {
       cv = makeCanvas(4, height);
-      const k = cv.getContext("2d"), bands = 9;
+      const k = cv.getContext("2d"), bands2 = 9;
       for (let y = 0; y < height; y++) {
-        const t = y / height * (bands - 1), band = Math.floor(t), frac = t - band;
+        const t = y / height * (bands2 - 1), band = Math.floor(t), frac = t - band;
         for (let x = 0; x < 4; x++) {
           const b = frac > bayer(x, y) ? band + 1 : band;
-          k.fillStyle = mix(top, bottom, b / (bands - 1));
+          k.fillStyle = mix(top, bottom, b / (bands2 - 1));
           k.fillRect(x, y, 1, 1);
         }
       }
@@ -23547,6 +24697,338 @@
     }
   }
 
+  // src/renderer/unmaker.ts
+  var LOOKS = [
+    { top: "#14041f", bottom: "#3a0a4a", aura: "#b36cff", hot: "#ff5a8a" },
+    { top: "#1e0318", bottom: "#5a0a38", aura: "#ff5a8a", hot: "#ffd0f0" },
+    { top: "#220206", bottom: "#7a0c1c", aura: "#ff2a4a", hot: "#ffb070" },
+    { top: "#030002", bottom: "#4a000c", aura: "#ff0a2a", hot: "#ffffff" }
+  ];
+  var DAWN = { top: "#f0c070", bottom: "#fff0d0" };
+  function fight(g) {
+    const u = g.unmaker, a = u.foe(), p = g.s.player, near = a && Math.abs(a.x - p.x) < 2600, scene = u.cutscene, dyingFor = scene?.kind === "death" ? u.clock - scene.start : -1, fromFall = dyingFor >= 0 ? dyingFor - SUPERNOVA : u.finale() ? 99 : -1;
+    if (!near && fromFall < 0) return null;
+    const beat = u.beat(), frac = beat - Math.floor(beat), downbeat = Math.floor(beat) % 4 === 0;
+    const look = a ? u.look(a) : null;
+    return {
+      phase: look?.phase ?? 3,
+      last: !!look?.last,
+      k: look?.intensity ?? 6,
+      beat,
+      pulse: (1 - frac) ** 3 * (downbeat ? 1 : 0.55),
+      dying: dyingFor,
+      dawn: fromFall < 0 ? 0 : fromFall === 99 ? clamp01(1.4 - (u.clock - (u.finaleUntil - FINALE_SECONDS) - SUPERNOVA) / FINALE_SECONDS) : clamp01(fromFall / 1.2),
+      clock: u.clock,
+      a: a ?? null
+    };
+  }
+  var clamp01 = (v) => Math.max(0, Math.min(1, v));
+  function bands(c, top, bottom, alpha, w, h) {
+    const n = 10;
+    for (let i = 0; i < n; i++) {
+      c.fillStyle = rgba(i < n / 2 ? top : bottom, alpha * (0.75 + i / n * 0.25));
+      c.fillRect(0, Math.floor(i * h / n), w, Math.ceil(h / n) + 1);
+    }
+  }
+  function drawUnmakerSky(c, g, w, h) {
+    const f = fight(g);
+    if (!f) return;
+    const L3 = LOOKS[f.phase];
+    if (f.dawn > 0) {
+      if (f.dawn < 1) bands(c, L3.top, L3.bottom, 0.6 * (1 - f.dawn), w, h);
+      bands(c, DAWN.top, DAWN.bottom, 0.8 * f.dawn, w, h);
+      const sx = Math.round(w / 2), sy = Math.round(h * 0.22 + (1 - Math.min(1, f.dawn * 1.5)) * 30);
+      for (const [r2, col, al] of [
+        [34, "#fff0c0", 0.18],
+        [24, "#ffe8a0", 0.3],
+        [14, "#fff8e0", 1]
+      ]) {
+        c.fillStyle = rgba(col, al * Math.min(1, f.dawn * 1.5));
+        for (let dy = -r2; dy <= r2; dy++) {
+          const half2 = Math.round(Math.sqrt(r2 * r2 - dy * dy));
+          c.fillRect(sx - half2, sy + dy, half2 * 2, 1);
+        }
+      }
+      c.fillStyle = rgba("#fff4d0", 0.25 * f.dawn);
+      for (let i = 0; i < 12; i++) {
+        const ang = i / 12 * Math.PI * 2 + f.clock * 0.05;
+        for (let s = 20; s < 160; s += 2)
+          c.fillRect(Math.round(sx + Math.cos(ang) * s), Math.round(sy + Math.sin(ang) * s), 1, 1);
+      }
+      return;
+    }
+    bands(c, L3.top, L3.bottom, f.last ? 0.8 : 0.5 + f.phase * 0.08, w, h);
+    const ex = Math.round(w / 2), ey = Math.round(h * 0.22), r = 12 + f.phase * 5 + Math.round(f.pulse * 2), blink = hash3(Math.floor(f.clock / 3.1), 7) > 0.85 && f.clock % 3.1 < 0.18;
+    c.fillStyle = rgba(L3.aura, 0.25);
+    for (let dy = -r - 3; dy <= r + 3; dy++) {
+      const half2 = Math.round(Math.sqrt(Math.max(0, (r + 3) ** 2 - dy * dy)) * 1.8);
+      c.fillRect(ex - half2, ey + dy, half2 * 2, 1);
+    }
+    if (!blink) {
+      c.fillStyle = f.phase >= 2 ? "#2a0008" : "#12001e";
+      for (let dy = -r; dy <= r; dy++) {
+        const half2 = Math.round(Math.sqrt(r * r - dy * dy) * 1.8);
+        c.fillRect(ex - half2, ey + dy, half2 * 2, 1);
+      }
+      const look = Math.max(-1, Math.min(1, (g.s.player.x - (f.a?.x ?? g.s.player.x)) / 600)), ix = ex + Math.round(look * r * 0.8), ir = Math.round(r * 0.55);
+      c.fillStyle = L3.hot;
+      for (let dy = -ir; dy <= ir; dy++) {
+        const half2 = Math.round(Math.sqrt(ir * ir - dy * dy));
+        c.fillRect(ix - half2, ey + dy, half2 * 2, 1);
+      }
+      c.fillStyle = "#000000";
+      c.fillRect(ix - 1, ey - Math.round(ir * 0.8), 3, Math.round(ir * 1.6));
+    } else {
+      c.fillStyle = "#000000";
+      c.fillRect(ex - r * 2, ey, r * 4, 1);
+    }
+    if (f.phase >= 2 || f.dying >= 0) {
+      const n = f.dying >= 0 ? 14 : 4 + f.phase * 2;
+      c.fillStyle = rgba(f.dying >= 0 ? "#ffffff" : L3.hot, 0.35 + f.pulse * 0.5);
+      for (let i = 0; i < n; i++) {
+        let x = ex, y = ey;
+        const ang = hash3(i, 11) * Math.PI * 2, len = 60 + hash3(i, 12) * (f.dying >= 0 ? 260 : 140);
+        for (let s = 0; s < len; s += 2) {
+          x += Math.cos(ang) * 2 + (hash3(i * 97 + s, 13) - 0.5) * 3;
+          y += Math.sin(ang) * 2 + (hash3(i * 89 + s, 14) - 0.5) * 3;
+          c.fillRect(Math.round(x), Math.round(y), 1, 1);
+        }
+      }
+    }
+    if (f.phase >= 1) {
+      c.fillStyle = rgba(L3.hot, 0.7);
+      for (let i = 0; i < 6 + f.phase * 4; i++) {
+        const span = 2.5 + hash3(i, 21) * 2, u = (f.clock + hash3(i, 22) * span) % span / span, x = Math.round(hash3(i, 23) * w + u * 90), y = Math.round(u * h * 0.6);
+        for (let s = 0; s < 6; s++) c.fillRect(x - s, y - s, 1, 1);
+      }
+    }
+  }
+  function drawUnmakerWeather(c, g, w, h) {
+    const f = fight(g);
+    if (!f) return;
+    const t = f.clock;
+    if (f.dawn > 0) {
+      c.fillStyle = rgba("#fff0c0", 0.7 * f.dawn);
+      for (let i = 0; i < 50; i++) {
+        const x = Math.round((hash3(i, 1) * w + Math.sin(t * 0.8 + i) * 8 + w) % w), y = Math.round((hash3(i, 2) * h + t * (8 + hash3(i, 3) * 10)) % h);
+        c.fillRect(x, y, 1, 1);
+      }
+      return;
+    }
+    const L3 = LOOKS[f.phase];
+    if (f.phase === 0) {
+      c.fillStyle = rgba(L3.aura, 0.6);
+      for (let i = 0; i < 50; i++) {
+        const x = Math.round((hash3(i, 1) * w + Math.sin(t + i) * 6 + w) % w), y = Math.round(h - (hash3(i, 2) * h + t * (10 + hash3(i, 3) * 20)) % h);
+        c.fillRect(x, y, 1, 1);
+      }
+    }
+    if (f.phase >= 1) {
+      const n = f.phase === 1 ? 70 : f.phase === 2 ? 110 : 170, speed = 160 + f.phase * 60;
+      c.fillStyle = rgba(f.phase >= 3 ? "#ff5a8a" : L3.aura, 0.45);
+      for (let i = 0; i < n; i++) {
+        const x = Math.round(
+          (hash3(i, 4) * (w + 60) - t * speed * 0.35 % (w + 60) + w + 60) % (w + 60)
+        ), y = Math.round((hash3(i, 5) * h + t * speed) % h);
+        c.fillRect(x, y, 1, 3);
+        c.fillRect(x - 1, y + 3, 1, 2);
+      }
+    }
+    if (f.phase >= 2) {
+      c.fillStyle = rgba(L3.hot, 0.7);
+      for (let i = 0; i < 40; i++) {
+        const x = Math.round((hash3(i, 6) * w + Math.sin(t * 2 + i) * 10 + w) % w), y = Math.round(h - (hash3(i, 7) * h + t * (30 + hash3(i, 8) * 40)) % h);
+        c.fillRect(x, y, 1, 1);
+      }
+    }
+    if (f.phase >= 3 || f.dying >= 0) {
+      const bar = Math.floor(f.beat / 4), into = f.beat - bar * 4;
+      if (bar % 2 === 0 && into < 0.35) {
+        c.fillStyle = rgba("#ffffff", 0.25 * (1 - into / 0.35));
+        c.fillRect(0, 0, w, h);
+        let x = Math.round(hash3(bar, 31) * w);
+        c.fillStyle = rgba("#ffe0f0", 0.9);
+        for (let y = 0; y < h * 0.7; y += 2) {
+          x += Math.round((hash3(bar * 131 + y, 32) - 0.5) * 6);
+          c.fillRect(x, y, 2, 2);
+          if (hash3(bar * 71 + y, 33) > 0.96)
+            for (let k = 0; k < 14; k++) c.fillRect(x + k, y + k, 1, 1);
+        }
+      }
+    }
+    if (f.last || f.dying >= 0 && f.dying < SUPERNOVA) {
+      for (let i = 0; i < 4; i++) {
+        if (hash3(Math.floor(t * 24), i) < 0.5) continue;
+        const y = Math.floor(hash3(Math.floor(t * 24) * 7 + i, 41) * h), hh = 2 + Math.floor(hash3(i, Math.floor(t * 24)) * 6), dx = Math.round((hash3(i * 3, Math.floor(t * 24)) - 0.5) * 16);
+        c.drawImage(c.canvas, 0, y, w, hh, dx, y, w, hh);
+      }
+    }
+    const edge = 0.12 + f.phase * 0.05 + f.pulse * 0.18;
+    for (let i = 0; i < 8; i++) {
+      c.fillStyle = rgba(f.dying >= 0 ? "#ffffff" : L3.aura, edge * (1 - i / 8));
+      c.fillRect(0, i, w, 1);
+      c.fillRect(0, h - 1 - i, w, 1);
+      c.fillRect(i, 0, 1, h);
+      c.fillRect(w - 1 - i, 0, 1, h);
+    }
+  }
+  function unmakerPose(g, a) {
+    const look = g.unmaker.look(a), c = look.convulse, jolt = c > 0 ? c * 5 : look.last ? 1.5 : 0, tick2 = Math.floor(g.unmaker.clock * 30);
+    return {
+      dx: Math.round((hash3(tick2, a.id) - 0.5) * jolt),
+      dy: Math.round((hash3(tick2, a.id + 1) - 0.5) * jolt),
+      alpha: (a.reveal ?? 1) * (look.dying > SUPERNOVA ? 0 : 1),
+      ghosts: look.phase >= 3 || look.last || look.dying >= 0
+    };
+  }
+  function drawUnmakerBack(c, g, a, x, y) {
+    const f = fight(g);
+    if (!f) return;
+    const look = g.unmaker.look(a), L3 = LOOKS[look.phase], cy = y - 30, reveal = a.reveal ?? 1, frame2 = Math.floor(f.clock * 14), rings = 2 + (look.phase >= 2 ? 1 : 0);
+    for (let ring = 0; ring < rings; ring++) {
+      const r = 22 + ring * 8 + Math.round(f.pulse * (4 + look.phase * 2)), n = 40 + ring * 16;
+      for (let i = 0; i < n; i++) {
+        const ang = i / n * Math.PI * 2 + f.clock * (0.6 + ring * 0.3) * (ring % 2 ? -1 : 1), flick = hash3(i + ring * 97, frame2), len = 1 + Math.floor(flick * (2 + look.phase));
+        c.fillStyle = rgba(ring === 0 ? L3.hot : L3.aura, (0.35 + flick * 0.4) * reveal);
+        const px = Math.round(x + Math.cos(ang) * r), py = Math.round(cy + Math.sin(ang) * r * 0.9);
+        c.fillRect(px, py - len, 1, len);
+      }
+    }
+    const now = performance.now() / 1e3;
+    for (let i = 0; i < Math.min(6, Math.round(f.k)); i++)
+      if (Math.random() < 0.5)
+        emit(
+          {
+            x: a.x + (Math.random() - 0.5) * 90,
+            y: a.y - 60 + (Math.random() - 0.5) * 70,
+            vx: (Math.random() - 0.5) * 20,
+            vy: -50 - Math.random() * 60,
+            kind: "spark",
+            color: Math.random() < 0.3 ? L3.hot : L3.aura,
+            life: 0.5 + Math.random() * 0.5,
+            gravity: -30
+          },
+          now
+        );
+    if (look.shielded && look.dying < 0) {
+      c.fillStyle = rgba("#ffffff", 0.5);
+      for (let i = 0; i < 36; i++) {
+        const ang = i / 36 * Math.PI * 2 + f.clock, r = 40 + Math.round(Math.sin(f.clock * 6 + i) * 1.5);
+        if ((i + frame2) % 3)
+          c.fillRect(Math.round(x + Math.cos(ang) * r), Math.round(cy + Math.sin(ang) * r), 1, 1);
+      }
+    }
+  }
+  function drawUnmakerFront(c, g, a, x, y) {
+    const f = fight(g);
+    if (!f) return;
+    const look = g.unmaker.look(a), L3 = LOOKS[look.phase], cy = y - 30, reveal = a.reveal ?? 1;
+    if (reveal <= 0.05) return;
+    c.globalAlpha = reveal;
+    if (look.phase >= 2) {
+      const n = look.phase >= 3 ? 7 : 5;
+      for (let i = 0; i < n; i++) {
+        const ang = -Math.PI / 2 + (i - (n - 1) / 2) / n * 1.9, len = 10 + (i % 2 ? 4 : 9) + look.phase * 2;
+        for (let s = 0; s < len; s++) {
+          c.fillStyle = s > len - 3 ? L3.hot : "#0a0006";
+          c.fillRect(
+            Math.round(x + Math.cos(ang) * (16 + s)),
+            Math.round(cy + Math.sin(ang) * (16 + s)),
+            s < len / 2 ? 2 : 1,
+            1
+          );
+        }
+      }
+      c.fillStyle = rgba(L3.hot, 0.6 + f.pulse * 0.4);
+      for (let i = 0; i < 3 + look.phase; i++) {
+        let px = x + Math.round((hash3(i, 51) - 0.5) * 20), py = cy + Math.round((hash3(i, 52) - 0.5) * 20);
+        for (let s = 0; s < 8; s++) {
+          px += Math.round((hash3(i * 13 + s, 53) - 0.5) * 3);
+          py += hash3(i * 17 + s, 54) > 0.5 ? 1 : -1;
+          c.fillRect(px, py, 1, 1);
+        }
+      }
+    }
+    for (let i = 0; i < look.phase * 2 + (look.last ? 2 : 0); i++) {
+      const ang = i / (look.phase * 2 + (look.last ? 2 : 0)) * Math.PI * 2 + 0.4, ex = Math.round(x + Math.cos(ang) * 19), ey = Math.round(cy + Math.sin(ang) * 17);
+      if (hash3(i, Math.floor(f.clock * 2 + i)) > 0.12) {
+        c.fillStyle = L3.hot;
+        c.fillRect(ex - 1, ey, 3, 1);
+        c.fillStyle = "#000000";
+        c.fillRect(ex, ey, 1, 1);
+      }
+    }
+    const shards = 3 + look.phase * 2 + (look.last ? 4 : 0);
+    for (let i = 0; i < shards; i++) {
+      const ang = i / shards * Math.PI * 2 + f.clock * (0.8 + f.k * 0.25), r = 38 + Math.round(Math.sin(f.clock * 2 + i) * 3), sx = Math.round(x + Math.cos(ang) * r), sy = Math.round(cy + Math.sin(ang) * r * 0.55);
+      c.fillStyle = "#12001e";
+      c.fillRect(sx - 1, sy - 2, 2, 5);
+      c.fillStyle = L3.hot;
+      c.fillRect(sx, sy - 2, 1, 1);
+    }
+    if (look.dying >= 0 && look.dying < SUPERNOVA) {
+      const k = look.dying / SUPERNOVA;
+      c.fillStyle = rgba("#ffffff", 0.2 + k * 0.6);
+      for (let i = 0; i < 4 + Math.round(k * 10); i++) {
+        const ang = hash3(i, 61) * Math.PI * 2, len = 8 + Math.round(k * 26 * hash3(i, 62));
+        for (let s = 0; s < len; s++)
+          c.fillRect(Math.round(x + Math.cos(ang) * s), Math.round(cy + Math.sin(ang) * s), 1, 1);
+      }
+      c.fillStyle = rgba("#ffffff", k * 0.5 * (Math.floor(f.clock * 20) % 2));
+      c.fillRect(x - 24, cy - 24, 48, 48);
+    }
+    c.globalAlpha = 1;
+  }
+  function drawUnmakerTear(c, g, ax, ay) {
+    const e = g.unmaker.entrance;
+    if (!e) return;
+    const into = g.unmaker.clock - e.start, open = clamp01((into - 1.7) / 3), fade = g.unmaker.frozen() ? 1 : 0.3;
+    if (open <= 0) return;
+    const x = Math.round(e.x / PX - ax), y = Math.round((e.y - 60) / PX - ay), hh = Math.round(8 + open * 60), ww = Math.round(1 + open * 9);
+    for (let dy = -hh; dy <= hh; dy++) {
+      const half2 = Math.round(ww * Math.sqrt(1 - (dy / hh) ** 2));
+      c.fillStyle = rgba("#ff5a8a", 0.8 * fade);
+      c.fillRect(x - half2 - 1, y + dy, 1, 1);
+      c.fillRect(x + half2 + 1, y + dy, 1, 1);
+      c.fillStyle = rgba("#05000a", 0.95 * fade);
+      c.fillRect(x - half2, y + dy, half2 * 2 + 1, 1);
+    }
+  }
+  function drawShadeTethers(c, g, ax, ay) {
+    const a = g.unmaker.foe();
+    if (!a) return;
+    const frame2 = Math.floor(g.unmaker.clock * 12);
+    for (const m of g.s.animals) {
+      if (m.type !== "void_shade" || m.deadUntil) continue;
+      const x0 = a.x / PX - ax, y0 = (a.y - 60) / PX - ay, x1 = m.x / PX - ax, y1 = (m.y - 20) / PX - ay, n = Math.max(1, Math.round(Math.hypot(x1 - x0, y1 - y0) / 2));
+      c.fillStyle = rgba("#ff5a8a", 0.55);
+      for (let i = 0; i < n; i++) {
+        if ((i + frame2) % 4 === 0) continue;
+        const k = i / n;
+        c.fillRect(
+          Math.round(x0 + (x1 - x0) * k + Math.sin(k * 20 + frame2) * 1.5),
+          Math.round(y0 + (y1 - y0) * k),
+          1,
+          1
+        );
+      }
+    }
+  }
+  function drawPlayerAura(c, g, x, y) {
+    if (!g.equipment.has("aura")) return;
+    const t = performance.now() / 1e3, beat = t * 140 / 60, pulse2 = (1 - (beat - Math.floor(beat))) ** 3, cy = y - 13, frame2 = Math.floor(t * 14);
+    for (let i = 0; i < 30; i++) {
+      const ang = i / 30 * Math.PI * 2 + t * 0.9, r = 14 + Math.round(pulse2 * 2), flick = hash3(i, frame2);
+      c.fillStyle = rgba(i % 3 ? "#b36cff" : "#ff5a8a", 0.3 + flick * 0.4);
+      c.fillRect(
+        Math.round(x + Math.cos(ang) * r),
+        Math.round(cy + Math.sin(ang) * r) - Math.floor(flick * 2),
+        1,
+        1 + Math.floor(flick * 2)
+      );
+    }
+  }
+
   // src/renderer/structures.ts
   var WOOD = "#8a6440";
   var DARKWOOD = "#5e4631";
@@ -23586,8 +25068,8 @@
           for (let layer = 0; layer < 4; layer++) {
             const lw = w / 2 * (1 - layer * 0.22), lh = h * (1 - layer * 0.2);
             for (let y = 0; y < lh; y++) {
-              const k = y / lh, half = lw * Math.sin(Math.PI * (0.25 + k * 0.75)) * (0.55 + 0.45 * k), sway = Math.round(Math.sin(frame2 * 2.1 + y * 0.6) * (1 - k) * 1.2);
-              for (let x = Math.round(w / 2 - half); x < Math.round(w / 2 + half); x++)
+              const k = y / lh, half2 = lw * Math.sin(Math.PI * (0.25 + k * 0.75)) * (0.55 + 0.45 * k), sway = Math.round(Math.sin(frame2 * 2.1 + y * 0.6) * (1 - k) * 1.2);
+              for (let x = Math.round(w / 2 - half2); x < Math.round(w / 2 + half2); x++)
                 p.set(
                   x + sway,
                   h - 1 - Math.round(lh - 1 - y) - Math.round(layer * 0.6),
@@ -25127,6 +26609,7 @@
     a.imageSmoothingEnabled = false;
     const t = g.s.elapsed, now = performance.now() / 1e3, ax = Math.round(cam.x / PX), ay = Math.round(cam.y / PX), fx = menu2 ? cam.x + view2.worldW / 2 : g.s.player.x;
     drawSky(a, g, ax, ay, w, h, fx);
+    if (!menu2) drawUnmakerSky(a, g, w, h);
     const visibleChunks = drawWalls(a, g, ax, ay, w, h);
     drawLava(a, g, ax, ay, w, h, now);
     drawLadders(a, ax, ay, w, h);
@@ -25150,8 +26633,30 @@
     for (const s of g.s.structures)
       if (s.type !== "rift_gate" && s.type !== "portal" && on(s))
         drawStructure(a, g, s, sx(s), sy(s), t);
+    if (!menu2) {
+      drawUnmakerTear(a, g, ax, ay);
+      drawShadeTethers(a, g, ax, ay);
+    }
     for (const m of g.s.animals) {
       if (m.deadUntil || !on(m)) continue;
+      if (m.type === "unmaker") {
+        const pose2 = unmakerPose(g, m), x = sx(m) + pose2.dx, y = sy(m) + pose2.dy;
+        drawUnmakerBack(a, g, m, x, y);
+        if (pose2.alpha > 0) {
+          if (pose2.ghosts) {
+            a.globalCompositeOperation = "lighter";
+            a.globalAlpha = 0.3 * pose2.alpha;
+            drawAnimal(a, g, m, x - 3, y, t);
+            drawAnimal(a, g, m, x + 3, y, t);
+            a.globalCompositeOperation = "source-over";
+          }
+          a.globalAlpha = pose2.alpha;
+          drawAnimal(a, g, m, x, y, t);
+          a.globalAlpha = 1;
+        }
+        drawUnmakerFront(a, g, m, x, y);
+        continue;
+      }
       if (m.hidden) {
         a.fillStyle = "rgba(120, 96, 64, 0.9)";
         for (let i = 0; i < 5; i++)
@@ -25166,7 +26671,10 @@
       drawAnimal(a, g, m, sx(m), sy(m), t);
     }
     drawDrops(a, g, ax, ay, w, h, t);
-    if (!menu2) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
+    if (!menu2) {
+      drawPlayerAura(a, g, sx(g.s.player), sy(g.s.player));
+      drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
+    }
     drawProjectiles(a, g, ax, ay, w, h);
     drawParticles(a, ax, ay, now);
     if (!menu2) drawTide(a, g, ax, ay, w, h, now);
@@ -25174,6 +26682,7 @@
     if (!menu2) drawRealmAir(a, g, ax, ay, w, h, now);
     drawCursor(a, g, ax, ay, cursor);
     drawWeather(a, g, ax, ay, w, h, fx, menu2);
+    if (!menu2) drawUnmakerWeather(a, g, w, h);
     c.imageSmoothingEnabled = false;
     c.drawImage(art, 0, 0, w * view2.scale, h * view2.scale);
   }
@@ -26155,6 +27664,64 @@
       g.connect(out.node);
     }
   };
+  var cowbell = {
+    voice: (k, out, t, m, _dur, v) => {
+      const f = hz(m);
+      const body = perc(k, t, 0.15 * v, 0.3), tick2 = perc(k, t, 0.08 * v, 0.025), bp = filter(k, "bandpass", f * 1.25, 1.3);
+      osc(k, "square", f, t, body.end).connect(bp);
+      osc(k, "square", f * 1.48, t, body.end).connect(bp);
+      bp.connect(body.g).connect(out.node);
+      osc(k, "square", f * 2.96, t, tick2.end).connect(tick2.g).connect(out.node);
+    }
+  };
+  var phonk808 = {
+    insert: (k) => {
+      const ws = k.ctx.createWaveShaper();
+      ws.curve = k.fuzz;
+      return insertChain(gain(k, 1.4), ws, filter(k, "lowpass", 2800), gain(k, 0.2));
+    },
+    voice: (k, out, t, m, dur, v) => {
+      const f = hz(m);
+      const { g, end } = adsr(k, t, dur, 3e-3, 0.5, 0.7, 0.3, 0.55 * v);
+      for (const [shape, level] of [
+        ["sine", 1],
+        ["square", 0.1]
+      ]) {
+        const o = osc(k, shape, f * 1.5, t, end), lv = gain(k, level);
+        o.frequency.setValueAtTime(f * 1.5, t);
+        o.frequency.exponentialRampToValueAtTime(f, t + 0.07);
+        o.connect(lv).connect(g);
+      }
+      g.connect(out.node);
+    }
+  };
+  var vox = {
+    insert: (k) => {
+      const input = gain(k, 1), output = gain(k, 1.4);
+      for (const [freq, q, level] of [
+        [800, 5, 1],
+        [1150, 6, 0.6],
+        [2900, 8, 0.3]
+      ]) {
+        const bp = filter(k, "bandpass", freq, q);
+        input.connect(bp).connect(gain(k, level)).connect(output);
+      }
+      return { input, output };
+    },
+    voice: (k, out, t, m, dur, v) => {
+      const f = hz(m);
+      const { g, end } = adsr(k, t, Math.min(dur, 0.32), 4e-3, 0.14, 0.55, 0.06, 0.32 * v);
+      for (const detune of [-12, 12]) {
+        const o = osc(k, "sawtooth", f * 1.12, t, end, detune);
+        o.frequency.setValueAtTime(f * 1.12, t);
+        o.frequency.exponentialRampToValueAtTime(f * 0.92, t + 0.28);
+        o.connect(g);
+      }
+      g.connect(out.node);
+      const breath = perc(k, t, 0.05 * v, 0.07);
+      noise(k, t, breath.end).connect(filter(k, "highpass", 3200)).connect(breath.g).connect(out.node);
+    }
+  };
   function click(k, out, t, freq, peak, decay, q = 1) {
     const n = noise(k, t, t + decay * 2 + 0.03), f = filter(k, "bandpass", freq, q), e = perc(k, t, peak, decay);
     n.connect(f).connect(e.g).connect(out);
@@ -26349,6 +27916,9 @@
     bass,
     synthbass,
     sub,
+    cowbell,
+    phonk808,
+    vox,
     kick,
     bigkick,
     snare,
@@ -26779,6 +28349,22 @@
       tone(k, o, t, { from: 3350, peak: 0.06 * v, decay: 0.08 });
       hiss(k, o, t, { freq: 3500, q: 2, peak: 0.18 * v, decay: 0.04 });
       tone(k, o, t, { from: 150, to: 90, peak: 0.12 * v, decay: 0.06 });
+    },
+    // The fourth wall: a monitor cracking, its glass falling out, and an old tube switching on.
+    screen_crack: (k, o, t, v) => {
+      tone(k, o, t, { from: 90, to: 40, peak: 0.5 * v, decay: 0.4 });
+      clicks(k, o, t, 18, 0.12, 5200, 0.16 * v);
+      hiss(k, o, t, { freq: 6e3, type: "highpass", peak: 0.35 * v, decay: 0.2 });
+    },
+    shatter: (k, o, t, v) => {
+      for (let i = 0; i < 6; i++) clicks(k, o, t + i * 0.09, 12, 0.3, 3800 + i * 500, 0.1 * v);
+      hiss(k, o, t, { freq: 4500, type: "highpass", peak: 0.3 * v, decay: 0.9 });
+      tone(k, o, t + 0.5, { from: 160, to: 60, peak: 0.2 * v, decay: 0.5 });
+    },
+    crt_on: (k, o, t, v) => {
+      tone(k, o, t, { from: 15e3, to: 15600, peak: 0.05 * v, decay: 0.9 });
+      tone(k, o, t, { from: 60, to: 120, peak: 0.3 * v, decay: 0.15 });
+      hiss(k, o, t, { freq: 2e3, type: "bandpass", peak: 0.2 * v, decay: 0.3 });
     },
     crumble: (k, o, t, v) => {
       clicks(k, o, t, 10, 0.35, 2400, 0.09 * v);
@@ -28229,93 +29815,267 @@
     }
   );
 
-  // src/audio/tracks/final.ts
-  var finalBoss = compose(
+  // src/audio/tracks/unmaker.ts
+  var HOOK = "f#5:2 f#5:1 r:1 a5:2 f#5:2 c#6:2 r:1 b5:1 a5:2 g5:2 | f#5:2 f#5:1 r:1 a5:2 f#5:2 d6:2 r:1 c#6:1 b5:2 a5:2 | f#5:2 f#5:1 r:1 a5:2 f#5:2 c#6:2 r:1 b5:1 a5:2 g5:2 | c#6:2 c#6:1 r:1 b5:2 a5:2 g5:3 a5:1 f#5:4";
+  var HOOK_B = "c#6:1 c#6:1 r:1 c#6:1 b5:2 a5:2 b5:1 b5:1 r:1 b5:1 a5:2 f#5:2 | a5:1 a5:1 r:1 a5:1 g5:2 f#5:2 e5:2 f#5:2 g5:2 a5:2 | c#6:1 c#6:1 r:1 c#6:1 d6:2 c#6:2 b5:2 a5:2 b5:2 c#6:2 | f#6:3 e6:3 d6:2 c#6:4 a5:4";
+  var COUNTER = "f#4:4 c#5:4 a4:4 c#5:4 | f#4:4 d5:4 a4:4 d5:4 | f#4:4 c#5:4 a4:4 c#5:4 | c#5:4 b4:4 g4:4 a4:4";
+  var PROG = "F#m F#m D C#";
+  var PROG_B = "F#m E D C#";
+  var half = (m) => m.split(" | ").slice(0, 2).join(" | ");
+  var PARTS = {
+    kick: { inst: "bigkick", vol: 0.75 },
+    clap: { inst: "clap", vol: 0.55, rev: 0.2 },
+    snare: { inst: "snare", vol: 0.5, rev: 0.25 },
+    hat: { inst: "hat", vol: 0.28, pan: 0.2 },
+    shaker: { inst: "shaker", vol: 0.35, pan: -0.2 },
+    tom: { inst: "tom", vol: 0.45, pan: -0.15 },
+    rim: { inst: "rim", vol: 0.35, pan: 0.3 },
+    bell: { inst: "cowbell", vol: 0.75, rev: 0.2, echo: 0.12, cutoff: 12e3 },
+    bell2: { inst: "cowbell", vol: 0.4, pan: 0.35, transpose: -12, duck: true },
+    b808: { inst: "phonk808", vol: 0.9 },
+    vox: { inst: "vox", vol: 0.5, rev: 0.3, echo: 0.1 },
+    crash: { inst: "crash", vol: 0.4, rev: 0.3 },
+    impact: { inst: "impact", vol: 0.8, rev: 0.5 },
+    riser: { inst: "riser", vol: 0.4, rev: 0.3 },
+    swell: { inst: "swell", vol: 0.35 }
+  };
+  function funk(s, bar, n, level) {
+    s.grid("kick", bar, level >= 4 ? "x..xx.x.x.xxx.x." : "x..x..x...x..x..", n);
+    s.grid("clap", bar, level >= 3 ? "....x.......x.x." : "....x.......x...", n);
+    s.grid("tom", bar, level >= 3 ? "..x..x.xx.x.x..x" : "..x..x...x..x..x", n, { midi: 50 });
+    s.grid("rim", bar, "x...x..x..x.x...", n, { vel: 0.8 });
+    s.grid("hat", bar, level >= 2 ? "xxxxxxxxxxxxxxxx" : "x.x.x.x.x.x.x.x.", n, { vel: 0.7 });
+    if (level >= 2) s.grid("shaker", bar, "x.xxx.xxx.xxx.xx", n, { vel: 0.8 });
+  }
+  function chops(s, bar, n, kind = "ah") {
+    const line = {
+      ah: "r:4 f#4:2 r:6 f#4:2 r:2",
+      hey: "r:2 c#5:2 r:4 r:2 c#5:2 r:4",
+      frenzy: "f#4:2 r:2 c#5:2 r:2 f#4:2 r:2 c#5:2 a4:2"
+    }[kind];
+    for (let i = 0; i < n; i++) s.play("vox", bar + i, line);
+  }
+  function slam(s, bar) {
+    s.note("impact", bar * 4, 60, 1);
+    s.grid("crash", bar, "x...............");
+    s.play("vox", bar, "f#5:4 r:12");
+  }
+  function roll(s, bar, gap = true) {
+    s.grid("snare", bar, gap ? "x.x.x.x.xxxx...." : "x.x.x.x.xxxxXXXX");
+  }
+  var unmaker = compose(
     {
-      id: "final_boss",
-      title: "Unmaker",
-      mood: "Final boss",
-      bpm: 152,
-      bars: 38,
-      loopBar: 4,
+      id: "unmaker",
+      title: "UNMAKER (Montagem do Vazio)",
+      mood: "Final boss \xB7 phase I",
+      bpm: UNMAKER_PHASES[0].bpm,
+      bars: 70,
+      loopBar: ENTRANCE_BARS,
+      sidechain: { part: "kick", depth: 0.3, release: 0.12 },
+      parts: PARTS
+    },
+    (s) => {
+      s.play("bell", 0, HOOK.replace(/f#5:4$/, "r:4"));
+      s.automate("bell", "cutoff", 0, 3.75, 350, 9e3);
+      s.note("swell", 0, 60, 8);
+      s.grid("hat", 1, "x.x.x.x.x.x.x.x.", 2, { vel: 0.5 });
+      s.grid("clap", 2, "....x.......x...");
+      s.bass("b808", 2, "F#m", "R:16", 30);
+      s.note("riser", 8, 60, 7);
+      roll(s, 3);
+      s.play("vox", 3, "r:8 c#5:2 r:6");
+      slam(s, 4);
+      s.play("bell", 4, HOOK);
+      s.play("bell", 8, HOOK);
+      s.bass("b808", 4, `${PROG} ${PROG}`, "R:3 R:3 R:4 5:2 R:4", 30);
+      funk(s, 4, 8, 1);
+      chops(s, 5, 7);
+      s.grid("crash", 12, "x...............");
+      for (const b of [12, 16]) {
+        s.play("bell", b, HOOK, { transpose: 12, vel: 0.8 });
+        s.play("bell2", b, HOOK);
+      }
+      s.bass("b808", 12, "F#m:2 E:2 D:2 C#:2", "R:3 R:3 R:2 8:2 5:2 R:4", 30);
+      funk(s, 12, 8, 2);
+      chops(s, 12, 8, "hey");
+      s.play("bell", 20, HOOK, { vel: 0.9 });
+      s.automate("bell", "cutoff", 20, 3.75, 900, 9e3);
+      s.bass("b808", 20, PROG, "R:8 R:8", 30);
+      s.grid("kick", 20, "x.......x.......", 3);
+      s.grid("clap", 20, "........x.......", 3);
+      s.grid("kick", 23, "x.......x.x.x.xx");
+      roll(s, 23, false);
+      s.note("riser", 88, 60, 4);
+      slam(s, 24);
+      for (const b of [24, 28]) {
+        s.play("bell", b, HOOK);
+        s.play("bell2", b, COUNTER, { transpose: 12 });
+      }
+      s.bass("b808", 24, `${PROG} ${PROG}`, "R:2 R:1 R:3 R:2 5:2 R:2 8:2 R:2", 30);
+      funk(s, 24, 8, 2);
+      chops(s, 25, 7);
+      slam(s, 32);
+      s.play("bell", 32, HOOK_B);
+      s.play("bell", 36, HOOK_B);
+      s.bass("b808", 32, `${PROG_B} ${PROG_B}`, "R:3 R:3 R:2 R:2 5:2 R:4", 30);
+      funk(s, 32, 8, 2);
+      chops(s, 32, 8, "hey");
+      s.grid("crash", 40, "x...............");
+      for (const b of [40, 44]) {
+        s.play("bell", b, HOOK_B, { transpose: 12, vel: 0.8 });
+        s.play("bell2", b, HOOK);
+      }
+      s.bass("b808", 40, `${PROG} ${PROG_B}`, "R:2 R:2 R:2 8:2 R:2 5:2 R:4", 30);
+      funk(s, 40, 8, 3);
+      chops(s, 41, 7);
+      s.play("bell", 48, HOOK, { vel: 0.8 });
+      s.automate("bell", "cutoff", 48, 3.75, 500, 9e3);
+      s.bass("b808", 48, PROG, "R:16", 30);
+      s.note("swell", 48 * 4, 60, 8);
+      s.note("riser", 49 * 4, 60, 11);
+      s.grid("clap", 50, "....x.......x...");
+      roll(s, 51);
+      slam(s, 52);
+      for (const b of [52, 56]) {
+        s.play("bell", b, HOOK);
+        s.play("bell2", b, HOOK_B);
+      }
+      s.bass("b808", 52, `${PROG} ${PROG}`, "R:2 R:1 R:1 R:2 R:2 5:2 8:2 R:4", 30);
+      funk(s, 52, 8, 3);
+      s.grid("crash", 56, "x...............");
+      chops(s, 53, 7);
+      s.grid("crash", 60, "x...............");
+      s.play("bell", 60, HOOK_B);
+      s.play("bell", 64, HOOK);
+      s.play("bell", 68, half(HOOK_B));
+      s.play("bell2", 60, COUNTER, { transpose: 12 });
+      s.play("bell2", 64, COUNTER, { transpose: 12 });
+      s.bass("b808", 60, `${PROG_B} ${PROG} F#m C#`, "R:3 R:3 R:2 8:2 5:2 R:4", 30);
+      funk(s, 60, 9, 3);
+      chops(s, 60, 9, "hey");
+      roll(s, 69, false);
+    }
+  );
+  function phaseTheme(n) {
+    const ph = UNMAKER_PHASES[n], level = n + 1, bars = 33 + (n === 3 ? 2 : 0);
+    return compose(
+      {
+        id: ph.music,
+        title: `UNMAKER ${["", "II", "III", "IV"][n]} (${["", "Enxame", "Desfazer", "Colapso"][n]})`,
+        mood: `Final boss \xB7 phase ${ph.name}`,
+        bpm: ph.bpm,
+        bars,
+        loopBar: 1,
+        sidechain: { part: "kick", depth: 0.3 + n * 0.05, release: 0.12 },
+        parts: {
+          ...PARTS,
+          b808: { inst: "phonk808", vol: 0.9 + n * 0.05 },
+          bell: { ...PARTS.bell, vol: 0.75 + n * 0.04 }
+        }
+      },
+      (s) => {
+        slam(s, 0);
+        s.play("vox", 0, "r:8 c#5:2 r:2 c#5:2 r:2");
+        s.bass("b808", 0, "F#m", "R:4 R:4 R:2 R:2 R:4", 30);
+        funk(s, 0, 1, level);
+        const hi = n >= 2 ? 12 : 0;
+        for (const [i, bar] of [1, 9, 17, 25].entries()) {
+          if (i) slam(s, bar);
+          const main = i % 2 ? HOOK_B : HOOK, under = i === 3 ? i % 2 ? HOOK : HOOK_B : COUNTER;
+          s.play("bell", bar, main, { transpose: hi });
+          s.play("bell", bar + 4, main, { transpose: hi });
+          if (n >= 2 || i >= 2) {
+            s.play("bell2", bar, under, { transpose: under === COUNTER ? 12 : 0 });
+            s.play("bell2", bar + 4, under, { transpose: under === COUNTER ? 12 : 0 });
+          }
+          const busy = n >= 3 ? "R:2 R:1 R:1 R:2 8:1 R:1 R:2 5:2 8:2 R:2" : n >= 2 ? "R:2 R:1 R:3 R:2 5:2 R:2 8:2 R:2" : "R:3 R:3 R:2 8:2 5:2 R:4";
+          s.bass("b808", bar, `${i % 2 ? PROG_B : PROG} ${PROG}`, busy, 30);
+          funk(s, bar, 8, level);
+          chops(s, bar, 8, n >= 3 ? "frenzy" : i % 2 ? "hey" : "ah");
+          if (n >= 2) s.grid("crash", bar + 4, "x...............");
+        }
+        if (n === 3) {
+          s.play(
+            "bell",
+            33,
+            "f#6:1 f#6:1 f#6:1 f#6:1 a6:1 a6:1 a6:1 a6:1 c#7:1 c#7:1 c#7:1 c#7:1 f#7:4"
+          );
+          s.play("bell", 34, "f#6:2 f#6:2 e6:2 e6:2 d6:2 d6:2 c#6:4");
+          s.bass("b808", 33, "F#m C#", "R:1 R:1 R:1 R:1", 30);
+          s.grid("kick", 33, "xxxxxxxxxxxxxxxx", 2);
+          chops(s, 33, 2, "frenzy");
+          roll(s, 34, false);
+        } else roll(s, 32, false);
+      }
+    );
+  }
+  var unmaker2 = phaseTheme(1);
+  var unmaker3 = phaseTheme(2);
+  var unmaker4 = phaseTheme(3);
+  var unmakerFinale = compose(
+    {
+      id: "unmaker_finale",
+      title: "Wildlands (Unmade)",
+      mood: "The end of the Unmaker",
+      bpm: FINALE_BPM,
+      bars: FINALE_BARS,
+      loopBar: FINALE_DROP_BARS,
       sidechain: { part: "kick", depth: 0.35, release: 0.14 },
       parts: {
-        kick: { inst: "bigkick", vol: 0.8 },
-        snare: { inst: "snare", vol: 0.7, rev: 0.3 },
-        hat: { inst: "hat", vol: 0.35, pan: 0.25 },
-        crash: { inst: "crash", vol: 0.5, rev: 0.35 },
-        taiko: { inst: "taiko", vol: 0.8, rev: 0.5 },
-        timp: { inst: "timpani", vol: 0.8, rev: 0.5 },
-        impact: { inst: "impact", vol: 0.8, rev: 0.6 },
-        riser: { inst: "riser", vol: 0.4, rev: 0.4 },
-        toll: { inst: "toll", vol: 1.2, rev: 0.75 },
-        lead: { inst: "supersaw", vol: 0.75, rev: 0.35, echo: 0.15 },
-        brass: { inst: "brass", vol: 0.65, rev: 0.45 },
-        strings: { inst: "tremolo", vol: 0.55, rev: 0.5 },
-        choir: { inst: "choir", vol: 0.7, rev: 0.7 },
-        organ: { inst: "organ", vol: 0.55, rev: 0.5 },
-        guitar: { inst: "guitar", vol: 0.5, pan: -0.35, duck: true },
-        guitar2: { inst: "guitar", vol: 0.4, pan: 0.35, transpose: 12, duck: true },
-        bass: { inst: "synthbass", vol: 0.85, duck: true },
-        hit: { inst: "orchhit", vol: 0.7, rev: 0.5 }
+        ...PARTS,
+        pad: { inst: "pad", vol: 0.55, rev: 0.5 },
+        choir: { inst: "choir", vol: 0.5, rev: 0.6 },
+        arp: { inst: "bell", vol: 0.4, rev: 0.4, echo: 0.2 },
+        howl: { inst: "howl", vol: 0.5, rev: 0.8, echo: 0.35, pan: -0.3 },
+        sub: { inst: "sub", vol: 0.6 }
       }
     },
     (s) => {
-      const progA = "Em C D B Em F G B", powerA = "E5 C5 D5 B5 E5 F5 G5 B5", progB = "Em F Em F G F Em B", powerB = "E5 F5 E5 F5 G5 F5 E5 B5", progC = "Am Em F B Am Em F B";
-      const theme = "e5:2 g5:2 b5:4 a5:2 g5:2 f#5:4 | g5:2 a5:2 b5:4 e6:8 | d6:2 c6:2 b5:4 a5:2 b5:2 c6:4 | b5:12 d#5:4 | e5:2 g5:2 b5:4 c6:2 b5:2 a5:4 | g5:2 f5:2 e5:4 f5:8 | g5:4 a5:4 b5:4 d6:4 | d#6:8 b5:8";
-      const drums = (bar, n) => {
-        s.grid("kick", bar, "x.x.x.x.x.x.x.x.", n);
-        s.grid("snare", bar, "....x.......x...", n);
-        s.grid("hat", bar, "x.x.x.x.x.x.x.x.", n, { vel: 0.8 });
-      };
-      for (let b = 0; b < 4; b += 2) s.at("toll", b, "e2", 6);
-      s.pad("choir", 0, "Em:2 F:1 B:1", 62);
-      s.grid("timp", 2, "oooooooxxxxxXXXX", 2, { midi: 40 });
-      s.note("riser", 0, 60, 16);
-      s.note("impact", 16, 60, 1);
-      s.grid("crash", 4, "x...............");
-      s.play("lead", 4, theme);
-      s.hits("guitar", 4, powerA, "x-.xx-.xx-.xx.xx", 52);
-      s.hits("guitar2", 4, powerA, "x-.xx-.xx-.xx.xx", 52);
-      s.bass("bass", 4, progA, "R:2", 28);
-      s.hits("hit", 4, progA, "x...............", 60);
-      drums(4, 8);
-      s.grid("crash", 12, "x...............");
-      s.pad("choir", 12, progB, 64);
-      s.pad("organ", 12, progB, 57);
-      s.play(
-        "brass",
-        12,
-        "e5:8 f5:8 | e5:4 d5:4 c5:8 | b4:8 c5:8 | d5:16 | g5:8 f5:8 | e5:4 f5:4 a5:8 | g5:8 f5:8 | d#5:16"
+      const intro = "Dm Bb Gm", progA = "Dm Bb F C Dm Bb Gm A", drop2 = "Bb C Dm F Gm Bb C A";
+      s.pad("pad", 0, intro, 62);
+      s.pad("choir", 0, intro, 57, { vel: 0.8 });
+      s.arp("arp", 0, "Dm Bb", "0 2 1 3 2 4 3 5", 74, 2, { vel: 0.8 });
+      s.play("arp", 2, "g5:2 bb5:2 d6:2 g6:2 d6:2 bb5:2 r:4");
+      s.bass("sub", 0, intro, "R:16", 33, { vel: 0.8 });
+      s.play("howl", 0, "r:4 a4:28 | r:16");
+      s.note("riser", 4, 60, 7);
+      roll(s, 2);
+      const themeA = "d5:6 e5:2 f5:4 a5:4 | g5:6 f5:2 d5:8 | c5:6 d5:2 f5:4 c6:4 | g5:12 e5:4 | d5:6 e5:2 f5:4 a5:4 | bb5:6 a5:2 g5:4 f5:4 | g5:6 f5:2 e5:4 d5:4 | c#5:8 e5:4 a5:4";
+      const chopped = themeA.replace(
+        /([a-g]#?b?\d):(6|8|12)/g,
+        (_m, n, len) => Array.from({ length: Number(len) / 2 }, (_, i) => `${i % 2 ? "_" : ""}${n}:2`).join(" ")
       );
-      s.hits("guitar", 12, powerB, "x-.xx-.xx-.xx.xx", 52);
-      s.bass("bass", 12, progB, "R:2", 28);
-      s.grid("taiko", 12, "x.......x.......", 8);
-      drums(12, 7);
-      s.grid("snare", 19, "x.x.x.x.xxxxXXXX");
-      s.pad("strings", 20, progC, 57);
-      s.pad("choir", 20, progC, 64, { vel: 0.8 });
-      s.bass("bass", 20, progC, "R:8 R:8", 28);
-      s.grid("kick", 20, "x.......x.......", 6);
-      s.grid("taiko", 20, "x...x...x...x...", 6);
-      s.hits("hit", 20, progC, "x.......x.......", 60);
-      s.grid("timp", 26, "x.x.x.x.xxxxXXXX", 2, { midi: 40 });
-      s.note("riser", 96, 60, 16);
-      s.note("impact", 112, 60, 1);
-      s.grid("crash", 28, "x...............");
-      s.grid("crash", 32, "x...............");
-      s.play("lead", 28, theme, { transpose: 12, vel: 0.9 });
-      s.play("brass", 28, theme, { vel: 0.8 });
-      s.pad("choir", 28, progA, 64);
-      s.hits("guitar", 28, powerA, "x-.xx-.xx-.xx.xx", 52);
-      s.hits("guitar2", 28, powerA, "x-.xx-.xx-.xx.xx", 52);
-      s.bass("bass", 28, progA, "R:2", 28);
-      drums(28, 8);
-      s.grid("taiko", 28, "x.......x.......", 8);
-      s.hits("hit", 36, "Em B", "x.......x.x.x...", 60);
-      s.bass("bass", 36, "Em B", "R:2", 28);
-      s.grid("kick", 36, "x.x.x.x.x.x.xxxx", 2);
-      s.grid("snare", 36, "....x.......x...|x.x.x.x.xxxxXXXX");
+      slam(s, 3);
+      s.play("bell", 3, chopped, { transpose: 12 });
+      s.play("bell2", 3, themeA, { transpose: 12 });
+      s.bass("b808", 3, progA, "R:3 R:3 R:4 5:2 R:4", 26);
+      funk(s, 3, 8, 2);
+      chops(s, 4, 7);
+      const hook1 = ">a5:3 a5:3 a5:2 g5:2 a5:2 c6:2 d6:2 | d6:3 c6:3 bb5:2 g5:4 f5:4 | >c6:3 c6:3 c6:2 a5:2 c6:2 f6:2 e6:2 | e6:6 d6:2 c6:4 g5:4 | >a5:3 a5:3 a5:2 g5:2 a5:2 c6:2 d6:2 | d6:3 c6:3 bb5:2 a5:2 bb5:2 c6:2 d6:2 | >f6:6 e6:2 d6:2 c6:2 a5:4 | c6:4 d6:4 e6:8";
+      slam(s, 11);
+      s.play("bell", 11, hook1);
+      s.pad("choir", 11, "Dm Bb F C Dm Bb F C", 64, { vel: 0.6 });
+      s.bass("b808", 11, "Dm Bb F C Dm Bb F C", "R:2 R:1 R:3 R:2 5:2 R:2 8:2 R:2", 26);
+      funk(s, 11, 8, 3);
+      chops(s, 11, 8, "hey");
+      const hook2 = ">bb5:3 d6:3 f6:2 f6:4 d6:4 | >c6:3 e6:3 g6:2 g6:4 e6:4 | >f6:3 e6:3 d6:2 d6:4 a5:4 | c6:3 d6:3 f6:2 >a6:8 | >g6:6 f6:2 d6:4 bb5:4 | f6:6 d6:2 bb5:4 d6:4 | e6:6 d6:2 c6:4 e6:4 | >e6:8 c#6:4 a5:4";
+      slam(s, 19);
+      s.play("bell", 19, hook2);
+      s.play("bell2", 19, hook1, { transpose: 12 });
+      s.pad("pad", 19, drop2, 60);
+      s.bass("b808", 19, drop2, "R:2 R:1 R:1 R:2 R:2 5:2 8:2 R:4", 26);
+      funk(s, 19, 8, 3);
+      chops(s, 20, 7);
+      s.play("bell", 27, "d5:8 e5:4 f5:4 | a5:8 g5:8 | f5:8 d5:8 | c#5:8 e5:4 a5:4");
+      s.pad("pad", 27, "Dm Bb Gm A", 60);
+      s.pad("choir", 27, "Dm Bb Gm A", 57, { vel: 0.9 });
+      s.bass("b808", 27, "Dm Bb Gm A", "R:8 R:8", 26);
+      s.grid("kick", 27, "x.......x.......", 4);
+      s.grid("clap", 27, "........x.......", 4);
+      s.play("howl", 29, "r:4 d5:12 | r:16");
+      s.pad("pad", 31, "Dm", 62);
+      s.at("b808", 31, "d2", 4);
+      s.note("impact", 31 * 4, 60, 1);
     }
   );
 
@@ -29942,7 +31702,11 @@
     mycelia,
     skyreach,
     voidsong,
-    finalBoss,
+    unmaker,
+    unmaker2,
+    unmaker3,
+    unmaker4,
+    unmakerFinale,
     town,
     orchard,
     steppe,
@@ -29974,6 +31738,7 @@
   var LOOKAHEAD = 1.2;
   var SCENE_SETTLE = 1.5;
   var URGENT = /* @__PURE__ */ new Set(["menu", "boss", "fallen"]);
+  var cutsIn = (id) => id.startsWith("unmaker");
   var ac;
   var master;
   var musicGain;
@@ -30025,15 +31790,20 @@
       return;
     }
     const quick = id === "boss" || id === "fallen";
-    deck?.stop(now, quick ? 0.8 : 2.5);
-    deck = player.play(TRACKS[id] ?? TRACKS.meadow, now + 0.08, current ? quick ? 0.25 : 1.5 : 0);
+    const cut = cutsIn(id);
+    deck?.stop(now, cut ? 0.3 : quick ? 0.8 : 2.5);
+    deck = player.play(
+      TRACKS[id] ?? TRACKS.meadow,
+      now + 0.08,
+      cut ? 0 : current ? quick ? 0.25 : 1.5 : 0
+    );
     current = id;
   }
   function tick() {
     if (!ac || !player || ac.state !== "running") return;
     const now = ac.currentTime;
     if (desired !== current) {
-      const urgent = !current || URGENT.has(desired) || URGENT.has(current);
+      const urgent = !current || URGENT.has(desired) || URGENT.has(current) || cutsIn(desired) || cutsIn(current);
       if (urgent || now - desiredSince > SCENE_SETTLE) switchTo(desired, now);
     }
     player.schedule(now + LOOKAHEAD, now);
@@ -30086,6 +31856,10 @@
     if (ac && sfxBus) sfxBus.gain.setTargetAtTime(settings.sfx * 0.8, ac.currentTime, 0.05);
     localStorage.setItem("wildlands-audio", JSON.stringify(settings));
   }
+  function setHushed(on) {
+    if (ac && musicGain)
+      musicGain.gain.setTargetAtTime(on ? 0 : musicLevel(), ac.currentTime, on ? 0.02 : 0.08);
+  }
   function nowPlaying() {
     return current ? TRACKS[current]?.title : void 0;
   }
@@ -30096,6 +31870,7 @@
     setAmbience,
     setScene,
     setMuffled,
+    setHushed,
     setVolumes,
     nowPlaying,
     settings
@@ -30137,7 +31912,10 @@
   function musicScene(c) {
     if (!c.playing) return "menu";
     if (c.dead) return "fallen";
-    if (c.boss) return c.bossType === "unmaker" ? "final_boss" : "boss";
+    if (c.finale) return "unmaker_finale";
+    if (c.boss && c.bossType === "unmaker")
+      return ["unmaker", "unmaker_2", "unmaker_3", "unmaker_4"][c.bossPhase ?? 0] ?? "unmaker";
+    if (c.boss) return "boss";
     if (c.dungeon && DUNGEON_TRACKS[c.dungeon]) return DUNGEON_TRACKS[c.dungeon];
     if (LAYER_TRACKS[c.layer]) return LAYER_TRACKS[c.layer];
     if (c.weather === "storm") return "storm";
@@ -30235,6 +32013,195 @@
     }
   };
 
+  // src/ui/shatter.ts
+  var HOLD = 1.7;
+  var FALL2 = 3.7;
+  var DARK = 4.5;
+  function shatter(source, sound2, hush) {
+    const w = innerWidth, h = innerHeight, diag = Math.hypot(w, h);
+    const snap = document.createElement("canvas");
+    snap.width = w;
+    snap.height = h;
+    snap.getContext("2d").drawImage(source, 0, 0, w, h);
+    const cv = document.createElement("canvas");
+    cv.id = "shatter";
+    cv.width = w;
+    cv.height = h;
+    document.body.appendChild(cv);
+    document.body.classList.add("shattering");
+    const c = cv.getContext("2d");
+    const r = Math.random, ix = w * (0.5 + (r() - 0.5) * 0.2), iy = h * (0.45 + (r() - 0.5) * 0.15), spokes = 16, radii = [0, 0.04, 0.11, 0.22, 0.38, 0.6, 1.2].map((k) => k * diag), angles = Array.from(
+      { length: spokes },
+      (_, i) => i / spokes * Math.PI * 2 + (r() - 0.5) * (Math.PI / spokes)
+    );
+    const vert = radii.map(
+      (rad, k) => angles.map((a) => {
+        const j = k ? 1 + (r() - 0.5) * 0.3 : 0;
+        return [ix + Math.cos(a) * rad * j, iy + Math.sin(a) * rad * j];
+      })
+    );
+    const shards = [];
+    for (let k = 0; k < radii.length - 1; k++)
+      for (let i = 0; i < spokes; i++) {
+        const n = (i + 1) % spokes, pts = [vert[k][i], vert[k][n], vert[k + 1][n], vert[k + 1][i]], cx = pts.reduce((s, p) => s + p[0], 0) / 4, cy = pts.reduce((s, p) => s + p[1], 0) / 4;
+        shards.push({
+          pts,
+          cx,
+          cy,
+          vx: (cx - ix) * 0.35 + (r() - 0.5) * 120,
+          spin: (r() - 0.5) * 3,
+          delay: k === 0 ? 0 : r() * 0.45 + (radii.length - k) * 0.06
+        });
+      }
+    const cracks = [];
+    const jag = (a, b) => {
+      const line = [a];
+      for (let s = 1; s < 5; s++) {
+        const k = s / 5;
+        line.push([
+          a[0] + (b[0] - a[0]) * k + (r() - 0.5) * 10,
+          a[1] + (b[1] - a[1]) * k + (r() - 0.5) * 10
+        ]);
+      }
+      line.push(b);
+      return line;
+    };
+    for (let k = 0; k < radii.length - 1; k++)
+      for (let i = 0; i < spokes; i++) {
+        cracks.push({ from: radii[k], line: jag(vert[k][i], vert[k + 1][i]) });
+        if (k) cracks.push({ from: radii[k], line: jag(vert[k][i], vert[k][(i + 1) % spokes]) });
+      }
+    const bleeds = Array.from({ length: 9 }, () => ({
+      x: ix + (r() - 0.5) * w * 0.5,
+      wd: 1 + Math.floor(r() * 3),
+      col: ["#ff2aa0", "#2af0ff", "#b0ff2a", "#ffffff", "#000000"][Math.floor(r() * 5)]
+    }));
+    const path = (pts) => {
+      c.beginPath();
+      c.moveTo(pts[0][0], pts[0][1]);
+      for (const p of pts.slice(1)) c.lineTo(p[0], p[1]);
+      c.closePath();
+    };
+    const drawCracks2 = (reach) => {
+      c.lineJoin = "round";
+      for (const { from, line } of cracks) {
+        if (from > reach) continue;
+        for (const [col, off, wd] of [
+          ["rgba(0,0,0,0.55)", 1, 2],
+          ["rgba(255,255,255,0.9)", 0, 1.2]
+        ]) {
+          c.strokeStyle = col;
+          c.lineWidth = wd;
+          c.beginPath();
+          c.moveTo(line[0][0] + off, line[0][1] + off);
+          for (const p of line.slice(1)) c.lineTo(p[0] + off, p[1] + off);
+          c.stroke();
+        }
+      }
+    };
+    const drawInk = (k) => {
+      for (const [col, rad] of [
+        ["#ff2aa0", 46],
+        ["#2af0ff", 40],
+        ["#000000", 34]
+      ]) {
+        c.fillStyle = col;
+        c.globalAlpha = col === "#000000" ? 0.95 : 0.5;
+        for (let i = 0; i < 7; i++) {
+          c.beginPath();
+          c.arc(
+            ix + Math.cos(i * 2.1) * rad * 0.35,
+            iy + Math.sin(i * 1.7) * rad * 0.3,
+            rad * k * (0.5 + i % 3 * 0.25),
+            0,
+            Math.PI * 2
+          );
+          c.fill();
+        }
+      }
+      c.globalAlpha = 1;
+    };
+    const t0 = performance.now() / 1e3, done = /* @__PURE__ */ new Set();
+    const once = (key, fn) => {
+      if (!done.has(key)) {
+        done.add(key);
+        fn();
+      }
+    };
+    sound2("screen_crack");
+    const frame2 = () => {
+      const t = performance.now() / 1e3 - t0;
+      c.clearRect(0, 0, w, h);
+      if (t < HOLD) {
+        c.drawImage(snap, 0, 0);
+        if (t > 0.12)
+          for (const b of bleeds) {
+            c.fillStyle = b.col;
+            c.globalAlpha = 0.75;
+            c.fillRect(b.x, 0, b.wd, h);
+          }
+        c.globalAlpha = 1;
+        drawInk(Math.min(1, t / 0.25));
+        drawCracks2(Math.min(1, t / 0.5) * diag);
+      } else if (t < FALL2) {
+        once("fall", () => sound2("shatter"));
+        if (t > HOLD + 0.35) once("hush", () => hush(true));
+        c.fillStyle = "#000";
+        c.fillRect(0, 0, w, h);
+        for (const s of shards) {
+          const ft = Math.max(0, t - HOLD - s.delay);
+          if (s.cy + 520 * ft * ft > h + diag * 0.3) continue;
+          c.save();
+          c.translate(s.cx + s.vx * ft, s.cy + 520 * ft * ft);
+          c.rotate(s.spin * ft);
+          c.translate(-s.cx, -s.cy);
+          path(s.pts);
+          c.clip();
+          c.drawImage(snap, 0, 0);
+          c.strokeStyle = "rgba(255,255,255,0.8)";
+          c.lineWidth = 1.5;
+          path(s.pts);
+          c.stroke();
+          c.restore();
+        }
+      } else if (t < DARK) {
+        c.fillStyle = "#000";
+        c.fillRect(0, 0, w, h);
+        if (Math.floor(t * 2) % 2) {
+          c.fillStyle = "#3a3a3a";
+          c.font = "16px monospace";
+          c.textAlign = "center";
+          c.fillText("NO SIGNAL", w / 2, h / 2);
+        }
+      } else if (t < SHATTER_SECONDS) {
+        once("on", () => {
+          sound2("crt_on");
+          hush(false);
+          document.body.classList.remove("shattering");
+        });
+        const k = (t - DARK) / (SHATTER_SECONDS - DARK);
+        c.fillStyle = "#000";
+        c.fillRect(0, 0, w, h);
+        if (k < 0.35) {
+          const lw = w * Math.min(1, k / 0.25);
+          c.fillStyle = "#ffffff";
+          c.fillRect((w - lw) / 2, h / 2 - 1, lw, 2);
+        } else {
+          const open = h * Math.min(1, (k - 0.35) / 0.5);
+          c.clearRect(0, (h - open) / 2, w, open);
+          c.fillStyle = `rgba(255,255,255,${(1 - k) * 0.8})`;
+          c.fillRect(0, (h - open) / 2, w, open);
+        }
+      } else {
+        cv.remove();
+        document.body.classList.remove("shattering");
+        return;
+      }
+      requestAnimationFrame(frame2);
+    };
+    requestAnimationFrame(frame2);
+  }
+
   // src/ui/App.ts
   var game = new Game();
   var $ = (id) => {
@@ -30277,6 +32244,11 @@
     merchant: null,
     armourySel: "iron_sword",
     camera: { x: 0, y: 0 },
+    /** How far the camera has eased toward a cinematic focus, and the focus itself. */
+    focus: 0,
+    focusAt: { x: 0, y: 0 },
+    /** The death scene whose screen has already been broken. */
+    shatteredAt: -1,
     lastFrame: performance.now(),
     lastUI: 0,
     lastAuto: 0,
@@ -30647,6 +32619,7 @@
     keys.add(key);
     if (e.repeat) return;
     if (key === "escape") {
+      if (game.unmaker.skip()) return;
       if (state.journal) toggleJournal(false);
       else if (game.s.placing) {
         game.s.placing = null;
@@ -31702,7 +33675,7 @@
       prompt = held ? `<b>CLICK</b> ${game.hands.describe(cursorWorld())}` : "<b>E</b> Explore and gather";
     $("interaction-prompt").innerHTML = prompt;
     const boss2 = game.s.animals.find((a) => a.id === game.s.altar.activeBoss && !a.deadUntil) ?? game.bosses.active();
-    $("boss-hud").classList.toggle("hidden", !boss2);
+    $("boss-hud").classList.toggle("hidden", !boss2 || game.unmaker.overlay()?.mode === "entrance");
     $("hud").classList.toggle("boss-fight", !!boss2);
     if (boss2) {
       const key = boss2.type === "boss" ? "direwolf" + game.s.altar.level : boss2.type;
@@ -31737,8 +33710,82 @@
   function camera() {
     const p = game.s.player;
     const [lo, hi] = regionBounds(p.x);
-    state.camera.x = clamp3(p.x - view.worldW / 2, lo, Math.max(lo, hi - view.worldW));
-    state.camera.y = clamp3(p.y - 24 - view.worldH / 2, 0, Math.max(0, WORLD_H - view.worldH));
+    const focus = game.unmaker.focus();
+    state.focus += ((focus ? 1 : 0) - state.focus) * 0.08;
+    if (focus) state.focusAt = focus;
+    const fx = p.x + (state.focusAt.x - p.x) * state.focus, fy = p.y - 24 + (state.focusAt.y - (p.y - 24)) * state.focus;
+    state.camera.x = clamp3(fx - view.worldW / 2, lo, Math.max(lo, hi - view.worldW));
+    state.camera.y = clamp3(fy - view.worldH / 2, 0, Math.max(0, WORLD_H - view.worldH));
+    const shake = game.unmaker.shake() * 18;
+    if (shake > 0.5) {
+      state.camera.x += (Math.random() - 0.5) * shake;
+      state.camera.y += (Math.random() - 0.5) * shake;
+    }
+  }
+  function updateCinematic() {
+    const o = state.playing ? game.unmaker.overlay() : null, el = $("cinematic");
+    el.classList.toggle("hidden", !o);
+    if (!o) {
+      document.body.classList.remove("cinematic");
+      canvas.style.filter = "";
+      return;
+    }
+    let bars = false, title = "", sub2 = "", flash = 0, tone2 = "#ffffff", grey = false;
+    if (o.mode === "entrance") {
+      bars = o.beat >= 1;
+      if (o.beat >= 12) title = o.beat >= 14 ? "THE UNMAKER" : o.beat >= 13 ? "THE UN" : "THE";
+      grey = o.beat >= 15;
+    } else if (o.mode === "scene") {
+      const c = o.scene;
+      bars = true;
+      if (c.kind === "death") {
+        grey = o.t < 0.35;
+        flash = o.t < 0.2 ? 0.7 * (1 - o.t / 0.2) : o.t > SUPERNOVA ? Math.max(0, 1 - (o.t - SUPERNOVA) / 0.8) : 0;
+        bars = o.t < SHATTER_AT;
+        if (o.t > SUPERNOVA && o.t < SHATTER_AT) [title, sub2] = [c.title, c.sub];
+        if (o.t > SHATTER_AT + SHATTER_SECONDS - 0.3) sub2 = c.sub;
+        if (o.t >= SHATTER_AT && state.shatteredAt !== c.start) {
+          state.shatteredAt = c.start;
+          const p = game.s.player;
+          shatter(
+            canvas,
+            (kind) => Audio.effect(kind, { x: p.x, y: p.y - 20 }, 1.6),
+            Audio.setHushed
+          );
+        }
+      } else {
+        tone2 = "#ff2a4a";
+        if (o.t > c.dur - 1.3) [title, sub2] = [c.title, c.sub];
+        flash = o.t > c.dur - 0.25 ? 0.7 : 0;
+      }
+    } else {
+      [title, sub2] = [o.hype.title, o.hype.sub];
+      tone2 = o.hype.kind === "drop" ? "#ffffff" : "#ff2a4a";
+      flash = o.t < 0.3 ? (o.hype.kind === "drop" ? 1 : 0.6) * (1 - o.t / 0.3) : 0;
+      if (o.hype.kind === "drop" && o.t < 0.1) {
+        $("boss-hud").classList.remove("slam");
+        void $("boss-hud").offsetWidth;
+        $("boss-hud").classList.add("slam");
+      }
+    }
+    el.classList.toggle("bars", bars);
+    document.body.classList.toggle("cinematic", bars);
+    el.dataset.mode = o.mode === "scene" ? o.scene.kind : o.mode === "hype" ? o.hype.kind : "entrance";
+    const t = $("cine-title");
+    if (t.textContent !== title) {
+      t.textContent = title;
+      t.classList.remove("slam");
+      void t.offsetWidth;
+      if (title) t.classList.add("slam");
+    }
+    $("cine-sub").textContent = sub2;
+    $("cine-flash").style.opacity = String(flash);
+    $("cine-flash").style.background = tone2;
+    canvas.style.filter = grey ? "grayscale(1) contrast(1.5)" : "";
+    $("cine-skip").classList.toggle(
+      "hidden",
+      !(o.mode === "entrance" && (game.s.bosses.unmaker ?? 0) > 0)
+    );
   }
   function ambienceLevels() {
     const p = game.s.player, layer = game.layer().id, biome = game.biome().id, surface = layer === "surface", weather = game.s.weather, wet = weather === "rain" ? 0.7 : weather === "storm" ? 1 : 0, day = !game.isNight();
@@ -31834,6 +33881,8 @@
         dead: game.s.dead,
         boss: !!game.s.altar.activeBoss || !!game.bosses.active(),
         bossType: game.bosses.active()?.type ?? null,
+        bossPhase: game.unmaker.phase(),
+        finale: game.unmaker.finale(),
         dungeon: dungeonAt(game.s.player.x, game.s.player.y - 20)?.def.id ?? null,
         layer: game.layer().id,
         weather: game.s.weather,
@@ -31843,6 +33892,7 @@
       })
     );
     Audio.setMuffled(state.playing && state.journal);
+    updateCinematic();
     drawWorld();
     updateUI();
     requestAnimationFrame(frame);

@@ -184,6 +184,10 @@ export const ITEMS: Record<string, ItemSpec> = {
   band_of_vigor: ['Band of vigor', 'accessory'],
   hollow_crown: ['Hollow crown', 'accessory'],
   wildlands_crown: ['Crown of the Wildlands', 'accessory'],
+  oblivion: ['Oblivion', 'weapon'],
+  unmakers_gaze: ["The Unmaker's Gaze", 'weapon'],
+  aura_of_the_unmade: ['Aura of the Unmade', 'accessory'],
+  void_heart: ['Heart of the Void', 'potion'],
   // ── Potions ──
   healing_draught: ['Healing draught', 'potion'],
   greater_healing: ['Greater healing draught', 'potion'],
