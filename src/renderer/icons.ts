@@ -1,5 +1,8 @@
 // Item icons: 16×16 pixel art built from a few templates and a material colour, shared by the
 // drops lying in the world, the item held in hand, and every inventory slot in the journal.
+import { WALLS } from '../data/town.ts';
+
+import { GROUND } from './art.ts';
 import { Painter, cached, ramp, shade, sprite, type Sprite } from './px.ts';
 
 /** Metal and material colours that tools, weapons, and armour take their look from. */
@@ -9,6 +12,11 @@ export const MATERIAL: Record<string, string> = {
   flint: '#6a7074',
   bone: '#e6dcc6',
   copper: '#d0844a',
+  silver: '#dfe4ea',
+  gold: '#f0c850',
+  ruby: '#e8304a',
+  sapphire: '#3a7ae8',
+  emerald: '#2ac870',
   iron: '#a8a4a0',
   steel: '#dfe3e6',
   obsidian: '#4a3a64',
@@ -84,7 +92,16 @@ type Tpl =
   | 'heart'
   | 'star'
   | 'scroll'
-  | 'bomb';
+  | 'bomb'
+  | 'wall'
+  | 'coin'
+  | 'chair'
+  | 'table'
+  | 'bed'
+  | 'door'
+  | 'bucket'
+  | 'rope'
+  | 'hook';
 /** Explicit icons; anything not listed is guessed from its id. */
 export const ICONS: Record<string, [Tpl, string, string?]> = {
   wood: ['log', '#8a6440'],
@@ -199,6 +216,21 @@ export const ICONS: Record<string, [Tpl, string, string?]> = {
   frostbrand: ['sword', '#bfe8f8', '#4a6a8a'],
   hellrazor: ['sword', '#ff6a2a', '#2a0a0a'],
   sunspear: ['spear', '#f0c860'],
+  // Homes and trade.
+  coin: ['coin', '#dfe4ea'],
+  chair: ['chair', '#8a6440'],
+  table: ['table', '#8a6440'],
+  bed: ['bed', '#8a3a3a'],
+  door: ['door', '#7a5a3c'],
+  bucket: ['bucket', '#a8a4a0'],
+  water_bucket: ['bucket', '#a8a4a0', '#5a9cbc'],
+  rope: ['rope', '#c8a878'],
+  grappling_hook: ['hook', '#a8a4a0'],
+  ruby: ['gem', '#e8304a'],
+  sapphire: ['gem', '#3a7ae8'],
+  emerald: ['gem', '#2ac870'],
+  silver_ore: ['ore', '#dfe4ea', '#6c6e74'],
+  gold_ore: ['ore', '#f0c850', '#6e665a'],
 };
 
 /** Paints an icon template into a 16×16 painter (plus outline border). */
@@ -581,6 +613,83 @@ function paint(p: Painter, tpl: Tpl, col: string, col2?: string) {
       p.ellipse(12, 5, 2.5, 3.5, '#f8b848');
       p.ellipse(12, 6, 1.5, 2, '#fff0b0');
       break;
+    case 'wall':
+      p.rect(1, 1, 14, 14, m);
+      for (let y = 1; y < 15; y += 4) {
+        p.rect(1, y, 14, 1, d);
+        for (let x = y % 8 === 1 ? 4 : 8; x < 15; x += 7) p.rect(x, y, 1, 4, d);
+      }
+      p.rect(1, 2, 14, 1, l);
+      break;
+    case 'coin':
+      p.ellipse(8, 8, 6, 6, d);
+      p.ellipse(8, 8, 5, 5, m);
+      p.ellipse(7, 7, 3, 3, l);
+      p.rect(7, 5, 2, 6, d);
+      p.rect(6, 5, 1, 1, ll);
+      break;
+    case 'chair':
+      p.rect(3, 1, 2, 14, d);
+      p.rect(3, 8, 10, 2, m);
+      p.rect(3, 8, 10, 1, l);
+      p.rect(11, 10, 2, 5, d);
+      p.rect(3, 3, 2, 2, l);
+      break;
+    case 'table':
+      p.rect(1, 5, 14, 3, m);
+      p.rect(1, 5, 14, 1, l);
+      p.rect(2, 8, 2, 7, d);
+      p.rect(12, 8, 2, 7, d);
+      break;
+    case 'bed':
+      p.rect(1, 4, 2, 11, '#5e4631');
+      p.rect(13, 8, 2, 7, '#5e4631');
+      p.rect(3, 9, 10, 4, m);
+      p.rect(3, 9, 10, 1, l);
+      p.rect(3, 7, 4, 2, '#e8dcc8');
+      p.rect(3, 13, 10, 1, '#5e4631');
+      break;
+    case 'door':
+      p.rect(4, 1, 8, 14, m);
+      p.rect(4, 1, 8, 1, l);
+      p.rect(7, 1, 1, 14, d);
+      p.rect(4, 4, 8, 1, '#8a8680');
+      p.rect(4, 11, 8, 1, '#8a8680');
+      p.set(10, 8, '#d8b848');
+      break;
+    case 'bucket':
+      p.poly(
+        [
+          [3, 5],
+          [13, 5],
+          [11, 14],
+          [5, 14],
+        ],
+        m,
+      );
+      p.rect(3, 5, 10, 1, l);
+      p.rect(4, 9, 8, 1, d);
+      p.line(3, 5, 8, 1, d);
+      p.line(13, 5, 8, 1, d);
+      if (col2) p.rect(4, 6, 8, 2, col2);
+      break;
+    case 'rope':
+      p.ellipse(8, 9, 6, 5, m);
+      p.ellipse(8, 9, 3, 2.5, '#000000');
+      for (let y = 7; y < 12; y++)
+        for (let x = 5; x < 12; x++)
+          if ((x + 0.5 - 8) ** 2 / 9 + (y + 0.5 - 9) ** 2 / 6 < 1) p.clear(x, y);
+      p.line(3, 7, 6, 12, d);
+      p.line(10, 5, 13, 10, l);
+      p.line(12, 12, 14, 15, m);
+      break;
+    case 'hook':
+      p.line(3, 14, 10, 4, '#c8a878');
+      p.line(8, 1, 12, 5, m);
+      p.line(12, 5, 14, 3, l);
+      p.line(8, 1, 6, 3, l);
+      p.rect(9, 3, 3, 3, d);
+      break;
     case 'crate':
       p.rect(2, 4, 12, 10, m);
       p.rect(2, 4, 12, 1, l);
@@ -672,6 +781,7 @@ function paint(p: Painter, tpl: Tpl, col: string, col2?: string) {
 
 function guess(id: string): [Tpl, string, string?] {
   if (ICONS[id]) return ICONS[id];
+  if (WALLS[id] !== undefined) return ['wall', GROUND[WALLS[id]]?.wall ?? '#4a4038'];
   const m = matOf(id);
   const tail = id.split('_').pop() ?? '';
   const byTail: Record<string, Tpl> = {
@@ -680,6 +790,7 @@ function guess(id: string): [Tpl, string, string?] {
     pickaxe: 'pick',
     sword: 'sword',
     blade: 'sword',
+    broadsword: 'sword',
     spear: 'spear',
     bow: 'bow',
     staff: 'staff',

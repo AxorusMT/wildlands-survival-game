@@ -127,6 +127,9 @@ export class SaveSystem extends System {
     s.buffs ??= {};
     s.bosses ??= {};
     s.rift ??= { sigils: [] };
+    s.wallEdits ??= {};
+    s.town ??= { homes: {} };
+    s.spawn ??= null;
     this.game.combat.projectiles = [];
     // Old records fill the quick slots with what they carry.
     if (s.hotbar.every((x) => x === null))

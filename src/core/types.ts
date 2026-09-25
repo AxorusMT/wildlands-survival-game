@@ -17,7 +17,9 @@ export type ItemCategory =
   | 'block'
   | 'potion'
   | 'ammo'
-  | 'key';
+  | 'key'
+  | 'wall'
+  | 'coin';
 
 export interface Point {
   x: number;
@@ -54,7 +56,7 @@ export interface NodeSpec {
   regen: number;
 }
 /** Tool family and tier granted by carrying a tool. */
-export type ToolTier = ['axe' | 'pick', number];
+export type ToolTier = ['axe' | 'pick' | 'hammer', number];
 /** Weapon tier, damage, and reach. */
 export type WeaponSpec = [tier: number, damage: number, reach: number];
 export interface BossSpec {
@@ -147,6 +149,8 @@ export interface Animal extends Point {
   timers?: Record<string, number>;
   /** Summoned by a boss; gone when the fight ends. */
   minion?: boolean;
+  /** A settler of the town, by id; settlers cannot be harmed. */
+  settler?: string;
   hitAt?: number;
   howlAt?: number;
   howlCue?: number;
@@ -252,6 +256,12 @@ export interface GameState {
   bosses: Record<string, number>;
   /** Sigils set into the Rift Gate. */
   rift: { sigils: string[] };
+  /** Back walls changed from the world's own, by tile index: a ground kind, or -1 for none. */
+  wallEdits: Record<number, number>;
+  /** Where the player wakes after a fall: their bed. */
+  spawn?: { x: number; y: number } | null;
+  /** Each settler's home, by settler id: the seat of their room. */
+  town: { homes: Record<string, { x: number; y: number }> };
   placing: string | null;
   dead: boolean;
   lastSave: number;
@@ -269,11 +279,13 @@ export interface GameResult {
   id?: string;
   qty?: number;
   target?: Animal;
+  settler?: string;
 }
 export type Interactable =
   | { object: ResourceNode; type: 'node'; d: number }
   | { object: Structure; type: 'structure'; d: number }
-  | { object: FieldCache; type: 'cache'; d: number };
+  | { object: FieldCache; type: 'cache'; d: number }
+  | { object: Animal; type: 'settler'; d: number };
 export interface GameMessage {
   message: string;
   tone: string;

@@ -25,7 +25,7 @@ TypeScript source is in `src/`. `src/main.ts` bundles the UI, audio, simulation,
 
 ## Music
 
-The soundtrack is twenty-one one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
+The soundtrack is twenty-two one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
 
 | Track                     | Plays                                     |
 | ------------------------- | ----------------------------------------- |
@@ -50,6 +50,7 @@ The soundtrack is twenty-one one-minute looping tracks, synthesised live by the 
 | Above the Cloud Sea       | Skyreach                                  |
 | The Hollow Between        | The Hollow Void                           |
 | Unmaker                   | The final fight                           |
+| Lamplight on the Square   | A town of two or more settlers            |
 
 Surface changes wait a moment before the music follows, so walking along a border does not flip tracks. The menu, boss, and death tracks cut in straight away. Music is muffled while the journal is open over the game.
 
@@ -99,12 +100,12 @@ Press ` (backquote) during play to open the field console. Tab completes command
 | J, I, or Tab                 | Open or close the animated journal                                            |
 | ` (backquote)                | Open or close the field console (developer commands)                          |
 | M                            | Open Field Notes and the world map                                            |
-| 1–7 (journal open)           | Change journal pages                                                          |
+| 1–8 (journal open)           | Change journal pages                                                          |
 | Esc                          | Open the journal as a pause menu, close it, or cancel placement               |
 
 The hotbar fills itself with tools, weapons, blocks, placeables and consumables as you pick them up. Picks crack tiles over several strikes, depending on their hardness. Blocks and torches go wherever the cursor points. Swords hit everything in their arc, and bows and staves fire at the cursor.
 
-Recipes are made from the **Recipes** page. Select **Details** to inspect a recipe. Structures are crafted into the pack, then placed by clicking nearby ground. Stand by a station to make its recipes. Use items, equip weapons, stow goods in a chest, and plant seeds from **Pack**. **Gear** shows your armour, accessories, health, mana, defense, set bonus and active effects, and lets you assign quick slots. Open **Vitals** to see exposure, diagnosis, treatment and the wash action. **Beasts** holds the Effergy folio and a bestiary of everything you have slain. **Rift** tracks the four sigils and the worlds they open. **Field Notes** contains the tutorial, expedition chapters, side elevation map, manual save, and return to menu. The main menu has an expedition guide and saved music and effects sliders.
+Recipes are made from the **Recipes** page. Select **Details** to inspect a recipe. Structures are crafted into the pack, then placed by clicking nearby ground. Stand by a station to make its recipes. Use items, equip weapons, stow goods in a chest, and plant seeds from **Pack**. **Gear** shows your armour, accessories, health, mana, defense, set bonus and active effects, and lets you assign quick slots. Open **Vitals** to see exposure, diagnosis, treatment and the wash action. **Beasts** holds the Effergy folio and a bestiary of everything you have slain. **Rift** tracks the four sigils and the worlds they open. **Town** lists your settlers and their shops. **Notes** contains the tutorial, expedition chapters, side elevation map, manual save, and return to menu. The main menu has an expedition guide and saved music and effects sliders.
 
 The game automatically saves to browser local storage every 40 seconds and when returning to the menu or closing the page. **Continue field record** reloads it. Perishable food and water, icebox fuel, and campfire fuel age while the game is closed. A death lets you recover in the meadow with reduced loose supplies or load the last saved record.
 
@@ -154,9 +155,20 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 - **Boss summons:** each boss is called with an item crafted from its world: the Spore lure, the Storm totem and the Void seal.
 - **The end:** the Unmaker's final fight has its own theme, and defeating it wins the Crown of the Wildlands.
 
+### Homes and the town
+
+- **Building:** place **back walls** (dirt, stone, wood, brick, glass and the stones of every dungeon and world), **doors**, **chairs**, **tables** and **beds**. Walls must touch ground or another wall. A **hammer** knocks walls down and picks furniture back up. Dungeon walls need an iron hammer.
+- **Doors:** a closed door is solid. Walk into it or press **E** to open it, and it swings shut once the doorway is clear.
+- **Beds:** sleeping in a bed passes the night and makes it your spawn point for as long as it stands.
+- **Homes:** a room is a home when it is enclosed, backed by walls everywhere, 10 to 160 tiles in size, and has a door, a seat, a table, and a light. Use a chair or table to check what a room still needs.
+- **Settlers:** eight settlers arrive as the expedition goes on. The Guide comes after your first campfire, the Trader after your first 50 silver marks, the Smith after your first copper ingot, the Herbalist after your first apothecary, the Tinker after the Mossy Crypt, the Mystic after your first sigil, the Sky-sailor after Skyreach, and the Void-touched after the Void. Each takes a free home, one settler to a room. They wander near home, cannot be harmed, and leave if their home is broken.
+- **Trade:** creatures drop **silver marks**. Talk to a settler to open the **Town** page, where you can buy their wares and sell anything you carry to any settler nearby.
+- **Town bonus:** two or more settlers nearby give a gentle healing bonus, and the town gets its own music.
+- **Silver, gold, and gems:** silver and gold ores, and rubies, sapphires and emeralds, lie in the mines. Silver and gold make tools, broadswords and armour between iron and steel, and the gems make staves.
+
 ### Gear, potions, and crystals
 
-- **Armour:** twelve sets (copper, iron, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
+- **Armour:** fourteen sets (copper, iron, silver, gold, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
 - **Accessories:** three can be worn at once, including double jumps, gliding, speed, regeneration, light, lava resistance and more.
 - **Ranged weapons:** bows fire arrows (plain, fire, crystal), and staves spend mana: embers, bone shards, icicles, homing sun bolts, spores and void beams.
 - **Healing:** healing draughts heal instantly and bring on a short potion sickness.
@@ -164,7 +176,7 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 141 recipes and 239 items, and 40 kinds of creature including 7 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 182 recipes and 287 items, and 40 kinds of creature including 7 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 
@@ -177,6 +189,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the dungeons (loot, traps, guardians, altars and brick);
 - boss fights and sigils, the Rift Gate, travel and portals home, and every dimension's walls, life and boss;
 - the hotbar (digging, building and torches), armour and set bonuses, potions, buffs and crystals, bows, staves and mana, and monsters of the deep;
+- homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
 - save migration from every earlier layout;
 - the music and sound.
 

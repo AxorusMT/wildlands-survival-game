@@ -28,6 +28,9 @@ export class Interaction extends System {
       ...this.game.s.caches
         .filter((c) => !c.opened)
         .map((c) => ({ object: c, type: 'cache' as const, d: dist(c, p) })),
+      ...this.game.s.animals
+        .filter((a) => a.settler && !a.deadUntil)
+        .map((a) => ({ object: a, type: 'settler' as const, d: dist(a, p) - 40 })),
     ]
       .filter((x) => x.d < radius)
       .sort((a, b) => a.d - b.d);
@@ -37,6 +40,7 @@ export class Interaction extends System {
     const near = this.nearestInteractable();
     if (!near) return { ok: false, reason: 'Nothing is within reach.' };
     if (near.type === 'node') return this.gather(near.object);
+    if (near.type === 'settler') return this.game.town.talk(near.object);
     if (near.type === 'cache') {
       const c = near.object;
       c.opened = true;
@@ -80,6 +84,15 @@ export class Interaction extends System {
       return { ok: true, action: 'rift', structure: st };
     }
     if (st.type === 'portal') return this.game.realms.goHome();
+    if (st.type === 'door') return this.game.town.toggleDoor(st);
+    if (st.type === 'bed') return this.game.town.sleep(st);
+    if (st.type === 'chair' || st.type === 'table') {
+      const seat =
+        st.type === 'chair'
+          ? st
+          : (this.game.s.structures.find((x) => x.type === 'chair' && dist(x, st) < 200) ?? st);
+      return this.game.town.inspect(seat);
+    }
     if (st.type === 'torch' || st.type.startsWith('trap_'))
       return { ok: false, reason: 'Nothing to do here.' };
     if (st.type === 'bedroll') {

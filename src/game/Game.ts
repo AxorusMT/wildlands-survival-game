@@ -32,6 +32,7 @@ import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
 import { Survival } from './systems/Survival.ts';
 import { Terrain } from './systems/Terrain.ts';
+import { Town } from './systems/Town.ts';
 import { Wildlife } from './systems/Wildlife.ts';
 import { SaveSystem } from './SaveSystem.ts';
 import { WorldGenerator } from './WorldGenerator.ts';
@@ -66,6 +67,7 @@ export class Game {
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
   readonly hands = new Hands(this);
+  readonly town = new Town(this);
   readonly devtools = new Dev(this);
   readonly world = new WorldGenerator(this);
   readonly saves = new SaveSystem(this);
@@ -137,6 +139,9 @@ export class Game {
       buffs: {},
       bosses: {},
       rift: { sigils: [] },
+      wallEdits: {},
+      spawn: null,
+      town: { homes: {} },
       placing: null,
       dead: false,
       lastSave: Date.now(),
@@ -164,6 +169,7 @@ export class Game {
     this.drops.step(dt);
     this.equipment.update(dt);
     this.realms.update(dt);
+    this.town.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
   }
@@ -248,6 +254,15 @@ export class Game {
   }
   floorNear(x: number, y: number) {
     return this.terrain.floorNear(x, y);
+  }
+  wallAt(tx: number, ty: number) {
+    return this.terrain.wallAt(tx, ty);
+  }
+  wallEditAt(tx: number, ty: number) {
+    return this.terrain.wallEditAt(tx, ty);
+  }
+  setWall(tx: number, ty: number, kind: number) {
+    this.terrain.setWall(tx, ty, kind);
   }
   setTile(tx: number, ty: number, kind: number) {
     this.terrain.setTile(tx, ty, kind);

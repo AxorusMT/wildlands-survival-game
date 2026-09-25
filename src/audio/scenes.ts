@@ -13,6 +13,8 @@ export interface MusicContext {
   dungeon?: string | null;
   /** The kind of boss being fought, if any (the Direwolf is 'boss'). */
   bossType?: string | null;
+  /** Settlers housed nearby. */
+  town?: number;
 }
 
 /** Each underground layer has its own track. */
@@ -40,6 +42,7 @@ export function musicScene(c: MusicContext): string {
   if (c.dungeon && DUNGEON_TRACKS[c.dungeon]) return DUNGEON_TRACKS[c.dungeon];
   if (LAYER_TRACKS[c.layer]) return LAYER_TRACKS[c.layer];
   if (c.weather === 'storm') return 'storm';
+  if (c.layer === 'surface' && (c.town ?? 0) >= 2) return 'town';
   if (['tundra', 'taiga', 'alpine'].includes(c.biome)) return 'cold';
   if (['desert', 'badlands'].includes(c.biome)) return 'desert';
   if (c.biome === 'marsh') return 'marsh';

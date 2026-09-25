@@ -1,4 +1,5 @@
 // Every creature: how tough it is, how it moves and fights, and what it leaves behind.
+import { SETTLERS } from './town.ts';
 
 /** How a creature gets around. Walkers keep to floors, fliers and floaters hover, hoppers bounce. */
 export type MobMove = 'walker' | 'flier' | 'floater' | 'hopper';
@@ -628,6 +629,20 @@ export const MOBS: Record<string, MobSpec> = {
     respawn: 0,
   },
 };
+// Settlers walk about their homes and never fight.
+for (const st of SETTLERS)
+  MOBS[st.id] = {
+    name: `${st.name} ${st.title}`,
+    hp: 250,
+    damage: 0,
+    speed: [28, 28],
+    move: 'walker',
+    sight: 0,
+    reach: 0,
+    cooldown: 1,
+    loot: [],
+    respawn: 99999,
+  };
 /** The item that calls each boss at its shrine, and where that boss lives. */
 export const BOSS_SHRINES: Record<string, { item: string; place: string; music: string }> = {
   hollow_king: { item: 'crypt_key', place: 'crypt', music: 'boss' },

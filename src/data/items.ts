@@ -1,5 +1,6 @@
 import type { ItemSpec } from '../core/types.ts';
 import { ARMOR_ITEMS } from './gear.ts';
+import { WALLS } from './town.ts';
 
 export const ITEMS: Record<string, ItemSpec> = {
   wood: ['Wood', 'material'],
@@ -212,6 +213,42 @@ export const ITEMS: Record<string, ItemSpec> = {
   torch: ['Torch', 'structure'],
   rift_gate: ['Rift Gate', 'structure'],
   starforge: ['Starforge', 'structure'],
+  // ── Homes ──
+  chair: ['Wooden chair', 'structure'],
+  table: ['Wooden table', 'structure'],
+  bed: ['Bed', 'structure'],
+  door: ['Wooden door', 'structure'],
+  wooden_hammer: ['Wooden hammer', 'tool'],
+  iron_hammer: ['Iron hammer', 'tool'],
+  coin: ['Silver mark', 'coin'],
+  // ── Silver, gold, and gems ──
+  silver_ore: ['Silver ore', 'ore'],
+  gold_ore: ['Gold ore', 'ore'],
+  silver_ingot: ['Silver ingot', 'metal'],
+  gold_ingot: ['Gold ingot', 'metal'],
+  ruby: ['Ruby', 'ore'],
+  sapphire: ['Sapphire', 'ore'],
+  emerald: ['Emerald', 'ore'],
+  silver_axe: ['Silver axe', 'tool'],
+  silver_pick: ['Silver pickaxe', 'tool'],
+  silver_broadsword: ['Silver broadsword', 'weapon'],
+  gold_axe: ['Gold axe', 'tool'],
+  gold_pick: ['Gold pickaxe', 'tool'],
+  gold_broadsword: ['Gold broadsword', 'weapon'],
+  ruby_staff: ['Ruby staff', 'weapon'],
+  sapphire_staff: ['Sapphire staff', 'weapon'],
+  emerald_staff: ['Emerald staff', 'weapon'],
+  // ── Getting about ──
+  bucket: ['Bucket', 'tool'],
+  water_bucket: ['Water bucket', 'tool'],
+  rope: ['Rope', 'structure'],
+  grappling_hook: ['Grappling hook', 'tool'],
+  ...Object.fromEntries(
+    Object.keys(WALLS).map((id) => [
+      id,
+      [id.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()), 'wall'] as ItemSpec,
+    ]),
+  ),
   ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, 'armor'] as ItemSpec])),
 };
 

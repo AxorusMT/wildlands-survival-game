@@ -8,6 +8,18 @@ import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
 
+/** Small things that stand close together inside a home. */
+const FURNITURE = new Set([
+  'chair',
+  'table',
+  'bed',
+  'torch',
+  'door',
+  'lantern',
+  'chest',
+  'workbench',
+]);
+
 export class Crafting extends System {
   /** Why a recipe cannot be made now, or null if it can. Console-unlocked recipes are free. */
   check(id: string): string | null {
@@ -73,6 +85,16 @@ export class Crafting extends System {
       y > WORLD_H - RULES.placeEdgePadding
     )
       return { ok: false, reason: 'Too close to the edge.' };
+    if (id === 'door') {
+      const r = this.game.town.placeDoor(x, y);
+      if (r.ok) {
+        this.game.remove(id);
+        this.game.s.placing = null;
+        this.game.sound('place', x, y);
+        this.game.progress.record('place:door');
+      }
+      return r;
+    }
     if (id !== 'platform') {
       let support = null;
       const tx = Math.floor(x / TILE);
@@ -92,7 +114,12 @@ export class Crafting extends System {
     if (
       this.game.s.structures.some(
         (st) =>
-          dist(st, { x, y }) < (id === 'platform' ? RULES.platformSpacing : RULES.structureSpacing),
+          dist(st, { x, y }) <
+          (id === 'platform' || st.type === 'platform'
+            ? RULES.platformSpacing
+            : FURNITURE.has(id) || FURNITURE.has(st.type)
+              ? 22
+              : RULES.structureSpacing),
       )
     )
       return { ok: false, reason: 'Leave room between structures.' };

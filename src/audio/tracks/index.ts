@@ -19,6 +19,7 @@ import { pandemonium } from './pandemonium.ts';
 import { skyreach } from './skyreach.ts';
 import { storm } from './storm.ts';
 import { tomb } from './tomb.ts';
+import { town } from './town.ts';
 import { voidsong } from './voidsong.ts';
 
 /** Every track in the score, in playlist order. Each track's id is the scene that plays it. */
@@ -44,6 +45,7 @@ export const TRACK_LIST: Track[] = [
   skyreach,
   voidsong,
   finalBoss,
+  town,
 ];
 
 export const TRACKS: Record<string, Track> = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
