@@ -334,6 +334,19 @@ const SOUNDS: Record<string, Sfx> = {
     hiss(k, o, t, { freq: 900, q: 2, peak: 0.12 * v, decay: 0.06 });
     tone(k, o, t + 0.09, { from: 200, to: 150, type: 'triangle', peak: 0.1 * v, decay: 0.05 });
   },
+  door: (k, o, t, v) => {
+    cry(k, o, t, { from: 180, to: 240, formant: 700, q: 5, peak: 0.06 * v, dur: 0.22, wobble: 10 });
+    tone(k, o, t + 0.2, { from: 110, to: 70, peak: 0.25 * v, decay: 0.08 });
+    hiss(k, o, t + 0.2, { freq: 800, q: 1.5, peak: 0.1 * v, decay: 0.05 });
+  },
+  coin: (k, o, t, v) => {
+    tone(k, o, t, { from: 1980, type: 'triangle', peak: 0.06 * v, decay: 0.12 });
+    tone(k, o, t + 0.07, { from: 2640, type: 'triangle', peak: 0.05 * v, decay: 0.18 });
+  },
+  hammer: (k, o, t, v) => {
+    tone(k, o, t, { from: 220, to: 120, peak: 0.25 * v, decay: 0.07 });
+    hiss(k, o, t, { freq: 1400, q: 1.2, peak: 0.14 * v, decay: 0.06 });
+  },
   open: (k, o, t, v) => {
     cry(k, o, t, { from: 300, to: 520, formant: 900, q: 6, peak: 0.1 * v, dur: 0.35, wobble: 18 });
     hiss(k, o, t + 0.36, { freq: 2600, q: 4, peak: 0.15 * v, decay: 0.03 });

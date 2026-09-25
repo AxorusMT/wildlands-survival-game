@@ -345,6 +345,68 @@ Object.assign(STATIC, {
       for (let x = 4; x < 12; x += 3) p.set(x, 0, '#1a0a0a');
     }),
 });
+// Furniture for homes.
+Object.assign(STATIC, {
+  chair: () =>
+    sprite(12, 20, 6, 19, (p) => {
+      p.rect(1, 0, 3, 20, DARKWOOD);
+      p.rect(1, 0, 1, 20, '#7a5a3c');
+      p.rect(1, 3, 3, 2, WOOD);
+      p.rect(1, 7, 3, 2, WOOD);
+      planks(p, 1, 10, 11, 3);
+      p.rect(9, 13, 2, 7, DARKWOOD);
+      p.rect(2, 13, 2, 7, DARKWOOD);
+    }),
+  table: () =>
+    sprite(30, 16, 15, 15, (p) => {
+      planks(p, 0, 0, 30, 4);
+      p.rect(0, 4, 30, 1, '#3a2a1c');
+      p.rect(3, 4, 3, 12, DARKWOOD);
+      p.rect(24, 4, 3, 12, DARKWOOD);
+      p.rect(3, 4, 1, 12, '#7a5a3c');
+      p.rect(12, 0, 6, 1, '#d8ccb0');
+    }),
+  bed: () =>
+    sprite(36, 16, 18, 15, (p) => {
+      p.rect(0, 0, 4, 16, DARKWOOD);
+      p.rect(0, 0, 1, 16, '#7a5a3c');
+      p.rect(32, 5, 4, 11, DARKWOOD);
+      p.rect(4, 7, 28, 5, '#8a3a3a');
+      p.rect(4, 7, 28, 1, '#b85a4a');
+      for (let x = 10; x < 32; x += 6) p.rect(x, 8, 1, 4, '#6a2a2a');
+      p.rect(4, 5, 9, 3, '#e8dcc8');
+      p.rect(4, 5, 9, 1, '#fff4e0');
+      planks(p, 4, 12, 28, 2);
+      p.rect(5, 14, 2, 2, DARKWOOD);
+      p.rect(29, 14, 2, 2, DARKWOOD);
+    }),
+  door_closed: () =>
+    sprite(10, 32, 5, 31, (p) => {
+      planks(p, 1, 0, 8, 32, '#7a5a3c');
+      p.rect(1, 0, 8, 1, '#a88458');
+      for (const y of [4, 26]) p.rect(1, y, 8, 2, IRON);
+      p.rect(6, 15, 2, 2, '#d8b848');
+      p.rect(0, 0, 1, 32, DARKWOOD);
+      p.rect(9, 0, 1, 32, DARKWOOD);
+    }),
+  door_open: () =>
+    sprite(16, 32, 5, 31, (p) => {
+      p.rect(0, 0, 1, 32, DARKWOOD);
+      p.rect(9, 0, 1, 32, DARKWOOD);
+      p.poly(
+        [
+          [1, 0],
+          [4, 2],
+          [4, 30],
+          [1, 32],
+        ],
+        '#6a4a30',
+      );
+      p.line(1, 0, 1, 31, '#a88458');
+      p.rect(2, 5, 2, 2, IRON);
+      p.rect(2, 26, 2, 2, IRON);
+    }),
+});
 const staticSprite = (k: string) => cached('st:' + k, STATIC[k]);
 
 /** A dungeon chest trimmed to match its halls, open once looted. */
@@ -573,6 +635,9 @@ export function drawStructure(
       } else flameAt(c, x, y - 10, t, 1, s.id);
       return;
     }
+    case 'door':
+      blit(c, staticSprite(s.crop === 'open' ? 'door_open' : 'door_closed'), x, y);
+      return;
     case 'dungeon_chest':
       blit(c, chestSprite(s.kind ?? '', s.crop === 'open'), x, y);
       return;

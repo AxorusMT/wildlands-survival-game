@@ -10,6 +10,7 @@ import {
   RANGED,
 } from '../../data/gear.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
+import { WALLS } from '../../data/town.ts';
 import { TOOL_TIERS, WEAPONS } from '../../data/resources.ts';
 
 import { System } from './System.ts';
@@ -126,6 +127,10 @@ export class Equipment extends System {
     if (set) out.add(ARMOR_SETS.find((x) => x.key === set)!.bonus);
     for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
     for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add('buff:' + id);
+    if (this.townCache.at !== Math.floor(this.game.s.elapsed)) {
+      this.townCache = { at: Math.floor(this.game.s.elapsed), near: this.game.town.townNear() };
+    }
+    if (this.townCache.near >= 2) out.add('home');
     return out;
   }
   has(effect: string) {
@@ -157,6 +162,7 @@ export class Equipment extends System {
       1 +
       (fx.has('buff:swiftness') ? 0.25 : 0) +
       (fx.has('speed20') ? 0.2 : 0) +
+      (fx.has('speed10') ? 0.1 : 0) +
       (fx.has('speed') ? 0.2 : 0) +
       (fx.has('cold') ? 0.1 : 0)
     );
@@ -237,10 +243,12 @@ export class Equipment extends System {
     if (fx.has('regen')) regen += 0.6;
     if (fx.has('buff:regeneration')) regen += 1.2;
     if (fx.has('spores')) regen += 0.5;
+    if (fx.has('home')) regen += 0.35;
     if (regen && !s.dead) this.heal(regen * dt);
     if (fx.has('stamina')) s.vitals.stamina = clamp(s.vitals.stamina + dt * 2, 0, 100);
   }
   lastCast?: number;
+  private townCache = { at: -1, near: 0 };
   spendMana(n: number) {
     const s = this.game.s;
     if (s.mana < n) return false;
@@ -253,6 +261,8 @@ export class Equipment extends System {
     id: string | null,
   ):
     | 'block'
+    | 'wall'
+    | 'hammer'
     | 'structure'
     | 'pick'
     | 'axe'
@@ -264,9 +274,10 @@ export class Equipment extends System {
     | 'none' {
     if (!id) return 'none';
     if (BLOCKS[id] !== undefined) return 'block';
+    if (WALLS[id] !== undefined) return 'wall';
     const cat = ITEMS[id]?.[1];
     if (cat === 'structure') return 'structure';
-    if (TOOL_TIERS[id]) return TOOL_TIERS[id][0] === 'pick' ? 'pick' : 'axe';
+    if (TOOL_TIERS[id]) return TOOL_TIERS[id][0];
     if (RANGED[id]) return RANGED[id].kind === 'bow' ? 'bow' : 'magic';
     if (WEAPONS[id]) return 'melee';
     if (ARMOR[id] || ACCESSORIES[id]) return 'wear';

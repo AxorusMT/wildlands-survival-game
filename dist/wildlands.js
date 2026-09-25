@@ -15,6 +15,7 @@
     ARMOR_ITEMS: () => ARMOR_ITEMS,
     ARMOR_RECIPES: () => ARMOR_RECIPES,
     ARMOR_SETS: () => ARMOR_SETS,
+    BASE_VALUE: () => BASE_VALUE,
     BIOMES: () => BIOMES,
     BIOME_CENTERS: () => BIOME_CENTERS,
     BIOME_SPANS: () => BIOME_SPANS,
@@ -30,11 +31,13 @@
     DIM_LAYERS: () => DIM_LAYERS,
     DIM_WIDTH: () => DIM_WIDTH,
     DISEASES: () => DISEASES,
+    DOOR_TILE: () => DOOR_TILE,
     DT: () => DT,
     DUNGEONS: () => DUNGEONS,
     DUNGEON_DEFS: () => DUNGEON_DEFS,
     ENTRANCES: () => ENTRANCES,
     Ground: () => Ground,
+    HOUSE_NEEDS: () => HOUSE_NEEDS,
     ISLANDS: () => ISLANDS,
     ITEMS: () => ITEMS,
     LAVA_Y: () => LAVA_Y,
@@ -50,6 +53,9 @@
     PROJECTILES: () => PROJECTILES,
     RANGED: () => RANGED,
     RECIPES: () => RECIPES,
+    ROOM_SIZE: () => ROOM_SIZE,
+    SETTLERS: () => SETTLERS,
+    SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
     SIDE_ORDER: () => SIDE_ORDER,
     SKY_LADDERS: () => SKY_LADDERS,
@@ -65,6 +71,8 @@
     VOICES: () => VOICES,
     VOID: () => VOID,
     VOID_LADDERS: () => VOID_LADDERS,
+    WALLS: () => WALLS,
+    WALL_ITEM: () => WALL_ITEM,
     WEAPONS: () => WEAPONS,
     WORLD_H: () => WORLD_H,
     WORLD_W: () => WORLD_W,
@@ -89,9 +97,11 @@
     layoutTile: () => layoutTile,
     makeDimensions: () => makeDimensions,
     mobName: () => mobName,
+    naturalWallKind: () => naturalWallKind,
     nodeForm: () => nodeForm,
     regionAt: () => regionAt,
     regionBounds: () => regionBounds,
+    settlerById: () => settlerById,
     surfaceAt: () => surfaceAt,
     underworldCeiling: () => underworldCeiling,
     underworldFloor: () => underworldFloor
@@ -330,6 +340,26 @@
       bonusText: "+3 defense"
     },
     {
+      key: "silver",
+      name: "Silver",
+      bar: "silver_ingot",
+      defense: [2, 4, 2],
+      station: "workbench",
+      tier: 3,
+      bonus: "speed10",
+      bonusText: "+10% speed"
+    },
+    {
+      key: "gold",
+      name: "Gold",
+      bar: "gold_ingot",
+      defense: [3, 4, 3],
+      station: "workbench",
+      tier: 4,
+      bonus: "defense4",
+      bonusText: "+4 defense"
+    },
+    {
       key: "steel",
       name: "Steel",
       bar: "steel_ingot",
@@ -472,6 +502,17 @@
     },
     glacier_staff: { kind: "magic", projectile: "icicle", delay: 0.42, speed: 760, mana: 8 },
     sun_staff: { kind: "magic", projectile: "sun_bolt", delay: 0.5, speed: 520, mana: 10 },
+    ruby_staff: { kind: "magic", projectile: "ruby_bolt", delay: 0.45, speed: 620, mana: 5 },
+    sapphire_staff: { kind: "magic", projectile: "sapphire_bolt", delay: 0.4, speed: 680, mana: 6 },
+    emerald_staff: {
+      kind: "magic",
+      projectile: "emerald_bolt",
+      delay: 0.42,
+      speed: 650,
+      mana: 6,
+      count: 2,
+      spread: 0.1
+    },
     spore_staff: {
       kind: "magic",
       projectile: "spore",
@@ -496,6 +537,9 @@
     sun_bolt: { color: "#ffd86a", glow: "#fff0a0", life: 2.2, size: 11, homing: 3.2 },
     spore: { color: "#58e0d0", glow: "#9ef0e0", life: 2.4, size: 12, homing: 2.2, drag: 0.6 },
     void_beam: { color: "#d8a0ff", glow: "#b36cff", life: 0.9, size: 10, pierce: 4 },
+    ruby_bolt: { color: "#ff5a6a", glow: "#ff8a9a", life: 1.1, size: 8 },
+    sapphire_bolt: { color: "#5a8aff", glow: "#9ac0ff", life: 1.1, size: 8, pierce: 1 },
+    emerald_bolt: { color: "#4ae07a", glow: "#9af0b0", life: 1.1, size: 8 },
     // Monster attacks.
     dart: { color: "#8a9058", life: 2.2, size: 7 },
     fireball: { color: "#ff6a2a", glow: "#ffb347", life: 2.6, size: 12, fire: true },
@@ -577,6 +621,281 @@
     manaMax: 180,
     baseHealth: 100,
     baseMana: 20
+  };
+
+  // src/data/town.ts
+  var WALLS = {
+    dirt_wall: 1,
+    stone_wall: 2,
+    wood_wall: 11,
+    stone_brick_wall: 12,
+    clay_brick_wall: 13,
+    glass_wall: 14,
+    crypt_wall: 15,
+    frost_wall: 16,
+    tomb_wall: 17,
+    citadel_wall: 18,
+    fungal_wall: 20,
+    skystone_wall: 22,
+    voidstone_wall: 23,
+    obsidian_wall: 25,
+    sandstone_wall: 26
+  };
+  var WALL_ITEM = Object.fromEntries(
+    Object.entries(WALLS).map(([id, kind]) => [kind, id])
+  );
+  Object.assign(WALL_ITEM, {
+    3: "sandstone_wall",
+    4: "dirt_wall",
+    5: "stone_wall",
+    6: "stone_wall",
+    8: "stone_wall",
+    9: "stone_wall",
+    10: "stone_wall",
+    19: "dirt_wall"
+  });
+  var DOOR_TILE = 29;
+  var HOUSE_NEEDS = {
+    seat: ["chair", "bed", "bedroll"],
+    table: ["table", "workbench", "apothecary"],
+    light: ["torch", "lantern", "crystal_lantern", "campfire"]
+  };
+  var ROOM_SIZE = { min: 10, max: 160 };
+  var SETTLERS = [
+    {
+      id: "guide",
+      name: "Ada",
+      title: "the Guide",
+      unlock: ["place:campfire", 1],
+      stock: [
+        ["torch", 2],
+        ["arrow", 1],
+        ["healing_draught", 30],
+        ["fiber", 2],
+        ["wood", 2]
+      ],
+      lines: [
+        "A campfire, a roof, walls on every side, a chair, a table, and a light. That is a home, and folk will come to fill it.",
+        "Hold a pickaxe and click the ground to dig. Harder stone takes more strikes, and better picks.",
+        "Five fallen stars make a mana crystal. They only fall on clear nights, out under the sky.",
+        "The Mossy Crypt lies beneath the forest. Its king has kept his throne too long.",
+        "Set a sigil in the Rift Gate and it opens. Four sigils, four dungeons."
+      ],
+      colors: ["#5d7560", "#c9a24e", "#7d6444"]
+    },
+    {
+      id: "trader",
+      name: "Bram",
+      title: "the Trader",
+      unlock: ["coin", 50],
+      stock: [
+        ["chest", 60],
+        ["bed", 40],
+        ["lantern", 45],
+        ["platform", 8],
+        ["herb", 6],
+        ["wheat", 6],
+        ["potato", 6],
+        ["boiled_water", 5],
+        ["bread", 12],
+        ["wooden_hammer", 20]
+      ],
+      lines: [
+        "Everything has a price, friend. Even that rock. Especially that rock.",
+        "Silver marks drop from anything with a heartbeat. Bring them here.",
+        "A chest by the door keeps a pack light for the long walk."
+      ],
+      colors: ["#8a4a3a", "#e8c86a", "#3a2a1c"]
+    },
+    {
+      id: "smith",
+      name: "Corra",
+      title: "the Smith",
+      unlock: ["craft:copper_ingot", 1],
+      stock: [
+        ["copper_ingot", 12],
+        ["iron_ingot", 24],
+        ["silver_ingot", 40],
+        ["coal", 4],
+        ["iron_hammer", 60],
+        ["arrow", 1],
+        ["iron_bow", 90]
+      ],
+      lines: [
+        "Copper, then iron, then steel. The forge does not skip a step, and neither should you.",
+        "Silver sits between iron and steel, down in the cold mines. Gold lies deeper still.",
+        "Bring me hellstone and I will show you what heat really is."
+      ],
+      colors: ["#4a4e4f", "#d0844a", "#2a2420"]
+    },
+    {
+      id: "herbalist",
+      name: "Dell",
+      title: "the Herbalist",
+      unlock: ["place:apothecary", 1],
+      stock: [
+        ["herb", 5],
+        ["honey", 10],
+        ["willow", 8],
+        ["healing_draught", 25],
+        ["regeneration_potion", 60],
+        ["swiftness_potion", 60],
+        ["antivenom", 40]
+      ],
+      lines: [
+        "Boil your water. I will keep saying it until someone listens.",
+        "A healing draught mends quickly, but the body needs a moment before the next.",
+        "Glowcaps from the Deep make the finest draughts I know."
+      ],
+      colors: ["#6a8a4a", "#e8e0a0", "#4a6a3a"]
+    },
+    {
+      id: "tinker",
+      name: "Esk",
+      title: "the Tinker",
+      unlock: ["visit:crypt", 1],
+      stock: [
+        ["miners_lamp", 150],
+        ["grappling_hook", 180],
+        ["rope", 2],
+        ["bucket", 20],
+        ["cloud_jar", 400],
+        ["magma_stone", 350]
+      ],
+      lines: [
+        "A hook, a rope, a little nerve. Walls are only suggestions.",
+        "Three charms at once and not a fourth. Too many and they argue.",
+        "The Citadel gates face the lava sea. Bring a Fireward if you like your boots."
+      ],
+      colors: ["#6a5a8a", "#d8b848", "#3a3040"]
+    },
+    {
+      id: "mystic",
+      name: "Fenn",
+      title: "the Mystic",
+      unlock: ["sigils", 1],
+      stock: [
+        ["mana_draught", 30],
+        ["mana_crystal", 250],
+        ["life_crystal", 400],
+        ["ember_wand", 220],
+        ["crystal_arrow", 3],
+        ["shine_potion", 50]
+      ],
+      lines: [
+        "The Rift is not a door. It is a wound that remembers being a door.",
+        "The Deep is alive. Every glowing thing down there is one thing, dreaming.",
+        "Beyond the islands, beyond the stars, something is watching. It has only one eye."
+      ],
+      colors: ["#3a2a5a", "#b36cff", "#1a1026"]
+    },
+    {
+      id: "skysailor",
+      name: "Gale",
+      title: "the Sky-sailor",
+      unlock: ["visit:skyreach", 1],
+      stock: [
+        ["featherfall_potion", 40],
+        ["cloud", 2],
+        ["sky_wood", 6],
+        ["starmetal_ore", 60],
+        ["fallen_star", 40],
+        ["wind_boots", 900]
+      ],
+      lines: [
+        "Fall off an island and you land on cloud. Soft, if you are lucky.",
+        "The Roc nests on the highest island. It does not like visitors."
+      ],
+      colors: ["#8ab8e0", "#f0f0f8", "#5a6a8a"]
+    },
+    {
+      id: "voidtouched",
+      name: "Hollis",
+      title: "the Void-touched",
+      unlock: ["visit:void", 1],
+      stock: [
+        ["void_essence", 60],
+        ["voidsteel_ore", 90],
+        ["wrath_potion", 80],
+        ["greater_healing", 90],
+        ["watcher_lens", 200]
+      ],
+      lines: [
+        "I went through and came back. Mostly.",
+        "The Unmaker does not hate you. It does not know you are there. That is worse."
+      ],
+      colors: ["#2a1c3a", "#ff5a8a", "#140a22"]
+    }
+  ];
+  var SETTLER_IDS = SETTLERS.map((s) => s.id);
+  var settlerById = (id) => SETTLERS.find((s) => s.id === id);
+  var BASE_VALUE = {
+    wood: 2,
+    stone: 1,
+    fiber: 1,
+    flint: 2,
+    clay: 2,
+    dirt: 1,
+    sand: 1,
+    reeds: 1,
+    salt: 3,
+    coal: 4,
+    copper_ore: 4,
+    iron_ore: 7,
+    silver_ore: 11,
+    gold_ore: 16,
+    ice: 3,
+    obsidian: 12,
+    sulfur: 8,
+    crystal: 18,
+    hellstone: 22,
+    hide: 5,
+    bone: 3,
+    chitin: 4,
+    venom: 8,
+    feathers: 3,
+    resin: 5,
+    honey: 8,
+    herb: 4,
+    willow: 5,
+    berry: 2,
+    mushroom: 3,
+    wheat: 3,
+    potato: 3,
+    cactus_fruit: 3,
+    raw_meat: 3,
+    raw_fish: 4,
+    wild_water: 1,
+    gel: 3,
+    silk: 5,
+    grave_dust: 14,
+    frost_shard: 16,
+    linen: 12,
+    sun_gold: 20,
+    cinder_core: 28,
+    spores: 20,
+    glowcap: 18,
+    sunbloom: 22,
+    void_lily: 30,
+    sky_silk: 26,
+    void_essence: 40,
+    watcher_lens: 60,
+    shroom_wood: 8,
+    sky_wood: 10,
+    void_wood: 14,
+    fallen_star: 20,
+    myconite_ore: 30,
+    starmetal_ore: 45,
+    voidsteel_ore: 65,
+    ruby: 40,
+    sapphire: 40,
+    emerald: 40,
+    eclipse_fang: 120,
+    direwolf_pelt: 80,
+    beast_core: 150,
+    life_crystal: 200,
+    life_fruit: 300,
+    coin: 1
   };
 
   // src/data/items.ts
@@ -791,6 +1110,42 @@
     torch: ["Torch", "structure"],
     rift_gate: ["Rift Gate", "structure"],
     starforge: ["Starforge", "structure"],
+    // ── Homes ──
+    chair: ["Wooden chair", "structure"],
+    table: ["Wooden table", "structure"],
+    bed: ["Bed", "structure"],
+    door: ["Wooden door", "structure"],
+    wooden_hammer: ["Wooden hammer", "tool"],
+    iron_hammer: ["Iron hammer", "tool"],
+    coin: ["Silver mark", "coin"],
+    // ── Silver, gold, and gems ──
+    silver_ore: ["Silver ore", "ore"],
+    gold_ore: ["Gold ore", "ore"],
+    silver_ingot: ["Silver ingot", "metal"],
+    gold_ingot: ["Gold ingot", "metal"],
+    ruby: ["Ruby", "ore"],
+    sapphire: ["Sapphire", "ore"],
+    emerald: ["Emerald", "ore"],
+    silver_axe: ["Silver axe", "tool"],
+    silver_pick: ["Silver pickaxe", "tool"],
+    silver_broadsword: ["Silver broadsword", "weapon"],
+    gold_axe: ["Gold axe", "tool"],
+    gold_pick: ["Gold pickaxe", "tool"],
+    gold_broadsword: ["Gold broadsword", "weapon"],
+    ruby_staff: ["Ruby staff", "weapon"],
+    sapphire_staff: ["Sapphire staff", "weapon"],
+    emerald_staff: ["Emerald staff", "weapon"],
+    // ── Getting about ──
+    bucket: ["Bucket", "tool"],
+    water_bucket: ["Water bucket", "tool"],
+    rope: ["Rope", "structure"],
+    grappling_hook: ["Grappling hook", "tool"],
+    ...Object.fromEntries(
+      Object.keys(WALLS).map((id) => [
+        id,
+        [id.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), "wall"]
+      ])
+    ),
     ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, "armor"]]))
   };
   var itemName = (id) => ITEMS[id]?.[0] || id;
@@ -960,6 +1315,44 @@
     ["fireward_potion", { sulfur: 2, obsidian: 1, boiled_water: 1 }, "apothecary", 5],
     ["wrath_potion", { venom: 1, hellstone: 1, boiled_water: 1 }, "apothecary", 6],
     ["greater_healing", { healing_draught: 2, glowcap: 2, crystal: 1 }, "apothecary", 7, 2],
+    // ── Homes: walls, doors, and furniture ──
+    ["wooden_hammer", { wood: 8 }, null, 1],
+    ["iron_hammer", { iron_ingot: 6, wood: 3 }, "workbench", 3],
+    ["chair", { planks: 4 }, "workbench", 1],
+    ["table", { planks: 8 }, "workbench", 1],
+    ["door", { planks: 6 }, "workbench", 1],
+    ["bed", { planks: 10, fiber: 6, hide: 2 }, "workbench", 1],
+    ["dirt_wall", { dirt: 1 }, "workbench", 1, 4],
+    ["wood_wall", { planks: 1 }, "workbench", 1, 4],
+    ["stone_wall", { stone: 1 }, "workbench", 1, 4],
+    ["stone_brick_wall", { stone_brick: 1 }, "workbench", 2, 4],
+    ["clay_brick_wall", { clay_brick: 1 }, "workbench", 2, 4],
+    ["glass_wall", { glass: 1 }, "workbench", 2, 4],
+    ["sandstone_wall", { sandstone_brick: 1 }, "workbench", 1, 4],
+    ["obsidian_wall", { obsidian_brick: 1 }, "workbench", 5, 4],
+    ["crypt_wall", { crypt_brick: 1 }, "workbench", 6, 4],
+    ["frost_wall", { frost_brick: 1 }, "workbench", 6, 4],
+    ["tomb_wall", { tomb_brick: 1 }, "workbench", 6, 4],
+    ["citadel_wall", { citadel_brick: 1 }, "workbench", 7, 4],
+    ["fungal_wall", { fungal_stone: 1 }, "workbench", 7, 4],
+    ["skystone_wall", { skystone: 1 }, "workbench", 8, 4],
+    ["voidstone_wall", { voidstone: 1 }, "workbench", 9, 4],
+    // ── Silver, gold, and gems ──
+    ["silver_ingot", { silver_ore: 3, coal: 1 }, "furnace", 3],
+    ["gold_ingot", { gold_ore: 3, coal: 1 }, "furnace", 4],
+    ["silver_axe", { silver_ingot: 4, wood: 2 }, "workbench", 3],
+    ["silver_pick", { silver_ingot: 4, wood: 2 }, "workbench", 3],
+    ["silver_broadsword", { silver_ingot: 6, wood: 1 }, "workbench", 3],
+    ["gold_axe", { gold_ingot: 4, wood: 2 }, "workbench", 4],
+    ["gold_pick", { gold_ingot: 4, wood: 2 }, "workbench", 4],
+    ["gold_broadsword", { gold_ingot: 6, wood: 1 }, "workbench", 4],
+    ["ruby_staff", { ruby: 4, silver_ingot: 4 }, "workbench", 3],
+    ["emerald_staff", { emerald: 4, silver_ingot: 4 }, "workbench", 3],
+    ["sapphire_staff", { sapphire: 4, gold_ingot: 4 }, "workbench", 4],
+    // ── Getting about ──
+    ["bucket", { iron_ingot: 3 }, "workbench", 3],
+    ["rope", { fiber: 3 }, null, 1, 10],
+    ["grappling_hook", { iron_ingot: 4, rope: 20, hide: 1 }, "workbench", 3],
     // ── Armour ──
     ...ARMOR_RECIPES
   ].map(([id, cost, station, tier, yieldQty]) => ({
@@ -998,6 +1391,11 @@
     hellstone: { yield: [2, 3], tool: "pick", req: 5, hp: 4, regen: 0 },
     cactus_fruit: { yield: [1, 2], hp: 2, regen: 230 },
     life_crystal: { yield: [1, 1], tool: "pick", req: 2, hp: 3, regen: 0 },
+    silver_ore: { yield: [2, 3], tool: "pick", req: 2, hp: 3, regen: 0 },
+    gold_ore: { yield: [2, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
+    ruby: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    sapphire: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    emerald: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     // The dimensions.
     glowcap: { yield: [1, 3], hp: 2, regen: 200 },
     sunbloom: { yield: [1, 2], hp: 2, regen: 240 },
@@ -1033,6 +1431,12 @@
     steel_pick: ["pick", 4],
     obsidian_axe: ["axe", 5],
     obsidian_pick: ["pick", 5],
+    silver_axe: ["axe", 3],
+    silver_pick: ["pick", 3],
+    gold_axe: ["axe", 4],
+    gold_pick: ["pick", 4],
+    wooden_hammer: ["hammer", 1],
+    iron_hammer: ["hammer", 3],
     hellstone_axe: ["axe", 6],
     hellstone_pick: ["pick", 6],
     myconite_axe: ["axe", 7],
@@ -1051,6 +1455,11 @@
     obsidian_blade: [5, 61, 67],
     eclipse_blade: [6, 85, 73],
     hellfire_blade: [6, 76, 70],
+    silver_broadsword: [3, 40, 64],
+    gold_broadsword: [4, 52, 66],
+    ruby_staff: [3, 24, 0],
+    sapphire_staff: [4, 30, 0],
+    emerald_staff: [4, 22, 0],
     frostbrand: [6, 84, 72],
     sunspear: [7, 98, 96],
     hellrazor: [7, 114, 76],
@@ -1983,6 +2392,20 @@
     if (biome === "badlands" && depth > 350) return Ground.redrock;
     return Ground.stone;
   }
+  function naturalWallKind(tx, ty) {
+    const x = tx * TILE + TILE / 2, y = ty * TILE + TILE / 2;
+    const dungeon2 = dungeonAt(x, y);
+    if (dungeon2) return dungeon2.def.brick;
+    if (y <= surfaceAt(x)) return 0;
+    if (regionAt(x) === "mycelia") return 20;
+    const depth = y - surfaceAt(x), biome = biomeAt(x, y).id;
+    if (depth < 76)
+      return biome === "desert" ? Ground.sand : biome === "marsh" || biome === "coast" ? Ground.mud : biome === "tundra" ? Ground.frost : biome === "badlands" ? Ground.redrock : Ground.soil;
+    if (y >= LAYERS[4].top) return Ground.hellrock;
+    if (y >= LAYERS[3].top) return Ground.ash;
+    if (y >= LAYERS[2].top) return Ground.deepstone;
+    return Ground.stone;
+  }
 
   // src/data/mobs.ts
   var L2 = (item, min, max = min, chance = 1) => [
@@ -2574,6 +2997,19 @@
       respawn: 0
     }
   };
+  for (const st of SETTLERS)
+    MOBS[st.id] = {
+      name: `${st.name} ${st.title}`,
+      hp: 250,
+      damage: 0,
+      speed: [28, 28],
+      move: "walker",
+      sight: 0,
+      reach: 0,
+      cooldown: 1,
+      loot: [],
+      respawn: 99999
+    };
   var BOSS_SHRINES = {
     hollow_king: { item: "crypt_key", place: "crypt", music: "boss" },
     rime_colossus: { item: "frost_key", place: "frost_keep", music: "boss" },
@@ -3071,7 +3507,7 @@
     }
     /** Harms a creature through its defense, knocks it back, and kills it at zero. */
     hurtMob(a, amount, from, magic = false) {
-      if (a.deadUntil) return 0;
+      if (a.deadUntil || a.settler) return 0;
       if (a.type === "boss" && (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier) {
         this.game.say("Ordinary steel glances off the Direwolf. Obsidian is required.", "danger");
         return 0;
@@ -3098,7 +3534,7 @@
       const s = this.game.s, p = s.player, weapon = WEAPONS[weaponId] || WEAPONS.fists, face = Math.cos(p.face) >= 0 ? 1 : -1;
       const reach = weapon[2] * 1.15, centre = { x: p.x, y: p.y - 26 };
       const targets = s.animals.filter((a) => {
-        if (a.deadUntil) return false;
+        if (a.deadUntil || a.settler) return false;
         const cy = a.y - bodyHeight(a), dx = a.x - centre.x;
         return Math.abs(dx) < reach + bodyRadius(a) * 0.6 && Math.abs(cy - centre.y) < 70 + bodyRadius(a) * 0.5 && dx * face > -24;
       });
@@ -3213,7 +3649,7 @@
         let spent = false;
         if (b.from === "player") {
           for (const a of s.animals) {
-            if (a.deadUntil || b.hit.has(a.id)) continue;
+            if (a.deadUntil || a.settler || b.hit.has(a.id)) continue;
             if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
               continue;
             b.hit.add(a.id);
@@ -3368,6 +3804,16 @@
   };
 
   // src/game/systems/Crafting.ts
+  var FURNITURE = /* @__PURE__ */ new Set([
+    "chair",
+    "table",
+    "bed",
+    "torch",
+    "door",
+    "lantern",
+    "chest",
+    "workbench"
+  ]);
   var Crafting = class extends System {
     /** Why a recipe cannot be made now, or null if it can. Console-unlocked recipes are free. */
     check(id) {
@@ -3413,6 +3859,16 @@
       const [lo, hi] = regionBounds(x);
       if (x < lo + RULES.placeEdgePadding + 32 || y < RULES.placeEdgePadding || x > hi - RULES.placeEdgePadding - 32 || y > WORLD_H - RULES.placeEdgePadding)
         return { ok: false, reason: "Too close to the edge." };
+      if (id === "door") {
+        const r = this.game.town.placeDoor(x, y);
+        if (r.ok) {
+          this.game.remove(id);
+          this.game.s.placing = null;
+          this.game.sound("place", x, y);
+          this.game.progress.record("place:door");
+        }
+        return r;
+      }
       if (id !== "platform") {
         let support = null;
         const tx = Math.floor(x / TILE);
@@ -3426,7 +3882,7 @@
         y = support - 1;
       }
       if (this.game.s.structures.some(
-        (st2) => dist(st2, { x, y }) < (id === "platform" ? RULES.platformSpacing : RULES.structureSpacing)
+        (st2) => dist(st2, { x, y }) < (id === "platform" || st2.type === "platform" ? RULES.platformSpacing : FURNITURE.has(id) || FURNITURE.has(st2.type) ? 22 : RULES.structureSpacing)
       ))
         return { ok: false, reason: "Leave room between structures." };
       this.game.remove(id);
@@ -3458,7 +3914,16 @@
       layer: "upper_mines",
       levels: [1, 2, 3],
       perKm: 9,
-      kinds: (ores) => [...ores, ...ores, "stone", "coal", "copper_ore", "clay", "mushroom"]
+      kinds: (ores) => [
+        ...ores,
+        ...ores,
+        "stone",
+        "coal",
+        "copper_ore",
+        "silver_ore",
+        "clay",
+        "mushroom"
+      ]
     },
     {
       layer: "lower_mines",
@@ -3467,6 +3932,12 @@
       kinds: () => [
         "iron_ore",
         "iron_ore",
+        "silver_ore",
+        "silver_ore",
+        "gold_ore",
+        "ruby",
+        "sapphire",
+        "emerald",
         "coal",
         "coal",
         "crystal",
@@ -4364,6 +4835,10 @@
       if (set) out.add(ARMOR_SETS.find((x) => x.key === set).bonus);
       for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
       for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add("buff:" + id);
+      if (this.townCache.at !== Math.floor(this.game.s.elapsed)) {
+        this.townCache = { at: Math.floor(this.game.s.elapsed), near: this.game.town.townNear() };
+      }
+      if (this.townCache.near >= 2) out.add("home");
       return out;
     }
     has(effect2) {
@@ -4391,7 +4866,7 @@
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
     maxHealth() {
@@ -4467,10 +4942,12 @@
       if (fx.has("regen")) regen += 0.6;
       if (fx.has("buff:regeneration")) regen += 1.2;
       if (fx.has("spores")) regen += 0.5;
+      if (fx.has("home")) regen += 0.35;
       if (regen && !s.dead) this.heal(regen * dt);
       if (fx.has("stamina")) s.vitals.stamina = clamp(s.vitals.stamina + dt * 2, 0, 100);
     }
     lastCast;
+    townCache = { at: -1, near: 0 };
     spendMana(n) {
       const s = this.game.s;
       if (s.mana < n) return false;
@@ -4482,9 +4959,10 @@
     useKind(id) {
       if (!id) return "none";
       if (BLOCKS[id] !== void 0) return "block";
+      if (WALLS[id] !== void 0) return "wall";
       const cat = ITEMS[id]?.[1];
       if (cat === "structure") return "structure";
-      if (TOOL_TIERS[id]) return TOOL_TIERS[id][0] === "pick" ? "pick" : "axe";
+      if (TOOL_TIERS[id]) return TOOL_TIERS[id][0];
       if (RANGED[id]) return RANGED[id].kind === "bow" ? "bow" : "magic";
       if (WEAPONS[id]) return "melee";
       if (ARMOR[id] || ACCESSORIES[id]) return "wear";
@@ -4527,6 +5005,8 @@
         return { ok: false, reason: "" };
       if (Math.abs(target.x - p.x) > 4) p.face = target.x >= p.x ? 0 : Math.PI;
       if (kind === "block") return this.placeBlock(held, target);
+      if (kind === "wall") return this.placeWall(held, target);
+      if (kind === "hammer") return this.hammer(target);
       if (kind === "structure") {
         if (held === "torch") return this.placeTorch(target);
         s.placing = held;
@@ -4641,6 +5121,61 @@
       this.game.progress.record("build");
       return { ok: true };
     }
+    /** Back walls go on open tiles next to other walls or ground. */
+    placeWall(id, target) {
+      const s = this.game.s, tx = Math.floor(target.x / TILE), ty = Math.floor(target.y / TILE);
+      if (this.game.wallAt(tx, ty)) return { ok: false, reason: "" };
+      if (!this.reachable({ x: tx * TILE + 16, y: ty * TILE + 16 }, RULES.placeReach + 30))
+        return { ok: false, reason: "Too far to place." };
+      const [lo, hi] = regionBounds(s.player.x);
+      if (tx * TILE < lo + 64 || tx * TILE > hi - 64) return { ok: false, reason: "" };
+      const touching = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1]
+      ].some(([dx, dy]) => this.game.tileAt(tx + dx, ty + dy) || this.game.wallAt(tx + dx, ty + dy));
+      if (!touching) return { ok: false, reason: "Walls must touch ground or other walls." };
+      this.game.remove(id);
+      this.game.setWall(tx, ty, WALLS[id]);
+      s.player.usedAt = s.elapsed;
+      this.game.sound("place_block", tx * TILE + 16, ty * TILE + 16, 0.5);
+      this.game.progress.record("build");
+      return { ok: true };
+    }
+    /** A hammer knocks down back walls, and picks up things you have built. */
+    hammer(target) {
+      const s = this.game.s, tx = Math.floor(target.x / TILE), ty = Math.floor(target.y / TILE);
+      if (!this.reachable({ x: tx * TILE + 16, y: ty * TILE + 16 }, RULES.placeReach))
+        return { ok: false, reason: "Too far to reach." };
+      s.player.usedAt = s.elapsed;
+      const built = s.structures.filter(
+        (st) => !st.fixed && Math.abs(st.x - target.x) < 22 && target.y < st.y + 6 && target.y > st.y - 60
+      ).sort((a, b) => Math.abs(a.x - target.x) - Math.abs(b.x - target.x))[0];
+      if (built) {
+        if (Object.keys(built.store).length) return { ok: false, reason: "Empty it first." };
+        if (built.type === "door") this.game.town.removeDoor(built);
+        else s.structures = s.structures.filter((x) => x !== built);
+        this.game.drops.spawn(
+          built.type === "torch" ? "torch" : built.type,
+          1,
+          built.x,
+          built.y - 16
+        );
+        this.game.sound("crumble", built.x, built.y - 10, 0.6);
+        return { ok: true };
+      }
+      const wall = this.game.wallAt(tx, ty);
+      if (!wall || this.game.tileAt(tx, ty)) return { ok: false, reason: "" };
+      if (dungeonAt(tx * TILE + 16, ty * TILE + 16) && this.game.toolTier("hammer") < 3)
+        return { ok: false, reason: "Dungeon walls need an iron hammer." };
+      this.game.setWall(tx, ty, 0);
+      const item = WALL_ITEM[wall];
+      if (item) this.game.drops.spawn(item, 1, tx * TILE + 16, ty * TILE + 16);
+      this.game.event("dig", tx * TILE + 16, ty * TILE + 16, String(wall));
+      this.game.sound("hammer", tx * TILE + 16, ty * TILE + 16, 0.6);
+      return { ok: true };
+    }
     /** Torches stick to any wall or floor, no clearing needed. */
     placeTorch(target) {
       const s = this.game.s, tx = Math.floor(target.x / TILE), ty = Math.floor(target.y / TILE);
@@ -4680,7 +5215,8 @@
         return "Dig";
       }
       if (kind === "axe") return this.nodeAt(target) ? "Chop" : "Swing";
-      if (kind === "block") return "Place " + itemName(held).toLowerCase();
+      if (kind === "block" || kind === "wall") return "Place " + itemName(held).toLowerCase();
+      if (kind === "hammer") return "Knock down walls, pick up furniture";
       if (kind === "structure") return "Place " + itemName(held).toLowerCase();
       if (kind === "melee") return "Strike";
       if (kind === "bow") return "Shoot";
@@ -4704,7 +5240,8 @@
           type: "structure",
           d: dist(st, p)
         })),
-        ...this.game.s.caches.filter((c) => !c.opened).map((c) => ({ object: c, type: "cache", d: dist(c, p) }))
+        ...this.game.s.caches.filter((c) => !c.opened).map((c) => ({ object: c, type: "cache", d: dist(c, p) })),
+        ...this.game.s.animals.filter((a) => a.settler && !a.deadUntil).map((a) => ({ object: a, type: "settler", d: dist(a, p) - 40 }))
       ].filter((x) => x.d < radius).sort((a, b) => a.d - b.d);
       return objects[0] || null;
     }
@@ -4712,6 +5249,7 @@
       const near = this.nearestInteractable();
       if (!near) return { ok: false, reason: "Nothing is within reach." };
       if (near.type === "node") return this.gather(near.object);
+      if (near.type === "settler") return this.game.town.talk(near.object);
       if (near.type === "cache") {
         const c = near.object;
         c.opened = true;
@@ -4747,6 +5285,12 @@
         return { ok: true, action: "rift", structure: st };
       }
       if (st.type === "portal") return this.game.realms.goHome();
+      if (st.type === "door") return this.game.town.toggleDoor(st);
+      if (st.type === "bed") return this.game.town.sleep(st);
+      if (st.type === "chair" || st.type === "table") {
+        const seat = st.type === "chair" ? st : this.game.s.structures.find((x) => x.type === "chair" && dist(x, st) < 200) ?? st;
+        return this.game.town.inspect(seat);
+      }
       if (st.type === "torch" || st.type.startsWith("trap_"))
         return { ok: false, reason: "Nothing to do here." };
       if (st.type === "bedroll") {
@@ -5049,6 +5593,11 @@
       }
       const [lo, hi] = regionBounds(p.x);
       const nx = clamp(p.x + p.vx * dt, lo + 40, hi - 40);
+      if (this.collides(nx, p.y)) {
+        const tx = Math.floor((nx + Math.sign(p.vx) * RULES.playerHalfWidth) / TILE);
+        for (const ty of [Math.floor((p.y - 8) / TILE), Math.floor((p.y - 40) / TILE)])
+          if (this.game.tileAt(tx, ty) === DOOR_TILE && this.game.town.push(tx, ty)) break;
+      }
       if (!this.collides(nx, p.y)) p.x = nx;
       else if (p.grounded && !this.collides(nx, p.y - TILE) && this.collides(nx, p.y + 2)) {
         p.x = nx;
@@ -5507,8 +6056,11 @@
     recover() {
       if (!this.game.s.dead) return;
       this.game.s.dead = false;
-      this.game.s.player.x = RULES.spawnX;
-      this.game.s.player.y = this.game.groundTopAt(RULES.spawnX) + 1;
+      const bed = this.game.s.spawn, stands = bed && this.game.s.structures.some(
+        (st) => st.type === "bed" && Math.abs(st.x - bed.x) < 8 && Math.abs(st.y - bed.y) < 8
+      );
+      this.game.s.player.x = stands ? bed.x + 20 : RULES.spawnX;
+      this.game.s.player.y = stands ? bed.y : this.game.groundTopAt(RULES.spawnX) + 1;
       this.game.s.player.vx = 0;
       this.game.s.player.vy = 0;
       this.game.s.player.grounded = true;
@@ -5635,6 +6187,21 @@
     tileAt(tx, ty) {
       return tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS ? 0 : this.game.s.tiles[ty * TILE_COLS + tx] || 0;
     }
+    /** The back wall at a tile (a ground kind), placed by the player or the world's own; 0 is none. */
+    wallAt(tx, ty) {
+      if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return 0;
+      const edit = this.game.s.wallEdits[ty * TILE_COLS + tx];
+      if (edit !== void 0) return edit < 0 ? 0 : edit;
+      return naturalWallKind(tx, ty);
+    }
+    /** The raw wall edit at a tile, for noticing changes: -2 where the world's own stands. */
+    wallEditAt(tx, ty) {
+      return this.game.s.wallEdits[ty * TILE_COLS + tx] ?? -2;
+    }
+    setWall(tx, ty, kind) {
+      if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return;
+      this.game.s.wallEdits[ty * TILE_COLS + tx] = kind > 0 ? kind : -1;
+    }
     /** Changes one tile and remembers the change for the field record. */
     setTile(tx, ty, kind) {
       if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return;
@@ -5660,6 +6227,14 @@
     mineTileAt(x, y) {
       const tx = Math.floor(x / TILE), ty = Math.floor(y / TILE), kind = this.tileAt(tx, ty);
       if (!kind) return { ok: false, reason: "There is no solid ground there." };
+      if (kind === DOOR_TILE) {
+        const door = this.game.town.doorAt(tx, ty);
+        if (door) {
+          this.game.town.removeDoor(door);
+          this.game.drops.spawn("door", 1, door.x, door.y - 20);
+        } else this.setTile(tx, ty, 0);
+        return { ok: true, item: "door" };
+      }
       if (Math.hypot(x - this.game.s.player.x, y - (this.game.s.player.y - 24)) > RULES.mineReach)
         return { ok: false, reason: "Move closer to mine this tile." };
       const need = MINE_TIER[kind] ?? 1;
@@ -5682,6 +6257,286 @@
         this.game.say("Found " + itemName(spec.bonus[0]).toLowerCase() + " in the rock!", "good");
       }
       return { ok: true, item: spec.item };
+    }
+  };
+
+  // src/game/systems/Town.ts
+  var Town = class extends System {
+    checkAt = 0;
+    valueMemo = /* @__PURE__ */ new Map();
+    // ─── Doors ─────────────────────────────────────────────────────────────────
+    /** Places a door in a two-tile gap standing on solid ground. */
+    placeDoor(x, y) {
+      const tx = Math.floor(x / TILE);
+      let ty = Math.floor(y / TILE);
+      for (let i = 0; i < 4 && !this.game.tileAt(tx, ty + 1); i++) ty++;
+      if (!this.game.tileAt(tx, ty + 1))
+        return { ok: false, reason: "A door must stand on solid ground." };
+      if (this.game.tileAt(tx, ty) || this.game.tileAt(tx, ty - 1))
+        return { ok: false, reason: "A door needs a gap two tiles tall." };
+      const st = {
+        id: uniqueId(),
+        type: "door",
+        x: tx * TILE + TILE / 2,
+        y: (ty + 1) * TILE - 1,
+        fuel: 0,
+        water: 0,
+        store: {},
+        crop: null,
+        plantedAt: 0,
+        triggeredAt: 0
+      };
+      this.game.s.structures.push(st);
+      this.setDoor(st, false);
+      return { ok: true, structure: st };
+    }
+    doorCells(st) {
+      const tx = Math.floor(st.x / TILE), ty = Math.floor(st.y / TILE);
+      return [
+        [tx, ty],
+        [tx, ty - 1]
+      ];
+    }
+    /** Opens or closes a door; closed doors fill their tiles. */
+    setDoor(st, open) {
+      for (const [tx, ty] of this.doorCells(st)) this.game.setTile(tx, ty, open ? 0 : DOOR_TILE);
+      st.crop = open ? "open" : null;
+      st.triggeredAt = this.game.s.elapsed;
+    }
+    toggleDoor(st) {
+      this.setDoor(st, st.crop !== "open");
+      this.game.sound("door", st.x, st.y - 30);
+      return { ok: true };
+    }
+    /** The door whose tile this is, if any. */
+    doorAt(tx, ty) {
+      return this.game.s.structures.find(
+        (st) => st.type === "door" && this.doorCells(st).some(([x, y]) => x === tx && y === ty)
+      );
+    }
+    /** Walking into a closed door opens it. */
+    push(tx, ty) {
+      const door = this.doorAt(tx, ty);
+      if (door && door.crop !== "open") this.toggleDoor(door);
+      return !!door;
+    }
+    removeDoor(st) {
+      for (const [tx, ty] of this.doorCells(st))
+        if (this.game.tileAt(tx, ty) === DOOR_TILE) this.game.setTile(tx, ty, 0);
+      this.game.s.structures = this.game.s.structures.filter((x) => x !== st);
+    }
+    // ─── Rooms ─────────────────────────────────────────────────────────────────
+    /** Flood-fills the open cells around a tile, stopping at solid ground and doors. */
+    roomAt(tx0, ty0) {
+      const cells = /* @__PURE__ */ new Set(), missing = [], queue = [[tx0, ty0]];
+      let leak = false;
+      if (this.game.tileAt(tx0, ty0)) return { cells, missing: ["That spot is solid."] };
+      while (queue.length) {
+        const [tx, ty] = queue.pop(), key = ty * TILE_COLS + tx;
+        if (cells.has(key) || this.game.tileAt(tx, ty) || this.doorAt(tx, ty)) continue;
+        cells.add(key);
+        if (cells.size > ROOM_SIZE.max) {
+          leak = true;
+          break;
+        }
+        if (!this.game.wallAt(tx, ty)) {
+          leak = true;
+          break;
+        }
+        queue.push([tx + 1, ty], [tx - 1, ty], [tx, ty + 1], [tx, ty - 1]);
+      }
+      if (leak)
+        missing.push(
+          cells.size > ROOM_SIZE.max ? "The room is too big or not enclosed." : "Back walls are missing."
+        );
+      else if (cells.size < ROOM_SIZE.min) missing.push("The room is too small.");
+      const inside = (st) => cells.has(Math.floor((st.y - 4) / TILE) * TILE_COLS + Math.floor(st.x / TILE));
+      const inRoom = this.game.s.structures.filter(inside);
+      const has = (list) => inRoom.find((st) => list.includes(st.type));
+      const seat = has(HOUSE_NEEDS.seat), door = this.game.s.structures.some(
+        (st) => st.type === "door" && this.doorCells(st).some(
+          ([x, y]) => [
+            [1, 0],
+            [-1, 0]
+          ].some(([dx, dy]) => cells.has((y + dy) * TILE_COLS + x + dx))
+        )
+      );
+      if (!leak) {
+        if (!seat) missing.push("A chair or bed is needed.");
+        if (!has(HOUSE_NEEDS.table)) missing.push("A table is needed.");
+        if (!has(HOUSE_NEEDS.light)) missing.push("A light is needed.");
+        if (!door) missing.push("A door is needed.");
+        const x = tx0 * TILE, y = ty0 * TILE;
+        if (dungeonAt(x, y) || dimensionAt(x)) missing.push("No one will live here.");
+      }
+      return { cells, missing, seat };
+    }
+    /** What a seat's room lacks, as a message. */
+    inspect(st) {
+      const room = this.roomAt(Math.floor(st.x / TILE), Math.floor((st.y - 4) / TILE));
+      const owner = Object.entries(this.game.s.town.homes).find(
+        ([, h]) => Math.abs(h.x - st.x) < 8 && Math.abs(h.y - st.y) < 8
+      );
+      if (!room.missing.length) {
+        const who = owner ? settlerById(owner[0]) : null;
+        this.game.say(
+          who ? `${who.name} ${who.title} lives here.` : "This room would make a fine home.",
+          "good"
+        );
+      } else this.game.say("Not yet a home: " + room.missing.join(" "), "danger");
+      return { ok: true };
+    }
+    // ─── Settlers ──────────────────────────────────────────────────────────────
+    settlers() {
+      return this.game.s.animals.filter((a) => a.settler);
+    }
+    unlocked(id) {
+      const st = settlerById(id);
+      if (!st) return false;
+      const [key, n] = st.unlock;
+      if (key === "sigils") return this.game.s.rift.sigils.length >= n;
+      return (this.game.s.tutorial.tally[key] ?? 0) >= n;
+    }
+    /** Moves an unlocked settler into a free home, one at a time. */
+    moveIn() {
+      const s = this.game.s, present = new Set(this.settlers().map((a) => a.settler));
+      const waiting = SETTLERS.filter((st) => !present.has(st.id) && this.unlocked(st.id));
+      if (!waiting.length) return;
+      const claimed = Object.values(s.town.homes);
+      for (const seat of s.structures.filter((st) => HOUSE_NEEDS.seat.includes(st.type))) {
+        if (claimed.some((h) => Math.abs(h.x - seat.x) < 8 && Math.abs(h.y - seat.y) < 8)) continue;
+        const room = this.roomAt(Math.floor(seat.x / TILE), Math.floor((seat.y - 4) / TILE));
+        if (room.missing.length) continue;
+        const taken = claimed.some(
+          (h) => room.cells.has(Math.floor((h.y - 4) / TILE) * TILE_COLS + Math.floor(h.x / TILE))
+        );
+        if (taken) continue;
+        const who = waiting[0];
+        s.town.homes[who.id] = { x: seat.x, y: seat.y };
+        this.game.world.addAnimal(who.id, seat.x + 20, seat.y, {
+          body: true,
+          vx: 0,
+          vy: 0,
+          settler: who.id
+        });
+        this.game.sound("victory", seat.x, seat.y);
+        this.game.say(`${who.name} ${who.title} has moved in!`, "victory");
+        this.game.progress.record("settler:" + who.id);
+        return;
+      }
+    }
+    /** Settlers whose homes fall apart become homeless and wander off. */
+    checkHomes() {
+      const s = this.game.s;
+      for (const [id, h] of Object.entries(s.town.homes)) {
+        const seat = s.structures.find((st) => Math.abs(st.x - h.x) < 8 && Math.abs(st.y - h.y) < 8);
+        const room = seat && this.roomAt(Math.floor(seat.x / TILE), Math.floor((seat.y - 4) / TILE));
+        if (room && !room.missing.length) continue;
+        delete s.town.homes[id];
+        s.animals = s.animals.filter((a) => a.settler !== id);
+        const who = settlerById(id);
+        if (who) this.game.say(`${who.name} ${who.title} has no home and has left.`, "danger");
+      }
+    }
+    /** Settlers housed near the player (a town lifts the spirits). */
+    townNear(radius = 1400) {
+      const p = this.game.s.player;
+      return this.settlers().filter(
+        (a) => Math.abs(a.homeX - p.x) < radius && Math.abs(a.homeY - p.y) < 600
+      ).length;
+    }
+    talk(a) {
+      const who = settlerById(a.settler ?? "");
+      if (!who) return { ok: false };
+      const line = who.lines[Math.floor(this.game.rng() * who.lines.length)];
+      this.game.say(`${who.name}: "${line}"`);
+      return { ok: true, action: "shop", settler: who.id };
+    }
+    // ─── Trade ─────────────────────────────────────────────────────────────────
+    /** What an item is worth in silver marks: raw materials by table, crafts by their parts. */
+    valueOf(id, depth = 0) {
+      const memo = this.valueMemo.get(id);
+      if (memo !== void 0) return memo;
+      let v = BASE_VALUE[id];
+      if (v === void 0) {
+        const stock = SETTLERS.flatMap((st) => st.stock).find(([item]) => item === id);
+        const r = RECIPES.find((x) => x.id === id);
+        if (stock) v = stock[1];
+        else if (r && depth < 8)
+          v = Math.ceil(
+            Object.entries(r.cost).reduce(
+              (n, [item, q]) => n + this.valueOf(item, depth + 1) * q,
+              0
+            ) * 1.25 / (r.yield ?? 1)
+          );
+        else v = ITEMS[id]?.[1] === "trophy" ? 100 : 8;
+      }
+      this.valueMemo.set(id, v);
+      return v;
+    }
+    sellPrice(id) {
+      return id === "coin" ? 0 : Math.max(1, Math.floor(this.valueOf(id) / 4));
+    }
+    nearSettler(id) {
+      const p = this.game.s.player;
+      return this.settlers().find(
+        (a) => (!id || a.settler === id) && dist(a, p) < RULES.interactReach + 60
+      );
+    }
+    buy(settlerId, item, qty = 1) {
+      const who = settlerById(settlerId), offer = who?.stock.find(([id]) => id === item);
+      if (!who || !offer) return { ok: false, reason: "That is not for sale." };
+      if (!this.nearSettler(settlerId)) return { ok: false, reason: `Stand beside ${who.name}.` };
+      const cost = offer[1] * qty;
+      if (this.game.count("coin") < cost)
+        return { ok: false, reason: `That costs ${cost} silver marks.` };
+      this.game.remove("coin", cost);
+      this.game.add(item, qty);
+      this.game.sound("coin");
+      this.game.say(`Bought ${qty} ${itemName(item)} for ${cost} marks.`, "good");
+      return { ok: true };
+    }
+    sell(item, qty = 1) {
+      if (!this.nearSettler()) return { ok: false, reason: "Stand beside a settler to trade." };
+      if (item === "coin" || this.game.count(item) < qty)
+        return { ok: false, reason: "You do not have that." };
+      const price = this.sellPrice(item) * qty;
+      this.game.remove(item, qty);
+      this.game.add("coin", price);
+      this.game.sound("coin");
+      this.game.say(`Sold ${qty} ${itemName(item)} for ${price} marks.`, "good");
+      return { ok: true };
+    }
+    // ─── Beds ──────────────────────────────────────────────────────────────────
+    /** Resting in a bed sets where you wake after a fall, and sleeps through the night. */
+    sleep(bed) {
+      const s = this.game.s;
+      s.spawn = { x: bed.x, y: bed.y };
+      s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45);
+      s.vitals.stamina = 100;
+      if (this.game.isNight()) {
+        const now = this.game.timeOfDay(), until = (6 * 60 - now + 24 * 60) % (24 * 60);
+        s.elapsed += until / RULES.minutesPerSecond;
+        this.game.say("You sleep through the night. You will wake here if you fall.", "good");
+      } else this.game.say("Your bed is made. You will wake here if you fall.", "good");
+      this.game.sound("rest");
+      return { ok: true };
+    }
+    update(dt) {
+      const s = this.game.s;
+      for (const st of s.structures)
+        if (st.type === "door" && st.crop === "open" && s.elapsed - st.triggeredAt > 2) {
+          const busy = [s.player, ...s.animals.filter((a) => !a.deadUntil)].some(
+            (o) => Math.abs(o.x - st.x) < 30 && o.y > st.y - 70 && o.y < st.y + 10
+          );
+          if (!busy) this.setDoor(st, false);
+          else st.triggeredAt = s.elapsed;
+        }
+      this.checkAt -= dt;
+      if (this.checkAt > 0) return;
+      this.checkAt = 4;
+      this.checkHomes();
+      this.moveIn();
     }
   };
 
@@ -5759,6 +6614,13 @@
         return;
       }
       const at = animal.x === void 0 ? this.game.s.player : animal;
+      if (spec && !animal.minion && animal.type !== "deer") {
+        const coins = Math.max(
+          1,
+          Math.round(spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1))
+        );
+        this.game.drops.spawn("coin", coins, at.x, at.y - 20);
+      }
       if (spec) {
         for (const [id, min, max, chance] of spec.loot)
           if (this.game.rng() < chance)
@@ -5918,7 +6780,8 @@
             if (t >= a.wanderAt) {
               a.angle = this.game.rng() > 0.5 ? 0 : Math.PI;
               a.wanderAt = t + 2 + this.game.rng() * 3;
-              if (Math.abs(a.x - a.homeX) > 260) a.angle = a.x > a.homeX ? Math.PI : 0;
+              if (Math.abs(a.x - a.homeX) > (a.settler ? 70 : 260))
+                a.angle = a.x > a.homeX ? Math.PI : 0;
             }
             a.vx = Math.cos(a.angle) * walk;
           }
@@ -6090,6 +6953,9 @@
       s.buffs ??= {};
       s.bosses ??= {};
       s.rift ??= { sigils: [] };
+      s.wallEdits ??= {};
+      s.town ??= { homes: {} };
+      s.spawn ??= null;
       this.game.combat.projectiles = [];
       if (s.hotbar.every((x) => x === null))
         for (const e of s.inventory) this.game.equipment.offer(e.id);
@@ -6179,6 +7045,7 @@
     bosses = new Bosses(this);
     realms = new Realms(this);
     hands = new Hands(this);
+    town = new Town(this);
     devtools = new Dev(this);
     world = new WorldGenerator(this);
     saves = new SaveSystem(this);
@@ -6248,6 +7115,9 @@
         buffs: {},
         bosses: {},
         rift: { sigils: [] },
+        wallEdits: {},
+        spawn: null,
+        town: { homes: {} },
         placing: null,
         dead: false,
         lastSave: Date.now()
@@ -6274,6 +7144,7 @@
       this.drops.step(dt);
       this.equipment.update(dt);
       this.realms.update(dt);
+      this.town.update(dt);
       this.survival.update(dt);
       this.devtools.sustain();
     }
@@ -6354,6 +7225,15 @@
     }
     floorNear(x, y) {
       return this.terrain.floorNear(x, y);
+    }
+    wallAt(tx, ty) {
+      return this.terrain.wallAt(tx, ty);
+    }
+    wallEditAt(tx, ty) {
+      return this.terrain.wallEditAt(tx, ty);
+    }
+    setWall(tx, ty, kind) {
+      this.terrain.setWall(tx, ty, kind);
     }
     setTile(tx, ty, kind) {
       this.terrain.setTile(tx, ty, kind);
@@ -6941,6 +7821,11 @@
     flint: "#6a7074",
     bone: "#e6dcc6",
     copper: "#d0844a",
+    silver: "#dfe4ea",
+    gold: "#f0c850",
+    ruby: "#e8304a",
+    sapphire: "#3a7ae8",
+    emerald: "#2ac870",
     iron: "#a8a4a0",
     steel: "#dfe3e6",
     obsidian: "#4a3a64",
@@ -7079,7 +7964,22 @@
     rift_blade: ["sword", "#d8a0ff", "#2a1c3a"],
     frostbrand: ["sword", "#bfe8f8", "#4a6a8a"],
     hellrazor: ["sword", "#ff6a2a", "#2a0a0a"],
-    sunspear: ["spear", "#f0c860"]
+    sunspear: ["spear", "#f0c860"],
+    // Homes and trade.
+    coin: ["coin", "#dfe4ea"],
+    chair: ["chair", "#8a6440"],
+    table: ["table", "#8a6440"],
+    bed: ["bed", "#8a3a3a"],
+    door: ["door", "#7a5a3c"],
+    bucket: ["bucket", "#a8a4a0"],
+    water_bucket: ["bucket", "#a8a4a0", "#5a9cbc"],
+    rope: ["rope", "#c8a878"],
+    grappling_hook: ["hook", "#a8a4a0"],
+    ruby: ["gem", "#e8304a"],
+    sapphire: ["gem", "#3a7ae8"],
+    emerald: ["gem", "#2ac870"],
+    silver_ore: ["ore", "#dfe4ea", "#6c6e74"],
+    gold_ore: ["ore", "#f0c850", "#6e665a"]
   };
   function paint(p, tpl, col, col2) {
     const [, d, m, l, ll] = ramp(col);
@@ -7459,6 +8359,83 @@
         p.ellipse(12, 5, 2.5, 3.5, "#f8b848");
         p.ellipse(12, 6, 1.5, 2, "#fff0b0");
         break;
+      case "wall":
+        p.rect(1, 1, 14, 14, m);
+        for (let y = 1; y < 15; y += 4) {
+          p.rect(1, y, 14, 1, d);
+          for (let x = y % 8 === 1 ? 4 : 8; x < 15; x += 7) p.rect(x, y, 1, 4, d);
+        }
+        p.rect(1, 2, 14, 1, l);
+        break;
+      case "coin":
+        p.ellipse(8, 8, 6, 6, d);
+        p.ellipse(8, 8, 5, 5, m);
+        p.ellipse(7, 7, 3, 3, l);
+        p.rect(7, 5, 2, 6, d);
+        p.rect(6, 5, 1, 1, ll);
+        break;
+      case "chair":
+        p.rect(3, 1, 2, 14, d);
+        p.rect(3, 8, 10, 2, m);
+        p.rect(3, 8, 10, 1, l);
+        p.rect(11, 10, 2, 5, d);
+        p.rect(3, 3, 2, 2, l);
+        break;
+      case "table":
+        p.rect(1, 5, 14, 3, m);
+        p.rect(1, 5, 14, 1, l);
+        p.rect(2, 8, 2, 7, d);
+        p.rect(12, 8, 2, 7, d);
+        break;
+      case "bed":
+        p.rect(1, 4, 2, 11, "#5e4631");
+        p.rect(13, 8, 2, 7, "#5e4631");
+        p.rect(3, 9, 10, 4, m);
+        p.rect(3, 9, 10, 1, l);
+        p.rect(3, 7, 4, 2, "#e8dcc8");
+        p.rect(3, 13, 10, 1, "#5e4631");
+        break;
+      case "door":
+        p.rect(4, 1, 8, 14, m);
+        p.rect(4, 1, 8, 1, l);
+        p.rect(7, 1, 1, 14, d);
+        p.rect(4, 4, 8, 1, "#8a8680");
+        p.rect(4, 11, 8, 1, "#8a8680");
+        p.set(10, 8, "#d8b848");
+        break;
+      case "bucket":
+        p.poly(
+          [
+            [3, 5],
+            [13, 5],
+            [11, 14],
+            [5, 14]
+          ],
+          m
+        );
+        p.rect(3, 5, 10, 1, l);
+        p.rect(4, 9, 8, 1, d);
+        p.line(3, 5, 8, 1, d);
+        p.line(13, 5, 8, 1, d);
+        if (col2) p.rect(4, 6, 8, 2, col2);
+        break;
+      case "rope":
+        p.ellipse(8, 9, 6, 5, m);
+        p.ellipse(8, 9, 3, 2.5, "#000000");
+        for (let y = 7; y < 12; y++)
+          for (let x = 5; x < 12; x++)
+            if ((x + 0.5 - 8) ** 2 / 9 + (y + 0.5 - 9) ** 2 / 6 < 1) p.clear(x, y);
+        p.line(3, 7, 6, 12, d);
+        p.line(10, 5, 13, 10, l);
+        p.line(12, 12, 14, 15, m);
+        break;
+      case "hook":
+        p.line(3, 14, 10, 4, "#c8a878");
+        p.line(8, 1, 12, 5, m);
+        p.line(12, 5, 14, 3, l);
+        p.line(8, 1, 6, 3, l);
+        p.rect(9, 3, 3, 3, d);
+        break;
       case "crate":
         p.rect(2, 4, 12, 10, m);
         p.rect(2, 4, 12, 1, l);
@@ -7549,6 +8526,7 @@
   }
   function guess(id) {
     if (ICONS[id]) return ICONS[id];
+    if (WALLS[id] !== void 0) return ["wall", GROUND[WALLS[id]]?.wall ?? "#4a4038"];
     const m = matOf(id);
     const tail = id.split("_").pop() ?? "";
     const byTail = {
@@ -7557,6 +8535,7 @@
       pickaxe: "pick",
       sword: "sword",
       blade: "sword",
+      broadsword: "sword",
       spear: "spear",
       bow: "bow",
       staff: "staff",
@@ -8281,6 +9260,29 @@
       light: [0.7, 0.25, 0.6]
     }
   });
+  var SKINS = [
+    "#d8a47c",
+    "#b8805a",
+    "#e8c0a0",
+    "#8a5a3a",
+    "#c89070",
+    "#e0b090",
+    "#a07050",
+    "#d0b0c0"
+  ];
+  SETTLERS.forEach((st, i) => {
+    MOBS3[st.id] = {
+      tpl: "biped",
+      body: st.colors[0],
+      belly: st.colors[1],
+      eye: "#1b1716",
+      w: 12,
+      h: 27,
+      skin: SKINS[i % SKINS.length],
+      hat: st.colors[2],
+      top: 32
+    };
+  });
   function paintQuad(p, a, frame2, ox, oy) {
     const [dk, d, m, l] = ramp(a.body), belly = a.belly ?? l, parts = new Set(a.parts ?? []), legH = parts.has("longlegs") ? Math.round(a.h * 0.45) : Math.round(a.h * 0.35), bodyH = a.h - legH - (parts.has("antlers") ? 5 : 0), bx = ox - Math.round(a.w * 0.4), bw = Math.round(a.w * 0.72), by = oy - legH - bodyH;
     const s = Math.sin(frame2 / 6 * Math.PI * 2), legs = [
@@ -8458,9 +9460,9 @@
       }
       for (let x = hx + 2; x < hx + hw - 2; x += 2) p.set(x, hy + headH - 2, "#141010");
     } else {
-      p.rect(hx, hy, hw, headH, parts.has("hood") ? sec : m);
-      p.rect(hx, hy, hw, 1, l);
-      p.rect(hx, hy, 1, headH, l);
+      p.rect(hx, hy, hw, headH, parts.has("hood") ? sec : a.skin ?? m);
+      p.rect(hx, hy, hw, 1, a.skin ? shade(a.skin, 0.15) : l);
+      p.rect(hx, hy, 1, headH, a.skin ? shade(a.skin, 0.15) : l);
       if (parts.has("hood")) p.rect(hx + 2, hy + 2, hw - 2, headH - 3, "#120e14");
       p.set(hx + hw - 2, eyeY, eye);
       if (hw > 5) p.set(hx + hw - 4, eyeY, eye);
@@ -8468,6 +9470,11 @@
         p.set(hx + hw - 3, eyeY, eye);
         p.set(hx + hw - 5, eyeY, eye);
       }
+    }
+    if (a.hat) {
+      p.rect(hx - 2, hy, hw + 4, 1, a.hat);
+      p.rect(hx, hy - 3, hw, 3, shade(a.hat, 0.1));
+      p.rect(hx, hy - 1, hw, 1, a.belly ?? shade(a.hat, -0.3));
     }
     if (parts.has("horns")) {
       const hl = Math.max(3, Math.round(headH * 0.6));
@@ -9595,6 +10602,11 @@
     salt: { rock: "#b8b2a4", crystal: "#f4f2ec" },
     copper_ore: { rock: "#7c7a74", fleck: "#d0844a", shine: "#62b08a" },
     iron_ore: { rock: "#7c7a74", fleck: "#a8745a", shine: "#d8c4b0" },
+    silver_ore: { rock: "#6c6e74", fleck: "#dfe4ea", shine: "#ffffff" },
+    gold_ore: { rock: "#6e665a", fleck: "#f0c850", shine: "#fff0a0" },
+    ruby: { rock: "#5a5058", crystal: "#e8304a", glow: true },
+    sapphire: { rock: "#50566a", crystal: "#3a7ae8", glow: true },
+    emerald: { rock: "#4e5a52", crystal: "#2ac870", glow: true },
     coal: { rock: "#5a5a5e", fleck: "#1c1c20", shine: "#8a8a96" },
     ice: { rock: "#8fb8d0", crystal: "#dff4ff" },
     obsidian: { rock: "#3a3448", crystal: "#2a2433", shine: "#9a8ac0" },
@@ -10242,6 +11254,62 @@
       for (let x = 4; x < 12; x += 3) p.set(x, 0, "#1a0a0a");
     })
   });
+  Object.assign(STATIC, {
+    chair: () => sprite(12, 20, 6, 19, (p) => {
+      p.rect(1, 0, 3, 20, DARKWOOD);
+      p.rect(1, 0, 1, 20, "#7a5a3c");
+      p.rect(1, 3, 3, 2, WOOD);
+      p.rect(1, 7, 3, 2, WOOD);
+      planks(p, 1, 10, 11, 3);
+      p.rect(9, 13, 2, 7, DARKWOOD);
+      p.rect(2, 13, 2, 7, DARKWOOD);
+    }),
+    table: () => sprite(30, 16, 15, 15, (p) => {
+      planks(p, 0, 0, 30, 4);
+      p.rect(0, 4, 30, 1, "#3a2a1c");
+      p.rect(3, 4, 3, 12, DARKWOOD);
+      p.rect(24, 4, 3, 12, DARKWOOD);
+      p.rect(3, 4, 1, 12, "#7a5a3c");
+      p.rect(12, 0, 6, 1, "#d8ccb0");
+    }),
+    bed: () => sprite(36, 16, 18, 15, (p) => {
+      p.rect(0, 0, 4, 16, DARKWOOD);
+      p.rect(0, 0, 1, 16, "#7a5a3c");
+      p.rect(32, 5, 4, 11, DARKWOOD);
+      p.rect(4, 7, 28, 5, "#8a3a3a");
+      p.rect(4, 7, 28, 1, "#b85a4a");
+      for (let x = 10; x < 32; x += 6) p.rect(x, 8, 1, 4, "#6a2a2a");
+      p.rect(4, 5, 9, 3, "#e8dcc8");
+      p.rect(4, 5, 9, 1, "#fff4e0");
+      planks(p, 4, 12, 28, 2);
+      p.rect(5, 14, 2, 2, DARKWOOD);
+      p.rect(29, 14, 2, 2, DARKWOOD);
+    }),
+    door_closed: () => sprite(10, 32, 5, 31, (p) => {
+      planks(p, 1, 0, 8, 32, "#7a5a3c");
+      p.rect(1, 0, 8, 1, "#a88458");
+      for (const y of [4, 26]) p.rect(1, y, 8, 2, IRON);
+      p.rect(6, 15, 2, 2, "#d8b848");
+      p.rect(0, 0, 1, 32, DARKWOOD);
+      p.rect(9, 0, 1, 32, DARKWOOD);
+    }),
+    door_open: () => sprite(16, 32, 5, 31, (p) => {
+      p.rect(0, 0, 1, 32, DARKWOOD);
+      p.rect(9, 0, 1, 32, DARKWOOD);
+      p.poly(
+        [
+          [1, 0],
+          [4, 2],
+          [4, 30],
+          [1, 32]
+        ],
+        "#6a4a30"
+      );
+      p.line(1, 0, 1, 31, "#a88458");
+      p.rect(2, 5, 2, 2, IRON);
+      p.rect(2, 26, 2, 2, IRON);
+    })
+  });
   var staticSprite = (k) => cached("st:" + k, STATIC[k]);
   function chestSprite(kind, open) {
     const trim = {
@@ -10440,6 +11508,9 @@
         } else flameAt(c, x, y - 10, t, 1, s.id);
         return;
       }
+      case "door":
+        blit(c, staticSprite(s.crop === "open" ? "door_open" : "door_closed"), x, y);
+        return;
       case "dungeon_chest":
         blit(c, chestSprite(s.kind ?? "", s.crop === "open"), x, y);
         return;
@@ -10738,22 +11809,12 @@
       this.data[i + 2] *= k;
     }
   };
-  function wallKind(tx, ty) {
-    const x = tx * T2 + T2 / 2, y = ty * T2 + T2 / 2;
-    const dungeon2 = data_exports.dungeonAt(x, y);
-    if (dungeon2) return dungeon2.def.brick;
-    if (data_exports.regionAt(x) === "mycelia") return 20;
-    const depth = y - data_exports.surfaceAt(x), biome = data_exports.biomeAt(x, y).id;
-    if (depth < 76)
-      return biome === "desert" ? 3 : biome === "marsh" || biome === "coast" ? 4 : biome === "tundra" ? 5 : biome === "badlands" ? 6 : 1;
-    if (y >= data_exports.LAYERS[4].top) return 10;
-    if (y >= data_exports.LAYERS[3].top) return 9;
-    if (y >= data_exports.LAYERS[2].top) return 8;
-    return 2;
-  }
-  var isBack = (g, tx, ty) => !g.tileAt(tx, ty) && ((ty + 0.5) * T2 > data_exports.surfaceAt((tx + 0.5) * T2) || !!data_exports.dungeonAt((tx + 0.5) * T2, (ty + 0.5) * T2));
+  var isBack = (g, tx, ty) => {
+    const tile = g.tileAt(tx, ty);
+    return (!tile || tile === DOOR_TILE) && g.wallAt(tx, ty) > 0;
+  };
   function paintWall(c, g, tx, ty, ox, oy) {
-    const kind = wallKind(tx, ty), tex = baseTexture(kind, tx + 3, ty + 5), [wr, wg, wb] = rgb(groundOf(kind).wall ?? "#2c3036");
+    const kind = g.wallAt(tx, ty), tex = baseTexture(kind, tx + 3, ty + 5), [wr, wg, wb] = rgb(groundOf(kind).wall ?? "#2c3036");
     for (let y = 0; y < TA; y++) {
       const row = y * TA * 4, dst = ((oy + y) * c.w + ox) * 4;
       for (let x = 0; x < TA; x++) {
@@ -10888,7 +11949,7 @@
     let s = 17;
     for (let ty = cy * CH - 1; ty <= cy * CH + CH; ty++)
       for (let tx = cx * CH - 1; tx <= cx * CH + CH; tx++)
-        s = Math.imul(s, 31) + g.tileAt(tx, ty) + 1 | 0;
+        s = Math.imul(s, 31) + g.tileAt(tx, ty) * 64 + g.wallEditAt(tx, ty) + 3 | 0;
     return s;
   }
   function renderChunk(g, cx, cy) {
@@ -10897,7 +11958,12 @@
     for (let j = 0; j < CH; j++)
       for (let i = 0; i < CH; i++) {
         const tx = cx * CH + i, ty = cy * CH + j, kind = g.tileAt(tx, ty);
-        if (kind) {
+        if (kind === DOOR_TILE) {
+          if (isBack(g, tx, ty)) {
+            paintWall(back, g, tx, ty, i * TA, j * TA);
+            anyBack = true;
+          }
+        } else if (kind) {
           paintSolid(front, g, tx, ty, kind, i * TA, j * TA);
           anyFront = true;
         } else {
@@ -12520,6 +13586,19 @@
       tone(k, o, t, { from: 130, to: 80, peak: 0.3 * v, decay: 0.1 });
       hiss(k, o, t, { freq: 900, q: 2, peak: 0.12 * v, decay: 0.06 });
       tone(k, o, t + 0.09, { from: 200, to: 150, type: "triangle", peak: 0.1 * v, decay: 0.05 });
+    },
+    door: (k, o, t, v) => {
+      cry(k, o, t, { from: 180, to: 240, formant: 700, q: 5, peak: 0.06 * v, dur: 0.22, wobble: 10 });
+      tone(k, o, t + 0.2, { from: 110, to: 70, peak: 0.25 * v, decay: 0.08 });
+      hiss(k, o, t + 0.2, { freq: 800, q: 1.5, peak: 0.1 * v, decay: 0.05 });
+    },
+    coin: (k, o, t, v) => {
+      tone(k, o, t, { from: 1980, type: "triangle", peak: 0.06 * v, decay: 0.12 });
+      tone(k, o, t + 0.07, { from: 2640, type: "triangle", peak: 0.05 * v, decay: 0.18 });
+    },
+    hammer: (k, o, t, v) => {
+      tone(k, o, t, { from: 220, to: 120, peak: 0.25 * v, decay: 0.07 });
+      hiss(k, o, t, { freq: 1400, q: 1.2, peak: 0.14 * v, decay: 0.06 });
     },
     open: (k, o, t, v) => {
       cry(k, o, t, { from: 300, to: 520, formant: 900, q: 6, peak: 0.1 * v, dur: 0.35, wobble: 18 });
@@ -14770,6 +15849,65 @@
     }
   );
 
+  // src/audio/tracks/town.ts
+  var town = compose(
+    {
+      id: "town",
+      title: "Lamplight on the Square",
+      mood: "A settled town",
+      bpm: 104,
+      bars: 24,
+      parts: {
+        kick: { inst: "kick", vol: 0.7 },
+        rim: { inst: "rim", vol: 0.4, rev: 0.2 },
+        shaker: { inst: "shaker", vol: 0.45, pan: 0.3 },
+        tamb: { inst: "tamb", vol: 0.4, pan: -0.3 },
+        bass: { inst: "bass", vol: 0.8 },
+        guitar: { inst: "pluck", vol: 0.7, pan: -0.25, rev: 0.2 },
+        harp: { inst: "harp", vol: 0.55, pan: 0.25, rev: 0.35 },
+        pad: { inst: "pad", vol: 0.45, rev: 0.4 },
+        reed: { inst: "reed", vol: 0.85, rev: 0.3, pan: -0.1 },
+        ocarina: { inst: "ocarina", vol: 0.9, rev: 0.4, echo: 0.12, pan: 0.1 },
+        marimba: { inst: "marimba", vol: 0.7, rev: 0.25, pan: 0.2 },
+        pizz: { inst: "pizz", vol: 0.6, rev: 0.3, pan: -0.2 },
+        strings: { inst: "strings", vol: 0.7, rev: 0.4 }
+      }
+    },
+    (s) => {
+      const progA = "D G D A Bm G A D", progB = "G A F#m Bm G A Bm A";
+      const theme = "a4:4 d5:4 f#5:4 e5:4 | d5:6 b4:2 g4:8 | a4:4 d5:4 f#5:4 a5:4 | g5:8 e5:8 | f#5:4 d5:4 b4:4 d5:4 | g5:6 f#5:2 e5:4 d5:4 | e5:4 f#5:2 g5:2 a5:4 c#5:4 | d5:12 r:4";
+      const bed = (bar, prog) => {
+        s.arp("guitar", bar, prog, "0 2 1 2 0 2 1 2", 55, 2);
+        s.bass("bass", bar, prog, "R:4 5:4 8:4 5:4", 38);
+        s.pad("pad", bar, prog, 62, { vel: 0.7 });
+        const bars = s.progression(bar, prog).length;
+        s.grid("kick", bar, "x.......x.......", bars);
+        s.grid("rim", bar, "....x.......x...", bars);
+        s.grid("shaker", bar, "x.o.x.o.x.o.x.o.", bars);
+      };
+      s.play("reed", 0, theme);
+      bed(0, progA);
+      s.play(
+        "ocarina",
+        8,
+        "b5:6 a5:2 g5:8 | a5:6 g5:2 e5:8 | f#5:4 a5:4 c#6:4 a5:4 | d6:8 b5:8 | b5:4 d6:4 b5:4 g5:4 | a5:6 b5:2 c#6:8 | d6:4 c#6:4 b5:4 f#5:4 | e5:8 a5:8"
+      );
+      s.play("strings", 8, "d5:16 | e5:16 | c#5:16 | d5:16 | d5:16 | e5:16 | f#5:16 | e5:16", {
+        vel: 0.5
+      });
+      s.arp("harp", 8, progB, "0 1 2 3 2 1 2 3", 62, 2, { vel: 0.7 });
+      bed(8, progB);
+      s.grid("tamb", 8, "..x...x...x...x.", 8);
+      s.play("marimba", 16, theme);
+      s.play("pizz", 16, theme, { transpose: -12, vel: 0.7 });
+      s.play("reed", 16, "r:16 | r:16 | r:16 | r:16 | d5:16 | b4:16 | c#5:16 | d5:12 r:4", {
+        vel: 0.6
+      });
+      bed(16, progA);
+      s.grid("tamb", 16, "..x...x...x...x.", 8);
+    }
+  );
+
   // src/audio/tracks/voidsong.ts
   var voidsong = compose(
     {
@@ -14842,7 +15980,8 @@
     mycelia,
     skyreach,
     voidsong,
-    finalBoss
+    finalBoss,
+    town
   ];
   var TRACKS = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
 
@@ -15002,6 +16141,7 @@
     if (c.dungeon && DUNGEON_TRACKS[c.dungeon]) return DUNGEON_TRACKS[c.dungeon];
     if (LAYER_TRACKS[c.layer]) return LAYER_TRACKS[c.layer];
     if (c.weather === "storm") return "storm";
+    if (c.layer === "surface" && (c.town ?? 0) >= 2) return "town";
     if (["tundra", "taiga", "alpine"].includes(c.biome)) return "cold";
     if (["desert", "badlands"].includes(c.biome)) return "desert";
     if (c.biome === "marsh") return "marsh";
@@ -15027,6 +16167,9 @@
       this.log = document.getElementById("dev-log");
       this.input = document.getElementById("dev-input");
       this.input.addEventListener("keydown", (e) => this.key(e));
+      this.root.addEventListener("click", (e) => {
+        if (e.target !== this.input && !window.getSelection()?.toString()) this.input.focus();
+      });
       this.print(["Type help for commands."], "ok");
     }
     get open() {
@@ -15042,7 +16185,14 @@
       for (const text of lines) {
         const row = document.createElement("div");
         row.className = text.startsWith("!") ? "err" : tone2;
-        row.textContent = text.startsWith("!") ? text.slice(1).trim() : text;
+        const cols = !text.startsWith("!") && /^\s*(\S.*?)\s{2,}(\S.*)$/.exec(text);
+        if (cols && tone2 === "ok") {
+          row.classList.add("cols");
+          const [name, about] = [document.createElement("span"), document.createElement("span")];
+          name.textContent = cols[1];
+          about.textContent = cols[2];
+          row.append(name, about);
+        } else row.textContent = text.startsWith("!") ? text.slice(1).trim() : text;
         this.log.append(row);
       }
       while (this.log.childElementCount > 200) this.log.firstElementChild?.remove();
@@ -15063,6 +16213,9 @@
         if (line === "clear") this.log.replaceChildren();
         else this.print(this.game.command(line), "ok");
         this.onRun();
+      } else if (e.key === "PageUp" || e.key === "PageDown") {
+        e.preventDefault();
+        this.log.scrollBy({ top: (e.key === "PageUp" ? -1 : 1) * this.log.clientHeight * 0.8 });
       } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
         this.cursor = Math.max(
@@ -15100,6 +16253,8 @@
     selectedRecipe: "stone_axe",
     farm: null,
     chest: null,
+    /** The settler whose wares the Town page shows. */
+    shop: null,
     camera: { x: 0, y: 0 },
     lastFrame: performance.now(),
     lastUI: 0,
@@ -15306,7 +16461,7 @@
       renderJournal();
     }
   );
-  var TABS = ["pack", "gear", "recipes", "vitals", "notes", "beasts", "rift"];
+  var TABS = ["pack", "gear", "recipes", "vitals", "notes", "beasts", "rift", "town"];
   function toggleJournal(force) {
     if (!state.playing || game.s.dead) return;
     state.journal = force === void 0 ? !state.journal : force;
@@ -15347,6 +16502,12 @@
       }
       if (result.action === "rift") {
         state.tab = "rift";
+        toggleJournal(true);
+      }
+      if (result.action === "shop") {
+        state.shop = result.settler ?? null;
+        state.tab = "town";
+        sound("page");
         toggleJournal(true);
       }
     }
@@ -15401,7 +16562,7 @@
       return;
     }
     if (state.journal) {
-      if (/^[1-7]$/.test(key)) {
+      if (/^[1-8]$/.test(key)) {
         state.tab = TABS[Number(key) - 1];
         renderJournal();
       }
@@ -15482,7 +16643,8 @@
       vitals: "04",
       notes: "05",
       beasts: "06",
-      rift: "07"
+      rift: "07",
+      town: "08"
     };
     $("page-number").textContent = page[tab];
     $("right-page-heading").textContent = tab === "notes" ? "FIELD NOTES" : tab.toUpperCase();
@@ -15496,6 +16658,7 @@
     if (tab === "beasts") renderBeasts(left, right);
     if (tab === "gear") renderGear(left, right);
     if (tab === "rift") renderRift(left, right);
+    if (tab === "town") renderTown(left, right);
     pixelate(left);
     pixelate(right);
   }
@@ -15679,7 +16842,7 @@
     };
     drawAtlas();
   }
-  var bestiary = () => Object.keys(MOBS).map((id) => ({ id, kills: game.s.tutorial.tally["kill:" + id] ?? 0 })).sort((a, b) => Number(!!MOBS[a.id].boss) - Number(!!MOBS[b.id].boss));
+  var bestiary = () => Object.keys(MOBS).filter((id) => !SETTLER_IDS.includes(id)).map((id) => ({ id, kills: game.s.tutorial.tally["kill:" + id] ?? 0 })).sort((a, b) => Number(!!MOBS[a.id].boss) - Number(!!MOBS[b.id].boss));
   var atlasLand = null;
   function drawAtlas() {
     const map = $("atlas-map"), ink = map.getContext("2d");
@@ -15759,7 +16922,7 @@
       cfg.rewards
     ).map(([id, n]) => `${n} ${pretty(id)}`).join(
       " \xB7 "
-    )} \xB7 ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? "disabled" : ""}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? "disabled" : ""}>UPGRADE \xB7 ${a.level === 1 ? 100 : 250} XP</button>` : ""}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ""}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p><h3>Bestiary \xB7 ${bestiary().filter((b) => b.kills).length} / ${Object.keys(MOBS).length}</h3><div class="book-list">${bestiary().map(
+    )} \xB7 ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? "disabled" : ""}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? "disabled" : ""}>UPGRADE \xB7 ${a.level === 1 ? 100 : 250} XP</button>` : ""}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ""}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p><h3>Bestiary \xB7 ${bestiary().filter((b) => b.kills).length} / ${bestiary().length}</h3><div class="book-list">${bestiary().map(
       (b) => `<div class="book-row"><div class="with-icon"><span class="icon-slot portrait"><img src="${b.kills ? mobPortrait(b.id) : ""}" alt="" ${b.kills ? "" : "hidden"}></span><div><strong>${b.kills ? MOBS[b.id].name : "???"}</strong><small>${b.kills ? (MOBS[b.id].boss ? "Slain " + b.kills + "\xD7" : b.kills + " slain") + " \xB7 " + MOBS[b.id].hp + " health" : "Not yet met"}</small></div></div></div>`
     ).join("")}</div>`;
     const attune = right.querySelector("[data-attune]"), upgrade = right.querySelector("[data-upgrade]");
@@ -15837,6 +17000,52 @@
       }
     );
   }
+  function renderTown(left, right) {
+    const town2 = game.town, here = new Set(town2.settlers().map((a) => a.settler)), coins = game.count("coin");
+    const hint = (st) => {
+      const [key, n] = st.unlock;
+      if (key === "sigils") return "Comes once a sigil is set in the Rift Gate.";
+      if (key === "coin") return `Comes once you have earned ${n} silver marks.`;
+      const [verb, what] = key.split(":");
+      const thing = pretty(what).toLowerCase();
+      if (verb === "place")
+        return `Comes once you build ${/^[aeiou]/.test(thing) ? "an" : "a"} ${thing}.`;
+      if (verb === "craft") return `Comes once you smelt ${pretty(what).toLowerCase()}.`;
+      if (verb === "visit")
+        return `Comes once you have been to ${BIOMES.find((b) => b.id === what)?.name ?? DUNGEONS.find((d) => d.def.id === what)?.def.name ?? what}.`;
+      return "";
+    };
+    left.innerHTML = `<h2>The Town</h2><p class="lede">Build rooms with back walls, a door, a seat, a table, and a light, and settlers will move in.</p><p>Purse: <strong>${coins} silver marks</strong></p><h3>Settlers \xB7 ${here.size} / ${SETTLERS.length}</h3><div class="book-list">${SETTLERS.map(
+      (st) => {
+        const status = here.has(st.id) ? "HOME" : town2.unlocked(st.id) ? "WAITING" : "\u2014";
+        return `<div class="book-row"><div class="with-icon"><div><strong>${st.name} ${st.title}</strong><small>${here.has(st.id) ? st.stock.length + " wares for sale" : town2.unlocked(st.id) ? "Needs a free home." : hint(st)}</small></div></div><div><span class="qty">${status}</span>${here.has(st.id) ? `<button data-shop="${st.id}">WARES</button>` : ""}</div></div>`;
+      }
+    ).join(
+      ""
+    )}</div><div class="note-block">Hold a chair or table and use it to check a room. A hammer takes down walls and furniture.</div>`;
+    const who = state.shop ? settlerById(state.shop) : null, near = (id) => town2.settlers().some(
+      (a) => a.settler === id && Math.hypot(a.x - game.s.player.x, a.y - game.s.player.y) < 160
+    ), anyNear = town2.settlers().some((a) => Math.hypot(a.x - game.s.player.x, a.y - game.s.player.y) < 160);
+    const sellable = game.s.inventory.filter((e) => e.id !== "coin" && !ITEMS[e.id]?.[1]?.startsWith("key")).sort((a, b) => town2.sellPrice(b.id) - town2.sellPrice(a.id));
+    right.innerHTML = `<h2>${who ? who.name + " " + who.title : "Trade"}</h2><p class="lede">${who ? near(who.id) ? "What will it be?" : "Stand beside " + who.name + " to trade." : "Talk to a settler to see their wares."}</p>${who ? `<h3>For sale</h3><div class="book-list">${who.stock.map(
+      ([id, price]) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${price} marks</small></div></div><div><button data-buy="${id}" ${near(who.id) && coins >= price ? "" : "disabled"}>BUY</button></div></div>`
+    ).join("")}</div>` : ""}<h3>Sell</h3><div class="book-list">${sellable.map(
+      (e) => `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${town2.sellPrice(e.id)} marks each</small></div></div><div><span class="qty">\xD7${e.qty}</span><button data-sell="${e.id}" ${anyNear ? "" : "disabled"}>SELL</button></div></div>`
+    ).join("") || "<p>Nothing to sell.</p>"}</div>`;
+    left.querySelectorAll("[data-shop]").forEach(
+      (b) => b.onclick = () => {
+        state.shop = b.dataset.shop ?? null;
+        renderJournal();
+      }
+    );
+    const act = (r) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    right.querySelectorAll("[data-buy]").forEach((b) => b.onclick = () => act(town2.buy(state.shop ?? "", b.dataset.buy ?? "")));
+    right.querySelectorAll("[data-sell]").forEach((b) => b.onclick = () => act(town2.sell(b.dataset.sell ?? "")));
+  }
   function renderHotbar() {
     const s = game.s, sig = s.hotbar.map((id) => id ? id + ":" + game.count(id) : "-").join(",") + "|" + s.hotbarIndex;
     if (sig === state.hotbarSig) return;
@@ -15882,8 +17091,11 @@
     if (game.s.placing) prompt = `<b>CLICK</b> Place ${pretty(game.s.placing)} \xB7 Esc cancels`;
     else if (near && near.type === "structure" && ["dungeon_chest", "boss_altar", "rift_gate", "portal"].includes(near.object.type))
       prompt = `<b>E</b> ${near.object.type === "dungeon_chest" ? "Open the chest" : near.object.type === "boss_altar" ? game.bosses.active() ? "The altar burns" : "Call " + MOBS[near.object.kind ?? ""]?.name : near.object.type === "portal" ? "Return home through the portal" : "Open the Rift"}`;
-    else if (near) {
-      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "icebox" ? "Add ice" : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
+    else if (near && near.type === "settler") {
+      const who = settlerById(near.object.settler ?? "");
+      prompt = `<b>E</b> Talk to ${who ? who.name + " " + who.title : "the settler"}`;
+    } else if (near) {
+      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "bed" ? "Sleep" : near.object.type === "door" ? near.object.crop === "open" ? "Close the door" : "Open the door" : near.object.type === "chair" || near.object.type === "table" ? "Check the room" : near.object.type === "icebox" ? "Add ice" : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
       prompt = `<b>E</b> ${action}`;
     } else
       prompt = held ? `<b>CLICK</b> ${game.hands.describe(cursorWorld())}` : "<b>E</b> Explore and gather";
@@ -16014,7 +17226,8 @@
         layer: game.layer().id,
         weather: game.s.weather,
         biome: game.biome().id,
-        night: game.isNight()
+        night: game.isNight(),
+        town: game.town.townNear()
       })
     );
     Audio.setMuffled(state.playing && state.journal);

@@ -1,6 +1,7 @@
 import { dist } from '../../core/math.ts';
 import type { GameResult, Point, ResourceNode } from '../../core/types.ts';
 import { BLOCKS, RANGED } from '../../data/gear.ts';
+import { WALLS, WALL_ITEM } from '../../data/town.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { NODES, WEAPONS, nodeForm } from '../../data/resources.ts';
 import {
@@ -78,6 +79,8 @@ export class Hands extends System {
       return { ok: false, reason: '' };
     if (Math.abs(target.x - p.x) > 4) p.face = target.x >= p.x ? 0 : Math.PI;
     if (kind === 'block') return this.placeBlock(held!, target);
+    if (kind === 'wall') return this.placeWall(held!, target);
+    if (kind === 'hammer') return this.hammer(target);
     if (kind === 'structure') {
       if (held === 'torch') return this.placeTorch(target);
       s.placing = held;
@@ -224,6 +227,71 @@ export class Hands extends System {
     this.game.progress.record('build');
     return { ok: true };
   }
+  /** Back walls go on open tiles next to other walls or ground. */
+  placeWall(id: string, target: Point) {
+    const s = this.game.s,
+      tx = Math.floor(target.x / TILE),
+      ty = Math.floor(target.y / TILE);
+    if (this.game.wallAt(tx, ty)) return { ok: false, reason: '' };
+    if (!this.reachable({ x: tx * TILE + 16, y: ty * TILE + 16 }, RULES.placeReach + 30))
+      return { ok: false, reason: 'Too far to place.' };
+    const [lo, hi] = regionBounds(s.player.x);
+    if (tx * TILE < lo + 64 || tx * TILE > hi - 64) return { ok: false, reason: '' };
+    const touching = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ].some(([dx, dy]) => this.game.tileAt(tx + dx, ty + dy) || this.game.wallAt(tx + dx, ty + dy));
+    if (!touching) return { ok: false, reason: 'Walls must touch ground or other walls.' };
+    this.game.remove(id);
+    this.game.setWall(tx, ty, WALLS[id]);
+    s.player.usedAt = s.elapsed;
+    this.game.sound('place_block', tx * TILE + 16, ty * TILE + 16, 0.5);
+    this.game.progress.record('build');
+    return { ok: true };
+  }
+  /** A hammer knocks down back walls, and picks up things you have built. */
+  hammer(target: Point) {
+    const s = this.game.s,
+      tx = Math.floor(target.x / TILE),
+      ty = Math.floor(target.y / TILE);
+    if (!this.reachable({ x: tx * TILE + 16, y: ty * TILE + 16 }, RULES.placeReach))
+      return { ok: false, reason: 'Too far to reach.' };
+    s.player.usedAt = s.elapsed;
+    const built = s.structures
+      .filter(
+        (st) =>
+          !st.fixed &&
+          Math.abs(st.x - target.x) < 22 &&
+          target.y < st.y + 6 &&
+          target.y > st.y - 60,
+      )
+      .sort((a, b) => Math.abs(a.x - target.x) - Math.abs(b.x - target.x))[0];
+    if (built) {
+      if (Object.keys(built.store).length) return { ok: false, reason: 'Empty it first.' };
+      if (built.type === 'door') this.game.town.removeDoor(built);
+      else s.structures = s.structures.filter((x) => x !== built);
+      this.game.drops.spawn(
+        built.type === 'torch' ? 'torch' : built.type,
+        1,
+        built.x,
+        built.y - 16,
+      );
+      this.game.sound('crumble', built.x, built.y - 10, 0.6);
+      return { ok: true };
+    }
+    const wall = this.game.wallAt(tx, ty);
+    if (!wall || this.game.tileAt(tx, ty)) return { ok: false, reason: '' };
+    if (dungeonAt(tx * TILE + 16, ty * TILE + 16) && this.game.toolTier('hammer') < 3)
+      return { ok: false, reason: 'Dungeon walls need an iron hammer.' };
+    this.game.setWall(tx, ty, 0);
+    const item = WALL_ITEM[wall];
+    if (item) this.game.drops.spawn(item, 1, tx * TILE + 16, ty * TILE + 16);
+    this.game.event('dig', tx * TILE + 16, ty * TILE + 16, String(wall));
+    this.game.sound('hammer', tx * TILE + 16, ty * TILE + 16, 0.6);
+    return { ok: true };
+  }
   /** Torches stick to any wall or floor, no clearing needed. */
   placeTorch(target: Point) {
     const s = this.game.s,
@@ -269,7 +337,8 @@ export class Hands extends System {
       return 'Dig';
     }
     if (kind === 'axe') return this.nodeAt(target) ? 'Chop' : 'Swing';
-    if (kind === 'block') return 'Place ' + itemName(held).toLowerCase();
+    if (kind === 'block' || kind === 'wall') return 'Place ' + itemName(held).toLowerCase();
+    if (kind === 'hammer') return 'Knock down walls, pick up furniture';
     if (kind === 'structure') return 'Place ' + itemName(held).toLowerCase();
     if (kind === 'melee') return 'Strike';
     if (kind === 'bow') return 'Shoot';

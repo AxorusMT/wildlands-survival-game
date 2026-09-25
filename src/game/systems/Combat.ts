@@ -60,7 +60,7 @@ export class Combat extends System {
   }
   /** Harms a creature through its defense, knocks it back, and kills it at zero. */
   hurtMob(a: Animal, amount: number, from: Point, magic = false) {
-    if (a.deadUntil) return 0;
+    if (a.deadUntil || a.settler) return 0;
     if (
       a.type === 'boss' &&
       (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier
@@ -98,7 +98,7 @@ export class Combat extends System {
     const reach = weapon[2] * 1.15,
       centre = { x: p.x, y: p.y - 26 };
     const targets = s.animals.filter((a) => {
-      if (a.deadUntil) return false;
+      if (a.deadUntil || a.settler) return false;
       const cy = a.y - bodyHeight(a),
         dx = a.x - centre.x;
       return (
@@ -261,7 +261,7 @@ export class Combat extends System {
       let spent = false;
       if (b.from === 'player') {
         for (const a of s.animals) {
-          if (a.deadUntil || b.hit.has(a.id)) continue;
+          if (a.deadUntil || a.settler || b.hit.has(a.id)) continue;
           if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
             continue;
           b.hit.add(a.id);

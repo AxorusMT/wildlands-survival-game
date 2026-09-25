@@ -38,6 +38,8 @@ const state = {
   selectedRecipe: 'stone_axe',
   farm: null as Structure | null,
   chest: null as Structure | null,
+  /** The settler whose wares the Town page shows. */
+  shop: null as string | null,
   camera: { x: 0, y: 0 },
   lastFrame: performance.now(),
   lastUI: 0,
@@ -262,7 +264,7 @@ document.querySelectorAll<HTMLButtonElement>('.book-tabs button').forEach(
       renderJournal();
     }),
 );
-const TABS = ['pack', 'gear', 'recipes', 'vitals', 'notes', 'beasts', 'rift'];
+const TABS = ['pack', 'gear', 'recipes', 'vitals', 'notes', 'beasts', 'rift', 'town'];
 function toggleJournal(force?: boolean) {
   if (!state.playing || game.s.dead) return;
   state.journal = force === undefined ? !state.journal : force;
@@ -303,6 +305,12 @@ function doInteract() {
     }
     if (result.action === 'rift') {
       state.tab = 'rift';
+      toggleJournal(true);
+    }
+    if (result.action === 'shop') {
+      state.shop = result.settler ?? null;
+      state.tab = 'town';
+      sound('page');
       toggleJournal(true);
     }
   }
@@ -357,7 +365,7 @@ addEventListener('keydown', (e) => {
     return;
   }
   if (state.journal) {
-    if (/^[1-7]$/.test(key)) {
+    if (/^[1-8]$/.test(key)) {
       state.tab = TABS[Number(key) - 1];
       renderJournal();
     }
@@ -445,6 +453,7 @@ function renderJournal() {
     notes: '05',
     beasts: '06',
     rift: '07',
+    town: '08',
   };
   $('page-number').textContent = page[tab];
   $('right-page-heading').textContent = tab === 'notes' ? 'FIELD NOTES' : tab.toUpperCase();
@@ -458,6 +467,7 @@ function renderJournal() {
   if (tab === 'beasts') renderBeasts(left, right);
   if (tab === 'gear') renderGear(left, right);
   if (tab === 'rift') renderRift(left, right);
+  if (tab === 'town') renderTown(left, right);
   pixelate(left);
   pixelate(right);
 }
@@ -684,6 +694,7 @@ function renderNotes(left: HTMLElement, right: HTMLElement) {
 /** Every creature, bosses last, with how many the player has slain. */
 const bestiary = () =>
   Object.keys(D.MOBS)
+    .filter((id) => !D.SETTLER_IDS.includes(id))
     .map((id) => ({ id, kills: game.s.tutorial.tally['kill:' + id] ?? 0 }))
     .sort((a, b) => Number(!!D.MOBS[a.id].boss) - Number(!!D.MOBS[b.id].boss));
 let atlasLand: HTMLCanvasElement | null = null;
@@ -802,7 +813,7 @@ function renderBeasts(left: HTMLElement, right: HTMLElement) {
     .map(([id, n]) => `${n} ${pretty(id)}`)
     .join(
       ' · ',
-    )} · ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? 'disabled' : ''}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? 'disabled' : ''}>UPGRADE · ${a.level === 1 ? 100 : 250} XP</button>` : ''}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ''}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p><h3>Bestiary · ${bestiary().filter((b) => b.kills).length} / ${Object.keys(D.MOBS).length}</h3><div class="book-list">${bestiary()
+    )} · ${cfg.xp} XP.</p><div class="book-actions"><button data-attune ${!owned || !near || a.activeBoss ? 'disabled' : ''}>ATTUNE TO WOLVES</button>${a.level < 3 ? `<button data-upgrade ${!owned || !near || a.activeBoss || a.xp < (a.level === 1 ? 100 : 250) ? 'disabled' : ''}>UPGRADE · ${a.level === 1 ? 100 : 250} XP</button>` : ''}</div>${a.activeBoss ? '<div class="disease-note">The Direwolf has been summoned. Return to the altar and finish the hunt.</div>' : ''}<h3>Later inscriptions</h3><p>Level 2: Ember Direwolf, nine kills. Level 3: Void Direwolf, twelve kills. Each level deepens the altar and expands its future sigil capacity.</p><h3>Bestiary · ${bestiary().filter((b) => b.kills).length} / ${bestiary().length}</h3><div class="book-list">${bestiary()
     .map(
       (b) =>
         `<div class="book-row"><div class="with-icon"><span class="icon-slot portrait"><img src="${b.kills ? mobPortrait(b.id) : ''}" alt="" ${b.kills ? '' : 'hidden'}></span><div><strong>${b.kills ? D.MOBS[b.id].name : '???'}</strong><small>${b.kills ? (D.MOBS[b.id].boss ? 'Slain ' + b.kills + '×' : b.kills + ' slain') + ' · ' + D.MOBS[b.id].hp + ' health' : 'Not yet met'}</small></div></div></div>`,
@@ -908,6 +919,80 @@ function renderRift(left: HTMLElement, right: HTMLElement) {
       }),
   );
 }
+function renderTown(left: HTMLElement, right: HTMLElement) {
+  const town = game.town,
+    here = new Set(town.settlers().map((a) => a.settler)),
+    coins = game.count('coin');
+  const hint = (st: (typeof D.SETTLERS)[number]) => {
+    const [key, n] = st.unlock;
+    if (key === 'sigils') return 'Comes once a sigil is set in the Rift Gate.';
+    if (key === 'coin') return `Comes once you have earned ${n} silver marks.`;
+    const [verb, what] = key.split(':');
+    const thing = pretty(what).toLowerCase();
+    if (verb === 'place')
+      return `Comes once you build ${/^[aeiou]/.test(thing) ? 'an' : 'a'} ${thing}.`;
+    if (verb === 'craft') return `Comes once you smelt ${pretty(what).toLowerCase()}.`;
+    if (verb === 'visit')
+      return `Comes once you have been to ${D.BIOMES.find((b) => b.id === what)?.name ?? D.DUNGEONS.find((d) => d.def.id === what)?.def.name ?? what}.`;
+    return '';
+  };
+  left.innerHTML = `<h2>The Town</h2><p class="lede">Build rooms with back walls, a door, a seat, a table, and a light, and settlers will move in.</p><p>Purse: <strong>${coins} silver marks</strong></p><h3>Settlers · ${here.size} / ${D.SETTLERS.length}</h3><div class="book-list">${D.SETTLERS.map(
+    (st) => {
+      const status = here.has(st.id) ? 'HOME' : town.unlocked(st.id) ? 'WAITING' : '—';
+      return `<div class="book-row"><div class="with-icon"><div><strong>${st.name} ${st.title}</strong><small>${here.has(st.id) ? st.stock.length + ' wares for sale' : town.unlocked(st.id) ? 'Needs a free home.' : hint(st)}</small></div></div><div><span class="qty">${status}</span>${here.has(st.id) ? `<button data-shop="${st.id}">WARES</button>` : ''}</div></div>`;
+    },
+  ).join(
+    '',
+  )}</div><div class="note-block">Hold a chair or table and use it to check a room. A hammer takes down walls and furniture.</div>`;
+  const who = state.shop ? D.settlerById(state.shop) : null,
+    near = (id: string) =>
+      town
+        .settlers()
+        .some(
+          (a) => a.settler === id && Math.hypot(a.x - game.s.player.x, a.y - game.s.player.y) < 160,
+        ),
+    anyNear = town
+      .settlers()
+      .some((a) => Math.hypot(a.x - game.s.player.x, a.y - game.s.player.y) < 160);
+  const sellable = game.s.inventory
+    .filter((e) => e.id !== 'coin' && !D.ITEMS[e.id]?.[1]?.startsWith('key'))
+    .sort((a, b) => town.sellPrice(b.id) - town.sellPrice(a.id));
+  right.innerHTML = `<h2>${who ? who.name + ' ' + who.title : 'Trade'}</h2><p class="lede">${who ? (near(who.id) ? 'What will it be?' : 'Stand beside ' + who.name + ' to trade.') : 'Talk to a settler to see their wares.'}</p>${
+    who
+      ? `<h3>For sale</h3><div class="book-list">${who.stock
+          .map(
+            ([id, price]) =>
+              `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${price} marks</small></div></div><div><button data-buy="${id}" ${near(who.id) && coins >= price ? '' : 'disabled'}>BUY</button></div></div>`,
+          )
+          .join('')}</div>`
+      : ''
+  }<h3>Sell</h3><div class="book-list">${
+    sellable
+      .map(
+        (e) =>
+          `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${town.sellPrice(e.id)} marks each</small></div></div><div><span class="qty">×${e.qty}</span><button data-sell="${e.id}" ${anyNear ? '' : 'disabled'}>SELL</button></div></div>`,
+      )
+      .join('') || '<p>Nothing to sell.</p>'
+  }</div>`;
+  left.querySelectorAll<HTMLButtonElement>('[data-shop]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.shop = b.dataset.shop ?? null;
+        renderJournal();
+      }),
+  );
+  const act = (r: { ok: boolean; reason?: string }) => {
+    if (!r.ok) message(r.reason);
+    renderJournal();
+    updateUI(true);
+  };
+  right
+    .querySelectorAll<HTMLButtonElement>('[data-buy]')
+    .forEach((b) => (b.onclick = () => act(town.buy(state.shop ?? '', b.dataset.buy ?? ''))));
+  right
+    .querySelectorAll<HTMLButtonElement>('[data-sell]')
+    .forEach((b) => (b.onclick = () => act(town.sell(b.dataset.sell ?? ''))));
+}
 /** Redraws the quick slots when their contents change. */
 function renderHotbar() {
   const s = game.s,
@@ -986,7 +1071,10 @@ function updateUI(force = false) {
             ? 'Return home through the portal'
             : 'Open the Rift'
     }`;
-  else if (near) {
+  else if (near && near.type === 'settler') {
+    const who = D.settlerById(near.object.settler ?? '');
+    prompt = `<b>E</b> Talk to ${who ? who.name + ' ' + who.title : 'the settler'}`;
+  } else if (near) {
     const action =
       near.type === 'node'
         ? near.object.kind === 'water'
@@ -1004,11 +1092,19 @@ function updateUI(force = false) {
               ? 'Tend farm plot'
               : near.object.type === 'bedroll'
                 ? 'Rest'
-                : near.object.type === 'icebox'
-                  ? 'Add ice'
-                  : near.object.type === 'campfire'
-                    ? 'Add wood'
-                    : 'Use ' + pretty(near.object.type);
+                : near.object.type === 'bed'
+                  ? 'Sleep'
+                  : near.object.type === 'door'
+                    ? near.object.crop === 'open'
+                      ? 'Close the door'
+                      : 'Open the door'
+                    : near.object.type === 'chair' || near.object.type === 'table'
+                      ? 'Check the room'
+                      : near.object.type === 'icebox'
+                        ? 'Add ice'
+                        : near.object.type === 'campfire'
+                          ? 'Add wood'
+                          : 'Use ' + pretty(near.object.type);
     prompt = `<b>E</b> ${action}`;
   } else
     prompt = held
@@ -1169,6 +1265,7 @@ function frame(now: number) {
       weather: game.s.weather,
       biome: game.biome().id,
       night: game.isNight(),
+      town: game.town.townNear(),
     }),
   );
   Audio.setMuffled(state.playing && state.journal);

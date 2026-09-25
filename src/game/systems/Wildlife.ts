@@ -85,6 +85,14 @@ export class Wildlife extends System {
       return;
     }
     const at = animal.x === undefined ? this.game.s.player : animal;
+    if (spec && !animal.minion && animal.type !== 'deer') {
+      // Silver marks, more from tougher foes, many from the great ones.
+      const coins = Math.max(
+        1,
+        Math.round((spec.hp / 20) * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1)),
+      );
+      this.game.drops.spawn('coin', coins, at.x, at.y - 20);
+    }
     if (spec) {
       for (const [id, min, max, chance] of spec.loot)
         if (this.game.rng() < chance)
@@ -296,7 +304,8 @@ export class Wildlife extends System {
             a.angle = this.game.rng() > 0.5 ? 0 : Math.PI;
             a.wanderAt = t + 2 + this.game.rng() * 3;
             // Wanderers stay near home.
-            if (Math.abs(a.x - a.homeX) > 260) a.angle = a.x > a.homeX ? Math.PI : 0;
+            if (Math.abs(a.x - a.homeX) > (a.settler ? 70 : 260))
+              a.angle = a.x > a.homeX ? Math.PI : 0;
           }
           a.vx = Math.cos(a.angle) * walk;
         }

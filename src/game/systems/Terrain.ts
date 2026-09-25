@@ -9,7 +9,9 @@ import {
   TILE_YIELD,
   WORLD_H,
   dimensionAt,
+  naturalWallKind,
 } from '../../data/world.ts';
+import { DOOR_TILE } from '../../data/town.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -19,6 +21,21 @@ export class Terrain extends System {
     return tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS
       ? 0
       : this.game.s.tiles[ty * TILE_COLS + tx] || 0;
+  }
+  /** The back wall at a tile (a ground kind), placed by the player or the world's own; 0 is none. */
+  wallAt(tx: number, ty: number) {
+    if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return 0;
+    const edit = this.game.s.wallEdits[ty * TILE_COLS + tx];
+    if (edit !== undefined) return edit < 0 ? 0 : edit;
+    return naturalWallKind(tx, ty);
+  }
+  /** The raw wall edit at a tile, for noticing changes: -2 where the world's own stands. */
+  wallEditAt(tx: number, ty: number) {
+    return this.game.s.wallEdits[ty * TILE_COLS + tx] ?? -2;
+  }
+  setWall(tx: number, ty: number, kind: number) {
+    if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return;
+    this.game.s.wallEdits[ty * TILE_COLS + tx] = kind > 0 ? kind : -1;
   }
   /** Changes one tile and remembers the change for the field record. */
   setTile(tx: number, ty: number, kind: number) {
@@ -50,6 +67,14 @@ export class Terrain extends System {
       ty = Math.floor(y / TILE),
       kind = this.tileAt(tx, ty);
     if (!kind) return { ok: false, reason: 'There is no solid ground there.' };
+    if (kind === DOOR_TILE) {
+      const door = this.game.town.doorAt(tx, ty);
+      if (door) {
+        this.game.town.removeDoor(door);
+        this.game.drops.spawn('door', 1, door.x, door.y - 20);
+      } else this.setTile(tx, ty, 0);
+      return { ok: true, item: 'door' };
+    }
     if (Math.hypot(x - this.game.s.player.x, y - (this.game.s.player.y - 24)) > RULES.mineReach)
       return { ok: false, reason: 'Move closer to mine this tile.' };
     const need = MINE_TIER[kind] ?? 1;

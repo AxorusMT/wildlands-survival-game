@@ -1,5 +1,6 @@
 // Pixel terrain: autotiled 16×16 ground, back walls behind caves, surface caps, and lava.
 import { ART, D, GROUND, groundOf, type GroundStyle, type Pattern } from './art.ts';
+import { DOOR_TILE } from '../data/town.ts';
 import { TA, bayer, hash, makeCanvas, ramp, rgb, shade, vnoise, type Rgb } from './px.ts';
 import type { RenderGame } from './types.ts';
 
@@ -246,37 +247,15 @@ class Canvas {
   }
 }
 
-/** Kind of rock that would stand here, so the wall behind a cave matches the ground around it. */
-function wallKind(tx: number, ty: number) {
-  const x = tx * T + T / 2,
-    y = ty * T + T / 2;
-  const dungeon = D.dungeonAt(x, y);
-  if (dungeon) return dungeon.def.brick;
-  if (D.regionAt(x) === 'mycelia') return 20;
-  const depth = y - D.surfaceAt(x),
-    biome = D.biomeAt(x, y).id;
-  if (depth < 76)
-    return biome === 'desert'
-      ? 3
-      : biome === 'marsh' || biome === 'coast'
-        ? 4
-        : biome === 'tundra'
-          ? 5
-          : biome === 'badlands'
-            ? 6
-            : 1;
-  if (y >= D.LAYERS[4].top) return 10;
-  if (y >= D.LAYERS[3].top) return 9;
-  if (y >= D.LAYERS[2].top) return 8;
-  return 2;
-}
-const isBack = (g: RenderGame, tx: number, ty: number) =>
-  !g.tileAt(tx, ty) &&
-  ((ty + 0.5) * T > D.surfaceAt((tx + 0.5) * T) || !!D.dungeonAt((tx + 0.5) * T, (ty + 0.5) * T));
+/** Open tiles with a wall behind them (placed, or the world's own); closed doors show one too. */
+const isBack = (g: RenderGame, tx: number, ty: number) => {
+  const tile = g.tileAt(tx, ty);
+  return (!tile || tile === DOOR_TILE) && g.wallAt(tx, ty) > 0;
+};
 
 function paintWall(c: Canvas, g: RenderGame, tx: number, ty: number, ox: number, oy: number) {
   // A wall is the rock around it, set back: its own texture, darkened and cooled.
-  const kind = wallKind(tx, ty),
+  const kind = g.wallAt(tx, ty),
     tex = baseTexture(kind, tx + 3, ty + 5),
     [wr, wg, wb] = rgb(groundOf(kind).wall ?? '#2c3036');
   for (let y = 0; y < TA; y++) {
@@ -450,7 +429,7 @@ function chunkSig(g: RenderGame, cx: number, cy: number) {
   let s = 17;
   for (let ty = cy * CH - 1; ty <= cy * CH + CH; ty++)
     for (let tx = cx * CH - 1; tx <= cx * CH + CH; tx++)
-      s = (Math.imul(s, 31) + g.tileAt(tx, ty) + 1) | 0;
+      s = (Math.imul(s, 31) + g.tileAt(tx, ty) * 64 + g.wallEditAt(tx, ty) + 3) | 0;
   return s;
 }
 
@@ -464,7 +443,13 @@ function renderChunk(g: RenderGame, cx: number, cy: number): Chunk {
       const tx = cx * CH + i,
         ty = cy * CH + j,
         kind = g.tileAt(tx, ty);
-      if (kind) {
+      if (kind === DOOR_TILE) {
+        // A closed door is drawn by its structure; the wall shows behind it.
+        if (isBack(g, tx, ty)) {
+          paintWall(back, g, tx, ty, i * TA, j * TA);
+          anyBack = true;
+        }
+      } else if (kind) {
         paintSolid(front, g, tx, ty, kind, i * TA, j * TA);
         anyFront = true;
       } else {

@@ -78,8 +78,15 @@ export class Survival extends System {
   recover() {
     if (!this.game.s.dead) return;
     this.game.s.dead = false;
-    this.game.s.player.x = RULES.spawnX;
-    this.game.s.player.y = this.game.groundTopAt(RULES.spawnX) + 1;
+    // Wake in your bed if it still stands; otherwise back in the meadow.
+    const bed = this.game.s.spawn,
+      stands =
+        bed &&
+        this.game.s.structures.some(
+          (st) => st.type === 'bed' && Math.abs(st.x - bed.x) < 8 && Math.abs(st.y - bed.y) < 8,
+        );
+    this.game.s.player.x = stands ? bed.x + 20 : RULES.spawnX;
+    this.game.s.player.y = stands ? bed.y : this.game.groundTopAt(RULES.spawnX) + 1;
     this.game.s.player.vx = 0;
     this.game.s.player.vy = 0;
     this.game.s.player.grounded = true;

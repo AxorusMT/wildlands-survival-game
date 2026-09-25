@@ -4,6 +4,7 @@
 import type { Animal, Player } from '../core/types.ts';
 import { D } from './art.ts';
 import { BLOCKS } from '../data/gear.ts';
+import { SETTLERS } from '../data/town.ts';
 import { iconSprite, miniIcon, useStyle } from './icons.ts';
 import {
   PX,
@@ -348,6 +349,9 @@ export interface MobArt {
   top?: number;
   /** Emits light as it moves (for lighting.ts). */
   light?: [number, number, number];
+  /** People: skin for the face and hands, and a brimmed hat. */
+  skin?: string;
+  hat?: string;
 }
 export const MOBS: Record<string, MobArt> = {
   deer: {
@@ -750,6 +754,30 @@ Object.assign(MOBS, {
     light: [0.7, 0.25, 0.6],
   },
 } satisfies Record<string, MobArt>);
+// The settlers: townsfolk in their own colours.
+const SKINS = [
+  '#d8a47c',
+  '#b8805a',
+  '#e8c0a0',
+  '#8a5a3a',
+  '#c89070',
+  '#e0b090',
+  '#a07050',
+  '#d0b0c0',
+];
+SETTLERS.forEach((st, i) => {
+  MOBS[st.id] = {
+    tpl: 'biped',
+    body: st.colors[0],
+    belly: st.colors[1],
+    eye: '#1b1716',
+    w: 12,
+    h: 27,
+    skin: SKINS[i % SKINS.length],
+    hat: st.colors[2],
+    top: 32,
+  };
+});
 /** Registers art for new creature types (dungeons and dimensions add theirs at load). */
 export function addMobArt(types: Record<string, MobArt>) {
   Object.assign(MOBS, types);
@@ -975,9 +1003,9 @@ function paintBiped(p: Painter, a: MobArt, frame: number, ox: number, oy: number
     }
     for (let x = hx + 2; x < hx + hw - 2; x += 2) p.set(x, hy + headH - 2, '#141010');
   } else {
-    p.rect(hx, hy, hw, headH, parts.has('hood') ? sec : m);
-    p.rect(hx, hy, hw, 1, l);
-    p.rect(hx, hy, 1, headH, l);
+    p.rect(hx, hy, hw, headH, parts.has('hood') ? sec : (a.skin ?? m));
+    p.rect(hx, hy, hw, 1, a.skin ? shade(a.skin, 0.15) : l);
+    p.rect(hx, hy, 1, headH, a.skin ? shade(a.skin, 0.15) : l);
     if (parts.has('hood')) p.rect(hx + 2, hy + 2, hw - 2, headH - 3, '#120e14');
     p.set(hx + hw - 2, eyeY, eye);
     if (hw > 5) p.set(hx + hw - 4, eyeY, eye);
@@ -985,6 +1013,11 @@ function paintBiped(p: Painter, a: MobArt, frame: number, ox: number, oy: number
       p.set(hx + hw - 3, eyeY, eye);
       p.set(hx + hw - 5, eyeY, eye);
     }
+  }
+  if (a.hat) {
+    p.rect(hx - 2, hy, hw + 4, 1, a.hat);
+    p.rect(hx, hy - 3, hw, 3, shade(a.hat, 0.1));
+    p.rect(hx, hy - 1, hw, 1, a.belly ?? shade(a.hat, -0.3));
   }
   if (parts.has('horns')) {
     const hl = Math.max(3, Math.round(headH * 0.6));

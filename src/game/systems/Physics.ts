@@ -1,5 +1,6 @@
 import { clamp } from '../../core/math.ts';
 import { TILE, WORLD_H, inShaft, regionBounds } from '../../data/world.ts';
+import { DOOR_TILE } from '../../data/town.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -121,6 +122,12 @@ export class Physics extends System {
     }
     const [lo, hi] = regionBounds(p.x);
     const nx = clamp(p.x + p.vx * dt, lo + 40, hi - 40);
+    if (this.collides(nx, p.y)) {
+      // Walking into a closed door opens it.
+      const tx = Math.floor((nx + Math.sign(p.vx) * RULES.playerHalfWidth) / TILE);
+      for (const ty of [Math.floor((p.y - 8) / TILE), Math.floor((p.y - 40) / TILE)])
+        if (this.game.tileAt(tx, ty) === DOOR_TILE && this.game.town.push(tx, ty)) break;
+    }
     if (!this.collides(nx, p.y)) p.x = nx;
     else if (p.grounded && !this.collides(nx, p.y - TILE) && this.collides(nx, p.y + 2)) {
       p.x = nx;

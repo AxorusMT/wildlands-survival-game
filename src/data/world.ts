@@ -519,3 +519,33 @@ export function baseTileAt(tx: number, ty: number): number {
   if (biome === 'badlands' && depth > 350) return Ground.redrock;
   return Ground.stone;
 }
+
+// ─── Back walls ───────────────────────────────────────────────────────────────
+/**
+ * The wall the world itself puts behind open ground at a tile: the rock around a cave, a
+ * dungeon's brick, or none out under the sky. Returns a ground kind, or 0 for no wall.
+ */
+export function naturalWallKind(tx: number, ty: number): number {
+  const x = tx * TILE + TILE / 2,
+    y = ty * TILE + TILE / 2;
+  const dungeon = dungeonAt(x, y);
+  if (dungeon) return dungeon.def.brick;
+  if (y <= surfaceAt(x)) return 0;
+  if (regionAt(x) === 'mycelia') return 20;
+  const depth = y - surfaceAt(x),
+    biome = biomeAt(x, y).id;
+  if (depth < 76)
+    return biome === 'desert'
+      ? Ground.sand
+      : biome === 'marsh' || biome === 'coast'
+        ? Ground.mud
+        : biome === 'tundra'
+          ? Ground.frost
+          : biome === 'badlands'
+            ? Ground.redrock
+            : Ground.soil;
+  if (y >= LAYERS[4].top) return Ground.hellrock;
+  if (y >= LAYERS[3].top) return Ground.ash;
+  if (y >= LAYERS[2].top) return Ground.deepstone;
+  return Ground.stone;
+}
