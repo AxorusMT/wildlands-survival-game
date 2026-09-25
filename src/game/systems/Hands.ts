@@ -162,6 +162,9 @@ export class Hands extends System {
       };
     if (s.vitals.stamina < 2) return { ok: false, reason: 'Too exhausted to mine.' };
     p.usedAt = s.elapsed;
+    // Every blow dulls the pick a little.
+    const pick = this.game.bestTool('pick');
+    if (pick) this.game.durability.use(pick);
     const index = ty * TILE_COLS + tx,
       hits = Math.max(1, 1 + need - Math.floor(tier / 2)),
       done = (this.cracks.get(index) ?? 0) + 1;

@@ -11,6 +11,7 @@ import {
 } from '../../data/gear.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { RELIC_EFFECTS } from '../../data/codex.ts';
+import { CLOTHING, WATERSKINS } from '../../data/clothing.ts';
 import { WALLS } from '../../data/town.ts';
 import { TOOL_TIERS, WEAPONS } from '../../data/resources.ts';
 
@@ -91,6 +92,19 @@ export class Equipment extends System {
       this.game.sound('wear');
       return { ok: true };
     }
+    const garment = CLOTHING[id];
+    if (garment) {
+      p.clothing ??= {};
+      if (p.clothing[garment.layer] === id) {
+        delete p.clothing[garment.layer];
+        this.game.say(itemName(id) + ' taken off.');
+      } else {
+        p.clothing[garment.layer] = id;
+        this.game.say(`${itemName(id)} worn · ${garment.text.toLowerCase()}.`, 'good');
+      }
+      this.game.sound('wear');
+      return { ok: true };
+    }
     if (ACCESSORIES[id]) {
       const i = s.accessories.indexOf(id);
       if (i >= 0) {
@@ -114,6 +128,31 @@ export class Equipment extends System {
     const armor = Object.values(p.armor ?? {}).filter(has) as string[];
     return { armor, accessories: this.game.s.accessories.filter(has) };
   }
+  /** Clothing worn and still in the pack. */
+  clothes(): string[] {
+    const c = this.game.s.player.clothing ?? {};
+    return [c.under, c.mid, c.outer].filter((id): id is string => !!id && this.game.count(id) > 0);
+  }
+  /** What worn clothing keeps out (worn-through clothing keeps nothing). */
+  clothingShield() {
+    let insul = 0,
+      heat = 0,
+      water = 0;
+    for (const id of this.clothes()) {
+      if (this.game.durability.broken(id)) continue;
+      const g = CLOTHING[id];
+      insul += g.insul;
+      heat += g.heat;
+      water += g.water;
+    }
+    return { insul, heat, water: Math.min(0.9, water) };
+  }
+  /** The best waterskin carried, if any. */
+  waterskin() {
+    return Object.keys(WATERSKINS)
+      .filter((id) => this.game.count(id) > 0)
+      .sort((a, b) => WATERSKINS[b].drink - WATERSKINS[a].drink)[0];
+  }
   /** The set whose three pieces are all worn, if any. */
   fullSet(): string | null {
     const { armor } = this.worn();
@@ -126,7 +165,12 @@ export class Equipment extends System {
     const out = new Set<string>(),
       set = this.fullSet();
     if (set) out.add(ARMOR_SETS.find((x) => x.key === set)!.bonus);
-    for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
+    for (const id of this.worn().accessories) {
+      // A miner's lamp gives no light once its resin is spent.
+      if (id === 'miners_lamp' && (this.game.s.lampFuel ?? 1) <= 0 && !this.game.count('resin'))
+        continue;
+      for (const e of ACCESSORIES[id].effects) out.add(e);
+    }
     for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add('buff:' + id);
     // Relics set on a shelf at camp lend their gifts wherever you are.
     for (const id of this.game.shelvedRelics()) for (const e of RELIC_EFFECTS[id] ?? []) out.add(e);

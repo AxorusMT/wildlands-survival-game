@@ -317,6 +317,19 @@ export const DISEASES: Record<string, Disease> = {
       'Gold-fevered and slow',
     ],
   },
+  rickets: {
+    name: 'Rickets',
+    cause: 'Too long without sunlight, in the deep places and the lightless realms',
+    treat: 'Fish oil, or sunlight',
+    item: 'fish_oil',
+    kind: 'illness',
+    incubate: 60,
+    worsen: 420,
+    recover: 90,
+    effect: { speed: 0.15, stamina: 0.2 },
+    cures: { fish_oil: 3, sunbloom: 1 },
+    symptoms: ['Aching bones', 'Your legs bow and ache', 'Every step is an effort'],
+  },
   // ── Injuries ──
   bleeding: {
     name: 'Bleeding',

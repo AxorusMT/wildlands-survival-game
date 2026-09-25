@@ -186,6 +186,7 @@ export class Combat extends System {
   // ─── The player's weapons ──────────────────────────────────────────────────
   /** A melee swing in the facing direction: hits every creature within the arc. */
   swing(weaponId = this.game.s.player.weapon) {
+    this.game.durability.use(weaponId);
     const s = this.game.s,
       p = s.player,
       w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : 'fists'),
@@ -233,6 +234,7 @@ export class Combat extends System {
       spec = RANGED[weaponId];
     if (!spec) return { ok: false, reason: 'That is not a ranged weapon.' };
     const w = this.game.armoury.stats(weaponId);
+    this.game.durability.use(weaponId);
     let damage = w.damage || 10,
       kind = spec.projectile,
       extra: Partial<Projectile> = { weapon: w };

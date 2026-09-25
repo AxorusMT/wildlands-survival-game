@@ -1,5 +1,7 @@
 import { clamp, dist } from '../../core/math.ts';
+import { DIET_MEMORY, FOOD_GROUPS } from '../../data/clothing.ts';
 import { DISEASES } from '../../data/diseases.ts';
+import { activeRealm } from '../../data/realms/index.ts';
 import { ITEMS } from '../../data/items.ts';
 import { NODES } from '../../data/resources.ts';
 import { isAggressive } from '../../data/mobs.ts';
@@ -108,6 +110,51 @@ export class Survival extends System {
         e.qty = Math.ceil(e.qty * 0.75);
     this.game.say('You woke in the meadow. Some loose supplies were lost.', 'good');
   }
+  /** Whether the player is somewhere dark: deep underground, a lightless realm, or out at night. */
+  dark() {
+    const p = this.game.s.player,
+      realm = this.game.pocket.here() ? activeRealm() : null;
+    if (realm && realm.tpl.daylight <= 0) return true;
+    if (p.y > surfaceAt(p.x) + 150) return true;
+    return this.game.isNight();
+  }
+  /** Out under the open sky by day: what rickets needs. */
+  sunlit() {
+    const p = this.game.s.player,
+      realm = this.game.pocket.here() ? activeRealm() : null;
+    if (realm && realm.tpl.daylight <= 0.3) return false;
+    return !this.game.isNight() && p.y <= surfaceAt(p.x) + 40;
+  }
+  /** How varied the recent meals have been: several kinds of food keep you strong. */
+  diet(): { groups: number; meals: number; state: 'balanced' | 'plain' | 'malnourished' } {
+    const recent = this.game.s.diet ?? [],
+      groups = new Set(recent).size;
+    const state =
+      recent.length >= 5 && groups <= 1
+        ? 'malnourished'
+        : recent.length >= DIET_MEMORY - 2 && groups >= 4
+          ? 'balanced'
+          : 'plain';
+    return { groups, meals: recent.length, state };
+  }
+  /** Notes what kind of food was eaten. */
+  ate(id: string) {
+    const group = FOOD_GROUPS[id];
+    if (!group) return;
+    const d = (this.game.s.diet ??= []);
+    const before = this.diet().state;
+    d.push(group);
+    while (d.length > DIET_MEMORY) d.shift();
+    const after = this.diet().state;
+    if (after !== before) {
+      if (after === 'malnourished')
+        this.game.say(
+          'The same food, meal after meal: you are malnourished. Eat something different.',
+          'danger',
+        );
+      else if (after === 'balanced') this.game.say('A varied diet: you feel strong.', 'good');
+    }
+  }
   private burnTimer = 0;
   /** Health lost per second to the heat of the hell layers. */
   heat() {
@@ -144,12 +191,14 @@ export class Survival extends System {
         (this.game.equipment.has('seasonward') ? this.game.pocket.seasonShift() : 0),
       skills = this.game.skills.stats(),
       wayfarer = this.game.equipment.has('wayfarer') ? 4 : 0,
+      clothes = this.game.equipment.clothingShield(),
       coldResist =
+        clothes.insul +
         skills.coldResist +
         (skills.coldBlooded ? 8 : 0) +
         wayfarer +
         (this.game.equipment.fullSet() === 'choirsilver' ? 6 : 0),
-      heatResist = skills.heatResist + wayfarer,
+      heatResist = skills.heatResist + wayfarer + clothes.heat,
       cold =
         air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
     const shelter = this.game.sheltered(),
@@ -160,7 +209,14 @@ export class Survival extends System {
     const marshWet = this.game.biome().id === 'marsh' && !shelter && !underground ? 0.065 : 0;
     v.wetness = clamp(
       v.wetness +
-        dt * (rain && !shelter && !underground ? 0.28 : fire ? -0.35 : shelter ? -0.17 : -0.07) +
+        dt *
+          (rain && !shelter && !underground
+            ? 0.28 * (1 - clothes.water)
+            : fire
+              ? -0.35
+              : shelter
+                ? -0.17
+                : -0.07) +
         dt * marshWet,
       0,
       100,
@@ -204,7 +260,12 @@ export class Survival extends System {
           ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0
             ? 1.4
             : 1) *
-          (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)),
+          (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)) *
+          (this.diet().state === 'malnourished'
+            ? 0.6
+            : this.diet().state === 'balanced'
+              ? 1.15
+              : 1),
       0,
       100,
     );

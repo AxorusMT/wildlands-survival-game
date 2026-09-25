@@ -1,6 +1,7 @@
 import { dist } from '../../core/math.ts';
 import type { GameResult, Structure } from '../../core/types.ts';
 import { PACK_COOLING, STORAGE, meltRate, rotRate } from '../../data/food.ts';
+import { WATERSKINS } from '../../data/clothing.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { surfaceAt } from '../../data/world.ts';
 
@@ -16,6 +17,7 @@ const ICE_IN_PACK = 700;
  */
 export class Larder extends System {
   private melt = 0;
+  private freeze = 0;
   private warned = new Set<number>();
 
   spec(st: Structure) {
@@ -148,8 +150,37 @@ export class Larder extends System {
         }
       }
     }
-    // Ice in the pack melts unless you are somewhere freezing or beside cold storage.
-    if (this.game.count('ice') && !near && air > 0) {
+    // Ice harvesters cut ice wherever it freezes: one block every two minutes, ten at most.
+    for (const st of s.structures)
+      if (st.type === 'ice_harvester' && env.temperatureAt(st.x, st.y - 20) <= 0) {
+        st.fuel += dt;
+        while (st.fuel >= 120) {
+          st.fuel -= 120;
+          st.store.ice = Math.min(10, (st.store.ice ?? 0) + 1);
+        }
+      }
+    // Water in the pack freezes in hard cold, unless it is in an insulated flask.
+    const skin = this.game.equipment.waterskin();
+    if (air < -4 && !near && !this.game.nearLitFire() && !(skin && WATERSKINS[skin].freezeProof)) {
+      const water = ['wild_water', 'boiled_water', 'filtered_water'].find((id) =>
+        this.game.count(id),
+      );
+      if (water) {
+        this.freeze += dt;
+        if (this.freeze >= 240) {
+          this.freeze = 0;
+          this.game.remove(water);
+          this.game.add('ice');
+          if (dt < 5)
+            this.game.say(
+              'A water in your pack has frozen solid. An insulated flask would stop it.',
+              'ink',
+            );
+        }
+      }
+    }
+    // Ice in the pack melts unless you are somewhere freezing, beside cold storage, or in a cold box.
+    if (this.game.count('ice') && !near && air > 0 && !this.game.count('cold_box')) {
       this.melt += dt * meltRate(air) * cool;
       while (this.melt >= ICE_IN_PACK && this.game.count('ice')) {
         this.melt -= ICE_IN_PACK;

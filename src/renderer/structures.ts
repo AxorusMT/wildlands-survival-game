@@ -531,6 +531,50 @@ Object.assign(STATIC, {
       p.rect(8, 12, 6, 7, '#2a2630');
       p.shadeEdges(0.2, -0.3);
     }),
+  // Keeping and cleaning: the distiller, the smoking rack, the canning kettle, the ice harvester.
+  distiller: () =>
+    sprite(28, 30, 14, 29, (p) => {
+      p.rect(2, 20, 14, 10, '#6a4a30');
+      p.ellipse(9, 16, 7, 7, '#c8804a');
+      p.ellipse(8, 14, 3, 3, '#e8a878');
+      p.line(14, 10, 24, 6, '#c8804a');
+      p.line(24, 6, 24, 22, '#c8804a');
+      p.rect(20, 22, 8, 8, '#8fb0c0');
+      p.rect(21, 23, 6, 3, '#bfe8ff');
+      p.rect(4, 26, 10, 2, '#ff8a3a');
+    }),
+  smoking_rack: () =>
+    sprite(30, 30, 15, 29, (p) => {
+      p.rect(2, 2, 2, 28, '#6a4a30');
+      p.rect(26, 2, 2, 28, '#6a4a30');
+      p.rect(2, 2, 26, 2, '#8a6440');
+      for (const x of [7, 13, 19]) {
+        p.rect(x, 4, 4, 9, '#9a4a3a');
+        p.rect(x, 4, 4, 2, '#c8784a');
+      }
+      p.rect(6, 24, 18, 4, '#5a5a5e');
+      for (let y = 14; y < 24; y += 3) p.set(13 + (y % 2), y, '#b8b0a0');
+    }),
+  canning_kettle: () =>
+    sprite(26, 24, 13, 23, (p) => {
+      p.ellipse(13, 14, 11, 9, '#5a5e64');
+      p.rect(2, 14, 22, 8, '#5a5e64');
+      p.rect(3, 6, 20, 2, '#8a8e94');
+      p.rect(9, 1, 8, 5, '#3a3e44');
+      p.rect(0, 22, 26, 2, '#3a2a1c');
+      for (const x of [6, 12, 18]) p.rect(x, 16, 3, 4, '#c8a060');
+    }),
+  ice_harvester: () =>
+    sprite(30, 28, 15, 27, (p) => {
+      p.rect(0, 22, 30, 6, '#6a6660');
+      p.rect(4, 2, 3, 20, '#8a6440');
+      p.rect(23, 2, 3, 20, '#8a6440');
+      p.rect(4, 2, 22, 3, '#a8a4a0');
+      p.rect(12, 5, 6, 10, '#c8ccd0');
+      p.rect(13, 15, 4, 2, '#e8ecf0');
+      p.rect(8, 16, 14, 6, '#bfe3ee');
+      p.rect(9, 17, 5, 2, '#ffffff');
+    }),
   // A diving bell on the seabed: air for the Undertow.
   diving_bell: () =>
     sprite(34, 40, 17, 39, (p) => {

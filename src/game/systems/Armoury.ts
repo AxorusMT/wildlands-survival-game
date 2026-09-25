@@ -149,7 +149,13 @@ export class Armoury extends System {
       (mastery >= 20 ? 0.1 : 0);
     const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
     const damage =
-      base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
+      base[1] *
+      QUALITIES[e.q].mult *
+      (1 + LEVEL_DAMAGE * e.lvl) *
+      (1 + (m.dmg ?? 0)) *
+      lift *
+      // A blunted weapon strikes for half until mended.
+      (this.game.durability.broken(id) ? 0.5 : 1);
     return {
       id,
       family,

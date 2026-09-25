@@ -27,8 +27,10 @@
     BUFFS: () => BUFFS,
     CAVE_LEVELS: () => CAVE_LEVELS,
     CHAPTERS: () => CHAPTERS,
+    CLOTHING: () => CLOTHING,
     CODEX: () => CODEX,
     CRYSTALS: () => CRYSTALS,
+    DIET_MEMORY: () => DIET_MEMORY,
     DIMENSIONS: () => DIMENSIONS,
     DIM_GAP: () => DIM_GAP,
     DIM_LAYERS: () => DIM_LAYERS,
@@ -47,6 +49,7 @@
     FEVER_BITES: () => FEVER_BITES,
     FEVER_CHANCE: () => FEVER_CHANCE,
     FOOD: () => FOOD,
+    FOOD_GROUPS: () => FOOD_GROUPS,
     FRACTURED_LOOT: () => FRACTURED_LOOT,
     GEMS: () => GEMS,
     GEN_ITEMS: () => GEN_ITEMS,
@@ -123,6 +126,7 @@
     VOID_LADDERS: () => VOID_LADDERS,
     WALLS: () => WALLS,
     WALL_ITEM: () => WALL_ITEM,
+    WATERSKINS: () => WATERSKINS,
     WEAPONS: () => WEAPONS,
     WEAPON_CLASS: () => WEAPON_CLASS,
     WHOLE_REALMS: () => WHOLE_REALMS,
@@ -690,6 +694,19 @@
         "Your pockets drag like stones",
         "Gold-fevered and slow"
       ]
+    },
+    rickets: {
+      name: "Rickets",
+      cause: "Too long without sunlight, in the deep places and the lightless realms",
+      treat: "Fish oil, or sunlight",
+      item: "fish_oil",
+      kind: "illness",
+      incubate: 60,
+      worsen: 420,
+      recover: 90,
+      effect: { speed: 0.15, stamina: 0.2 },
+      cures: { fish_oil: 3, sunbloom: 1 },
+      symptoms: ["Aching bones", "Your legs bow and ache", "Every step is an effort"]
     },
     // ── Injuries ──
     bleeding: {
@@ -2887,6 +2904,31 @@
     thornlash: ["Thornlash", "weapon"],
     seasons_seed: ["Seed of Seasons", "accessory"],
     warden_face: ["The Warden's face", "trophy"],
+    // ── Clothing, water, and preserving ──
+    linen_underlayer: ["Linen underlayer", "clothing"],
+    wool_underlayer: ["Wool underlayer", "clothing"],
+    silk_underlayer: ["Silk underlayer", "clothing"],
+    hide_vest: ["Hide vest", "clothing"],
+    fur_jerkin: ["Fur jerkin", "clothing"],
+    linen_shirt: ["Linen shirt", "clothing"],
+    oilskin_coat: ["Oilskin coat", "clothing"],
+    fur_cloak: ["Fur cloak", "clothing"],
+    desert_robe: ["Desert robe", "clothing"],
+    rime_parka: ["Rime parka", "clothing"],
+    ember_mantle: ["Ember mantle", "clothing"],
+    waterskin: ["Waterskin", "tool"],
+    insulated_flask: ["Insulated flask", "tool"],
+    rime_flask: ["Rime flask", "tool"],
+    cold_box: ["Cold box", "tool"],
+    purification_tablet: ["Purification tablet", "medicine"],
+    fish_oil: ["Fish oil", "medicine", 9e3],
+    distiller: ["Distiller", "structure"],
+    smoking_rack: ["Smoking rack", "structure"],
+    canning_kettle: ["Canning kettle", "structure"],
+    ice_harvester: ["Ice harvester", "structure"],
+    smoked_fish: ["Smoked fish", "food", 3e3],
+    canned_stew: ["Canned stew", "food", 4e4],
+    canned_fruit: ["Canned fruit", "food", 4e4],
     // The Fractured Realms.
     fracture_shard: ["Fracture shard", "material"],
     fractured_key: ["Fractured key", "key"],
@@ -3220,6 +3262,39 @@
     ["choir_stave", { rime_silver: 10, frost_lily: 4, crystal: 4 }, "starforge", 9],
     ["bellhammer", { rime_silver: 12, bell_bronze: 4, wood: 3 }, "starforge", 9],
     ["respirator", { iron_ingot: 4, reeds: 6, crystal: 2, hide: 2 }, "workbench", 5],
+    // Clothing, in three layers.
+    ["linen_underlayer", { fiber: 8 }, "workbench", 1],
+    ["wool_underlayer", { hide: 3, fiber: 4 }, "workbench", 2],
+    ["silk_underlayer", { silk: 6 }, "workbench", 3],
+    ["hide_vest", { hide: 5, fiber: 2 }, "workbench", 1],
+    ["fur_jerkin", { hide: 8, fiber: 4 }, "workbench", 2],
+    ["linen_shirt", { fiber: 10 }, "workbench", 1],
+    ["oilskin_coat", { fiber: 8, resin: 4 }, "workbench", 2],
+    ["fur_cloak", { hide: 12, fiber: 4 }, "workbench", 3],
+    ["desert_robe", { fiber: 12, silk: 2 }, "workbench", 2],
+    ["rime_parka", { hide: 10, frost_shard: 4, silk: 4 }, "workbench", 6],
+    ["ember_mantle", { cinderflax: 10, ashcloth: 4 }, "workbench", 4],
+    // Water: skins and flasks, tablets, and the distiller.
+    ["waterskin", { hide: 3, fiber: 2 }, null, 1],
+    ["insulated_flask", { copper_ingot: 3, hide: 2 }, "workbench", 2],
+    ["rime_flask", { rime_silver: 3, frost_shard: 2 }, "forge", 7],
+    ["purification_tablet", { salt: 2, crystal: 1, herb: 1 }, "apothecary", 3, 3],
+    ["distiller", { copper_ingot: 4, glass: 2, clay: 4 }, "workbench", 3],
+    ["fish_oil", { raw_fish: 3, boiled_water: 1 }, "apothecary", 3, 2],
+    // Preserving: smoke, cans, and ice.
+    ["smoking_rack", { wood: 10, stone: 6, fiber: 4 }, "workbench", 1],
+    ["smoked_fish", { raw_fish: 2, wood: 1 }, "smoking_rack", 1],
+    ["canning_kettle", { iron_ingot: 6, copper_ingot: 4, clay: 4 }, "workbench", 3],
+    [
+      "canned_stew",
+      { potato: 2, raw_meat: 1, copper_ingot: 1, boiled_water: 1 },
+      "canning_kettle",
+      3,
+      2
+    ],
+    ["canned_fruit", { berry: 4, honey: 1, copper_ingot: 1 }, "canning_kettle", 3, 2],
+    ["ice_harvester", { iron_ingot: 4, wood: 10, stone: 10 }, "workbench", 3],
+    ["cold_box", { wood: 10, hide: 2, clay: 4 }, "workbench", 2],
     // The Fractured Realms: shards open them, and forge the twelfth tier.
     ["fractured_key", { fracture_shard: 4 }, "waystone", 11],
     ["ascended_ingot", { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 }, "starforge", 12],
@@ -8603,6 +8678,9 @@
     herb: [2, 0, 8],
     sunbloom: [10, 1, 12],
     frost_lily: [6, 0, 18],
+    smoked_fish: [30, 26, 2],
+    canned_stew: [40, 18, 10],
+    canned_fruit: [24, 0, 18],
     // Preserves.
     salted_meat: [34, 28, 0],
     salted_fish: [28, 24, 1],
@@ -10143,6 +10221,144 @@
   ];
   var featById = (id) => FEATS.find((f) => f.id === id);
 
+  // src/data/clothing.ts
+  var CLOTHING = {
+    linen_underlayer: {
+      layer: "under",
+      insul: 1,
+      heat: 2,
+      water: 0,
+      life: 5400,
+      text: "Light linen: a little warmth, cool in the heat"
+    },
+    wool_underlayer: {
+      layer: "under",
+      insul: 3,
+      heat: 0,
+      water: 0,
+      life: 6e3,
+      text: "Warm wool against the skin"
+    },
+    silk_underlayer: {
+      layer: "under",
+      insul: 1,
+      heat: 4,
+      water: 0.05,
+      life: 7200,
+      text: "Spider silk: breathes in the worst heat"
+    },
+    hide_vest: {
+      layer: "mid",
+      insul: 3,
+      heat: 0,
+      water: 0.1,
+      life: 6e3,
+      text: "Tanned hide over the chest"
+    },
+    fur_jerkin: {
+      layer: "mid",
+      insul: 6,
+      heat: -1,
+      water: 0.1,
+      life: 6600,
+      text: "Thick fur: warm, and hot in the sun"
+    },
+    linen_shirt: {
+      layer: "mid",
+      insul: 1,
+      heat: 3,
+      water: 0,
+      life: 5400,
+      text: "A loose shirt that keeps the sun off"
+    },
+    oilskin_coat: {
+      layer: "outer",
+      insul: 2,
+      heat: 0,
+      water: 0.7,
+      life: 7200,
+      text: "Waxed cloth: rain runs off it"
+    },
+    fur_cloak: {
+      layer: "outer",
+      insul: 8,
+      heat: -2,
+      water: 0.2,
+      life: 7200,
+      text: "A heavy fur cloak for the deep cold"
+    },
+    desert_robe: {
+      layer: "outer",
+      insul: 0,
+      heat: 6,
+      water: 0.1,
+      life: 7200,
+      text: "Pale layered cloth for the open desert"
+    },
+    rime_parka: {
+      layer: "outer",
+      insul: 12,
+      heat: -2,
+      water: 0.5,
+      life: 9e3,
+      text: "Frost-lined and hooded: the coldest places yield to it"
+    },
+    ember_mantle: {
+      layer: "outer",
+      insul: 1,
+      heat: 10,
+      water: 0.3,
+      life: 9e3,
+      text: "Woven cinderflax: heat slides off it"
+    }
+  };
+  var WATERSKINS = {
+    waterskin: { drink: 0.25, freezeProof: false, text: "Each drink goes a quarter further" },
+    insulated_flask: {
+      drink: 0.4,
+      freezeProof: true,
+      text: "Drinks go further, and water will not freeze"
+    },
+    rime_flask: { drink: 0.6, freezeProof: true, text: "Drinks go much further; nothing freezes" }
+  };
+  var FOOD_GROUPS = {
+    raw_meat: "meat",
+    cooked_meat: "meat",
+    smoked_meat: "meat",
+    salted_meat: "meat",
+    spiced_skewers: "meat",
+    raw_fish: "fish",
+    cooked_fish: "fish",
+    salted_fish: "fish",
+    smoked_fish: "fish",
+    fish_chowder: "fish",
+    bread: "grain",
+    wheat: "grain",
+    trail_ration: "grain",
+    potato: "greens",
+    potato_stew: "greens",
+    hearty_stew: "greens",
+    canned_stew: "greens",
+    herb: "greens",
+    frost_lily: "greens",
+    berry: "fruit",
+    cactus_fruit: "fruit",
+    bog_apple: "fruit",
+    berry_preserves: "fruit",
+    orchard_pie: "fruit",
+    canned_fruit: "fruit",
+    sunbloom: "fruit",
+    mushroom: "fungus",
+    glowcap: "fungus",
+    pickled_mushrooms: "fungus",
+    mushroom_broth: "fungus",
+    honey: "sweet",
+    honey_cakes: "sweet",
+    ember_chili: "meat",
+    explorers_feast: "meat"
+  };
+  var DIET_MEMORY = 8;
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -10409,6 +10625,7 @@
       if (id === "hypothermia") return v.bodyTemp > 36.2;
       if (id === "heatstroke") return v.bodyTemp < 38.2;
       if (id === "scurvy") return v.vitamins > 45;
+      if (id === "rickets") return this.game.survival.sunlit();
       return false;
     }
     /** Cold, heat, wet cold, and a diet without greens bring on ailments of their own. */
@@ -10425,6 +10642,7 @@
       hold("heat", v.bodyTemp > 39.2, 60, "heatstroke");
       hold("wetcold", v.wetness > 60 && v.bodyTemp < 35.8, 120, "pneumonia");
       hold("greens", v.vitamins < 10, 240, "scurvy");
+      hold("dark", !this.game.survival.sunlit(), 1200, "rickets");
     }
   };
 
@@ -10485,7 +10703,8 @@
       const melee = !f.ranged, heavy = family === "greatsword" || family === "battleaxe" || family === "warhammer", shooter = family === "bow" || family === "crossbow", magic = f.ranged === "magic";
       const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (set === "gearwright" ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === "prismweave" || set === "astral" ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
       const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
-      const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
+      const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift * // A blunted weapon strikes for half until mended.
+      (this.game.durability.broken(id) ? 0.5 : 1);
       return {
         id,
         family,
@@ -11516,6 +11735,7 @@
     // ─── The player's weapons ──────────────────────────────────────────────────
     /** A melee swing in the facing direction: hits every creature within the arc. */
     swing(weaponId = this.game.s.player.weapon) {
+      this.game.durability.use(weaponId);
       const s = this.game.s, p = s.player, w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : "fists"), face = Math.cos(p.face) >= 0 ? 1 : -1;
       const reach = w.reach * 1.15, wide = w.family === "greatsword" ? 1.5 : 1, centre = { x: p.x, y: p.y - 26 };
       const targets = s.animals.filter((a) => {
@@ -11546,6 +11766,7 @@
       const s = this.game.s, p = s.player, spec = RANGED[weaponId];
       if (!spec) return { ok: false, reason: "That is not a ranged weapon." };
       const w = this.game.armoury.stats(weaponId);
+      this.game.durability.use(weaponId);
       let damage = w.damage || 10, kind = spec.projectile, extra = { weapon: w };
       if (spec.kind === "bow") {
         const arrow = this.ammo();
@@ -11734,7 +11955,21 @@
         return { ok: true };
       }
       if (id === "fishing_rod") return this.game.fish();
-      if (ARMOR[id] || ACCESSORIES[id]) return this.game.equipment.wear(id);
+      if (ARMOR[id] || ACCESSORIES[id] || CLOTHING[id]) return this.game.equipment.wear(id);
+      if (id === "purification_tablet") {
+        let n = 0;
+        for (const bad of ["brackish_water", "wild_water"])
+          while (n < 3 && this.game.count(bad)) {
+            this.game.remove(bad);
+            this.game.add("boiled_water");
+            n++;
+          }
+        if (!n) return { ok: false, reason: "You carry no wild or brackish water to purify." };
+        this.game.remove("purification_tablet");
+        this.game.sound("potion");
+        this.game.say(`Purified ${n} water${n > 1 ? "s" : ""}.`, "good");
+        return { ok: true };
+      }
       const drunk = this.game.equipment.drink(id);
       if (drunk) return drunk;
       if (BLOCKS[id] !== void 0 || id === "torch") {
@@ -11764,13 +11999,15 @@
           if (chance(0.12)) ail.contract("tapeworm", false, "food");
         }
         this.game.progress.record("eat:" + id);
+        this.game.survival.ate(id);
         const buff = MEAL_BUFFS[id];
         if (buff && worth >= 0.65) {
           this.game.equipment.addBuff(buff[0], buff[1] * (1 + this.game.skills.get("meals")));
           this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, "good");
         }
       } else if (ITEMS[id]?.[1] === "water") {
-        v.hydration = clamp(v.hydration + (state2 === "rotten" ? 15 : 27), 0, RULES.maxVital);
+        const skin = this.game.equipment.waterskin(), more = 1 + (skin ? WATERSKINS[skin].drink : 0);
+        v.hydration = clamp(v.hydration + (state2 === "rotten" ? 15 : 27) * more, 0, RULES.maxVital);
         if (id === "wild_water" && chance(0.38)) ail.contract("dysentery", false, "water");
         if (id === "brackish_water") {
           if (chance(0.45)) ail.contract("cholera", false, "water");
@@ -12850,6 +13087,19 @@
         this.game.sound("wear");
         return { ok: true };
       }
+      const garment = CLOTHING[id];
+      if (garment) {
+        p.clothing ??= {};
+        if (p.clothing[garment.layer] === id) {
+          delete p.clothing[garment.layer];
+          this.game.say(itemName(id) + " taken off.");
+        } else {
+          p.clothing[garment.layer] = id;
+          this.game.say(`${itemName(id)} worn \xB7 ${garment.text.toLowerCase()}.`, "good");
+        }
+        this.game.sound("wear");
+        return { ok: true };
+      }
       if (ACCESSORIES[id]) {
         const i = s.accessories.indexOf(id);
         if (i >= 0) {
@@ -12872,6 +13122,27 @@
       const armor = Object.values(p.armor ?? {}).filter(has);
       return { armor, accessories: this.game.s.accessories.filter(has) };
     }
+    /** Clothing worn and still in the pack. */
+    clothes() {
+      const c = this.game.s.player.clothing ?? {};
+      return [c.under, c.mid, c.outer].filter((id) => !!id && this.game.count(id) > 0);
+    }
+    /** What worn clothing keeps out (worn-through clothing keeps nothing). */
+    clothingShield() {
+      let insul = 0, heat = 0, water = 0;
+      for (const id of this.clothes()) {
+        if (this.game.durability.broken(id)) continue;
+        const g = CLOTHING[id];
+        insul += g.insul;
+        heat += g.heat;
+        water += g.water;
+      }
+      return { insul, heat, water: Math.min(0.9, water) };
+    }
+    /** The best waterskin carried, if any. */
+    waterskin() {
+      return Object.keys(WATERSKINS).filter((id) => this.game.count(id) > 0).sort((a, b) => WATERSKINS[b].drink - WATERSKINS[a].drink)[0];
+    }
     /** The set whose three pieces are all worn, if any. */
     fullSet() {
       const { armor } = this.worn();
@@ -12883,7 +13154,11 @@
     effects() {
       const out = /* @__PURE__ */ new Set(), set = this.fullSet();
       if (set) out.add(ARMOR_SETS.find((x) => x.key === set).bonus);
-      for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
+      for (const id of this.worn().accessories) {
+        if (id === "miners_lamp" && (this.game.s.lampFuel ?? 1) <= 0 && !this.game.count("resin"))
+          continue;
+        for (const e of ACCESSORIES[id].effects) out.add(e);
+      }
       for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add("buff:" + id);
       for (const id of this.game.shelvedRelics()) for (const e of RELIC_EFFECTS[id] ?? []) out.add(e);
       if (this.townCache.at !== Math.floor(this.game.s.elapsed)) {
@@ -13140,6 +13415,8 @@
         };
       if (s.vitals.stamina < 2) return { ok: false, reason: "Too exhausted to mine." };
       p.usedAt = s.elapsed;
+      const pick2 = this.game.bestTool("pick");
+      if (pick2) this.game.durability.use(pick2);
       const index = ty * TILE_COLS + tx, hits = Math.max(1, 1 + need - Math.floor(tier / 2)), done = (this.cracks.get(index) ?? 0) + 1;
       this.game.sound("pick", tx * TILE + 16, ty * TILE + 16, 0.6);
       this.game.event("chip", tx * TILE + 16, ty * TILE + 16, "stone");
@@ -13383,6 +13660,33 @@
           this.game.sound("place", st.x, st.y, 0.7);
           this.game.say("Fed the campfire with wood.", "good");
         } else return { ok: false, reason: "One wood refuels the campfire." };
+      } else if (st.type === "distiller") {
+        const n = Math.min(
+          this.game.count("brackish_water") + this.game.count("wild_water"),
+          this.game.count("wood") * 2
+        );
+        if (!n)
+          return {
+            ok: false,
+            reason: "The distiller needs brackish or wild water, and wood to heat it."
+          };
+        let done = 0;
+        for (const bad of ["brackish_water", "wild_water"])
+          while (done < n && this.game.count(bad)) {
+            this.game.remove(bad);
+            this.game.add("boiled_water");
+            done++;
+          }
+        this.game.remove("wood", Math.ceil(done / 2));
+        this.game.sound("sizzle", st.x, st.y, 0.7);
+        this.game.say(`Distilled ${done} clean water.`, "good");
+      } else if (st.type === "ice_harvester") {
+        const ice = st.store.ice ?? 0;
+        if (!ice) return { ok: false, reason: "No ice yet. It cuts ice only where it freezes." };
+        this.game.add("ice", ice);
+        st.store.ice = 0;
+        this.game.sound("dig_ice", st.x, st.y, 0.7);
+        this.game.say(`Took ${ice} ice from the harvester.`, "good");
       } else if (st.type === "relic_shelf") {
         return { ok: true, action: "shelf", structure: st };
       } else if (STORAGE[st.type]) {
@@ -13479,6 +13783,10 @@
         };
       if (v.stamina < 7) return { ok: false, reason: "Too exhausted to gather. Rest or wait." };
       v.stamina -= 7;
+      if (spec.tool) {
+        const tool = this.game.bestTool(spec.tool);
+        if (tool) this.game.durability.use(tool, 2);
+      }
       v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
       v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
       const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0) + (this.game.rng() < this.game.skills.get("gather") ? 1 : 0);
@@ -13571,9 +13879,19 @@
     canAfford(cost) {
       return Object.entries(cost).every(([id, n]) => this.count(id) >= n);
     }
+    /** The best unbroken tool of a kind carried, which is the one that wears with use. */
+    bestTool(kind) {
+      let best = null, tier = 0;
+      for (const [id, [tool, t]] of Object.entries(TOOL_TIERS))
+        if (tool === kind && this.count(id) && !this.game.durability.broken(id) && t > tier) {
+          best = id;
+          tier = t;
+        }
+      return best;
+    }
     toolTier(kind) {
       return Object.entries(TOOL_TIERS).reduce(
-        (best, [id, [tool, tier]]) => tool === kind && this.count(id) ? Math.max(best, tier) : best,
+        (best, [id, [tool, tier]]) => tool === kind && this.count(id) && !this.game.durability.broken(id) ? Math.max(best, tier) : best,
         0
       );
     }
@@ -13583,6 +13901,7 @@
   var ICE_IN_PACK = 700;
   var Larder = class extends System {
     melt = 0;
+    freeze = 0;
     warned = /* @__PURE__ */ new Set();
     spec(st) {
       return STORAGE[st.type];
@@ -13680,7 +13999,34 @@
           }
         }
       }
-      if (this.game.count("ice") && !near && air > 0) {
+      for (const st of s.structures)
+        if (st.type === "ice_harvester" && env2.temperatureAt(st.x, st.y - 20) <= 0) {
+          st.fuel += dt;
+          while (st.fuel >= 120) {
+            st.fuel -= 120;
+            st.store.ice = Math.min(10, (st.store.ice ?? 0) + 1);
+          }
+        }
+      const skin = this.game.equipment.waterskin();
+      if (air < -4 && !near && !this.game.nearLitFire() && !(skin && WATERSKINS[skin].freezeProof)) {
+        const water = ["wild_water", "boiled_water", "filtered_water"].find(
+          (id) => this.game.count(id)
+        );
+        if (water) {
+          this.freeze += dt;
+          if (this.freeze >= 240) {
+            this.freeze = 0;
+            this.game.remove(water);
+            this.game.add("ice");
+            if (dt < 5)
+              this.game.say(
+                "A water in your pack has frozen solid. An insulated flask would stop it.",
+                "ink"
+              );
+          }
+        }
+      }
+      if (this.game.count("ice") && !near && air > 0 && !this.game.count("cold_box")) {
         this.melt += dt * meltRate(air) * cool;
         while (this.melt >= ICE_IN_PACK && this.game.count("ice")) {
           this.melt -= ICE_IN_PACK;
@@ -13768,7 +14114,7 @@
       const lava = this.game.inLava(), water = this.game.pocket.submerged();
       if (lava && !this.wasInLava) this.game.sound("sizzle", p.x, p.y, 1.3);
       this.wasInLava = lava;
-      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
+      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (this.game.survival.diet().state === "malnourished" ? 0.93 : 1) * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
       p.vx = dx * speed;
       const shaft = inShaft(p.x, p.y);
@@ -15175,6 +15521,43 @@
           e.qty = Math.ceil(e.qty * 0.75);
       this.game.say("You woke in the meadow. Some loose supplies were lost.", "good");
     }
+    /** Whether the player is somewhere dark: deep underground, a lightless realm, or out at night. */
+    dark() {
+      const p = this.game.s.player, realm = this.game.pocket.here() ? activeRealm() : null;
+      if (realm && realm.tpl.daylight <= 0) return true;
+      if (p.y > surfaceAt(p.x) + 150) return true;
+      return this.game.isNight();
+    }
+    /** Out under the open sky by day: what rickets needs. */
+    sunlit() {
+      const p = this.game.s.player, realm = this.game.pocket.here() ? activeRealm() : null;
+      if (realm && realm.tpl.daylight <= 0.3) return false;
+      return !this.game.isNight() && p.y <= surfaceAt(p.x) + 40;
+    }
+    /** How varied the recent meals have been: several kinds of food keep you strong. */
+    diet() {
+      const recent = this.game.s.diet ?? [], groups = new Set(recent).size;
+      const state2 = recent.length >= 5 && groups <= 1 ? "malnourished" : recent.length >= DIET_MEMORY - 2 && groups >= 4 ? "balanced" : "plain";
+      return { groups, meals: recent.length, state: state2 };
+    }
+    /** Notes what kind of food was eaten. */
+    ate(id) {
+      const group = FOOD_GROUPS[id];
+      if (!group) return;
+      const d = this.game.s.diet ??= [];
+      const before = this.diet().state;
+      d.push(group);
+      while (d.length > DIET_MEMORY) d.shift();
+      const after = this.diet().state;
+      if (after !== before) {
+        if (after === "malnourished")
+          this.game.say(
+            "The same food, meal after meal: you are malnourished. Eat something different.",
+            "danger"
+          );
+        else if (after === "balanced") this.game.say("A varied diet: you feel strong.", "good");
+      }
+    }
     burnTimer = 0;
     /** Health lost per second to the heat of the hell layers. */
     heat() {
@@ -15195,13 +15578,13 @@
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const air = this.game.temperature() - (this.game.equipment.has("seasonward") ? this.game.pocket.seasonShift() : 0), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
+      const air = this.game.temperature() - (this.game.equipment.has("seasonward") ? this.game.pocket.seasonShift() : 0), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, clothes = this.game.equipment.clothingShield(), coldResist = clothes.insul + skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer + clothes.heat, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
       const marshWet = this.game.biome().id === "marsh" && !shelter && !underground ? 0.065 : 0;
       v.wetness = clamp(
-        v.wetness + dt * (rain && !shelter && !underground ? 0.28 : fire ? -0.35 : shelter ? -0.17 : -0.07) + dt * marshWet,
+        v.wetness + dt * (rain && !shelter && !underground ? 0.28 * (1 - clothes.water) : fire ? -0.35 : shelter ? -0.17 : -0.07) + dt * marshWet,
         0,
         100
       );
@@ -15226,7 +15609,7 @@
         RULES.maxVital
       );
       v.stamina = clamp(
-        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) * ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1) * (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)),
+        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) * ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1) * (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)) * (this.diet().state === "malnourished" ? 0.6 : this.diet().state === "balanced" ? 1.15 : 1),
         0,
         100
       );
@@ -15265,6 +15648,107 @@
           "danger"
         );
       }
+    }
+  };
+
+  // src/game/systems/Durability.ts
+  var LAMP_SECONDS = 300;
+  var Durability = class extends System {
+    warned = /* @__PURE__ */ new Set();
+    get map() {
+      return this.game.s.wear ??= {};
+    }
+    /** How worn an item is, 0 (new) to 100 (worn out). */
+    wear(id) {
+      return this.map[id] ?? 0;
+    }
+    broken(id) {
+      return this.wear(id) >= 100;
+    }
+    /** Whether an item wears at all. */
+    wears(id) {
+      return id !== "fists" && (!!WEAPONS[id] || !!TOOL_TIERS[id] || !!CLOTHING[id]);
+    }
+    tier(id) {
+      return WEAPON_CLASS[id]?.[1] ?? TOOL_TIERS[id]?.[1] ?? WEAPONS[id]?.[0] ?? 1;
+    }
+    /** Uses before a weapon or tool wears out. */
+    uses(id) {
+      const t = this.tier(id);
+      return TOOL_TIERS[id] ? 300 + t * 100 : 500 + t * 120;
+    }
+    /** Wears an item by a number of uses (or, for clothing, seconds of hard weather). */
+    use(id, n = 1) {
+      if (!this.wears(id) || this.game.dev.god) return;
+      const before = this.wear(id), per = CLOTHING[id] ? 100 / CLOTHING[id].life : 100 / this.uses(id);
+      const after = Math.min(100, before + per * n);
+      this.map[id] = after;
+      if (before < 80 && after >= 80 && !this.warned.has(id + ":80")) {
+        this.warned.add(id + ":80");
+        this.game.say(`${itemName(id)} is badly worn. Mend it at a station soon.`, "danger");
+      }
+      if (before < 100 && after >= 100) {
+        this.game.say(
+          `${itemName(id)} is worn out: ${CLOTHING[id] ? "it keeps nothing out" : TOOL_TIERS[id] ? "it will not cut its tier" : "it strikes for half"} until mended.`,
+          "danger"
+        );
+        this.game.sound("crumble");
+      }
+    }
+    /** Where an item is mended, and what it costs. */
+    station(id) {
+      return CLOTHING[id] ? "workbench" : anvilFor(this.tier(id));
+    }
+    cost(id) {
+      const w = this.wear(id);
+      if (!w) return {};
+      const scale = Math.ceil(w / 34);
+      if (CLOTHING[id]) return { fiber: 2 * scale, hide: scale };
+      const bar = tierOf(this.tier(id)).bar;
+      return { [bar]: scale, coin: 4 * this.tier(id) * scale };
+    }
+    repair(id) {
+      if (!this.wear(id)) return { ok: false, reason: "It needs no mending." };
+      const where = this.station(id);
+      if (!this.game.near(where) && !this.game.dev.god)
+        return { ok: false, reason: `Mend it at a ${itemName(where).toLowerCase()}.` };
+      const cost = this.cost(id);
+      if (!this.game.dev.god) {
+        if (!this.game.canAfford(cost))
+          return {
+            ok: false,
+            reason: "Mending needs " + Object.entries(cost).map(([k, n]) => `${n} ${itemName(k).toLowerCase()}`).join(" and ") + "."
+          };
+        for (const [k, n] of Object.entries(cost)) this.game.remove(k, n);
+      }
+      this.map[id] = 0;
+      this.warned.delete(id + ":80");
+      this.game.sound(CLOTHING[id] ? "craft_wood" : "craft_anvil");
+      this.game.say(`${itemName(id)} mended.`, "good");
+      return { ok: true };
+    }
+    /** Everything worn and carried that can be mended at the stations nearby. */
+    mendable() {
+      return [...new Set(this.game.s.inventory.map((e) => e.id))].filter(
+        (id) => this.wear(id) > 0 && (this.game.near(this.station(id)) || this.game.dev.god)
+      );
+    }
+    update(dt) {
+      const s = this.game.s, p = s.player;
+      const air = this.game.temperature(), rain = (s.weather === "rain" || s.weather === "storm") && !this.game.sheltered(), hard = air < 5 || air > 30 || rain ? 1 : 0.2;
+      for (const id of this.game.equipment.clothes()) this.use(id, dt * hard);
+      if (this.game.equipment.worn().accessories.includes("miners_lamp") && this.game.survival.dark()) {
+        s.lampFuel = (s.lampFuel ?? 0) - dt;
+        if (s.lampFuel <= 0) {
+          if (this.game.count("resin")) {
+            this.game.remove("resin");
+            s.lampFuel += LAMP_SECONDS;
+          } else if (s.lampFuel > -dt * 1.5) {
+            this.game.say("Your miner's lamp gutters out. It burns resin.", "danger");
+          }
+        }
+      }
+      void p;
     }
   };
 
@@ -16209,6 +16693,7 @@
     interaction = new Interaction(this);
     consumables = new Consumables(this);
     survival = new Survival(this);
+    durability = new Durability(this);
     ailments = new Ailments(this);
     larder = new Larder(this);
     physics = new Physics(this);
@@ -16336,6 +16821,7 @@
       this.feats.update();
       this.town.update(dt);
       this.ailments.update(dt);
+      this.durability.update(dt);
       this.survival.update(dt);
       this.devtools.sustain();
     }
@@ -16460,6 +16946,9 @@
     }
     toolTier(kind) {
       return this.inventory.toolTier(kind);
+    }
+    bestTool(kind) {
+      return this.inventory.bestTool(kind);
     }
     use(id) {
       return this.consumables.use(id);
@@ -17455,6 +17944,30 @@
     garden_key: ["key", "#8ad070"],
     diving_bell: ["crate", "#5a9ac0"],
     fracture_shard: ["crystal", "#d8a0ff"],
+    linen_underlayer: ["legs", "#e8e0c8"],
+    wool_underlayer: ["legs", "#c8b8a0"],
+    silk_underlayer: ["legs", "#f0f0f8"],
+    hide_vest: ["chest", "#a47c55"],
+    fur_jerkin: ["chest", "#8a6a4a"],
+    linen_shirt: ["chest", "#e8e0c8"],
+    oilskin_coat: ["cloak", "#6a6a3a"],
+    fur_cloak: ["cloak", "#8a6a4a"],
+    desert_robe: ["cloak", "#e8d8b0"],
+    rime_parka: ["cloak", "#bfe3ee"],
+    ember_mantle: ["cloak", "#c8704a"],
+    waterskin: ["bottle", "#a47c55"],
+    insulated_flask: ["bottle", "#d0844a"],
+    rime_flask: ["bottle", "#dfeaf6"],
+    cold_box: ["crate", "#8fb8d0"],
+    purification_tablet: ["gem", "#f0f0e8"],
+    fish_oil: ["bottle", "#e8c060"],
+    distiller: ["crate", "#c8804a"],
+    smoking_rack: ["crate", "#6a4a30"],
+    canning_kettle: ["crate", "#5a5e64"],
+    ice_harvester: ["crate", "#bfe3ee"],
+    smoked_fish: ["fish", "#b86a3a"],
+    canned_stew: ["bowl", "#a8a4a0"],
+    canned_fruit: ["bowl", "#c85a6a"],
     fractured_key: ["key", "#e0c0ff"],
     ascended_ingot: ["ingot", "#e8d8ff"],
     world_prism: ["gem", "#f0d8ff"],
@@ -22290,6 +22803,46 @@
       p.rect(2, 3, 18, 4, "#5a5462");
       p.rect(8, 12, 6, 7, "#2a2630");
       p.shadeEdges(0.2, -0.3);
+    }),
+    // Keeping and cleaning: the distiller, the smoking rack, the canning kettle, the ice harvester.
+    distiller: () => sprite(28, 30, 14, 29, (p) => {
+      p.rect(2, 20, 14, 10, "#6a4a30");
+      p.ellipse(9, 16, 7, 7, "#c8804a");
+      p.ellipse(8, 14, 3, 3, "#e8a878");
+      p.line(14, 10, 24, 6, "#c8804a");
+      p.line(24, 6, 24, 22, "#c8804a");
+      p.rect(20, 22, 8, 8, "#8fb0c0");
+      p.rect(21, 23, 6, 3, "#bfe8ff");
+      p.rect(4, 26, 10, 2, "#ff8a3a");
+    }),
+    smoking_rack: () => sprite(30, 30, 15, 29, (p) => {
+      p.rect(2, 2, 2, 28, "#6a4a30");
+      p.rect(26, 2, 2, 28, "#6a4a30");
+      p.rect(2, 2, 26, 2, "#8a6440");
+      for (const x of [7, 13, 19]) {
+        p.rect(x, 4, 4, 9, "#9a4a3a");
+        p.rect(x, 4, 4, 2, "#c8784a");
+      }
+      p.rect(6, 24, 18, 4, "#5a5a5e");
+      for (let y = 14; y < 24; y += 3) p.set(13 + y % 2, y, "#b8b0a0");
+    }),
+    canning_kettle: () => sprite(26, 24, 13, 23, (p) => {
+      p.ellipse(13, 14, 11, 9, "#5a5e64");
+      p.rect(2, 14, 22, 8, "#5a5e64");
+      p.rect(3, 6, 20, 2, "#8a8e94");
+      p.rect(9, 1, 8, 5, "#3a3e44");
+      p.rect(0, 22, 26, 2, "#3a2a1c");
+      for (const x of [6, 12, 18]) p.rect(x, 16, 3, 4, "#c8a060");
+    }),
+    ice_harvester: () => sprite(30, 28, 15, 27, (p) => {
+      p.rect(0, 22, 30, 6, "#6a6660");
+      p.rect(4, 2, 3, 20, "#8a6440");
+      p.rect(23, 2, 3, 20, "#8a6440");
+      p.rect(4, 2, 22, 3, "#a8a4a0");
+      p.rect(12, 5, 6, 10, "#c8ccd0");
+      p.rect(13, 15, 4, 2, "#e8ecf0");
+      p.rect(8, 16, 14, 6, "#bfe3ee");
+      p.rect(9, 17, 5, 2, "#ffffff");
     }),
     // A diving bell on the seabed: air for the Undertow.
     diving_bell: () => sprite(34, 40, 17, 39, (p) => {
@@ -28429,10 +28982,15 @@
     const t = game.timeOfDay();
     return `DAY ${game.s.day} \xB7 ${fmt(t / 60)}:${fmt(t % 60)} \xB7 ${game.s.weather.toUpperCase()}`;
   };
-  var worn = (id) => Object.values(game.s.player.armor ?? {}).includes(id) || game.s.accessories.includes(id);
+  var worn = (id) => Object.values(game.s.player.armor ?? {}).includes(id) || Object.values(game.s.player.clothing ?? {}).includes(id) || game.s.accessories.includes(id);
+  var wearText = (id) => {
+    if (!game.durability.wears(id)) return "";
+    const w = game.durability.wear(id);
+    return w >= 100 ? ' \xB7 <b class="worn">WORN OUT</b>' : w >= 1 ? ` \xB7 ${Math.round(100 - w)}% sound` : "";
+  };
   var itemUseLabel = (id) => {
     const cat = ITEMS[id]?.[1];
-    if (cat === "armor" || cat === "accessory") return worn(id) ? "REMOVE" : "WEAR";
+    if (cat === "armor" || cat === "accessory" || CLOTHING[id]) return worn(id) ? "REMOVE" : "WEAR";
     if (cat === "structure") return "PLACE";
     if (cat === "block") return "HOLD";
     if (cat === "potion") return "DRINK";
@@ -28877,7 +29435,7 @@
         const use = itemUseLabel(e.id), fresh = freshness(e);
         const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
         const stow = state.larder && ITEMS[e.id]?.[2];
-        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
+        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, "")}</small>` : ""}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
     const shelf = state.shelf;
@@ -29021,7 +29579,10 @@
   }
   function renderVitals(left, right) {
     const v = game.s.vitals, current2 = game.biome(), symptoms = game.vitalReasons();
-    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${BIOMES.some((b) => b.id === current2.id) ? current2.name.toLowerCase() : current2.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${BIOMES.some((b) => b.id === current2.id) ? current2.name.toLowerCase() : current2.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><h3>Diet</h3><p>${(() => {
+      const d = game.survival.diet();
+      return d.state === "malnourished" ? "<strong>Malnourished</strong>: the same food over and over. Stamina returns slowly, and you tire. Eat other kinds of food." : d.state === "balanced" ? `<strong>Balanced</strong>: ${d.groups} kinds of food in recent meals. Stamina returns faster.` : `${d.groups} kind${d.groups === 1 ? "" : "s"} of food in the last ${d.meals} meals. Four or more kinds keep you strong: meat, fish, grain, fruit, greens, fungus, sweets.`;
+    })()}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
     const labels = [
       ["health", "Health"],
       ["hydration", "Hydration"],
@@ -29199,13 +29760,25 @@
       renderJournal();
     };
     const wearables = game.s.inventory.filter(
-      (e) => ["armor", "accessory"].includes(ITEMS[e.id]?.[1] ?? "")
+      (e) => ["armor", "accessory"].includes(ITEMS[e.id]?.[1] ?? "") || CLOTHING[e.id]
     );
-    right.innerHTML = `<h2>Wardrobe</h2><p class="lede">Armour and charms in the pack. Life crystals raise your health; five fallen stars make a mana crystal.</p><div class="book-list">${wearables.map(
-      (e) => `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${ARMOR[e.id] ? ARMOR[e.id].defense + " defense \xB7 " + ARMOR[e.id].slot : ACCESSORIES[e.id]?.text ?? ""}</small></div></div><button data-wear="${e.id}">${worn(e.id) ? "REMOVE" : "WEAR"}</button></div>`
+    const shield = game.equipment.clothingShield(), mend = game.durability.mendable();
+    right.innerHTML = `<h2>Wardrobe</h2><p class="lede">Armour, charms, and clothing in the pack. Clothing is worn in three layers (under, mid, outer) and wears through in hard weather.</p><p class="muted">Clothing keeps out ${shield.insul}\xB0 of cold and ${shield.heat}\xB0 of heat, and ${Math.round(shield.water * 100)}% of the rain.</p>${mend.length ? `<div class="book-list">${mend.map(
+      (id) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${Math.round(game.durability.wear(id))}% worn \xB7 mend: ${Object.entries(
+        game.durability.cost(id)
+      ).map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`).join(", ")}</small></div></div><button data-mend="${id}">MEND</button></div>`
+    ).join("")}</div>` : ""}<div class="book-list">${wearables.map(
+      (e) => `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${ARMOR[e.id] ? ARMOR[e.id].defense + " defense \xB7 " + ARMOR[e.id].slot : CLOTHING[e.id] ? `${CLOTHING[e.id].layer} layer \xB7 ${CLOTHING[e.id].text.toLowerCase()}${wearText(e.id)}` : ACCESSORIES[e.id]?.text ?? ""}</small></div></div><button data-wear="${e.id}">${worn(e.id) ? "REMOVE" : "WEAR"}</button></div>`
     ).join("") || "<p>No armour yet. Forge it from ingots at a workbench, forge, or starforge.</p>"}</div><h3>Quick slots</h3><p class="muted">Numbers 1\u20130 or the mouse wheel choose a slot; click to use what it holds. Assign a slot from here:</p><div class="book-list">${game.s.hotbar.map(
       (id, i) => `<div class="book-row"><span class="with-icon"><b class="qty">${(i + 1) % 10}</b>&nbsp;${id ? icon(id) + pretty(id) : '<span class="muted">empty</span>'}</span>${id ? `<button data-clear="${i}">CLEAR</button>` : ""}</div>`
     ).join("")}</div>`;
+    right.querySelectorAll("[data-mend]").forEach(
+      (b) => b.onclick = () => {
+        const r = game.durability.repair(b.dataset.mend ?? "");
+        if (!r.ok) message(r.reason);
+        renderJournal();
+      }
+    );
     for (const root of [left, right])
       root.querySelectorAll("[data-wear]").forEach(
         (b) => b.onclick = () => {
@@ -29425,7 +29998,7 @@
     const infusions = INFUSIONS.filter((i) => game.count(i.item) > 0 || game.dev.god), gems = Object.keys(GEMS).filter((g) => game.count(g) > 0 || game.dev.god);
     right.innerHTML = `<h2 style="color:${has ? q.color : "inherit"}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} \xB7 tier ${tier} (${tierOf(tier).name}) \xB7 ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` \xB7 ${ranged.kind === "bow" ? "shots" : "mana " + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` \xB7 reach ${Math.round(st.reach)} \xB7 swing \xD7${st.pace.toFixed(2)}`} \xB7 crit ${Math.round(st.crit * 100)}%${st.defense ? ` \xB7 +${st.defense} defense` : ""}</p>${has ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? "disabled" : ""}>${game.s.player.weapon === id ? "IN HAND" : "READY IT"}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (\xD7${q.mult}) \xB7 level <strong>+${e.lvl}</strong> / ${MAX_LEVEL} \xB7 infusion <strong>${e.inf ? infusionById(e.inf)?.name : "none"}</strong> \xB7 sockets <strong>${e.gems.map((g) => GEMS[g].name).join(", ") || "\u2014"}</strong> (${e.gems.length}/${q.sockets})</p>${stage >= 0 ? `<h3>Evolve \xB7 choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0].map(
       (ev, i) => `<div class="book-row"><div><strong>${ev.name}</strong><small>${ev.text}</small></div><button data-evolve="${i}">CHOOSE</button></div>`
-    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
+    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `${game.durability.wear(id) >= 1 ? `<p class="muted">${Math.round(game.durability.wear(id))}% worn${game.durability.broken(id) ? " (blunted: half damage)" : ""} \xB7 mend at a ${pretty(game.durability.station(id)).toLowerCase()}: ${costText(game.durability.cost(id))}</p><div class="book-actions"><button data-mend>MEND</button></div>` : ""}<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
     left.querySelectorAll("[data-weapon]").forEach(
       (b) => b.onclick = () => {
         state.armourySel = b.dataset.weapon ?? id;
@@ -29445,6 +30018,7 @@
     on("[data-upgrade]", () => arm.upgrade(id));
     on("[data-reforge]", () => arm.reforge(id));
     on("[data-shard]", () => arm.reforge(id, true));
+    on("[data-mend]", () => game.durability.repair(id));
     on("[data-evolve]", (b) => arm.evolve(id, Number(b.dataset.evolve)));
     on("[data-infuse]", (b) => arm.infuse(id, b.dataset.infuse ?? ""));
     on("[data-gem]", (b) => arm.socket(id, b.dataset.gem ?? ""));

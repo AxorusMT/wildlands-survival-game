@@ -258,3 +258,129 @@ test('older records keep their disease as an ailment already showing', () => {
   assert.equal(back.s.disease, 'wound');
   assert.equal(back.s.vitals.vitamins, 70);
 });
+
+test('clothing layers keep out cold, heat, and rain, and wear through until mended', () => {
+  const g = fresh();
+  for (const id of ['wool_underlayer', 'fur_jerkin', 'oilskin_coat']) {
+    g.add(id);
+    assert.ok(g.equipment.wear(id).ok);
+  }
+  const shield = g.equipment.clothingShield();
+  assert.equal(shield.insul, 3 + 6 + 2);
+  assert.ok(shield.water >= 0.7);
+  // A second garment of the same layer replaces the first.
+  g.add('fur_cloak');
+  g.equipment.wear('fur_cloak');
+  assert.equal(g.s.player.clothing.outer, 'fur_cloak');
+  // Warmer in the tundra than without.
+  const bare = fresh();
+  for (const h of [g, bare]) {
+    standIn(h, 'tundra');
+    h.s.vitals.bodyTemp = 36;
+    for (let i = 0; i < 60; i++) h.survival.update(1);
+  }
+  assert.ok(g.s.vitals.bodyTemp > bare.s.vitals.bodyTemp + 0.2);
+  // Worn through, it keeps nothing out; mended at a workbench, it is whole again.
+  g.s.wear = { fur_cloak: 100 };
+  assert.equal(g.equipment.clothingShield().insul, 3 + 6);
+  g.add('fiber', 10);
+  g.add('hide', 5);
+  g.add('workbench');
+  const x = g.s.player.x + 40;
+  g.place('workbench', x, g.groundTopAt(x));
+  assert.ok(g.durability.repair('fur_cloak').ok);
+  assert.equal(g.durability.wear('fur_cloak'), 0);
+});
+
+test('weapons blunt and tools dull with use; worn-out gear is mended, not lost', () => {
+  const g = fresh();
+  g.add('iron_sword');
+  g.s.player.weapon = 'iron_sword';
+  const sharp = g.armoury.stats('iron_sword').damage;
+  for (let i = 0; i < 5; i++) g.combat.swing();
+  assert.ok(g.durability.wear('iron_sword') > 0);
+  g.s.wear.iron_sword = 100;
+  assert.ok(Math.abs(g.armoury.stats('iron_sword').damage - sharp / 2) < 0.01);
+  g.add('iron_pick');
+  assert.equal(g.toolTier('pick'), 3);
+  g.s.wear.iron_pick = 100;
+  assert.equal(g.toolTier('pick'), 0, 'a worn-out pick will not cut its tier');
+  assert.equal(g.count('iron_pick'), 1, 'but it is still yours');
+});
+
+test('water: skins, freezing, tablets, the distiller, and ice harvesters', () => {
+  const g = fresh();
+  g.s.vitals.hydration = 10;
+  g.add('wild_water', 2);
+  g.use('wild_water');
+  const plain = g.s.vitals.hydration;
+  g.add('waterskin');
+  g.s.vitals.hydration = 10;
+  g.use('wild_water');
+  assert.ok(g.s.vitals.hydration > plain + 5, 'a waterskin makes it go further');
+  // Water freezes in the deep cold, but not in an insulated flask.
+  const c = fresh();
+  standIn(c, 'tundra');
+  c.s.elapsed = 1200;
+  c.add('boiled_water', 3);
+  c.larder.advance(250);
+  if (c.temperature() < -4) assert.ok(c.count('ice') >= 1);
+  const f = fresh();
+  standIn(f, 'tundra');
+  f.s.elapsed = 1200;
+  f.add('boiled_water', 3);
+  f.add('insulated_flask');
+  f.larder.advance(250);
+  assert.equal(f.count('boiled_water'), 3);
+  // A tablet cleans three.
+  const t = fresh();
+  t.add('wild_water', 4);
+  t.add('purification_tablet');
+  assert.ok(t.use('purification_tablet').ok);
+  assert.equal(t.count('boiled_water'), 3);
+  assert.equal(t.count('wild_water'), 1);
+  // The distiller boils water with wood.
+  const d = fresh();
+  d.add('brackish_water', 4);
+  d.add('wood', 2);
+  const st = place(d, 'distiller');
+  d.s.player.x = st.x;
+  d.s.player.y = st.y;
+  assert.ok(d.interact().ok);
+  assert.equal(d.count('boiled_water'), 4);
+  assert.equal(d.count('wood'), 0);
+  // An ice harvester cuts ice where it freezes.
+  const h = fresh();
+  standIn(h, 'tundra');
+  h.s.elapsed = 1200;
+  const cutter = place(h, 'ice_harvester');
+  h.larder.advance(260);
+  if (h.environment.temperatureAt(cutter.x, cutter.y - 20) <= 0) assert.ok(cutter.store.ice >= 2);
+});
+
+test('a varied diet keeps you strong; one food, meal after meal, does not', () => {
+  const g = fresh();
+  for (let i = 0; i < 6; i++) g.survival.ate('cooked_meat');
+  assert.equal(g.survival.diet().state, 'malnourished');
+  for (const id of ['bread', 'berry', 'cooked_fish', 'mushroom', 'potato', 'honey'])
+    g.survival.ate(id);
+  assert.equal(g.survival.diet().state, 'balanced');
+});
+
+test('rickets comes from long darkness and lifts in the sun; the lamp burns resin', () => {
+  const g = fresh();
+  g.s.player.y = g.groundTopAt(g.s.player.x) + 600;
+  assert.ok(g.survival.dark());
+  for (let i = 0; i < 1300 && !g.ailments.has('rickets'); i += 10) g.ailments.update(10);
+  assert.ok(g.ailments.has('rickets'));
+  const lamp = fresh();
+  lamp.add('miners_lamp');
+  lamp.equipment.wear('miners_lamp');
+  lamp.s.player.y = lamp.groundTopAt(lamp.s.player.x) + 600;
+  lamp.add('resin', 1);
+  lamp.durability.update(1);
+  assert.equal(lamp.count('resin'), 0, 'resin burns');
+  assert.ok(lamp.equipment.has('light'));
+  lamp.durability.update(400);
+  assert.equal(lamp.equipment.has('light'), false, 'out of resin, out of light');
+});

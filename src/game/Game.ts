@@ -38,6 +38,7 @@ import { Realms } from './systems/Realms.ts';
 import { Feats } from './systems/Feats.ts';
 import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
+import { Durability } from './systems/Durability.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Town } from './systems/Town.ts';
 import { Wildlife } from './systems/Wildlife.ts';
@@ -65,6 +66,7 @@ export class Game {
   readonly interaction = new Interaction(this);
   readonly consumables = new Consumables(this);
   readonly survival = new Survival(this);
+  readonly durability = new Durability(this);
   readonly ailments = new Ailments(this);
   readonly larder = new Larder(this);
   readonly physics = new Physics(this);
@@ -196,6 +198,7 @@ export class Game {
     this.feats.update();
     this.town.update(dt);
     this.ailments.update(dt);
+    this.durability.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
   }
@@ -326,6 +329,9 @@ export class Game {
   }
   toolTier(kind: string) {
     return this.inventory.toolTier(kind);
+  }
+  bestTool(kind: string) {
+    return this.inventory.bestTool(kind);
   }
   use(id: string): GameResult {
     return this.consumables.use(id);

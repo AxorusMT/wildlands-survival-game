@@ -222,6 +222,7 @@ export class Ailments extends System {
     if (id === 'hypothermia') return v.bodyTemp > 36.2;
     if (id === 'heatstroke') return v.bodyTemp < 38.2;
     if (id === 'scurvy') return v.vitamins > 45;
+    if (id === 'rickets') return this.game.survival.sunlit();
     return false;
   }
   /** Cold, heat, wet cold, and a diet without greens bring on ailments of their own. */
@@ -239,5 +240,7 @@ export class Ailments extends System {
     hold('heat', v.bodyTemp > 39.2, 60, 'heatstroke');
     hold('wetcold', v.wetness > 60 && v.bodyTemp < 35.8, 120, 'pneumonia');
     hold('greens', v.vitamins < 10, 240, 'scurvy');
+    // Twenty minutes without sunlight bends the bones.
+    hold('dark', !this.game.survival.sunlit(), 1200, 'rickets');
   }
 }

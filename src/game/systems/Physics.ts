@@ -102,6 +102,7 @@ export class Physics extends System {
       (v.illness > 60 ? 0.82 : 1) *
       this.game.ailments.speedScale() *
       this.game.pocket.moveScale() *
+      (this.game.survival.diet().state === 'malnourished' ? 0.93 : 1) *
       (p.boots ? 1.12 : 1) *
       this.game.equipment.speedBonus() *
       this.game.dev.speed;

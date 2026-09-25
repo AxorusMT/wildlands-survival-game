@@ -647,6 +647,9 @@ canvas.icon {
   border-style: double;
   border-width: 3px;
 }
+b.worn {
+  color: #b2402e;
+}
 .book-row.muted-row {
   opacity: 0.6;
 }

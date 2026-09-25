@@ -247,6 +247,8 @@ export interface Player extends Point {
   invuln: number;
   /** Worn armour, by slot: item ids. */
   armor?: { head?: string; body?: string; legs?: string };
+  /** Clothing worn in three layers, apart from armour. */
+  clothing?: { under?: string; mid?: string; outer?: string };
   /** When the held item was last used, for its animation. */
   usedAt?: number;
   /** Aim angle from level toward the cursor, up negative (radians). */
@@ -325,6 +327,12 @@ export interface GameState {
   /** Each settler's home, by settler id: the seat of their room. */
   town: { homes: Record<string, { x: number; y: number }> };
   /** Lasting progress: renown earned, skills learned, and damage dealt with each weapon family. */
+  /** How worn each weapon, tool, and garment is (0 to 100). */
+  wear?: Record<string, number>;
+  /** Seconds of light left in the miner's lamp. */
+  lampFuel?: number;
+  /** The kinds of food in the last few meals. */
+  diet?: string[];
   meta?: {
     renown: number;
     skills: string[];

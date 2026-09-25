@@ -1,6 +1,7 @@
 import { clamp } from '../../core/math.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { FOOD, MEAL_BUFFS, RAW } from '../../data/food.ts';
+import { CLOTHING, WATERSKINS } from '../../data/clothing.ts';
 import { ACCESSORIES, ARMOR, BLOCKS, BUFFS } from '../../data/gear.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import { RULES } from '../rules.ts';
@@ -36,7 +37,22 @@ export class Consumables extends System {
       return { ok: true };
     }
     if (id === 'fishing_rod') return this.game.fish();
-    if (ARMOR[id] || ACCESSORIES[id]) return this.game.equipment.wear(id);
+    if (ARMOR[id] || ACCESSORIES[id] || CLOTHING[id]) return this.game.equipment.wear(id);
+    // A purification tablet makes up to three draughts of doubtful water safe.
+    if (id === 'purification_tablet') {
+      let n = 0;
+      for (const bad of ['brackish_water', 'wild_water'])
+        while (n < 3 && this.game.count(bad)) {
+          this.game.remove(bad);
+          this.game.add('boiled_water');
+          n++;
+        }
+      if (!n) return { ok: false, reason: 'You carry no wild or brackish water to purify.' };
+      this.game.remove('purification_tablet');
+      this.game.sound('potion');
+      this.game.say(`Purified ${n} water${n > 1 ? 's' : ''}.`, 'good');
+      return { ok: true };
+    }
     const drunk = this.game.equipment.drink(id);
     if (drunk) return drunk;
     if (BLOCKS[id] !== undefined || id === 'torch') {
@@ -69,13 +85,17 @@ export class Consumables extends System {
         if (chance(0.12)) ail.contract('tapeworm', false, 'food');
       }
       this.game.progress.record('eat:' + id);
+      this.game.survival.ate(id);
       const buff = MEAL_BUFFS[id];
       if (buff && worth >= 0.65) {
         this.game.equipment.addBuff(buff[0], buff[1] * (1 + this.game.skills.get('meals')));
         this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, 'good');
       }
     } else if (ITEMS[id]?.[1] === 'water') {
-      v.hydration = clamp(v.hydration + (state === 'rotten' ? 15 : 27), 0, RULES.maxVital);
+      // A waterskin makes each drink go further.
+      const skin = this.game.equipment.waterskin(),
+        more = 1 + (skin ? WATERSKINS[skin].drink : 0);
+      v.hydration = clamp(v.hydration + (state === 'rotten' ? 15 : 27) * more, 0, RULES.maxVital);
       if (id === 'wild_water' && chance(0.38)) ail.contract('dysentery', false, 'water');
       if (id === 'brackish_water') {
         if (chance(0.45)) ail.contract('cholera', false, 'water');

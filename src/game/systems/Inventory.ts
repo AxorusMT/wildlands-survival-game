@@ -57,9 +57,23 @@ export class Inventory extends System {
   canAfford(cost: Record<string, number>) {
     return Object.entries(cost).every(([id, n]) => this.count(id) >= n);
   }
+  /** The best unbroken tool of a kind carried, which is the one that wears with use. */
+  bestTool(kind: string) {
+    let best: string | null = null,
+      tier = 0;
+    for (const [id, [tool, t]] of Object.entries(TOOL_TIERS))
+      if (tool === kind && this.count(id) && !this.game.durability.broken(id) && t > tier) {
+        best = id;
+        tier = t;
+      }
+    return best;
+  }
   toolTier(kind: string) {
     return Object.entries(TOOL_TIERS).reduce(
-      (best, [id, [tool, tier]]) => (tool === kind && this.count(id) ? Math.max(best, tier) : best),
+      (best, [id, [tool, tier]]) =>
+        tool === kind && this.count(id) && !this.game.durability.broken(id)
+          ? Math.max(best, tier)
+          : best,
       0,
     );
   }

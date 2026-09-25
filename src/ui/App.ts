@@ -124,10 +124,22 @@ const timeText = () => {
   return `DAY ${game.s.day} · ${fmt(t / 60)}:${fmt(t % 60)} · ${game.s.weather.toUpperCase()}`;
 };
 const worn = (id: string) =>
-  Object.values(game.s.player.armor ?? {}).includes(id) || game.s.accessories.includes(id);
+  Object.values(game.s.player.armor ?? {}).includes(id) ||
+  Object.values(game.s.player.clothing ?? {}).includes(id) ||
+  game.s.accessories.includes(id);
+/** A small wear bar and label for gear that wears out. */
+const wearText = (id: string) => {
+  if (!game.durability.wears(id)) return '';
+  const w = game.durability.wear(id);
+  return w >= 100
+    ? ' · <b class="worn">WORN OUT</b>'
+    : w >= 1
+      ? ` · ${Math.round(100 - w)}% sound`
+      : '';
+};
 const itemUseLabel = (id: string) => {
   const cat = D.ITEMS[id]?.[1];
-  if (cat === 'armor' || cat === 'accessory') return worn(id) ? 'REMOVE' : 'WEAR';
+  if (cat === 'armor' || cat === 'accessory' || D.CLOTHING[id]) return worn(id) ? 'REMOVE' : 'WEAR';
   if (cat === 'structure') return 'PLACE';
   if (cat === 'block') return 'HOLD';
   if (cat === 'potion') return 'DRINK';
@@ -618,7 +630,7 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
               const weapon = D.WEAPONS[e.id] && game.armoury.known(e.id),
                 q = weapon ? D.QUALITIES[game.armoury.entry(e.id).q] : null;
               const stow = state.larder && D.ITEMS[e.id]?.[2];
-              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">×${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
+              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, '')}</small>` : ''}</div></div><div><span class="qty">×${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
             })
             .join('')}</div>`,
       )
@@ -805,7 +817,14 @@ function renderVitals(left: HTMLElement, right: HTMLElement) {
   const v = game.s.vitals,
     current = game.biome(),
     symptoms = game.vitalReasons();
-  left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}°C</strong> in the ${D.BIOMES.some((b) => b.id === current.id) ? current.name.toLowerCase() : current.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}°C</strong><br>Weather: <strong>${game.s.weather}</strong> · ${game.isNight() ? 'night' : 'day'}</p><div class="note-block">${symptoms.map((s) => `<div>• ${s}</div>`).join('')}</div><div class="book-actions"><button data-wash ${game.count('wild_water') + game.count('boiled_water') ? '' : 'disabled'}>WASH · 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+  left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}°C</strong> in the ${D.BIOMES.some((b) => b.id === current.id) ? current.name.toLowerCase() : current.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}°C</strong><br>Weather: <strong>${game.s.weather}</strong> · ${game.isNight() ? 'night' : 'day'}</p><h3>Diet</h3><p>${(() => {
+    const d = game.survival.diet();
+    return d.state === 'malnourished'
+      ? '<strong>Malnourished</strong>: the same food over and over. Stamina returns slowly, and you tire. Eat other kinds of food.'
+      : d.state === 'balanced'
+        ? `<strong>Balanced</strong>: ${d.groups} kinds of food in recent meals. Stamina returns faster.`
+        : `${d.groups} kind${d.groups === 1 ? '' : 's'} of food in the last ${d.meals} meals. Four or more kinds keep you strong: meat, fish, grain, fruit, greens, fungus, sweets.`;
+  })()}</p><div class="note-block">${symptoms.map((s) => `<div>• ${s}</div>`).join('')}</div><div class="book-actions"><button data-wash ${game.count('wild_water') + game.count('boiled_water') ? '' : 'disabled'}>WASH · 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
   const labels: [keyof Vitals, string][] = [
     ['health', 'Health'],
     ['hydration', 'Hydration'],
@@ -1040,14 +1059,29 @@ function renderGear(left: HTMLElement, right: HTMLElement) {
       state.armourySel = game.s.player.weapon;
     renderJournal();
   };
-  const wearables = game.s.inventory.filter((e) =>
-    ['armor', 'accessory'].includes(D.ITEMS[e.id]?.[1] ?? ''),
+  const wearables = game.s.inventory.filter(
+    (e) => ['armor', 'accessory'].includes(D.ITEMS[e.id]?.[1] ?? '') || D.CLOTHING[e.id],
   );
-  right.innerHTML = `<h2>Wardrobe</h2><p class="lede">Armour and charms in the pack. Life crystals raise your health; five fallen stars make a mana crystal.</p><div class="book-list">${
+  const shield = game.equipment.clothingShield(),
+    mend = game.durability.mendable();
+  right.innerHTML = `<h2>Wardrobe</h2><p class="lede">Armour, charms, and clothing in the pack. Clothing is worn in three layers (under, mid, outer) and wears through in hard weather.</p><p class="muted">Clothing keeps out ${shield.insul}° of cold and ${shield.heat}° of heat, and ${Math.round(shield.water * 100)}% of the rain.</p>${
+    mend.length
+      ? `<div class="book-list">${mend
+          .map(
+            (id) =>
+              `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${Math.round(game.durability.wear(id))}% worn · mend: ${Object.entries(
+                game.durability.cost(id),
+              )
+                .map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`)
+                .join(', ')}</small></div></div><button data-mend="${id}">MEND</button></div>`,
+          )
+          .join('')}</div>`
+      : ''
+  }<div class="book-list">${
     wearables
       .map(
         (e) =>
-          `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${D.ARMOR[e.id] ? D.ARMOR[e.id].defense + ' defense · ' + D.ARMOR[e.id].slot : (D.ACCESSORIES[e.id]?.text ?? '')}</small></div></div><button data-wear="${e.id}">${worn(e.id) ? 'REMOVE' : 'WEAR'}</button></div>`,
+          `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${D.ARMOR[e.id] ? D.ARMOR[e.id].defense + ' defense · ' + D.ARMOR[e.id].slot : D.CLOTHING[e.id] ? `${D.CLOTHING[e.id].layer} layer · ${D.CLOTHING[e.id].text.toLowerCase()}${wearText(e.id)}` : (D.ACCESSORIES[e.id]?.text ?? '')}</small></div></div><button data-wear="${e.id}">${worn(e.id) ? 'REMOVE' : 'WEAR'}</button></div>`,
       )
       .join('') || '<p>No armour yet. Forge it from ingots at a workbench, forge, or starforge.</p>'
   }</div><h3>Quick slots</h3><p class="muted">Numbers 1–0 or the mouse wheel choose a slot; click to use what it holds. Assign a slot from here:</p><div class="book-list">${game.s.hotbar
@@ -1056,6 +1090,14 @@ function renderGear(left: HTMLElement, right: HTMLElement) {
         `<div class="book-row"><span class="with-icon"><b class="qty">${(i + 1) % 10}</b>&nbsp;${id ? icon(id) + pretty(id) : '<span class="muted">empty</span>'}</span>${id ? `<button data-clear="${i}">CLEAR</button>` : ''}</div>`,
     )
     .join('')}</div>`;
+  right.querySelectorAll<HTMLButtonElement>('[data-mend]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        const r = game.durability.repair(b.dataset.mend ?? '');
+        if (!r.ok) message(r.reason);
+        renderJournal();
+      }),
+  );
   for (const root of [left, right])
     root.querySelectorAll<HTMLButtonElement>('[data-wear]').forEach(
       (b) =>
@@ -1390,7 +1432,7 @@ function renderArmoury(left: HTMLElement, right: HTMLElement) {
                 )
                 .join('')}</div>`
             : e.lvl < D.MAX_LEVEL
-              ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count('fracture_shard') ? '<button class="quiet" data-shard>REFORGE · SHARD</button>' : ''}</div><p class="muted">+${e.lvl + 1}: ${costText(D.upgradeCost(tier, e.lvl))} at a ${pretty(D.anvilFor(tier)).toLowerCase()} · reforge rerolls quality: ${costText(D.reforgeCost(tier))}.</p>`
+              ? `${game.durability.wear(id) >= 1 ? `<p class="muted">${Math.round(game.durability.wear(id))}% worn${game.durability.broken(id) ? ' (blunted: half damage)' : ''} · mend at a ${pretty(game.durability.station(id)).toLowerCase()}: ${costText(game.durability.cost(id))}</p><div class="book-actions"><button data-mend>MEND</button></div>` : ''}<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count('fracture_shard') ? '<button class="quiet" data-shard>REFORGE · SHARD</button>' : ''}</div><p class="muted">+${e.lvl + 1}: ${costText(D.upgradeCost(tier, e.lvl))} at a ${pretty(D.anvilFor(tier)).toLowerCase()} · reforge rerolls quality: ${costText(D.reforgeCost(tier))}.</p>`
               : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button>${game.count('fracture_shard') ? '<button class="quiet" data-shard>REFORGE · SHARD</button>' : ''}</div>`
         }${
           e.evo.length
@@ -1420,6 +1462,7 @@ function renderArmoury(left: HTMLElement, right: HTMLElement) {
   on('[data-upgrade]', () => arm.upgrade(id));
   on('[data-reforge]', () => arm.reforge(id));
   on('[data-shard]', () => arm.reforge(id, true));
+  on('[data-mend]', () => game.durability.repair(id));
   on('[data-evolve]', (b) => arm.evolve(id, Number(b.dataset.evolve) as 0 | 1));
   on('[data-infuse]', (b) => arm.infuse(id, b.dataset.infuse ?? ''));
   on('[data-gem]', (b) => arm.socket(id, b.dataset.gem ?? ''));
