@@ -103,6 +103,8 @@ export class Physics extends System {
       this.game.ailments.speedScale() *
       this.game.pocket.moveScale() *
       (this.game.survival.diet().state === 'malnourished' ? 0.93 : 1) *
+      // Overloaded, you slow down: to half at twice your capacity.
+      Math.max(0.5, 1 - this.game.inventory.overload() * 0.5) *
       (p.boots ? 1.12 : 1) *
       this.game.equipment.speedBonus() *
       this.game.dev.speed;

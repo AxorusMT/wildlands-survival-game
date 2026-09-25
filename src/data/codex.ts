@@ -378,6 +378,16 @@ export const CODEX: CodexPage[] = [
     bonusText: '+4% damage',
   },
   {
+    id: 'studies',
+    name: 'Studies',
+    group: 'Lore',
+    prefix: 'study:',
+    entries: [],
+    count: 20,
+    bonus: { xp: 0.05, gather: 0.05 },
+    bonusText: '+5% renown; 5% more chance of an extra find',
+  },
+  {
     id: 'relics',
     name: 'Relics',
     group: 'Lore',

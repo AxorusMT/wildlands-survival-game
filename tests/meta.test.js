@@ -264,3 +264,94 @@ test('sixty-odd feats, each with a title and a perk, earned from the record', ()
     .reduce((n, [, v]) => n + v, 0);
   assert.deepEqual(h.feats.progress('hunter'), [kills, 100]);
 });
+
+const placeAt = (g, type, dx = 40) => {
+  const x = g.s.player.x + dx;
+  g.add(type);
+  const r = g.place(type, x, g.groundTopAt(x));
+  assert.ok(r?.ok !== false, r?.reason);
+  return g.s.structures.find((st) => st.type === type);
+};
+
+test('upgraded stations do the work of those below, and make finer weapons', () => {
+  const g = fresh();
+  placeAt(g, 'tinkers_bench');
+  assert.ok(g.near('workbench'), "a tinker's bench is a workbench too");
+  assert.equal(g.near('artisan_bench'), undefined);
+  const h = fresh();
+  placeAt(h, 'hearth');
+  assert.ok(h.nearLitFire(), 'a hearth burns without feeding');
+  assert.ok(D.RECIPES.find((r) => r.id === 'ascended_sword').station === 'rift_forge');
+  // An artisan bench rolls better quality on average.
+  const avg = (station) => {
+    let sum = 0;
+    for (let i = 0; i < 40; i++) {
+      const k = new Game(100 + i);
+      k.dev.unlocked.add('iron_sword');
+      if (station) placeAt(k, station);
+      k.crafting.craft('iron_sword');
+      sum += k.s.armoury.iron_sword.q;
+    }
+    return sum / 40;
+  };
+  assert.ok(avg('artisan_bench') > avg(null));
+});
+
+test('a heavy pack slows you; a better pack carries more', () => {
+  const g = fresh();
+  const cap = g.inventory.capacity();
+  g.add('stone', 400);
+  assert.ok(g.inventory.load() > cap);
+  assert.ok(g.inventory.overload() > 0);
+  g.add('expedition_frame');
+  assert.ok(g.inventory.capacity() >= cap + 180);
+  assert.equal(g.inventory.overload(), 0);
+});
+
+test('study at a research desk: used up, uses revealed, renown earned', () => {
+  const g = fresh();
+  placeAt(g, 'research_desk');
+  g.add('copper_ingot', 2);
+  const renown = g.skills.renown();
+  const r = g.crafting.study('copper_ingot');
+  assert.ok(r.ok);
+  assert.ok(r.reveals.length > 3);
+  assert.equal(g.count('copper_ingot'), 1);
+  assert.ok(g.skills.renown() > renown);
+  assert.equal(g.crafting.study('copper_ingot').ok, false, 'once is enough');
+});
+
+test('mastery 10 teaches each family a move of its own', () => {
+  assert.equal(Object.keys(D.MASTERY_PERKS).length, D.FAMILIES.length);
+  const g = fresh();
+  g.add('iron_staff');
+  g.add('mana_crystal');
+  g.s.mana = 200;
+  g.s.player.weapon = 'iron_staff';
+  const before = g.combat.projectiles.length;
+  g.combat.fire('iron_staff', { x: g.s.player.x + 200, y: g.s.player.y - 30 });
+  const one = g.combat.projectiles.length - before;
+  g.skills.train('staff', D.masteryFor(10));
+  const mid = g.combat.projectiles.length;
+  g.combat.fire('iron_staff', { x: g.s.player.x + 200, y: g.s.player.y - 30 });
+  assert.equal(g.combat.projectiles.length - mid, one + 1, 'an extra bolt');
+});
+
+test('field repair kits, artisan whetstones, and the panacea', () => {
+  const g = fresh();
+  g.add('iron_sword');
+  g.s.player.weapon = 'iron_sword';
+  g.s.wear = { iron_sword: 80 };
+  g.add('repair_kit');
+  assert.ok(g.use('repair_kit').ok);
+  assert.equal(g.durability.wear('iron_sword'), 30);
+  g.s.armoury.iron_sword.q = 1;
+  g.add('whetstone');
+  assert.ok(g.use('whetstone').ok);
+  assert.equal(g.s.armoury.iron_sword.q, 2);
+  g.ailments.contract('fever', true);
+  g.ailments.contract('wound', true);
+  g.add('panacea');
+  assert.ok(g.use('panacea').ok);
+  assert.equal(g.ailments.showing().length, 0);
+});

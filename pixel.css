@@ -647,6 +647,10 @@ canvas.icon {
   border-style: double;
   border-width: 3px;
 }
+.warn-line {
+  color: #b2402e;
+  font-weight: 700;
+}
 b.worn {
   color: #b2402e;
 }

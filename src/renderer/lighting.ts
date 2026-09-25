@@ -58,6 +58,8 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
     else if (s.type === 'effergy') out.push([s.x, s.y - 60, 0.85, 0.72, 1.0]);
     else if (s.type === 'shrine' && s.crop !== 'spent') out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
     else if (s.type === 'diving_bell') out.push([s.x, s.y - 24, 0.6, 0.8, 0.9]);
+    else if (s.type === 'hearth') out.push([s.x, s.y - 12, 1.2 * f, 0.7 * f, 0.35 * f]);
+    else if (s.type === 'rift_forge') out.push([s.x, s.y - 20, 0.9, 0.4, 0.9]);
     else if (s.type === 'relic_shelf' && Object.keys(s.store).length)
       out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
     else if (s.type === 'kiln') out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);

@@ -35,6 +35,7 @@ import { Physics } from './systems/Physics.ts';
 import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
+import { STATION_LINES } from '../data/stations.ts';
 import { Feats } from './systems/Feats.ts';
 import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
@@ -236,10 +237,17 @@ export class Game {
   }
   near(type: string, radius = 110) {
     // The old kilns of the Ashen Steppe still burn hot enough to smelt.
-    const ok = (t: string) => t === type || (type === 'furnace' && t === 'kiln');
+    // Upgraded stations do the work of the ones below them.
+    const ok = (t: string) =>
+      t === type || (type === 'furnace' && t === 'kiln') || !!STATION_LINES[t]?.includes(type);
     return this.s.structures.find((st) => ok(st.type) && dist(st, this.s.player) <= radius);
   }
   nearLitFire() {
+    // A hearth or a kitchen keeps its fire without feeding.
+    const hearth = this.s.structures.find(
+      (st) => (st.type === 'hearth' || st.type === 'kitchen') && dist(st, this.s.player) <= 155,
+    );
+    if (hearth) return hearth;
     const f = this.near('campfire', 155);
     return f && f.fuel > 0 ? f : null;
   }

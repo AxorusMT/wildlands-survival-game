@@ -86,9 +86,11 @@ export class Armoury extends System {
     return [r ? (r.kind === 'bow' ? 'bow' : 'staff') : 'blade', tier];
   }
   /** First time a weapon comes into the pack: roll its quality. */
+  /** Quality luck from the station a weapon is being made at (set while crafting). */
+  craftLuck = 1;
   acquire(id: string, luck = 1) {
     if (!WEAPONS[id] || id === 'fists' || this.all[id]) return;
-    const q = rollQuality(this.game.rng, luck);
+    const q = rollQuality(this.game.rng, Math.max(luck, this.craftLuck));
     this.all[id] = { q, lvl: 0, gems: [], evo: [] };
     this.game.progress.record('weapon:' + id);
     this.game.progress.record('family:' + this.classOf(id)[0]);
@@ -213,7 +215,7 @@ export class Armoury extends System {
     for (const [k, n] of Object.entries(cost)) this.game.remove(k, n);
     return true;
   }
-  private record(id: string) {
+  record(id: string) {
     return (this.all[id] ??= { ...DEFAULT, gems: [], evo: [] });
   }
   /** Whether the weapon waits on a choice of evolution before it can climb further. */

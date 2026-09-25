@@ -16,6 +16,7 @@
     ARMOR_ITEMS: () => ARMOR_ITEMS,
     ARMOR_RECIPES: () => ARMOR_RECIPES,
     ARMOR_SETS: () => ARMOR_SETS,
+    BASE_CAPACITY: () => BASE_CAPACITY,
     BASE_VALUE: () => BASE_VALUE,
     BIOMES: () => BIOMES,
     BIOME_CENTERS: () => BIOME_CENTERS,
@@ -25,6 +26,7 @@
     BOSSES: () => BOSSES,
     BOSS_SHRINES: () => BOSS_SHRINES,
     BUFFS: () => BUFFS,
+    CATEGORY_WEIGHT: () => CATEGORY_WEIGHT,
     CAVE_LEVELS: () => CAVE_LEVELS,
     CHAPTERS: () => CHAPTERS,
     CLOTHING: () => CLOTHING,
@@ -66,6 +68,7 @@
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
     LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    MASTERY_PERKS: () => MASTERY_PERKS,
     MASTERY_TITLES: () => MASTERY_TITLES,
     MAX_LEVEL: () => MAX_LEVEL,
     MAX_MASTERY: () => MAX_MASTERY,
@@ -80,7 +83,9 @@
     NATURAL: () => NATURAL,
     NODES: () => NODES,
     OVERWORLD_W: () => OVERWORLD_W,
+    PACKS: () => PACKS,
     PACK_COOLING: () => PACK_COOLING,
+    PERK_LEVEL: () => PERK_LEVEL,
     POCKET: () => POCKET,
     POTIONS: () => POTIONS,
     PROJECTILES: () => PROJECTILES,
@@ -91,6 +96,7 @@
     REALM_IDS: () => REALM_IDS,
     RECIPES: () => RECIPES,
     RELIC_EFFECTS: () => RELIC_EFFECTS,
+    RESEARCH_RENOWN: () => RESEARCH_RENOWN,
     RESPEC_COST: () => RESPEC_COST,
     ROOM_SIZE: () => ROOM_SIZE,
     ROW_POINTS: () => ROW_POINTS,
@@ -100,6 +106,7 @@
     SETTLERS: () => SETTLERS,
     SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
+    SHINE_LEVEL: () => SHINE_LEVEL,
     SIDE_ORDER: () => SIDE_ORDER,
     SIGNATURE: () => SIGNATURE,
     SKILLS: () => SKILLS,
@@ -107,6 +114,8 @@
     SKY_SEA: () => SKY_SEA,
     STAGE_FORCE: () => STAGE_FORCE,
     STAGE_NAMES: () => STAGE_NAMES,
+    STATION_LINES: () => STATION_LINES,
+    STATION_QUALITY: () => STATION_QUALITY,
     STORAGE: () => STORAGE,
     SURFACE_BAND: () => SURFACE_BAND,
     TIERS: () => TIERS,
@@ -129,6 +138,7 @@
     WATERSKINS: () => WATERSKINS,
     WEAPONS: () => WEAPONS,
     WEAPON_CLASS: () => WEAPON_CLASS,
+    WEIGHT_OVERRIDE: () => WEIGHT_OVERRIDE,
     WHOLE_REALMS: () => WHOLE_REALMS,
     WORLD_H: () => WORLD_H,
     WORLD_W: () => WORLD_W,
@@ -884,7 +894,7 @@
       mat: "ascended",
       name: "Ascended",
       bar: "ascended_ingot",
-      station: "starforge",
+      station: "rift_forge",
       base: 300,
       color: "#e8d8ff",
       glow: "#ffffff"
@@ -1166,7 +1176,7 @@
     const t = tierOf(tier);
     return { [t.bar]: 3, coin: 40 * tier };
   }
-  var anvilFor = (tier) => tier >= 8 ? "starforge" : tier >= 4 ? "forge" : "workbench";
+  var anvilFor = (tier) => tier >= 12 ? "rift_forge" : tier >= 8 ? "starforge" : tier >= 4 ? "forge" : "workbench";
   var E = (id, name, text, mods) => ({
     id,
     name,
@@ -2929,6 +2939,19 @@
     smoked_fish: ["Smoked fish", "food", 3e3],
     canned_stew: ["Canned stew", "food", 4e4],
     canned_fruit: ["Canned fruit", "food", 4e4],
+    // Station upgrades, packs, and study.
+    tinkers_bench: ["Tinker's bench", "structure"],
+    artisan_bench: ["Artisan bench", "structure"],
+    rift_forge: ["Rift forge", "structure"],
+    laboratory: ["Laboratory", "structure"],
+    hearth: ["Hearth", "structure"],
+    research_desk: ["Research desk", "structure"],
+    satchel: ["Satchel", "tool"],
+    pack: ["Pack", "tool"],
+    expedition_frame: ["Expedition frame", "tool"],
+    repair_kit: ["Repair kit", "material"],
+    whetstone: ["Artisan whetstone", "material"],
+    panacea: ["Panacea", "medicine", 9e3],
     // The Fractured Realms.
     fracture_shard: ["Fracture shard", "material"],
     fractured_key: ["Fractured key", "key"],
@@ -3295,9 +3318,28 @@
     ["canned_fruit", { berry: 4, honey: 1, copper_ingot: 1 }, "canning_kettle", 3, 2],
     ["ice_harvester", { iron_ingot: 4, wood: 10, stone: 10 }, "workbench", 3],
     ["cold_box", { wood: 10, hide: 2, clay: 4 }, "workbench", 2],
+    // Station upgrades: each does the work of those below, and more.
+    ["tinkers_bench", { wood: 20, iron_ingot: 6, copper_ingot: 4 }, "workbench", 3],
+    ["artisan_bench", { wood: 20, gold_ingot: 6, crystal: 4, silk: 4 }, "tinkers_bench", 6],
+    ["rift_forge", { voidsteel_ingot: 8, void_essence: 4, obsidian: 12 }, "starforge", 10],
+    ["laboratory", { glass: 10, crystal: 4, gold_ingot: 4 }, "apothecary", 6],
+    ["hearth", { stone: 30, clay: 10, wood: 6 }, "workbench", 2],
+    ["research_desk", { wood: 16, glass: 4, crystal: 2 }, "workbench", 3],
+    ["repair_kit", { iron_ingot: 2, fiber: 4, resin: 2 }, "tinkers_bench", 3],
+    ["whetstone", { crystal: 3, gold_ingot: 2, sapphire: 1 }, "artisan_bench", 6],
+    ["panacea", { fever_bloom: 2, lumen_moss: 2, fish_oil: 1 }, "laboratory", 8],
+    // Packs: more room, and the carrying goes easier.
+    ["satchel", { hide: 4, fiber: 6 }, "workbench", 1],
+    ["pack", { hide: 8, silk: 4, iron_ingot: 2 }, "tinkers_bench", 3],
+    ["expedition_frame", { hide: 10, steel_ingot: 4, silk: 8 }, "artisan_bench", 6],
     // The Fractured Realms: shards open them, and forge the twelfth tier.
     ["fractured_key", { fracture_shard: 4 }, "waystone", 11],
-    ["ascended_ingot", { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 }, "starforge", 12],
+    [
+      "ascended_ingot",
+      { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 },
+      "rift_forge",
+      12
+    ],
     // The Feverlands.
     ["venom_blade", { plague_ivory: 10, venom: 6, gold_ingot: 2 }, "starforge", 9],
     ["plague_censer", { plague_ivory: 8, fever_bloom: 6, silk: 4 }, "starforge", 9],
@@ -9052,6 +9094,20 @@
   }
   var MASTERY_TITLES = ["Untried", "Novice", "Adept", "Expert", "Master", "Grandmaster"];
   var masteryTitle = (level) => MASTERY_TITLES[Math.min(MASTERY_TITLES.length - 1, Math.floor(level / 5) + (level > 0 ? 1 : 0))];
+  var MASTERY_PERKS = {
+    blade: "Combo finishers heal 3% of your health",
+    greatsword: "Cleaves stagger foes and throw them back",
+    spear: "Leaping thrust: strikes in the air hit 40% harder and reach further",
+    battleaxe: "Bleeding foes take 15% more from everything",
+    warhammer: "Staggers shake even great foes for a moment",
+    whip: "Marks last twice as long and bite harder",
+    bow: "Every fifth arrow is free and pierces two more foes",
+    crossbow: "Bolts throw foes back",
+    staff: "Every cast looses an extra bolt",
+    tome: "Sparks seek harder, and a tenth of casts cost nothing"
+  };
+  var PERK_LEVEL = 10;
+  var SHINE_LEVEL = 20;
 
   // src/data/codex.ts
   var creatures = (id, name, entries, bonus, bonusText) => ({ id, name, group: "Creatures", prefix: "kill:", entries, bonus, bonusText });
@@ -9409,6 +9465,16 @@
       count: 30,
       bonus: { meleeDmg: 0.04, rangedDmg: 0.04, magicDmg: 0.04 },
       bonusText: "+4% damage"
+    },
+    {
+      id: "studies",
+      name: "Studies",
+      group: "Lore",
+      prefix: "study:",
+      entries: [],
+      count: 20,
+      bonus: { xp: 0.05, gather: 0.05 },
+      bonusText: "+5% renown; 5% more chance of an extra find"
     },
     {
       id: "relics",
@@ -10359,6 +10425,60 @@
   };
   var DIET_MEMORY = 8;
 
+  // src/data/stations.ts
+  var STATION_LINES = {
+    tinkers_bench: ["workbench"],
+    artisan_bench: ["workbench", "tinkers_bench"],
+    forge: ["furnace"],
+    starforge: ["forge", "furnace"],
+    rift_forge: ["starforge", "forge", "furnace"],
+    laboratory: ["apothecary"],
+    hearth: ["campfire"],
+    kitchen: ["hearth", "campfire"]
+  };
+  var STATION_QUALITY = {
+    tinkers_bench: 1.15,
+    artisan_bench: 1.35,
+    starforge: 1.1,
+    rift_forge: 1.4
+  };
+  var CATEGORY_WEIGHT = {
+    material: 0.2,
+    ore: 0.5,
+    food: 0.3,
+    water: 0.5,
+    medicine: 0.1,
+    metal: 0.8,
+    tool: 1.5,
+    weapon: 3,
+    clothing: 1.5,
+    trophy: 1,
+    structure: 4,
+    armor: 4,
+    accessory: 0.3,
+    block: 0.2,
+    potion: 0.3,
+    ammo: 0.05,
+    key: 0.1,
+    wall: 0.2,
+    coin: 5e-3
+  };
+  var WEIGHT_OVERRIDE = {
+    wood: 0.4,
+    stone: 0.4,
+    ice: 0.6,
+    satchel: 0.5,
+    pack: 1,
+    expedition_frame: 2
+  };
+  var BASE_CAPACITY = 120;
+  var PACKS = {
+    satchel: 40,
+    pack: 90,
+    expedition_frame: 180
+  };
+  var RESEARCH_RENOWN = 25;
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -10666,9 +10786,11 @@
       return [r ? r.kind === "bow" ? "bow" : "staff" : "blade", tier];
     }
     /** First time a weapon comes into the pack: roll its quality. */
+    /** Quality luck from the station a weapon is being made at (set while crafting). */
+    craftLuck = 1;
     acquire(id, luck = 1) {
       if (!WEAPONS[id] || id === "fists" || this.all[id]) return;
-      const q = rollQuality(this.game.rng, luck);
+      const q = rollQuality(this.game.rng, Math.max(luck, this.craftLuck));
       this.all[id] = { q, lvl: 0, gems: [], evo: [] };
       this.game.progress.record("weapon:" + id);
       this.game.progress.record("family:" + this.classOf(id)[0]);
@@ -11636,6 +11758,11 @@
   var Combat = class extends System {
     projectiles = [];
     combo = 0;
+    shots = 0;
+    /** Whether mastery of a family has reached its perk. */
+    perk(family) {
+      return this.game.skills.mastery(family) >= PERK_LEVEL;
+    }
     lastSwing = -9;
     // ─── Taking and dealing damage ─────────────────────────────────────────────
     /** Harms the player through armour; returns the damage actually taken. */
@@ -11685,6 +11812,7 @@
         if (magic && w.magic) k *= 1 + w.magic;
       }
       if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+      if ((a.fx?.bleed?.[0] ?? 0) > t && this.perk("battleaxe")) k *= 1.15;
       const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1, pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === "void" ? 0.5 : 0)), armour = (spec?.defense ?? 0) * cracked * (1 - pierce), raw = amount * this.game.equipment.damageBonus(magic) * k, taken = Math.max(1, Math.round(raw - armour * 0.5));
       a.hp -= taken;
       if (w) {
@@ -11694,7 +11822,8 @@
       a.warning = 0;
       const dir = Math.sign(a.x - from.x) || 1;
       if (!spec?.boss && a.type !== "boss") {
-        a.x += dir * 12;
+        const shove = w && (w.family === "greatsword" && this.perk("greatsword") || w.family === "crossbow" && this.perk("crossbow")) ? 36 : 12;
+        a.x += dir * shove;
         if (a.body) a.vy = Math.min(a.vy ?? 0, -140);
       }
       this.game.event("damage", a.x, a.y - bodyHeight(a) * 2, String(taken), crit ? 2 : 0);
@@ -11720,8 +11849,13 @@
       if (w.infusion === "venom") dot("poison", 0.22, 4);
       if (w.infusion === "frost") fx.slow = t + 3;
       if (w.stagger && !great) fx.stun = t + 0.5;
+      else if (w.stagger && this.perk("warhammer")) fx.stun = t + 0.25;
+      if (w.family === "greatsword" && !great && this.perk("greatsword")) fx.stun = t + 0.3;
       if (w.sunder) fx.sunder = t + w.sunder;
-      if (w.mark) fx.mark = [t + (w.mark > 0.2 ? 8 : 4), w.mark];
+      if (w.mark) {
+        const whip = this.perk("whip");
+        fx.mark = [t + (w.mark > 0.2 ? 8 : 4) * (whip ? 2 : 1), w.mark + (whip ? 0.05 : 0)];
+      }
       if (w.heal) this.game.equipment.heal(taken * w.heal);
       if (w.infusion === "storm" && this.game.rng() < 0.3) {
         const next = this.game.s.animals.filter((b) => b !== a && !b.deadUntil && !b.settler && dist(a, b) < 220).sort((m, n) => dist(a, m) - dist(a, n))[0];
@@ -11737,7 +11871,8 @@
     swing(weaponId = this.game.s.player.weapon) {
       this.game.durability.use(weaponId);
       const s = this.game.s, p = s.player, w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : "fists"), face = Math.cos(p.face) >= 0 ? 1 : -1;
-      const reach = w.reach * 1.15, wide = w.family === "greatsword" ? 1.5 : 1, centre = { x: p.x, y: p.y - 26 };
+      const leap = w.family === "spear" && !p.grounded && this.perk("spear");
+      const reach = w.reach * 1.15 + (leap ? 24 : 0), wide = w.family === "greatsword" ? 1.5 : 1, centre = { x: p.x, y: p.y - 26 };
       const targets = s.animals.filter((a) => {
         if (a.deadUntil || a.settler) return false;
         const cy = a.y - bodyHeight(a), dx = a.x - centre.x;
@@ -11745,8 +11880,12 @@
       });
       this.combo = s.elapsed - this.lastSwing < 1.3 ? this.combo + 1 : 1;
       this.lastSwing = s.elapsed;
-      const combo = w.family === "blade" && this.combo % 3 === 0 ? w.combo : 1, damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1);
-      if (combo > 1 && targets.length) this.game.event("burst", p.x + face * 30, p.y - 30, "#fff0a0");
+      const combo = w.family === "blade" && this.combo % 3 === 0 ? w.combo : 1, damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1) * (leap ? 1.4 : 1);
+      if (combo > 1 && targets.length) {
+        this.game.event("burst", p.x + face * 30, p.y - 30, "#fff0a0");
+        if (this.perk("blade")) this.game.equipment.heal(this.game.maxHealth() * 0.03);
+      }
+      if (leap && targets.length) this.game.event("burst", p.x + face * 40, p.y - 20, "#dfe3e6");
       for (const a of targets) this.hurtMob(a, damage, p, false, w);
       if (targets.length === 1) {
         const a = targets[0];
@@ -11773,15 +11912,19 @@
         if (!arrow)
           return { ok: false, reason: "No arrows. Make them at a workbench from wood and flint." };
         const sk = this.game.skills.stats(), set = this.game.equipment.fullSet(), save = sk.ammoSave + (sk.quiverMaster ? 0.3 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.25 : 0);
-        if (this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
+        this.shots++;
+        const fifth = w.family === "bow" && this.perk("bow") && this.shots % 5 === 0;
+        if (fifth) extra.pierce = (extra.pierce ?? 0) + 2;
+        if (!fifth && this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
         damage += AMMO[arrow].damage;
         if (AMMO[arrow].effect === "fire") extra.fire = true;
         if (AMMO[arrow].effect === "pierce") extra.pierce = 3;
         kind = spec.projectile === "bolt" ? "bolt" : arrow === "arrow" ? "arrow" : arrow;
         this.game.sound("bow");
       } else {
-        const cost = Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
-        if (!this.game.equipment.spendMana(cost)) {
+        const free = w.family === "tome" && this.perk("tome") && this.game.rng() < 0.1;
+        const cost = free ? 0 : Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
+        if (cost && !this.game.equipment.spendMana(cost)) {
           if (!this.game.skills.flag("overchannel") || s.vitals.health <= cost * 0.6 + 5)
             return { ok: false, reason: "Not enough mana." };
           s.vitals.health -= cost * 0.6;
@@ -11789,8 +11932,9 @@
         }
         this.game.sound("cast");
       }
-      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), bonusShots = (this.game.rng() < this.game.skills.get("extraShot") ? 1 : 0) + (spec.kind === "bow" && this.game.skills.flag("quiverMaster") ? 1 : 0), count = (spec.count ?? 1) + w.count + bonusShots, spread = spec.spread ?? (w.count || bonusShots ? 0.1 : 0), pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
+      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), bonusShots = (this.game.rng() < this.game.skills.get("extraShot") ? 1 : 0) + (spec.kind === "bow" && this.game.skills.flag("quiverMaster") ? 1 : 0), count = (spec.count ?? 1) + w.count + bonusShots + (w.family === "staff" && this.perk("staff") ? 1 : 0), spread = spec.spread ?? (w.count || bonusShots ? 0.1 : 0), pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
       if (w.homing) extra.homing = w.homing;
+      if (w.family === "tome" && this.perk("tome")) extra.homing = (extra.homing ?? 3) + 2;
       extra.pierce = pierce;
       for (let i = 0; i < count; i++) {
         const a = angle + (i - (count - 1) / 2) * spread;
@@ -11956,6 +12100,40 @@
       }
       if (id === "fishing_rod") return this.game.fish();
       if (ARMOR[id] || ACCESSORIES[id] || CLOTHING[id]) return this.game.equipment.wear(id);
+      if (id === "repair_kit") {
+        const w = this.game.s.player.weapon;
+        if (!this.game.durability.wear(w))
+          return { ok: false, reason: "Your weapon needs no mending." };
+        const wear2 = this.game.s.wear;
+        wear2[w] = Math.max(0, wear2[w] - 50);
+        this.game.remove("repair_kit");
+        this.game.sound("craft_anvil");
+        this.game.say(`${itemName(w)} patched up in the field.`, "good");
+        return { ok: true };
+      }
+      if (id === "whetstone") {
+        const w = this.game.s.player.weapon;
+        if (!WEAPONS[w] || w === "fists") return { ok: false, reason: "Hold a weapon to hone." };
+        const e = this.game.armoury.entry(w);
+        if (e.q >= 3) return { ok: false, reason: "It is already as fine as honing can make it." };
+        this.game.armoury.record(w).q = e.q + 1;
+        this.game.remove("whetstone");
+        this.game.sound("crystal");
+        this.game.say(`Honed: ${this.game.armoury.title(w)}.`, "victory");
+        return { ok: true };
+      }
+      if (id === "panacea") {
+        const list = this.game.ailments.list().filter((a) => a.stage > 0);
+        if (!list.length) return { ok: false, reason: "Nothing ails you." };
+        for (const a of list) {
+          a.stage--;
+          if (a.stage <= 0) this.game.ailments.cure(a.id);
+        }
+        this.game.remove("panacea");
+        this.game.sound("medicine");
+        this.game.say("The panacea eases every ailment.", "good");
+        return { ok: true };
+      }
       if (id === "purification_tablet") {
         let n = 0;
         for (const bad of ["brackish_water", "wild_water"])
@@ -12087,6 +12265,25 @@
       if (!this.game.canAfford(r.cost)) return "More materials are needed.";
       return null;
     }
+    /** Studies an item at a research desk: it is used up, and its uses are revealed. */
+    study(id) {
+      if (!this.game.near("research_desk") && !this.game.dev.god)
+        return { ok: false, reason: "Study at a research desk." };
+      if (!this.game.count(id)) return { ok: false, reason: "You carry none to study." };
+      if ((this.game.s.tutorial.tally["study:" + id] ?? 0) > 0)
+        return { ok: false, reason: "You have already studied it." };
+      this.game.remove(id);
+      this.game.progress.record("study:" + id);
+      this.game.skills.gain(RESEARCH_RENOWN);
+      const uses = RECIPES.filter((r) => r.cost[id]).map((r) => itemName(r.id).toLowerCase());
+      const evo = WEAPON_CLASS[id] ? EVOLUTIONS[WEAPON_CLASS[id][0]] : null;
+      this.game.sound("page");
+      this.game.say(
+        `Studied ${itemName(id).toLowerCase()}.` + (uses.length ? ` It goes into ${uses.slice(0, 6).join(", ")}${uses.length > 6 ? ", and more" : ""}.` : "") + (evo ? ` At +5 it may become ${evo[0].map((e) => e.name).join(" or ")}; at +10, ${evo[1].map((e) => e.name).join(" or ")}.` : ""),
+        "good"
+      );
+      return { ok: true, reveals: uses };
+    }
     free(id) {
       return this.game.dev.unlocked.has(id);
     }
@@ -12096,7 +12293,12 @@
       const r = RECIPES.find((r2) => r2.id === id);
       if (!this.free(id))
         for (const [item, qty] of Object.entries(r.cost)) this.game.remove(item, qty);
+      this.game.armoury.craftLuck = Math.max(
+        1,
+        ...Object.entries(STATION_QUALITY).filter(([st]) => this.game.near(st) && this.game.near(st).type === st).map(([, k]) => k)
+      );
       this.game.add(id, r.yield ?? 1);
+      this.game.armoury.craftLuck = 1;
       this.game.sound(
         r.station === "forge" || r.station === "furnace" ? "craft_anvil" : r.station === "campfire" || r.station === "drying_rack" ? "craft_cook" : r.station === "apothecary" ? "craft_brew" : "craft_wood"
       );
@@ -13660,6 +13862,8 @@
           this.game.sound("place", st.x, st.y, 0.7);
           this.game.say("Fed the campfire with wood.", "good");
         } else return { ok: false, reason: "One wood refuels the campfire." };
+      } else if (st.type === "research_desk") {
+        return { ok: true, action: "research", structure: st };
       } else if (st.type === "distiller") {
         const n = Math.min(
           this.game.count("brackish_water") + this.game.count("wild_water"),
@@ -13878,6 +14082,23 @@
     }
     canAfford(cost) {
       return Object.entries(cost).every(([id, n]) => this.count(id) >= n);
+    }
+    /** Kilograms carried. */
+    load() {
+      let kg = 0;
+      for (const e of this.game.s.inventory) {
+        const cat = ITEMS[e.id]?.[1] ?? "material";
+        kg += e.qty * (WEIGHT_OVERRIDE[e.id] ?? CATEGORY_WEIGHT[cat] ?? 0.2);
+      }
+      return kg;
+    }
+    /** Kilograms the pack can hold without slowing you: a base, plus the best pack carried. */
+    capacity() {
+      return BASE_CAPACITY + Math.max(0, ...Object.entries(PACKS).map(([id, kg]) => this.count(id) ? kg : 0));
+    }
+    /** How far over capacity you are, 0 when within it. */
+    overload() {
+      return Math.max(0, this.load() / this.capacity() - 1);
     }
     /** The best unbroken tool of a kind carried, which is the one that wears with use. */
     bestTool(kind) {
@@ -14114,7 +14335,8 @@
       const lava = this.game.inLava(), water = this.game.pocket.submerged();
       if (lava && !this.wasInLava) this.game.sound("sizzle", p.x, p.y, 1.3);
       this.wasInLava = lava;
-      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (this.game.survival.diet().state === "malnourished" ? 0.93 : 1) * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
+      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (this.game.survival.diet().state === "malnourished" ? 0.93 : 1) * // Overloaded, you slow down: to half at twice your capacity.
+      Math.max(0.5, 1 - this.game.inventory.overload() * 0.5) * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
       p.vx = dx * speed;
       const shaft = inShaft(p.x, p.y);
@@ -15603,6 +15825,11 @@
       v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
       v.vitamins = clamp(v.vitamins - dt * hunger * 0.012, 0, RULES.maxVital);
       v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
+      const over = this.game.inventory.overload();
+      if (over > 0 && p.moving) {
+        v.stamina = clamp(v.stamina - dt * over * 6, 0, 100);
+        v.fatigue = clamp(v.fatigue + dt * over * 0.05, 0, RULES.maxVital);
+      }
       v.hygiene = clamp(
         v.hygiene - dt * (this.game.biome().id === "marsh" ? 0.025 : 0.011),
         0,
@@ -16855,10 +17082,14 @@
       return lavaAt(p.x, p.y - 8);
     }
     near(type, radius = 110) {
-      const ok = (t) => t === type || type === "furnace" && t === "kiln";
+      const ok = (t) => t === type || type === "furnace" && t === "kiln" || !!STATION_LINES[t]?.includes(type);
       return this.s.structures.find((st) => ok(st.type) && dist(st, this.s.player) <= radius);
     }
     nearLitFire() {
+      const hearth = this.s.structures.find(
+        (st) => (st.type === "hearth" || st.type === "kitchen") && dist(st, this.s.player) <= 155
+      );
+      if (hearth) return hearth;
       const f = this.near("campfire", 155);
       return f && f.fuel > 0 ? f : null;
     }
@@ -17944,6 +18175,18 @@
     garden_key: ["key", "#8ad070"],
     diving_bell: ["crate", "#5a9ac0"],
     fracture_shard: ["crystal", "#d8a0ff"],
+    tinkers_bench: ["crate", "#8a6440"],
+    artisan_bench: ["crate", "#6a3a2a"],
+    rift_forge: ["crate", "#b36cff"],
+    laboratory: ["bottle", "#58e0d0"],
+    hearth: ["crate", "#8b8f8a"],
+    research_desk: ["scroll", "#e8dcc0"],
+    satchel: ["pelt", "#a47c55"],
+    pack: ["pelt", "#8a6440"],
+    expedition_frame: ["crate", "#6a4a30"],
+    repair_kit: ["crate", "#a8a4a0"],
+    whetstone: ["gem", "#8fe3df"],
+    panacea: ["potion", "#e8f070"],
     linen_underlayer: ["legs", "#e8e0c8"],
     wool_underlayer: ["legs", "#c8b8a0"],
     silk_underlayer: ["legs", "#f0f0f8"],
@@ -19018,6 +19261,15 @@
       } else {
         c.rotate(Math.atan2(Math.cos(qa), Math.sin(qa)) + Math.PI / 4);
         c.drawImage(icon2.cv, -5, -13);
+        const cls = data_exports.WEAPON_CLASS[held];
+        if (cls && g.skills.mastery(cls[0]) >= data_exports.SHINE_LEVEL) {
+          c.fillStyle = data_exports.tierOf(cls[1]).glow;
+          for (let i = 0; i < 4; i++) {
+            const k2 = (t * 1.7 + i / 4) % 1;
+            if (Math.sin(t * 9 + i * 2) > 0)
+              c.fillRect(-4 + Math.round(k2 * 12), -12 + Math.round(k2 * 12) - i % 2, 1, 1);
+          }
+        }
       }
       c.restore();
     };
@@ -21306,6 +21558,8 @@
       else if (s.type === "effergy") out.push([s.x, s.y - 60, 0.85, 0.72, 1]);
       else if (s.type === "shrine" && s.crop !== "spent") out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
       else if (s.type === "diving_bell") out.push([s.x, s.y - 24, 0.6, 0.8, 0.9]);
+      else if (s.type === "hearth") out.push([s.x, s.y - 12, 1.2 * f, 0.7 * f, 0.35 * f]);
+      else if (s.type === "rift_forge") out.push([s.x, s.y - 20, 0.9, 0.4, 0.9]);
       else if (s.type === "relic_shelf" && Object.keys(s.store).length)
         out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
       else if (s.type === "kiln") out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);
@@ -22803,6 +23057,73 @@
       p.rect(2, 3, 18, 4, "#5a5462");
       p.rect(8, 12, 6, 7, "#2a2630");
       p.shadeEdges(0.2, -0.3);
+    }),
+    // Station upgrades.
+    tinkers_bench: () => sprite(36, 22, 18, 21, (p) => {
+      p.rect(0, 6, 36, 4, "#8a6440");
+      p.rect(0, 6, 36, 1, "#b08a5a");
+      p.rect(2, 10, 3, 12, "#6a4a30");
+      p.rect(31, 10, 3, 12, "#6a4a30");
+      p.rect(6, 12, 24, 3, "#6a4a30");
+      p.rect(4, 2, 6, 4, "#a8a4a0");
+      p.rect(14, 3, 3, 3, "#d0844a");
+      p.rect(22, 1, 8, 5, "#5a5e64");
+      p.set(25, 2, "#f0c850");
+    }),
+    artisan_bench: () => sprite(40, 26, 20, 25, (p) => {
+      p.rect(0, 8, 40, 5, "#6a3a2a");
+      p.rect(0, 8, 40, 1, "#a86a4a");
+      for (const x of [2, 35]) p.rect(x, 13, 3, 13, "#4a2a1a");
+      p.rect(6, 16, 28, 3, "#4a2a1a");
+      p.rect(4, 2, 10, 6, "#f0c850");
+      p.rect(5, 3, 8, 1, "#fff0a0");
+      p.rect(18, 4, 3, 4, "#8fe3df");
+      p.rect(26, 0, 10, 8, "#dfe3e6");
+      p.rect(27, 1, 3, 2, "#ffffff");
+    }),
+    rift_forge: () => sprite(44, 40, 22, 39, (p) => {
+      p.rect(2, 12, 40, 28, "#2a1c3a");
+      p.rect(2, 12, 40, 2, "#6a4a8a");
+      p.rect(12, 20, 20, 14, "#140a22");
+      p.ellipse(22, 27, 7, 5, "#ff6ad5");
+      p.ellipse(22, 27, 4, 3, "#ffe0f8");
+      p.rect(8, 0, 6, 12, "#3a2a4a");
+      p.rect(30, 0, 6, 12, "#3a2a4a");
+      for (const x of [4, 38]) p.rect(x, 16, 2, 20, "#b36cff");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    laboratory: () => sprite(36, 28, 18, 27, (p) => {
+      p.rect(0, 14, 36, 4, "#6a6a70");
+      p.rect(2, 18, 3, 10, "#4a4a50");
+      p.rect(31, 18, 3, 10, "#4a4a50");
+      p.ellipse(8, 9, 4, 5, "#bfe8ff");
+      p.rect(7, 2, 2, 4, "#bfe8ff");
+      p.rect(6, 9, 5, 4, "#58e0d0");
+      p.rect(16, 4, 3, 10, "#dfe3e6");
+      p.rect(16, 9, 3, 5, "#e8577a");
+      p.ellipse(27, 10, 5, 4, "#bfe8ff");
+      p.rect(24, 10, 7, 3, "#e8f070");
+    }),
+    hearth: () => sprite(38, 34, 19, 33, (p) => {
+      p.rect(0, 10, 38, 24, "#8b8f8a");
+      for (let y = 12; y < 34; y += 5)
+        for (let x = (y % 10 ? 0 : 4) + 1; x < 37; x += 8) p.rect(x, y, 7, 1, "#6a6e6a");
+      p.rect(9, 18, 20, 16, "#1c1410");
+      p.ellipse(19, 30, 7, 4, "#ff8a3a");
+      p.ellipse(19, 30, 4, 2, "#ffe070");
+      p.rect(13, 0, 12, 10, "#7a7e7a");
+      p.rect(0, 10, 38, 2, "#a8aca8");
+    }),
+    research_desk: () => sprite(34, 26, 17, 25, (p) => {
+      p.rect(0, 10, 34, 4, "#6a4a30");
+      p.rect(0, 10, 34, 1, "#8a6440");
+      p.rect(2, 14, 3, 12, "#4a3020");
+      p.rect(29, 14, 3, 12, "#4a3020");
+      p.rect(4, 5, 12, 5, "#e8dcc0");
+      p.line(10, 5, 10, 9, "#b8a080");
+      p.rect(20, 2, 3, 8, "#b8b0a0");
+      p.ellipse(21, 2, 3, 2, "#bfe8ff");
+      p.rect(26, 6, 5, 4, "#8fe3df");
     }),
     // Keeping and cleaning: the distiller, the smoking rack, the canning kettle, the ice harvester.
     distiller: () => sprite(28, 30, 14, 29, (p) => {
@@ -28923,6 +29244,8 @@
     codexPage: "wilds",
     /** The relic shelf open on the Pack page. */
     shelf: null,
+    /** The research desk open on the Pack page. */
+    research: null,
     armourySel: "iron_sword",
     camera: { x: 0, y: 0 },
     lastFrame: performance.now(),
@@ -29180,6 +29503,14 @@
         state.atlasView = "rift";
         toggleJournal(true);
       }
+      if (result.action === "research") {
+        state.research = result.structure ?? null;
+        state.shelf = null;
+        state.larder = null;
+        state.tab = "pack";
+        sound("open");
+        toggleJournal(true);
+      }
       if (result.action === "shelf") {
         state.shelf = result.structure ?? null;
         state.larder = null;
@@ -29430,7 +29761,8 @@
     const groups = [...new Set(items.map((e) => ITEMS[e.id][1]))].sort(
       (a, b) => order.indexOf(a) - order.indexOf(b)
     );
-    right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p>${groups.map(
+    const load = game.inventory.load(), cap = game.inventory.capacity();
+    right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p><div class="vital-row" title="Carry more than this and you slow down and tire. A satchel, pack, or expedition frame raises it."><span>Load</span><span class="mini-track"><i style="width:${clamp3(load / cap * 100, 0, 100)}%;${load > cap ? "background:#b2402e" : ""}"></i></span><b>${Math.round(load)}/${cap} kg</b></div>${load > cap ? '<p class="warn-line">Overloaded: you move slowly and tire fast. Drop or store something.</p>' : ""}${groups.map(
       (category) => `<h3>${category}</h3><div class="book-list">${shown.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
         const use = itemUseLabel(e.id), fresh = freshness(e);
         const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
@@ -29438,6 +29770,27 @@
         return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, "")}</small>` : ""}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
+    const desk = state.research;
+    if (desk) {
+      const tally = game.s.tutorial.tally, fresh = [...new Set(game.s.inventory.map((e) => e.id))].filter(
+        (id) => !(tally["study:" + id] > 0) && id !== "coin"
+      );
+      left.innerHTML = `<h2>Research desk</h2><p class="lede">Study a thing and learn what it is for: what it goes into, and how a weapon may grow. Studying uses one up, and every study earns renown.</p><p class="muted">${Object.keys(tally).filter((k) => k.startsWith("study:")).length} things studied.</p><div class="book-list">${fresh.map(
+        (id) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${RECIPES.filter((r) => r.cost[id]).length} known uses</small></div></div><button data-study="${id}">STUDY</button></div>`
+      ).join("") || "<p>Nothing new in your pack to study.</p>"}</div><div class="book-actions"><button class="quiet" data-close-desk>CLOSE</button></div>`;
+      left.querySelectorAll("[data-study]").forEach(
+        (b) => b.onclick = () => {
+          const r = game.crafting.study(b.dataset.study ?? "");
+          if (!r.ok) message(r.reason);
+          renderJournal();
+          updateUI(true);
+        }
+      );
+      left.querySelector("[data-close-desk]").onclick = () => {
+        state.research = null;
+        renderJournal();
+      };
+    }
     const shelf = state.shelf;
     if (shelf) {
       const held = Object.keys(shelf.store).filter((id) => RELIC_EFFECTS[id]), carried = game.s.inventory.filter((e) => RELIC_EFFECTS[e.id]).map((e) => e.id);
@@ -29888,11 +30241,11 @@
     right.innerHTML = `<h2>Renown ${sk.level()}</h2><p class="lede">Everything you do earns renown: slaying, making, finding, clearing realms. Each level is a skill point. Renown never fades.</p><div class="vital-row"><span>Next level</span><span class="mini-track"><i style="width:${clamp3(into / need * 100, 0, 100)}%"></i></span><b>${Math.round(into)}/${need}</b></div><p><strong>${sk.points()}</strong> point${sk.points() === 1 ? "" : "s"} to spend \xB7 relic shelf holds <strong>${sk.shelfSlots()}</strong></p><h3>Weapon mastery</h3><div class="book-list">${FAMILIES.map(
       (f) => {
         const lvl = sk.mastery(f.id);
-        return `<div class="book-row"><div><strong>${f.name}</strong><small>${masteryTitle(lvl)}</small></div><span class="qty">${lvl} / ${MAX_MASTERY}</span></div>`;
+        return `<div class="book-row" title="Mastery ${PERK_LEVEL}: ${MASTERY_PERKS[f.id]}. Mastery ${SHINE_LEVEL}: the weapon glints in your hand."><div><strong>${f.name}</strong><small>${masteryTitle(lvl)}${lvl >= PERK_LEVEL ? " \xB7 " + MASTERY_PERKS[f.id] : ""}</small></div><span class="qty">${lvl} / ${MAX_MASTERY}</span></div>`;
       }
     ).join(
       ""
-    )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10%.</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL \xB7 3 FALLEN STARS, 200 MARKS</button></div>`;
+    )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10% and makes it glint. At 10 each family also learns a move of its own (hover a family to see it).</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL \xB7 3 FALLEN STARS, 200 MARKS</button></div>`;
     left.querySelectorAll("[data-tree]").forEach(
       (b) => b.onclick = () => {
         state.skillTree = b.dataset.tree ?? "warfare";

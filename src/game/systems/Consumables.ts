@@ -38,6 +38,43 @@ export class Consumables extends System {
     }
     if (id === 'fishing_rod') return this.game.fish();
     if (ARMOR[id] || ACCESSORIES[id] || CLOTHING[id]) return this.game.equipment.wear(id);
+    // A repair kit mends half the wear of the weapon in hand, anywhere.
+    if (id === 'repair_kit') {
+      const w = this.game.s.player.weapon;
+      if (!this.game.durability.wear(w))
+        return { ok: false, reason: 'Your weapon needs no mending.' };
+      const wear = this.game.s.wear!;
+      wear[w] = Math.max(0, wear[w] - 50);
+      this.game.remove('repair_kit');
+      this.game.sound('craft_anvil');
+      this.game.say(`${itemName(w)} patched up in the field.`, 'good');
+      return { ok: true };
+    }
+    // An artisan's whetstone raises the weapon in hand one grade, up to Masterwork.
+    if (id === 'whetstone') {
+      const w = this.game.s.player.weapon;
+      if (!WEAPONS[w] || w === 'fists') return { ok: false, reason: 'Hold a weapon to hone.' };
+      const e = this.game.armoury.entry(w);
+      if (e.q >= 3) return { ok: false, reason: 'It is already as fine as honing can make it.' };
+      this.game.armoury.record(w).q = e.q + 1;
+      this.game.remove('whetstone');
+      this.game.sound('crystal');
+      this.game.say(`Honed: ${this.game.armoury.title(w)}.`, 'victory');
+      return { ok: true };
+    }
+    // A panacea eases every ailment a stage.
+    if (id === 'panacea') {
+      const list = this.game.ailments.list().filter((a) => a.stage > 0);
+      if (!list.length) return { ok: false, reason: 'Nothing ails you.' };
+      for (const a of list) {
+        a.stage--;
+        if (a.stage <= 0) this.game.ailments.cure(a.id);
+      }
+      this.game.remove('panacea');
+      this.game.sound('medicine');
+      this.game.say('The panacea eases every ailment.', 'good');
+      return { ok: true };
+    }
     // A purification tablet makes up to three draughts of doubtful water safe.
     if (id === 'purification_tablet') {
       let n = 0;

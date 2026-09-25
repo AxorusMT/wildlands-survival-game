@@ -312,6 +312,16 @@ export function drawPlayer(
       // Icons point up and right from a grip near their lower left; line that up with the arm.
       c.rotate(Math.atan2(Math.cos(qa), Math.sin(qa)) + Math.PI / 4);
       c.drawImage(icon.cv, -5, -13);
+      // A weapon mastered to the full glints with its tier's light.
+      const cls = D.WEAPON_CLASS[held];
+      if (cls && g.skills.mastery(cls[0]) >= D.SHINE_LEVEL) {
+        c.fillStyle = D.tierOf(cls[1]).glow;
+        for (let i = 0; i < 4; i++) {
+          const k = (t * 1.7 + i / 4) % 1;
+          if (Math.sin(t * 9 + i * 2) > 0)
+            c.fillRect(-4 + Math.round(k * 12), -12 + Math.round(k * 12) - (i % 2), 1, 1);
+        }
+      }
     }
     c.restore();
   };

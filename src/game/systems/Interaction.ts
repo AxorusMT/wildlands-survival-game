@@ -117,6 +117,8 @@ export class Interaction extends System {
         this.game.sound('place', st.x, st.y, 0.7);
         this.game.say('Fed the campfire with wood.', 'good');
       } else return { ok: false, reason: 'One wood refuels the campfire.' };
+    } else if (st.type === 'research_desk') {
+      return { ok: true, action: 'research', structure: st };
     } else if (st.type === 'distiller') {
       // Boils and condenses brackish and wild water into clean, a wood for every two.
       const n = Math.min(

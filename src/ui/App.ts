@@ -55,6 +55,8 @@ const state = {
   codexPage: 'wilds',
   /** The relic shelf open on the Pack page. */
   shelf: null as Structure | null,
+  /** The research desk open on the Pack page. */
+  research: null as Structure | null,
   armourySel: 'iron_sword',
   camera: { x: 0, y: 0 },
   lastFrame: performance.now(),
@@ -337,6 +339,14 @@ function doInteract() {
       state.atlasView = 'rift';
       toggleJournal(true);
     }
+    if (result.action === 'research') {
+      state.research = result.structure ?? null;
+      state.shelf = null;
+      state.larder = null;
+      state.tab = 'pack';
+      sound('open');
+      toggleJournal(true);
+    }
     if (result.action === 'shelf') {
       state.shelf = result.structure ?? null;
       state.larder = null;
@@ -617,7 +627,9 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
   const groups = [...new Set(items.map((e) => D.ITEMS[e.id][1]))].sort(
     (a, b) => order.indexOf(a) - order.indexOf(b),
   );
-  right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p>${
+  const load = game.inventory.load(),
+    cap = game.inventory.capacity();
+  right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p><div class="vital-row" title="Carry more than this and you slow down and tire. A satchel, pack, or expedition frame raises it."><span>Load</span><span class="mini-track"><i style="width:${clamp((load / cap) * 100, 0, 100)}%;${load > cap ? 'background:#b2402e' : ''}"></i></span><b>${Math.round(load)}/${cap} kg</b></div>${load > cap ? '<p class="warn-line">Overloaded: you move slowly and tire fast. Drop or store something.</p>' : ''}${
     groups
       .map(
         (category) =>
@@ -636,6 +648,34 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
       )
       .join('') || '<p>Only the journal remains. Gather what the meadow offers.</p>'
   }`;
+  const desk = state.research;
+  if (desk) {
+    const tally = game.s.tutorial.tally,
+      fresh = [...new Set(game.s.inventory.map((e) => e.id))].filter(
+        (id) => !(tally['study:' + id] > 0) && id !== 'coin',
+      );
+    left.innerHTML = `<h2>Research desk</h2><p class="lede">Study a thing and learn what it is for: what it goes into, and how a weapon may grow. Studying uses one up, and every study earns renown.</p><p class="muted">${Object.keys(tally).filter((k) => k.startsWith('study:')).length} things studied.</p><div class="book-list">${
+      fresh
+        .map(
+          (id) =>
+            `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${D.RECIPES.filter((r) => r.cost[id]).length} known uses</small></div></div><button data-study="${id}">STUDY</button></div>`,
+        )
+        .join('') || '<p>Nothing new in your pack to study.</p>'
+    }</div><div class="book-actions"><button class="quiet" data-close-desk>CLOSE</button></div>`;
+    left.querySelectorAll<HTMLButtonElement>('[data-study]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          const r = game.crafting.study(b.dataset.study ?? '');
+          if (!r.ok) message(r.reason);
+          renderJournal();
+          updateUI(true);
+        }),
+    );
+    left.querySelector<HTMLButtonElement>('[data-close-desk]')!.onclick = () => {
+      state.research = null;
+      renderJournal();
+    };
+  }
   const shelf = state.shelf;
   if (shelf) {
     const held = Object.keys(shelf.store).filter((id) => D.RELIC_EFFECTS[id]),
@@ -1246,11 +1286,11 @@ function renderSkills(left: HTMLElement, right: HTMLElement) {
   right.innerHTML = `<h2>Renown ${sk.level()}</h2><p class="lede">Everything you do earns renown: slaying, making, finding, clearing realms. Each level is a skill point. Renown never fades.</p><div class="vital-row"><span>Next level</span><span class="mini-track"><i style="width:${clamp((into / need) * 100, 0, 100)}%"></i></span><b>${Math.round(into)}/${need}</b></div><p><strong>${sk.points()}</strong> point${sk.points() === 1 ? '' : 's'} to spend · relic shelf holds <strong>${sk.shelfSlots()}</strong></p><h3>Weapon mastery</h3><div class="book-list">${D.FAMILIES.map(
     (f) => {
       const lvl = sk.mastery(f.id);
-      return `<div class="book-row"><div><strong>${f.name}</strong><small>${D.masteryTitle(lvl)}</small></div><span class="qty">${lvl} / ${D.MAX_MASTERY}</span></div>`;
+      return `<div class="book-row" title="Mastery ${D.PERK_LEVEL}: ${D.MASTERY_PERKS[f.id]}. Mastery ${D.SHINE_LEVEL}: the weapon glints in your hand."><div><strong>${f.name}</strong><small>${D.masteryTitle(lvl)}${lvl >= D.PERK_LEVEL ? ' · ' + D.MASTERY_PERKS[f.id] : ''}</small></div><span class="qty">${lvl} / ${D.MAX_MASTERY}</span></div>`;
     },
   ).join(
     '',
-  )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10%.</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL · 3 FALLEN STARS, 200 MARKS</button></div>`;
+  )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10% and makes it glint. At 10 each family also learns a move of its own (hover a family to see it).</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL · 3 FALLEN STARS, 200 MARKS</button></div>`;
   left.querySelectorAll<HTMLButtonElement>('[data-tree]').forEach(
     (b) =>
       (b.onclick = () => {

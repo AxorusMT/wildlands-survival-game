@@ -400,3 +400,20 @@ export function masteryLevel(xp: number) {
 export const MASTERY_TITLES = ['Untried', 'Novice', 'Adept', 'Expert', 'Master', 'Grandmaster'];
 export const masteryTitle = (level: number) =>
   MASTERY_TITLES[Math.min(MASTERY_TITLES.length - 1, Math.floor(level / 5) + (level > 0 ? 1 : 0))];
+
+/** What mastery 10 teaches each family: a new way to fight, not just more of the same. */
+export const MASTERY_PERKS: Record<string, string> = {
+  blade: 'Combo finishers heal 3% of your health',
+  greatsword: 'Cleaves stagger foes and throw them back',
+  spear: 'Leaping thrust: strikes in the air hit 40% harder and reach further',
+  battleaxe: 'Bleeding foes take 15% more from everything',
+  warhammer: 'Staggers shake even great foes for a moment',
+  whip: 'Marks last twice as long and bite harder',
+  bow: 'Every fifth arrow is free and pierces two more foes',
+  crossbow: 'Bolts throw foes back',
+  staff: 'Every cast looses an extra bolt',
+  tome: 'Sparks seek harder, and a tenth of casts cost nothing',
+};
+/** Mastery at which a family's perk is learned, and at which its weapons shine. */
+export const PERK_LEVEL = 10,
+  SHINE_LEVEL = 20;

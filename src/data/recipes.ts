@@ -298,9 +298,28 @@ export const RECIPES: Recipe[] = (
     ['canned_fruit', { berry: 4, honey: 1, copper_ingot: 1 }, 'canning_kettle', 3, 2],
     ['ice_harvester', { iron_ingot: 4, wood: 10, stone: 10 }, 'workbench', 3],
     ['cold_box', { wood: 10, hide: 2, clay: 4 }, 'workbench', 2],
+    // Station upgrades: each does the work of those below, and more.
+    ['tinkers_bench', { wood: 20, iron_ingot: 6, copper_ingot: 4 }, 'workbench', 3],
+    ['artisan_bench', { wood: 20, gold_ingot: 6, crystal: 4, silk: 4 }, 'tinkers_bench', 6],
+    ['rift_forge', { voidsteel_ingot: 8, void_essence: 4, obsidian: 12 }, 'starforge', 10],
+    ['laboratory', { glass: 10, crystal: 4, gold_ingot: 4 }, 'apothecary', 6],
+    ['hearth', { stone: 30, clay: 10, wood: 6 }, 'workbench', 2],
+    ['research_desk', { wood: 16, glass: 4, crystal: 2 }, 'workbench', 3],
+    ['repair_kit', { iron_ingot: 2, fiber: 4, resin: 2 }, 'tinkers_bench', 3],
+    ['whetstone', { crystal: 3, gold_ingot: 2, sapphire: 1 }, 'artisan_bench', 6],
+    ['panacea', { fever_bloom: 2, lumen_moss: 2, fish_oil: 1 }, 'laboratory', 8],
+    // Packs: more room, and the carrying goes easier.
+    ['satchel', { hide: 4, fiber: 6 }, 'workbench', 1],
+    ['pack', { hide: 8, silk: 4, iron_ingot: 2 }, 'tinkers_bench', 3],
+    ['expedition_frame', { hide: 10, steel_ingot: 4, silk: 8 }, 'artisan_bench', 6],
     // The Fractured Realms: shards open them, and forge the twelfth tier.
     ['fractured_key', { fracture_shard: 4 }, 'waystone', 11],
-    ['ascended_ingot', { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 }, 'starforge', 12],
+    [
+      'ascended_ingot',
+      { fracture_shard: 3, voidsteel_ingot: 2, void_essence: 1 },
+      'rift_forge',
+      12,
+    ],
     // The Feverlands.
     ['venom_blade', { plague_ivory: 10, venom: 6, gold_ingot: 2 }, 'starforge', 9],
     ['plague_censer', { plague_ivory: 8, fever_bloom: 6, silk: 4 }, 'starforge', 9],

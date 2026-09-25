@@ -248,6 +248,12 @@ export class Survival extends System {
     v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
     v.vitamins = clamp(v.vitamins - dt * hunger * 0.012, 0, RULES.maxVital);
     v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
+    // Hauling too much wears you out.
+    const over = this.game.inventory.overload();
+    if (over > 0 && p.moving) {
+      v.stamina = clamp(v.stamina - dt * over * 6, 0, 100);
+      v.fatigue = clamp(v.fatigue + dt * over * 0.05, 0, RULES.maxVital);
+    }
     v.hygiene = clamp(
       v.hygiene - dt * (this.game.biome().id === 'marsh' ? 0.025 : 0.011),
       0,

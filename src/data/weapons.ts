@@ -132,7 +132,7 @@ export const TIERS: WeaponTier[] = [
     mat: 'ascended',
     name: 'Ascended',
     bar: 'ascended_ingot',
-    station: 'starforge',
+    station: 'rift_forge',
     base: 300,
     color: '#e8d8ff',
     glow: '#ffffff',
@@ -496,7 +496,7 @@ export function reforgeCost(tier: number): Record<string, number> {
 }
 /** The station that works a tier's weapons. */
 export const anvilFor = (tier: number) =>
-  tier >= 8 ? 'starforge' : tier >= 4 ? 'forge' : 'workbench';
+  tier >= 12 ? 'rift_forge' : tier >= 8 ? 'starforge' : tier >= 4 ? 'forge' : 'workbench';
 
 // ── Evolutions: a choice at +5 and another at +10 ──────────────────────────────────────────────
 export interface WeaponMods {
