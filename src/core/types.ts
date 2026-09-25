@@ -327,6 +327,8 @@ export interface GameState {
   /** Each settler's home, by settler id: the seat of their room. */
   town: { homes: Record<string, { x: number; y: number }> };
   /** Lasting progress: renown earned, skills learned, and damage dealt with each weapon family. */
+  /** Armour's levels, gems, and infusions. */
+  armourMods?: Record<string, { lvl: number; gems: string[]; inf?: string }>;
   /** How worn each weapon, tool, and garment is (0 to 100). */
   wear?: Record<string, number>;
   /** Seconds of light left in the miner's lamp. */

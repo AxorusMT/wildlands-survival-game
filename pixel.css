@@ -647,6 +647,12 @@ canvas.icon {
   border-style: double;
   border-width: 3px;
 }
+.compare .better {
+  color: #3a7a3a;
+}
+.compare .worse {
+  color: #b2402e;
+}
 .warn-line {
   color: #b2402e;
   font-weight: 700;

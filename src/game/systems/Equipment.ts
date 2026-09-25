@@ -198,6 +198,8 @@ export class Equipment extends System {
     if (this.fullSet() === 'amberguard') d += 2;
     if (this.fullSet() === 'leviathan') d += 3;
     if (this.fullSet() === 'forgeborn') d += 4;
+    // Worked armour: levels and onyx.
+    d += this.game.armourForge.totals().defense;
     // A Phalanx spear or Juggernaut hammer guards you while it is your ready weapon.
     d += this.game.armoury.stats(this.game.s.player.weapon).defense;
     return d;
@@ -211,6 +213,7 @@ export class Equipment extends System {
     if (fx.has('buff:wrath')) k += 0.15;
     if (fx.has('buff:fiery') || fx.has('buff:feasted')) k += 0.1;
     if (magic && (fx.has('mana40') || fx.has('magic15'))) k += 0.15;
+    k += this.game.armourForge.totals().damage;
     return k;
   }
   speedBonus() {
@@ -224,6 +227,7 @@ export class Equipment extends System {
       (fx.has('cold') ? 0.1 : 0) +
       (fx.has('buff:sweet') ? 0.1 : 0) +
       (this.fullSet() === 'saltwarden' || this.fullSet() === 'ashwalker' ? 0.1 : 0) +
+      this.game.armourForge.totals().speed +
       this.game.skills.get('speed') -
       (this.game.skills.flag('juggernaut') ? 0.1 : 0) +
       (this.game.skills.flag('wanderer') ? 0.15 : 0)
@@ -243,7 +247,8 @@ export class Equipment extends System {
     return (
       (this.game.s.maxMana || CRYSTALS.baseMana) +
       (fx.has('mana40') || fx.has('arcanist') ? 40 : 0) +
-      this.game.skills.get('maxMana')
+      this.game.skills.get('maxMana') +
+      this.game.armourForge.totals().mana
     );
   }
   heal(amount: number) {
@@ -319,6 +324,7 @@ export class Equipment extends System {
     );
     let regen = 0;
     if (fx.has('regen') || this.fullSet() === 'druid') regen += 0.6;
+    regen += this.game.armourForge.totals().regen;
     if (fx.has('buff:regeneration')) regen += 1.2;
     if (fx.has('spores')) regen += 0.5;
     if (fx.has('home')) regen += 0.35;

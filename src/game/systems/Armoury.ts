@@ -169,6 +169,7 @@ export class Armoury extends System {
         0.05 +
         (m.crit ?? 0) +
         sk.crit +
+        this.game.armourForge.totals().crit +
         (mastery >= 10 ? 0.05 : 0) +
         (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === 'ranger' ? 0.1 : 0),
       count: m.count ?? 0,

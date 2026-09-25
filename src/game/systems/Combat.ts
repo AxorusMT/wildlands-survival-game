@@ -6,6 +6,7 @@ import { MOBS, mobName } from '../../data/mobs.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import { TILE } from '../../data/world.ts';
 import { PERK_LEVEL } from '../../data/skills.ts';
+import { resistOf, type DamageKind } from '../../data/resist.ts';
 import { UNDEAD, infusionById } from '../../data/weapons.ts';
 import { RULES } from '../rules.ts';
 import type { WeaponStats } from './Armoury.ts';
@@ -129,6 +130,9 @@ export class Combat extends System {
       if (magic && w.magic) k *= 1 + w.magic;
     }
     if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+    // What it resists, and what it fears.
+    const kind: DamageKind = (w?.infusion as DamageKind) ?? (magic ? 'arcane' : 'physical');
+    k *= 1 - (resistOf(a.type)[kind] ?? 0);
     // Battleaxe mastery: bleeding foes take more from everything.
     if ((a.fx?.bleed?.[0] ?? 0) > t && this.perk('battleaxe')) k *= 1.15;
     const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1,

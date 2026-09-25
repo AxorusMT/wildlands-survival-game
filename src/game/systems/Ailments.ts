@@ -45,6 +45,14 @@ export class Ailments extends System {
     if (source && sk.ironGut >= 1) return false;
     if (source === 'spoiled' && sk.ironGut > 0) return false;
     if (id === 'frostbite' && sk.coldBlooded) return false;
+    // Infused armour keeps some harms from taking hold.
+    const inf = this.game.armourForge.totals().infusions;
+    if (
+      (id === 'burn' && inf.has('fire')) ||
+      (id === 'poisoning' && inf.has('venom')) ||
+      (id === 'void_rot' && inf.has('void'))
+    )
+      return false;
     // Hale bodies and a wayfarer's kit sometimes shrug a sickness off.
     const resist =
       sk.disease +

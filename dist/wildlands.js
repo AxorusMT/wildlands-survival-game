@@ -13,7 +13,10 @@
     AIR_SECONDS: () => AIR_SECONDS,
     AMMO: () => AMMO,
     ARMOR: () => ARMOR,
+    ARMOR_GEMS: () => ARMOR_GEMS,
+    ARMOR_INFUSIONS: () => ARMOR_INFUSIONS,
     ARMOR_ITEMS: () => ARMOR_ITEMS,
+    ARMOR_MAX_LEVEL: () => ARMOR_MAX_LEVEL,
     ARMOR_RECIPES: () => ARMOR_RECIPES,
     ARMOR_SETS: () => ARMOR_SETS,
     BASE_CAPACITY: () => BASE_CAPACITY,
@@ -190,6 +193,8 @@
     relicText: () => relicText,
     renownFor: () => renownFor,
     renownLevel: () => renownLevel,
+    resistOf: () => resistOf,
+    resistText: () => resistText,
     rollMods: () => rollMods,
     rollQuality: () => rollQuality,
     rotRate: () => rotRate,
@@ -10479,6 +10484,65 @@
   };
   var RESEARCH_RENOWN = 25;
 
+  // src/data/resist.ts
+  var KINDS = [
+    [
+      /ember|kiln|cinder|magma|hell|imp|archdemon|anvil|forge|slag|heart|ash_|steppe|drake|wyrm/,
+      { fire: 0.6, frost: -0.3 }
+    ],
+    [/frost|rime|snow|ice_|choir|cantor|hymnal|wraith_?|colossus_rime/, { frost: 0.6, fire: -0.3 }],
+    [/void|watcher|unmaker|star_|constellation|astronomer|comet|moon/, { void: 0.6, holy: -0.3 }],
+    [
+      /golem|colossus|sentry|cog_|tin_|brass|clockwork|gear_|juggernaut|engine|lens|orrery|guard/,
+      { venom: 0.8, storm: -0.3, physical: 0.1 }
+    ],
+    [/slime|glassling/, { physical: 0.2, fire: -0.2 }],
+    [/plague|rot|fever|bog_|mosquito|toad|ivory/, { venom: 0.6, fire: -0.2 }],
+    [
+      /eel|crab|angler|jelly|leviathan|drowned|diver|abyss|tide|orchard_mother/,
+      { storm: -0.4, fire: 0.3 }
+    ],
+    [/glass|prism|lumen|crystal/, { storm: 0.3, arcane: -0.3 }],
+    [/salt|mirage|sand_/, { frost: -0.3, fire: 0.3 }],
+    [/thorn|bramble|season|bloom|petal|harvest|warden/, { fire: -0.3, venom: 0.3 }]
+  ];
+  var cache = /* @__PURE__ */ new Map();
+  function resistOf(type) {
+    const hit = cache.get(type);
+    if (hit) return hit;
+    const out = {};
+    for (const [re, r] of KINDS)
+      if (re.test(type)) for (const [k, v] of Object.entries(r)) out[k] = v;
+    if (UNDEAD.has(type)) out.venom = Math.max(out.venom ?? 0, 0.6);
+    if (MOBS[type]?.boss) for (const k of Object.keys(out)) out[k] = out[k] * 0.8;
+    cache.set(type, out);
+    return out;
+  }
+  function resistText(type) {
+    const r = resistOf(type), strong = Object.entries(r).filter(([, v]) => v >= 0.3).map(([k]) => k), weak = Object.entries(r).filter(([, v]) => v < 0).map(([k]) => k);
+    return [
+      strong.length ? "resists " + strong.join(", ") : "",
+      weak.length ? "weak to " + weak.join(", ") : ""
+    ].filter(Boolean).join("; ");
+  }
+  var ARMOR_MAX_LEVEL = 5;
+  var ARMOR_GEMS = {
+    ruby: { text: "+3% damage" },
+    sapphire: { text: "+10 mana" },
+    emerald: { text: "+2% critical chance" },
+    topaz: { text: "+2% speed" },
+    onyx: { text: "+1 defense" },
+    opal: { text: "Slowly regenerate health" }
+  };
+  var ARMOR_INFUSIONS = {
+    fire: { text: "Burns cannot take hold; lava bites less" },
+    frost: { text: "Shrug off 2\xB0 of cold" },
+    venom: { text: "Poison cannot take hold" },
+    void: { text: "Void rot cannot take hold" },
+    holy: { text: "The undead strike 10% softer" },
+    storm: { text: "+3% speed" }
+  };
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -10592,6 +10656,9 @@
       if (source && sk.ironGut >= 1) return false;
       if (source === "spoiled" && sk.ironGut > 0) return false;
       if (id === "frostbite" && sk.coldBlooded) return false;
+      const inf = this.game.armourForge.totals().infusions;
+      if (id === "burn" && inf.has("fire") || id === "poisoning" && inf.has("venom") || id === "void_rot" && inf.has("void"))
+        return false;
       const resist = sk.disease + (this.game.equipment.has("wayfarer") ? 0.2 : 0) + (this.game.equipment.fullSet() === "plaguedoctor" ? 0.15 : 0);
       if (!now && def.kind !== "injury" && this.game.rng() < Math.min(0.7, resist)) return false;
       if (!now && def.kind === "illness" && (this.game.s.buffs.iron_gut ?? 0) > 0 && this.game.rng() < 0.5)
@@ -10834,7 +10901,7 @@
         damage,
         reach: base[2] * (1 + (m.reach ?? 0) + (melee ? sk.reach : 0)),
         pace: Math.max(0.35, (f.pace + (m.pace ?? 0)) / quick) * (mastery >= 15 ? 0.95 : 1),
-        crit: 0.05 + (m.crit ?? 0) + sk.crit + (mastery >= 10 ? 0.05 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.1 : 0),
+        crit: 0.05 + (m.crit ?? 0) + sk.crit + this.game.armourForge.totals().crit + (mastery >= 10 ? 0.05 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.1 : 0),
         count: m.count ?? 0,
         pierce: (m.pierce ?? 0) + (shooter ? sk.pierce : 0),
         bleed: ((family === "battleaxe" ? 0.15 : 0) + (m.bleed ?? 0) + (shooter ? sk.rangedBleed : 0)) * (1 + sk.bleedDmg),
@@ -11812,6 +11879,8 @@
         if (magic && w.magic) k *= 1 + w.magic;
       }
       if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+      const kind = w?.infusion ?? (magic ? "arcane" : "physical");
+      k *= 1 - (resistOf(a.type)[kind] ?? 0);
       if ((a.fx?.bleed?.[0] ?? 0) > t && this.perk("battleaxe")) k *= 1.15;
       const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1, pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === "void" ? 0.5 : 0)), armour = (spec?.defense ?? 0) * cracked * (1 - pierce), raw = amount * this.game.equipment.damageBonus(magic) * k, taken = Math.max(1, Math.round(raw - armour * 0.5));
       a.hp -= taken;
@@ -13386,6 +13455,7 @@
       if (this.fullSet() === "amberguard") d += 2;
       if (this.fullSet() === "leviathan") d += 3;
       if (this.fullSet() === "forgeborn") d += 4;
+      d += this.game.armourForge.totals().defense;
       d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
@@ -13398,11 +13468,12 @@
       if (fx.has("buff:wrath")) k += 0.15;
       if (fx.has("buff:fiery") || fx.has("buff:feasted")) k += 0.1;
       if (magic && (fx.has("mana40") || fx.has("magic15"))) k += 0.15;
+      k += this.game.armourForge.totals().damage;
       return k;
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + (this.fullSet() === "saltwarden" || this.fullSet() === "ashwalker" ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + (this.fullSet() === "saltwarden" || this.fullSet() === "ashwalker" ? 0.1 : 0) + this.game.armourForge.totals().speed + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
     /** Health from crystals and fruit alone; skills add to it. */
@@ -13414,7 +13485,7 @@
     }
     maxMana() {
       const fx = this.effects();
-      return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has("mana40") || fx.has("arcanist") ? 40 : 0) + this.game.skills.get("maxMana");
+      return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has("mana40") || fx.has("arcanist") ? 40 : 0) + this.game.skills.get("maxMana") + this.game.armourForge.totals().mana;
     }
     heal(amount) {
       const v = this.game.s.vitals;
@@ -13484,6 +13555,7 @@
       );
       let regen = 0;
       if (fx.has("regen") || this.fullSet() === "druid") regen += 0.6;
+      regen += this.game.armourForge.totals().regen;
       if (fx.has("buff:regeneration")) regen += 1.2;
       if (fx.has("spores")) regen += 0.5;
       if (fx.has("home")) regen += 0.35;
@@ -15795,12 +15867,12 @@
       const fx = this.game.equipment.effects(), p = this.game.s.player;
       if (!this.game.inLava() || fx.has("buff:fireward") || fx.has("forgeward") || this.game.equipment.fullSet() === "cinder")
         return 0;
-      return RULES.lavaDamage[p.ward ? 1 : 0] * (fx.has("lava") ? 0.35 : fx.has("fire") ? 0.7 : 1);
+      return RULES.lavaDamage[p.ward ? 1 : 0] * (fx.has("lava") ? 0.35 : fx.has("fire") ? 0.7 : 1) * (this.game.armourForge.totals().infusions.has("fire") ? 0.8 : 1);
     }
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const air = this.game.temperature() - (this.game.equipment.has("seasonward") ? this.game.pocket.seasonShift() : 0), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, clothes = this.game.equipment.clothingShield(), coldResist = clothes.insul + skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer + clothes.heat, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
+      const air = this.game.temperature() - (this.game.equipment.has("seasonward") ? this.game.pocket.seasonShift() : 0), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, clothes = this.game.equipment.clothingShield(), coldResist = clothes.insul + skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0) + (this.game.armourForge.totals().infusions.has("frost") ? 2 : 0), heatResist = skills.heatResist + wayfarer + clothes.heat, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
@@ -15976,6 +16048,116 @@
         }
       }
       void p;
+    }
+  };
+
+  // src/game/systems/ArmourForge.ts
+  var ArmourForge = class extends System {
+    get all() {
+      return this.game.s.armourMods ??= {};
+    }
+    mods(id) {
+      return this.all[id] ?? { lvl: 0, gems: [] };
+    }
+    record(id) {
+      return this.all[id] ??= { lvl: 0, gems: [] };
+    }
+    /** Sockets a piece has: two in a chestplate, one elsewhere. */
+    sockets(id) {
+      return ARMOR[id]?.slot === "body" ? 2 : 1;
+    }
+    set(id) {
+      return ARMOR_SETS.find((s) => s.key === ARMOR[id]?.set);
+    }
+    cost(id) {
+      const s = this.set(id), lvl = this.mods(id).lvl;
+      return { [s?.bar ?? "iron_ingot"]: 2 + lvl, coin: 20 * (lvl + 1) };
+    }
+    station(id) {
+      return anvilFor(this.set(id)?.tier ?? 3);
+    }
+    upgrade(id) {
+      if (!ARMOR[id] || !this.game.count(id))
+        return { ok: false, reason: "Carry the armour to work it." };
+      const m = this.record(id);
+      if (m.lvl >= ARMOR_MAX_LEVEL)
+        return { ok: false, reason: "It is as strong as it can be made." };
+      if (!this.game.dev.god) {
+        if (!this.game.near(this.station(id)))
+          return { ok: false, reason: `Work it at a ${itemName(this.station(id)).toLowerCase()}.` };
+        const cost = this.cost(id);
+        if (!this.game.canAfford(cost)) return { ok: false, reason: "More materials are needed." };
+        for (const [k, n] of Object.entries(cost)) this.game.remove(k, n);
+      }
+      m.lvl++;
+      this.game.sound("craft_anvil");
+      this.game.say(`${itemName(id)} strengthened to +${m.lvl}.`, "good");
+      this.game.progress.record("armour:" + m.lvl);
+      return { ok: true };
+    }
+    socket(id, gem) {
+      if (!ARMOR[id] || !this.game.count(id))
+        return { ok: false, reason: "Carry the armour to work it." };
+      if (!ARMOR_GEMS[gem]) return { ok: false, reason: "That will not sit in armour." };
+      const m = this.record(id);
+      if (m.gems.length >= this.sockets(id)) return { ok: false, reason: "Its sockets are full." };
+      if (!this.game.dev.god) {
+        if (!this.game.count(gem))
+          return { ok: false, reason: `You need a ${itemName(gem).toLowerCase()}.` };
+        this.game.remove(gem);
+      }
+      m.gems.push(gem);
+      this.game.sound("crystal");
+      this.game.say(
+        `${itemName(gem)} set in ${itemName(id).toLowerCase()}: ${ARMOR_GEMS[gem].text.toLowerCase()}.`,
+        "good"
+      );
+      return { ok: true };
+    }
+    infuse(id, infusion) {
+      if (!ARMOR[id] || !this.game.count(id))
+        return { ok: false, reason: "Carry the armour to work it." };
+      const inf = infusionById(infusion);
+      if (!inf || !ARMOR_INFUSIONS[infusion]) return { ok: false, reason: "No such infusion." };
+      if (!this.game.dev.god) {
+        if (!this.game.count(inf.item))
+          return { ok: false, reason: `You need a ${itemName(inf.item).toLowerCase()}.` };
+        this.game.remove(inf.item);
+      }
+      this.record(id).inf = infusion;
+      this.game.sound("potion");
+      this.game.say(
+        `${itemName(id)} infused: ${ARMOR_INFUSIONS[infusion].text.toLowerCase()}.`,
+        "good"
+      );
+      return { ok: true };
+    }
+    /** Everything worn armour adds: extra defense and the gems' and infusions' gifts. */
+    totals() {
+      const out = {
+        defense: 0,
+        damage: 0,
+        mana: 0,
+        crit: 0,
+        speed: 0,
+        regen: 0,
+        gems: {},
+        infusions: /* @__PURE__ */ new Set()
+      };
+      for (const id of this.game.equipment.worn().armor) {
+        const m = this.mods(id);
+        out.defense += m.lvl;
+        for (const g of m.gems) out.gems[g] = (out.gems[g] ?? 0) + 1;
+        if (m.inf) out.infusions.add(m.inf);
+      }
+      const n = (g) => out.gems[g] ?? 0;
+      out.damage = 0.03 * n("ruby");
+      out.mana = 10 * n("sapphire");
+      out.crit = 0.02 * n("emerald");
+      out.speed = 0.02 * n("topaz") + (out.infusions.has("storm") ? 0.03 : 0);
+      out.defense += n("onyx");
+      out.regen = 0.15 * n("opal");
+      return out;
     }
   };
 
@@ -16680,8 +16862,9 @@
           return;
         }
         this.cry(a, "attack");
+        const holy = UNDEAD.has(a.type) && this.game.armourForge.totals().infusions.has("holy");
         const taken = this.game.combat.hurtPlayer(
-          spec.damage,
+          spec.damage * (holy ? 0.9 : 1),
           mobName(a.type) + " attack!",
           spec.disease
         );
@@ -16921,6 +17104,7 @@
     consumables = new Consumables(this);
     survival = new Survival(this);
     durability = new Durability(this);
+    armourForge = new ArmourForge(this);
     ailments = new Ailments(this);
     larder = new Larder(this);
     physics = new Physics(this);
@@ -22222,8 +22406,8 @@
       c.globalAlpha = 1;
     }
   }
-  function drawCache(c, cache, x, y) {
-    const deep = !!cache.layer;
+  function drawCache(c, cache2, x, y) {
+    const deep = !!cache2.layer;
     const s = cached(
       "cache" + deep,
       () => sprite(16, 16, 7, 15, (p) => {
@@ -24142,8 +24326,8 @@
     for (const n of g.s.nodes)
       if (!TREE_NODES.has(n.kind) && on(n) && (n.hp > 0 || n.kind !== "water"))
         drawNode(a, n, sx(n), sy(n), t);
-    for (const cache of g.s.caches)
-      if (!cache.opened && on(cache)) drawCache(a, cache, sx(cache), sy(cache));
+    for (const cache2 of g.s.caches)
+      if (!cache2.opened && on(cache2)) drawCache(a, cache2, sx(cache2), sy(cache2));
     for (const s of g.s.structures)
       if (s.type !== "rift_gate" && s.type !== "portal" && on(s))
         drawStructure(a, g, s, sx(s), sy(s), t);
@@ -29238,6 +29422,8 @@
     atlasTier: 1,
     /** The Gear page: what you wear, or the Armoury's weapon hierarchy (and which weapon). */
     gearView: "gear",
+    armouryMode: "weapons",
+    armourSel: "",
     skillTree: "warfare",
     /** The Beasts page: the Effergy and bestiary, or the Codex (and which page). */
     beastsView: "beasts",
@@ -29762,7 +29948,7 @@
       (a, b) => order.indexOf(a) - order.indexOf(b)
     );
     const load = game.inventory.load(), cap = game.inventory.capacity();
-    right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p><div class="vital-row" title="Carry more than this and you slow down and tire. A satchel, pack, or expedition frame raises it."><span>Load</span><span class="mini-track"><i style="width:${clamp3(load / cap * 100, 0, 100)}%;${load > cap ? "background:#b2402e" : ""}"></i></span><b>${Math.round(load)}/${cap} kg</b></div>${load > cap ? '<p class="warn-line">Overloaded: you move slowly and tire fast. Drop or store something.</p>' : ""}${groups.map(
+    right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p><div class="vital-row" title="Carry more than this and you slow down and tire. A satchel, pack, or expedition frame raises it."><span>Load (kg)</span><span class="mini-track"><i style="width:${clamp3(load / cap * 100, 0, 100)}%;${load > cap ? "background:#b2402e" : ""}"></i></span><b>${Math.round(load)}/${cap}</b></div>${load > cap ? '<p class="warn-line">Overloaded: you move slowly and tire fast. Drop or store something.</p>' : ""}${groups.map(
       (category) => `<h3>${category}</h3><div class="book-list">${shown.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
         const use = itemUseLabel(e.id), fresh = freshness(e);
         const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
@@ -30278,7 +30464,8 @@
     const entry = (e) => {
       const found = (tally[p.prefix + e] ?? 0) > 0, mob = p.prefix === "kill:" && MOBS[e], name = mob ? MOBS[e].name : BIOMES.find((x) => x.id === e)?.name ?? DUNGEONS.find((d) => d.def.id === e)?.def.name ?? realmById(e)?.name ?? (ITEMS[e] ? pretty(e) : e[0].toUpperCase() + e.slice(1));
       const pic = mob ? `<span class="icon-slot portrait"><img src="${found ? mobPortrait(e) : ""}" alt="" ${found ? "" : "hidden"}></span>` : ITEMS[e] ? icon(e) : '<span class="icon-slot"></span>';
-      return `<div class="book-row"><div class="with-icon">${pic}<div><strong>${found ? name : "???"}</strong><small>${found ? "Recorded" : "Not yet"}</small></div></div></div>`;
+      const traits = mob && found ? resistText(e) : "";
+      return `<div class="book-row"><div class="with-icon">${pic}<div><strong>${found ? name : "???"}</strong><small>${found ? traits ? traits[0].toUpperCase() + traits.slice(1) : "Recorded" : "Not yet"}</small></div></div></div>`;
     };
     const counted = p.count ? Object.keys(tally).filter((k) => k.startsWith(p.prefix) && tally[k] > 0).map((k) => k.slice(p.prefix.length)) : [];
     right.innerHTML = `<h2>${p.name}</h2><p class="lede">${a} of ${b} \xB7 ${a >= b ? "complete: " : "when complete: "}${p.bonusText}.</p><div class="book-list">${p.count ? counted.map(entry).join("") + (a < b ? `<p class="muted">${b - a} more to find.</p>` : "") : p.entries.map(entry).join("")}</div>`;
@@ -30331,14 +30518,65 @@
         updateUI(true);
       };
   }
+  function renderArmourForge(left, right) {
+    const forge = game.armourForge, pieces = [...new Set(game.s.inventory.map((e) => e.id))].filter((id2) => ARMOR[id2]);
+    if (!pieces.includes(state.armourSel)) state.armourSel = pieces[0] ?? "";
+    left.innerHTML = `<h2>The Armoury</h2><div class="farm-choice"><button class="tiny-button" data-mode="weapons">WEAPONS</button><button class="tiny-button active">ARMOUR</button></div><p class="lede">Armour has its own line: up to +${ARMOR_MAX_LEVEL} at the anvil (+1 defense each), a gem in each socket (two in a chestplate), and one infusion per piece.</p><div class="book-list">${pieces.map((id2) => {
+      const m = forge.mods(id2);
+      return `<div class="book-row ${state.armourSel === id2 ? "selected" : ""}"><div class="with-icon">${icon(id2)}<div><strong>${pretty(id2)}${m.lvl ? " +" + m.lvl : ""}</strong><small>${ARMOR[id2].defense + m.lvl} defense${m.gems.length ? " \xB7 " + m.gems.map(pretty).join(", ") : ""}${m.inf ? " \xB7 " + m.inf : ""}${worn(id2) ? " \xB7 worn" : ""}</small></div></div><button data-piece="${id2}">WORK</button></div>`;
+    }).join("") || "<p>No armour in the pack.</p>"}</div><div class="book-actions"><button class="quiet" data-gear>\u2039 GEAR</button></div>`;
+    const id = state.armourSel;
+    if (id) {
+      const m = forge.mods(id), gems = Object.keys(ARMOR_GEMS).filter((g) => game.count(g) || game.dev.god), infs = INFUSIONS.filter(
+        (i) => ARMOR_INFUSIONS[i.id] && (game.count(i.item) || game.dev.god)
+      );
+      const cost = Object.entries(forge.cost(id)).map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`).join(", ");
+      right.innerHTML = `<h2>${pretty(id)}${m.lvl ? " +" + m.lvl : ""}</h2><p class="lede">${ARMOR[id].slot} \xB7 ${ARMOR[id].defense + m.lvl} defense.</p><p>Sockets: <strong>${m.gems.map((g) => `${pretty(g)} (${ARMOR_GEMS[g].text})`).join(", ") || "\u2014"}</strong> (${m.gems.length}/${forge.sockets(id)})<br>Infusion: <strong>${m.inf ? `${m.inf} \xB7 ${ARMOR_INFUSIONS[m.inf].text}` : "none"}</strong></p>${m.lvl < ARMOR_MAX_LEVEL ? `<div class="book-actions"><button data-armup>STRENGTHEN TO +${m.lvl + 1}</button></div><p class="muted">${cost} at a ${pretty(forge.station(id)).toLowerCase()}.</p>` : ""}${gems.length && m.gems.length < forge.sockets(id) ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-armgem="${g}" title="${ARMOR_GEMS[g].text}">${pretty(g).toUpperCase()}</button>`).join("")}</div>` : ""}${infs.length ? `<h3>Infuse</h3><div class="farm-choice">${infs.map((i) => `<button class="tiny-button" data-arminf="${i.id}" title="${ARMOR_INFUSIONS[i.id].text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}`;
+    } else right.innerHTML = "<h2>Armour</h2><p>Carry a piece of armour to work it.</p>";
+    const act = (r) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    left.querySelectorAll("[data-piece]").forEach(
+      (b) => b.onclick = () => {
+        state.armourSel = b.dataset.piece ?? "";
+        renderJournal();
+      }
+    );
+    left.querySelector("[data-mode]").onclick = () => {
+      state.armouryMode = "weapons";
+      state.armourySel = game.s.player.weapon !== "fists" ? game.s.player.weapon : "iron_sword";
+      renderJournal();
+    };
+    left.querySelector("[data-gear]").onclick = () => {
+      state.gearView = "gear";
+      renderJournal();
+    };
+    right.querySelector("[data-armup]")?.addEventListener("click", () => act(forge.upgrade(id)));
+    right.querySelectorAll("[data-armgem]").forEach((b) => b.onclick = () => act(forge.socket(id, b.dataset.armgem ?? "")));
+    right.querySelectorAll("[data-arminf]").forEach((b) => b.onclick = () => act(forge.infuse(id, b.dataset.arminf ?? "")));
+  }
+  function compareText(id) {
+    const other = game.s.player.weapon;
+    if (!other || other === id || !WEAPONS[other]) return "";
+    const a = game.armoury.stats(id), b = game.armoury.stats(other);
+    const dps = (w, wid) => w.damage / ((RANGED[wid]?.delay ?? 0.45) * w.pace);
+    const row = (label, x, y, fmtN) => {
+      const d = x - y, arrow = Math.abs(d) < 1e-6 ? "=" : d > 0 ? "\u25B2" : "\u25BC";
+      return `<div class="book-row"><span>${label}</span><span class="qty ${d > 0 ? "better" : d < 0 ? "worse" : ""}">${fmtN(x)} ${arrow} ${fmtN(y)}</span></div>`;
+    };
+    return `<h3>Against ${pretty(other).toLowerCase()} in hand</h3><div class="book-list compare">${row("Damage each second", dps(a, id), dps(b, other), (n) => String(Math.round(n)))}${row("Damage a blow", a.damage, b.damage, (n) => String(Math.round(n)))}${RANGED[id] || RANGED[other] ? "" : row("Reach", a.reach, b.reach, (n) => String(Math.round(n)))}${row("Critical chance", a.crit, b.crit, (n) => Math.round(n * 100) + "%")}</div>`;
+  }
   function renderArmoury(left, right) {
+    if (state.armouryMode === "armour") return renderArmourForge(left, right);
     const arm = game.armoury, owned = (id2) => game.count(id2) > 0;
     const cell = (id2, tier2) => {
       const has2 = owned(id2), known = arm.known(id2), craftable = !!RECIPES.find((r) => r.id === id2);
       return `<button class="armoury-cell ${has2 ? "owned" : known ? "known" : ""} ${state.armourySel === id2 ? "active" : ""}" data-weapon="${id2}" title="${pretty(id2)} \xB7 tier ${tier2}${craftable ? "" : " \xB7 found, not made"}"><img src="${iconURL(id2)}" alt=""></button>`;
     };
     const sig = Object.keys(SIGNATURE).filter((id2) => owned(id2) || arm.known(id2));
-    left.innerHTML = `<h2>The Armoury</h2><p class="lede">Ten families by eleven tiers; each weapon climbs to +10.</p><div class="armoury-grid"><span></span>${FAMILIES.map((f) => `<span class="armoury-head" title="${f.name}: ${f.text}">${f.name.slice(0, 4).toUpperCase()}</span>`).join("")}${TIERS.map(
+    left.innerHTML = `<h2>The Armoury</h2><div class="farm-choice"><button class="tiny-button active">WEAPONS</button><button class="tiny-button" data-mode="armour">ARMOUR</button></div><p class="lede">Ten families by twelve tiers; each weapon climbs to +10.</p><div class="armoury-grid"><span></span>${FAMILIES.map((f) => `<span class="armoury-head" title="${f.name}: ${f.text}">${f.name.slice(0, 4).toUpperCase()}</span>`).join("")}${TIERS.map(
       (t) => `<span class="armoury-tier" title="${t.name}">${t.tier}</span>${FAMILIES.map((f) => {
         const w = GRID.find((g) => g.tier === t.tier && g.family === f.id);
         return cell(w.id, t.tier);
@@ -30349,9 +30587,13 @@
     const id = state.armourySel, [family, tier] = arm.classOf(id), fam = familyById(family), e = arm.entry(id), st = arm.stats(id), q = QUALITIES[e.q], has = owned(id), recipe = RECIPES.find((r) => r.id === id), ranged = RANGED[id], stage = arm.pendingEvolution(id), evos = EVOLUTIONS[family];
     const costText = (cost) => Object.entries(cost).map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`).join(", ");
     const infusions = INFUSIONS.filter((i) => game.count(i.item) > 0 || game.dev.god), gems = Object.keys(GEMS).filter((g) => game.count(g) > 0 || game.dev.god);
-    right.innerHTML = `<h2 style="color:${has ? q.color : "inherit"}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} \xB7 tier ${tier} (${tierOf(tier).name}) \xB7 ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` \xB7 ${ranged.kind === "bow" ? "shots" : "mana " + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` \xB7 reach ${Math.round(st.reach)} \xB7 swing \xD7${st.pace.toFixed(2)}`} \xB7 crit ${Math.round(st.crit * 100)}%${st.defense ? ` \xB7 +${st.defense} defense` : ""}</p>${has ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? "disabled" : ""}>${game.s.player.weapon === id ? "IN HAND" : "READY IT"}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (\xD7${q.mult}) \xB7 level <strong>+${e.lvl}</strong> / ${MAX_LEVEL} \xB7 infusion <strong>${e.inf ? infusionById(e.inf)?.name : "none"}</strong> \xB7 sockets <strong>${e.gems.map((g) => GEMS[g].name).join(", ") || "\u2014"}</strong> (${e.gems.length}/${q.sockets})</p>${stage >= 0 ? `<h3>Evolve \xB7 choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0].map(
+    right.innerHTML = `<h2 style="color:${has ? q.color : "inherit"}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} \xB7 tier ${tier} (${tierOf(tier).name}) \xB7 ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` \xB7 ${ranged.kind === "bow" ? "shots" : "mana " + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` \xB7 reach ${Math.round(st.reach)} \xB7 swing \xD7${st.pace.toFixed(2)}`} \xB7 crit ${Math.round(st.crit * 100)}%${st.defense ? ` \xB7 +${st.defense} defense` : ""}</p>${(has ? compareText(id) : "") + (has ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? "disabled" : ""}>${game.s.player.weapon === id ? "IN HAND" : "READY IT"}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (\xD7${q.mult}) \xB7 level <strong>+${e.lvl}</strong> / ${MAX_LEVEL} \xB7 infusion <strong>${e.inf ? infusionById(e.inf)?.name : "none"}</strong> \xB7 sockets <strong>${e.gems.map((g) => GEMS[g].name).join(", ") || "\u2014"}</strong> (${e.gems.length}/${q.sockets})</p>${stage >= 0 ? `<h3>Evolve \xB7 choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0].map(
       (ev, i) => `<div class="book-row"><div><strong>${ev.name}</strong><small>${ev.text}</small></div><button data-evolve="${i}">CHOOSE</button></div>`
-    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `${game.durability.wear(id) >= 1 ? `<p class="muted">${Math.round(game.durability.wear(id))}% worn${game.durability.broken(id) ? " (blunted: half damage)" : ""} \xB7 mend at a ${pretty(game.durability.station(id)).toLowerCase()}: ${costText(game.durability.cost(id))}</p><div class="book-actions"><button data-mend>MEND</button></div>` : ""}<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
+    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `${game.durability.wear(id) >= 1 ? `<p class="muted">${Math.round(game.durability.wear(id))}% worn${game.durability.broken(id) ? " (blunted: half damage)" : ""} \xB7 mend at a ${pretty(game.durability.station(id)).toLowerCase()}: ${costText(game.durability.cost(id))}</p><div class="book-actions"><button data-mend>MEND</button></div>` : ""}<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button>${game.count("fracture_shard") ? '<button class="quiet" data-shard>REFORGE \xB7 SHARD</button>' : ""}</div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`)}`;
+    left.querySelector("[data-mode]").onclick = () => {
+      state.armouryMode = "armour";
+      renderJournal();
+    };
     left.querySelectorAll("[data-weapon]").forEach(
       (b) => b.onclick = () => {
         state.armourySel = b.dataset.weapon ?? id;

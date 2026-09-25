@@ -178,7 +178,11 @@ export class Survival extends System {
       this.game.equipment.fullSet() === 'cinder'
     )
       return 0;
-    return RULES.lavaDamage[p.ward ? 1 : 0] * (fx.has('lava') ? 0.35 : fx.has('fire') ? 0.7 : 1);
+    return (
+      RULES.lavaDamage[p.ward ? 1 : 0] *
+      (fx.has('lava') ? 0.35 : fx.has('fire') ? 0.7 : 1) *
+      (this.game.armourForge.totals().infusions.has('fire') ? 0.8 : 1)
+    );
   }
   // Exposure, hunger, illness, morale, and health drift for one tick.
   update(dt: number) {
@@ -197,7 +201,8 @@ export class Survival extends System {
         skills.coldResist +
         (skills.coldBlooded ? 8 : 0) +
         wayfarer +
-        (this.game.equipment.fullSet() === 'choirsilver' ? 6 : 0),
+        (this.game.equipment.fullSet() === 'choirsilver' ? 6 : 0) +
+        (this.game.armourForge.totals().infusions.has('frost') ? 2 : 0),
       heatResist = skills.heatResist + wayfarer + clothes.heat,
       cold =
         air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;

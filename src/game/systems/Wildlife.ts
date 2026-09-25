@@ -7,6 +7,8 @@ import { RANGED } from '../../data/gear.ts';
 import { LAVA_Y, TILE, caveY, regionBounds, underworldFloor } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
+import { UNDEAD } from '../../data/weapons.ts';
+
 import { System } from './System.ts';
 
 export class Wildlife extends System {
@@ -442,8 +444,10 @@ export class Wildlife extends System {
         return;
       }
       this.cry(a, 'attack');
+      // Holy-infused armour turns some of the dead's blows aside.
+      const holy = UNDEAD.has(a.type) && this.game.armourForge.totals().infusions.has('holy');
       const taken = this.game.combat.hurtPlayer(
-        spec.damage,
+        spec.damage * (holy ? 0.9 : 1),
         mobName(a.type) + ' attack!',
         spec.disease,
       );

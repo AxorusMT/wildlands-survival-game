@@ -20,3 +20,4 @@ export * from './codex.ts';
 export * from './feats.ts';
 export * from './clothing.ts';
 export * from './stations.ts';
+export * from './resist.ts';

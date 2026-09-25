@@ -40,6 +40,7 @@ import { Feats } from './systems/Feats.ts';
 import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
 import { Durability } from './systems/Durability.ts';
+import { ArmourForge } from './systems/ArmourForge.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Town } from './systems/Town.ts';
 import { Wildlife } from './systems/Wildlife.ts';
@@ -68,6 +69,7 @@ export class Game {
   readonly consumables = new Consumables(this);
   readonly survival = new Survival(this);
   readonly durability = new Durability(this);
+  readonly armourForge = new ArmourForge(this);
   readonly ailments = new Ailments(this);
   readonly larder = new Larder(this);
   readonly physics = new Physics(this);
