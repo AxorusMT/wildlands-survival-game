@@ -493,6 +493,7 @@ canvas.icon {
 .eyebrow {
   font: 400 11px var(--caps);
 }
+.intro-art img,
 .intro-art canvas {
   width: 100%;
   height: auto;
