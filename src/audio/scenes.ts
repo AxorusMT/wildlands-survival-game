@@ -15,6 +15,10 @@ export interface MusicContext {
   bossType?: string | null;
   /** Settlers housed nearby. */
   town?: number;
+  /** The Unmaker's phase (0 to 3), whose theme grows harder with each. */
+  bossPhase?: number;
+  /** The Unmaker has fallen: its finale plays. */
+  finale?: boolean;
 }
 
 /** Each underground layer has its own track. */
@@ -55,7 +59,10 @@ const DUNGEON_TRACKS: Record<string, string> = {
 export function musicScene(c: MusicContext): string {
   if (!c.playing) return 'menu';
   if (c.dead) return 'fallen';
-  if (c.boss) return c.bossType === 'unmaker' ? 'final_boss' : 'boss';
+  if (c.finale) return 'unmaker_finale';
+  if (c.boss && c.bossType === 'unmaker')
+    return ['unmaker', 'unmaker_2', 'unmaker_3', 'unmaker_4'][c.bossPhase ?? 0] ?? 'unmaker';
+  if (c.boss) return 'boss';
   if (c.dungeon && DUNGEON_TRACKS[c.dungeon]) return DUNGEON_TRACKS[c.dungeon];
   if (LAYER_TRACKS[c.layer]) return LAYER_TRACKS[c.layer];
   if (c.weather === 'storm') return 'storm';

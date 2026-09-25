@@ -570,6 +570,16 @@ export const RANGED: Record<string, RangedSpec> = {
     spread: 0.3,
   },
   void_staff: { kind: 'magic', projectile: 'void_beam', delay: 0.3, speed: 1100, mana: 12 },
+  // The Unmaker's own gaze, turned: three seeking beams a cast.
+  unmakers_gaze: {
+    kind: 'magic',
+    projectile: 'gaze_beam',
+    delay: 0.24,
+    speed: 1150,
+    mana: 10,
+    count: 3,
+    spread: 0.12,
+  },
   ...GEN_RANGED,
 };
 /** Arrows: extra damage and a special effect. */
@@ -639,6 +649,12 @@ export const PROJECTILES: Record<string, ProjectileSpec> = {
   shockwave: { color: '#dff6ff', glow: '#9fd8ec', life: 1.6, size: 18, pierce: 99 },
   lightning: { color: '#fff8c0', glow: '#fff0a0', life: 0.5, size: 18, pierce: 99 },
   eye_beam: { color: '#ff5a8a', glow: '#ff9ac0', life: 2.4, size: 11 },
+  // The Unmaker's: a lance that passes through rock, spikes that erupt from the floor, and
+  // slow orbs that seek you and burst.
+  void_lance: { color: '#ffd0f0', glow: '#ff5a8a', life: 1.4, size: 9, pierce: 99 },
+  rift_spike: { color: '#b36cff', glow: '#ffd0f0', life: 0.45, size: 14, pierce: 99 },
+  null_orb: { color: '#12001e', glow: '#b36cff', life: 4, size: 20, homing: 1.1 },
+  gaze_beam: { color: '#ff5a8a', glow: '#ffd0f0', life: 1.6, size: 10, homing: 3, pierce: 2 },
   flame_jet: { color: '#ffb347', glow: '#ff6a2a', life: 0.7, size: 16, fire: true, pierce: 99 },
   ...GEN_PROJECTILES,
 };
@@ -795,6 +811,10 @@ export const ACCESSORIES: Record<string, { effects: string[]; text: string }> = 
   wildlands_crown: {
     effects: ['damage10', 'defense4', 'regen', 'light'],
     text: 'The crown of the wildlands',
+  },
+  aura_of_the_unmade: {
+    effects: ['void', 'damage10', 'regen', 'speed10', 'aura'],
+    text: '+30% damage, regenerate, +10% speed; a void aura sears every foe near you',
   },
 };
 

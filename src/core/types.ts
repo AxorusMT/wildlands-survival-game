@@ -149,7 +149,20 @@ export interface Drop extends Point {
 }
 /** A passing event for the renderer and audio: felling, crumbling, chips, pickups. */
 export interface WorldEvent extends Point {
-  type: 'chip' | 'fell' | 'crumble' | 'dig' | 'pickup' | 'sizzle' | 'sfx' | 'damage' | 'burst';
+  type:
+    | 'chip'
+    | 'fell'
+    | 'crumble'
+    | 'dig'
+    | 'pickup'
+    | 'sizzle'
+    | 'sfx'
+    | 'damage'
+    | 'burst'
+    | 'implode'
+    | 'shockwave'
+    | 'rays'
+    | 'supernova';
   kind: string;
   dir?: number;
   /** Loudness for sound events, around 1. */
@@ -207,6 +220,10 @@ export interface Animal extends Point {
   echo?: boolean;
   /** Burrowed out of sight (and out of reach) for the moment. */
   hidden?: boolean;
+  /** Seconds of a great foe's entrance left; it cannot be harmed until it ends. */
+  intro?: number;
+  /** How far a great foe has risen into view during its entrance, 0 to 1. */
+  reveal?: number;
   /** Already split once (a split creature's halves do not split again). */
   split?: boolean;
   hitAt?: number;
@@ -249,6 +266,8 @@ export interface Player extends Point {
   ward?: boolean;
   attackAt: number;
   invuln: number;
+  /** Sideways shove (px/s) from a blast or a pull, on top of walking; it fades. */
+  push?: number;
   /** Worn armour, by slot: item ids. */
   armor?: { head?: string; body?: string; legs?: string };
   /** Clothing worn in three layers, apart from armour. */

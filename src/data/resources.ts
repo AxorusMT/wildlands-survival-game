@@ -164,6 +164,8 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   star_saber: [9, 152, 78],
   void_reaver: [10, 272, 86],
   rift_blade: [11, 245, 92],
+  oblivion: [12, 560, 90],
+  unmakers_gaze: [12, 250, 0],
   // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
   wooden_bow: [1, 9, 0],
   iron_bow: [3, 20, 0],

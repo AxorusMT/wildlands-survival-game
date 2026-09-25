@@ -301,6 +301,9 @@ const CANON: Record<string, [FamilyId, number]> = {
 };
 /** Signature weapons: outside the grid, each a family member at a tier of its own. */
 export const SIGNATURE: Record<string, [FamilyId, number]> = {
+  // The Unmaker's: the best of their families.
+  oblivion: ['greatsword', 12],
+  unmakers_gaze: ['staff', 12],
   silver_broadsword: ['blade', 3],
   gold_broadsword: ['blade', 4],
   tidecaller_spear: ['spear', 4],

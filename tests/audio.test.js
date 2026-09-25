@@ -21,7 +21,9 @@ test('score notation parses notes, chords, and smooth voicings', () => {
 test('every track loops about a minute of well-formed, playable music', () => {
   assert.ok(TRACK_LIST.length >= 12);
   for (const t of TRACK_LIST) {
-    assert.ok(seconds(t, t.loopBar) > 50 && seconds(t) < 72, `${t.id} length`);
+    // The Unmaker's first theme runs to two minutes; every other track stays near one.
+    const most = t.id === 'unmaker' ? 125 : 72;
+    assert.ok(seconds(t, t.loopBar) > 50 && seconds(t) < most, `${t.id} length`);
     let last = -1;
     for (const e of t.events) {
       assert.ok(e.t >= last, `${t.id} events sorted`);
@@ -73,7 +75,7 @@ test('the music follows menu, death, bosses, dungeons, dimensions, caves, weathe
     [{ layer: 'skyreach', night: true }, 'skyreach'],
     [{ layer: 'void' }, 'void'],
     [{ boss: true, bossType: 'hollow_king', dungeon: 'crypt' }, 'boss'],
-    [{ boss: true, bossType: 'unmaker', layer: 'void' }, 'final_boss'],
+    [{ boss: true, bossType: 'unmaker', layer: 'void' }, 'unmaker'],
   ];
   for (const [over, want] of cases) assert.equal(musicScene({ ...base, ...over }), want);
   for (const [, id] of cases) assert.ok(TRACKS[id], `track for ${id}`);

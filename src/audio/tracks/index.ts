@@ -8,7 +8,7 @@ import { depths } from './depths.ts';
 import { dungeon } from './dungeon.ts';
 import { desert } from './desert.ts';
 import { fallen } from './fallen.ts';
-import { finalBoss } from './final.ts';
+import { unmaker, unmaker2, unmaker3, unmaker4, unmakerFinale } from './unmaker.ts';
 import { forest } from './forest.ts';
 import { marsh } from './marsh.ts';
 import { meadow } from './meadow.ts';
@@ -59,7 +59,11 @@ export const TRACK_LIST: Track[] = [
   mycelia,
   skyreach,
   voidsong,
-  finalBoss,
+  unmaker,
+  unmaker2,
+  unmaker3,
+  unmaker4,
+  unmakerFinale,
   town,
   orchard,
   steppe,

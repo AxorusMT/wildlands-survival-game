@@ -67,6 +67,8 @@ export class Wildlife extends System {
       this.game.sound(voice + '_' + what, a.x, a.y - 20, a.type === 'boss' || spec?.boss ? 1.6 : 1);
   }
   kill(animal: Animal) {
+    // The Unmaker does not simply die: it holds on for its death scene.
+    if (animal.type === 'unmaker' && this.game.unmaker.intercept(animal)) return;
     if (animal.x !== undefined) {
       this.game.sound('die', animal.x, animal.y - 20);
       this.cry(animal, 'hurt');

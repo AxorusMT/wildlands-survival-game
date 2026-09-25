@@ -13,11 +13,14 @@ interface Particle {
   vy: number;
   size: number;
   color: string;
-  kind: 'chip' | 'leaf' | 'dust' | 'spark' | 'ring' | 'drop' | 'text';
+  kind: 'chip' | 'leaf' | 'dust' | 'spark' | 'ring' | 'drop' | 'text' | 'wave' | 'ray';
   born: number;
   life: number;
   gravity: number;
   text?: string;
+  /** For waves, how fast the ring grows (art px/s); for rays, their direction and length. */
+  speed?: number;
+  angle?: number;
 }
 const particles: Particle[] = [];
 const MAX_PARTICLES = 700;
@@ -213,7 +216,95 @@ export function spawnEffects(g: RenderGame, events: WorldEvent[], now = performa
         ['#f4ecd8', '#ff6a5a', '#ffe070', '#ff9a4a', '#8ad060', '#d05050'][e.dir ?? 0] ?? '#f4ecd8',
         now,
       );
-    else if (e.type === 'burst')
+    else if (e.type === 'implode') {
+      // The light drawn inward, to a point.
+      for (let i = 0; i < 26; i++) {
+        const ang = rnd() * Math.PI * 2,
+          r = 90 + rnd() * 70,
+          life = 0.35 + rnd() * 0.2;
+        emit(
+          {
+            x: e.x + Math.cos(ang) * r,
+            y: e.y + Math.sin(ang) * r,
+            vx: (-Math.cos(ang) * r) / life,
+            vy: (-Math.sin(ang) * r) / life,
+            kind: 'spark',
+            color: e.kind || '#b36cff',
+            life,
+            gravity: 0,
+          },
+          now,
+        );
+      }
+    } else if (e.type === 'shockwave') {
+      for (const [speed, life, size] of [
+        [220, 0.55, 3],
+        [150, 0.7, 1],
+      ])
+        emit({ x: e.x, y: e.y, kind: 'wave', color: e.kind || '#ffffff', speed, life, size }, now);
+      burst(e, now, 30, () => {
+        const ang = rnd() * Math.PI * 2;
+        return {
+          kind: 'dust',
+          vx: Math.cos(ang) * 420,
+          vy: Math.sin(ang) * 200,
+          color: e.kind || '#ffffff',
+          size: 3,
+          life: 0.6,
+          gravity: 0,
+        };
+      });
+    } else if (e.type === 'rays') {
+      // Shafts of light breaking out of something.
+      const n = e.dir ?? 4;
+      for (let i = 0; i < n; i++)
+        emit(
+          {
+            x: e.x,
+            y: e.y,
+            kind: 'ray',
+            angle: rnd() * Math.PI * 2,
+            speed: 120 + rnd() * 160,
+            color: e.kind || '#ffffff',
+            life: 0.45 + rnd() * 0.3,
+            gravity: 0,
+          },
+          now,
+        );
+    } else if (e.type === 'supernova') {
+      for (const [speed, life, size] of [
+        [320, 0.8, 4],
+        [210, 1, 2],
+        [120, 1.2, 1],
+      ])
+        emit({ x: e.x, y: e.y, kind: 'wave', color: e.kind || '#ffffff', speed, life, size }, now);
+      burst(e, now, 90, () => {
+        const ang = rnd() * Math.PI * 2,
+          v = 200 + rnd() * 700;
+        return {
+          kind: 'spark',
+          vx: Math.cos(ang) * v,
+          vy: Math.sin(ang) * v,
+          color: rnd() < 0.5 ? '#ffffff' : e.kind || '#ff5a8a',
+          life: 0.6 + rnd() * 0.9,
+          gravity: 120,
+        };
+      });
+      for (let i = 0; i < 18; i++)
+        emit(
+          {
+            x: e.x,
+            y: e.y,
+            kind: 'ray',
+            angle: (i / 18) * Math.PI * 2 + rnd() * 0.2,
+            speed: 260 + rnd() * 200,
+            color: i % 2 ? '#ffffff' : e.kind || '#ffd0f0',
+            life: 0.7 + rnd() * 0.4,
+            gravity: 0,
+          },
+          now,
+        );
+    } else if (e.type === 'burst')
       burst(e, now, 14, () => ({
         kind: 'spark',
         vx: (rnd() - 0.5) * 260,
@@ -256,6 +347,30 @@ export function drawParticles(
       c.fillRect(x + r, y, 1, 1);
       c.fillRect(x, y - r, 1, 1);
       c.fillRect(x, y + r, 1, 1);
+    } else if (p.kind === 'wave') {
+      // A ring of light racing outward.
+      const r = Math.round((p.speed ?? 100) * age + 4),
+        n = Math.max(16, Math.round(r * 1.2));
+      c.fillStyle = rgba(p.color, 0.9 * fade);
+      for (let k = 0; k < n; k++) {
+        const ang = (k / n) * Math.PI * 2;
+        c.fillRect(
+          Math.round(x + Math.cos(ang) * r),
+          Math.round(y + Math.sin(ang) * r),
+          p.size,
+          p.size,
+        );
+      }
+    } else if (p.kind === 'ray') {
+      // A shaft of light, thick at its root, lengthening and fading.
+      const len = Math.round((p.speed ?? 150) * Math.min(1, age * 3)),
+        dx = Math.cos(p.angle ?? 0),
+        dy = Math.sin(p.angle ?? 0);
+      c.fillStyle = rgba(p.color, 0.85 * fade);
+      for (let k = 4; k < len; k += 1) {
+        const wdt = k < len * 0.3 ? 2 : 1;
+        c.fillRect(Math.round(x + dx * k), Math.round(y + dy * k), wdt, wdt);
+      }
     } else if (p.kind === 'spark') {
       c.fillStyle = age < p.life * 0.4 ? '#fff2c0' : p.color;
       c.globalAlpha = fade;

@@ -10,6 +10,16 @@ import { PROJECTILES } from '../data/gear.ts';
 import { PX, TA, cached, hash, makeCanvas, ramp, sprite, type PixelView } from './px.ts';
 import { drawRealmAir, drawTide } from './realm.ts';
 import { drawSky } from './sky.ts';
+import {
+  drawPlayerAura,
+  drawShadeTethers,
+  drawUnmakerBack,
+  drawUnmakerFront,
+  drawUnmakerSky,
+  drawUnmakerTear,
+  drawUnmakerWeather,
+  unmakerPose,
+} from './unmaker.ts';
 import { drawStructure } from './structures.ts';
 import { drawGround, drawLava, drawWalls } from './tiles.ts';
 import type { RenderGame } from './types.ts';
@@ -206,6 +216,7 @@ export function draw(
     ay = Math.round(cam.y / PX),
     fx = menu ? cam.x + view.worldW / 2 : g.s.player.x;
   drawSky(a, g, ax, ay, w, h, fx);
+  if (!menu) drawUnmakerSky(a, g, w, h);
   const visibleChunks = drawWalls(a, g, ax, ay, w, h);
   drawLava(a, g, ax, ay, w, h, now);
   drawLadders(a, ax, ay, w, h);
@@ -230,8 +241,33 @@ export function draw(
   for (const s of g.s.structures)
     if (s.type !== 'rift_gate' && s.type !== 'portal' && on(s))
       drawStructure(a, g, s, sx(s), sy(s), t);
+  if (!menu) {
+    drawUnmakerTear(a, g, ax, ay);
+    drawShadeTethers(a, g, ax, ay);
+  }
   for (const m of g.s.animals) {
     if (m.deadUntil || !on(m)) continue;
+    // The Unmaker: its aura behind, afterimages at the end, and its growing horrors in front.
+    if (m.type === 'unmaker') {
+      const pose = unmakerPose(g, m),
+        x = sx(m) + pose.dx,
+        y = sy(m) + pose.dy;
+      drawUnmakerBack(a, g, m, x, y);
+      if (pose.alpha > 0) {
+        if (pose.ghosts) {
+          a.globalCompositeOperation = 'lighter';
+          a.globalAlpha = 0.3 * pose.alpha;
+          drawAnimal(a, g, m, x - 3, y, t);
+          drawAnimal(a, g, m, x + 3, y, t);
+          a.globalCompositeOperation = 'source-over';
+        }
+        a.globalAlpha = pose.alpha;
+        drawAnimal(a, g, m, x, y, t);
+        a.globalAlpha = 1;
+      }
+      drawUnmakerFront(a, g, m, x, y);
+      continue;
+    }
     // A burrowed creature shows only as dirt stirring where it tunnels.
     if (m.hidden) {
       a.fillStyle = 'rgba(120, 96, 64, 0.9)';
@@ -247,7 +283,10 @@ export function draw(
     drawAnimal(a, g, m, sx(m), sy(m), t);
   }
   drawDrops(a, g, ax, ay, w, h, t);
-  if (!menu) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
+  if (!menu) {
+    drawPlayerAura(a, g, sx(g.s.player), sy(g.s.player));
+    drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
+  }
   drawProjectiles(a, g, ax, ay, w, h);
   drawParticles(a, ax, ay, now);
   if (!menu) drawTide(a, g, ax, ay, w, h, now);
@@ -255,6 +294,7 @@ export function draw(
   if (!menu) drawRealmAir(a, g, ax, ay, w, h, now);
   drawCursor(a, g, ax, ay, cursor);
   drawWeather(a, g, ax, ay, w, h, fx, menu);
+  if (!menu) drawUnmakerWeather(a, g, w, h);
   c.imageSmoothingEnabled = false;
   c.drawImage(art, 0, 0, w * view.scale, h * view.scale);
 }

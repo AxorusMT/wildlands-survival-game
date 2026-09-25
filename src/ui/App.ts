@@ -9,6 +9,7 @@ import { Audio } from '../audio/Audio.ts';
 import { musicScene } from '../audio/scenes.ts';
 import { SILENCE, type AmbienceLevels } from '../audio/sfx.ts';
 import { DevConsole } from './Console.ts';
+import { shatter } from './shatter.ts';
 import type { GameMessage, Structure, Vitals } from '../core/types.ts';
 
 declare global {
@@ -63,6 +64,11 @@ const state = {
   merchant: null as Structure | null,
   armourySel: 'iron_sword',
   camera: { x: 0, y: 0 },
+  /** How far the camera has eased toward a cinematic focus, and the focus itself. */
+  focus: 0,
+  focusAt: { x: 0, y: 0 },
+  /** The death scene whose screen has already been broken. */
+  shatteredAt: -1,
   lastFrame: performance.now(),
   lastUI: 0,
   lastAuto: 0,
@@ -471,6 +477,8 @@ addEventListener('keydown', (e) => {
   keys.add(key);
   if (e.repeat) return;
   if (key === 'escape') {
+    // Esc skips the Unmaker's entrance, once you have seen it through before.
+    if (game.unmaker.skip()) return;
     if (state.journal) toggleJournal(false);
     else if (game.s.placing) {
       game.s.placing = null;
@@ -1992,7 +2000,8 @@ function updateUI(force = false) {
   const boss =
     game.s.animals.find((a) => a.id === game.s.altar.activeBoss && !a.deadUntil) ??
     game.bosses.active();
-  $('boss-hud').classList.toggle('hidden', !boss);
+  // The boss bar waits for the beat to drop.
+  $('boss-hud').classList.toggle('hidden', !boss || game.unmaker.overlay()?.mode === 'entrance');
   $('hud').classList.toggle('boss-fight', !!boss);
   if (boss) {
     const key = boss.type === 'boss' ? 'direwolf' + game.s.altar.level : boss.type;
@@ -2032,8 +2041,102 @@ function updateUI(force = false) {
 function camera() {
   const p = game.s.player;
   const [lo, hi] = D.regionBounds(p.x);
-  state.camera.x = clamp(p.x - view.worldW / 2, lo, Math.max(lo, hi - view.worldW));
-  state.camera.y = clamp(p.y - 24 - view.worldH / 2, 0, Math.max(0, D.WORLD_H - view.worldH));
+  // During the Unmaker's entrance and cutscenes, the camera eases over to look at it.
+  const focus = game.unmaker.focus();
+  state.focus += ((focus ? 1 : 0) - state.focus) * 0.08;
+  if (focus) state.focusAt = focus;
+  const fx = p.x + (state.focusAt.x - p.x) * state.focus,
+    fy = p.y - 24 + (state.focusAt.y - (p.y - 24)) * state.focus;
+  state.camera.x = clamp(fx - view.worldW / 2, lo, Math.max(lo, hi - view.worldW));
+  state.camera.y = clamp(fy - view.worldH / 2, 0, Math.max(0, D.WORLD_H - view.worldH));
+  // And the screen shakes with its blows.
+  const shake = game.unmaker.shake() * 18;
+  if (shake > 0.5) {
+    state.camera.x += (Math.random() - 0.5) * shake;
+    state.camera.y += (Math.random() - 0.5) * shake;
+  }
+}
+/** The Unmaker's cinematics: letterbox bars, titles slammed on the beat, flashes, and grey. */
+function updateCinematic() {
+  const o = state.playing ? game.unmaker.overlay() : null,
+    el = $('cinematic');
+  el.classList.toggle('hidden', !o);
+  if (!o) {
+    document.body.classList.remove('cinematic');
+    canvas.style.filter = '';
+    return;
+  }
+  let bars = false,
+    title = '',
+    sub = '',
+    flash = 0,
+    tone = '#ffffff',
+    grey = false;
+  if (o.mode === 'entrance') {
+    // The title lands a word a beat, then everything holds still for the gap before the drop.
+    bars = o.beat >= 1;
+    if (o.beat >= 12) title = o.beat >= 14 ? 'THE UNMAKER' : o.beat >= 13 ? 'THE UN' : 'THE';
+    grey = o.beat >= 15;
+  } else if (o.mode === 'scene') {
+    const c = o.scene;
+    bars = true;
+    if (c.kind === 'death') {
+      grey = o.t < 0.35;
+      flash =
+        o.t < 0.2
+          ? 0.7 * (1 - o.t / 0.2)
+          : o.t > D.SUPERNOVA
+            ? Math.max(0, 1 - (o.t - D.SUPERNOVA) / 0.8)
+            : 0;
+      bars = o.t < D.SHATTER_AT;
+      if (o.t > D.SUPERNOVA && o.t < D.SHATTER_AT) [title, sub] = [c.title, c.sub];
+      if (o.t > D.SHATTER_AT + D.SHATTER_SECONDS - 0.3) sub = c.sub;
+      // The fourth wall breaks.
+      if (o.t >= D.SHATTER_AT && state.shatteredAt !== c.start) {
+        state.shatteredAt = c.start;
+        const p = game.s.player;
+        shatter(
+          canvas,
+          (kind) => Audio.effect(kind, { x: p.x, y: p.y - 20 }, 1.6),
+          Audio.setHushed,
+        );
+      }
+    } else {
+      tone = '#ff2a4a';
+      if (o.t > c.dur - 1.3) [title, sub] = [c.title, c.sub];
+      flash = o.t > c.dur - 0.25 ? 0.7 : 0;
+    }
+  } else {
+    [title, sub] = [o.hype.title, o.hype.sub];
+    tone = o.hype.kind === 'drop' ? '#ffffff' : '#ff2a4a';
+    flash = o.t < 0.3 ? (o.hype.kind === 'drop' ? 1 : 0.6) * (1 - o.t / 0.3) : 0;
+    if (o.hype.kind === 'drop' && o.t < 0.1) {
+      $('boss-hud').classList.remove('slam');
+      void $('boss-hud').offsetWidth;
+      $('boss-hud').classList.add('slam');
+    }
+  }
+  el.classList.toggle('bars', bars);
+  // While it plays out, the field record's panels step aside.
+  document.body.classList.toggle('cinematic', bars);
+  el.dataset.mode =
+    o.mode === 'scene' ? o.scene.kind : o.mode === 'hype' ? o.hype.kind : 'entrance';
+  // Each new title slams in afresh.
+  const t = $('cine-title');
+  if (t.textContent !== title) {
+    t.textContent = title;
+    t.classList.remove('slam');
+    void t.offsetWidth;
+    if (title) t.classList.add('slam');
+  }
+  $('cine-sub').textContent = sub;
+  $('cine-flash').style.opacity = String(flash);
+  $('cine-flash').style.background = tone;
+  canvas.style.filter = grey ? 'grayscale(1) contrast(1.5)' : '';
+  $('cine-skip').classList.toggle(
+    'hidden',
+    !(o.mode === 'entrance' && (game.s.bosses.unmaker ?? 0) > 0),
+  );
 }
 /** How loud each ambient bed should be for where the player stands. */
 function ambienceLevels(): AmbienceLevels {
@@ -2154,6 +2257,8 @@ function frame(now: number) {
           dead: game.s.dead,
           boss: !!game.s.altar.activeBoss || !!game.bosses.active(),
           bossType: game.bosses.active()?.type ?? null,
+          bossPhase: game.unmaker.phase(),
+          finale: game.unmaker.finale(),
           dungeon: D.dungeonAt(game.s.player.x, game.s.player.y - 20)?.def.id ?? null,
           layer: game.layer().id,
           weather: game.s.weather,
@@ -2163,6 +2268,7 @@ function frame(now: number) {
         }),
   );
   Audio.setMuffled(state.playing && state.journal);
+  updateCinematic();
   drawWorld();
   updateUI();
   requestAnimationFrame(frame);

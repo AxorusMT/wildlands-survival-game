@@ -685,6 +685,17 @@ Object.assign(MOBS, {
     top: 24,
     light: [0.4, 0.15, 0.55],
   },
+  void_shade: {
+    tpl: 'floater',
+    body: '#1a0a24',
+    belly: '#ff5a8a',
+    eye: '#ffd0f0',
+    w: 30,
+    h: 30,
+    parts: ['eye'],
+    top: 40,
+    light: [0.5, 0.1, 0.4],
+  },
   // Bosses.
   hollow_king: {
     tpl: 'biped',

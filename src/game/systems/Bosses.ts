@@ -78,6 +78,12 @@ export class Bosses extends System {
     // A Fractured Realm's foe comes empowered, and its fall yields shards.
     if (realm && s.pocket?.realm === 'fractured') a.maxHp = a.hp = Math.round(a.maxHp * 1.5);
     s.animals.push(a);
+    // The Unmaker makes an entrance, timed to its theme.
+    if (boss === 'unmaker') {
+      this.game.unmaker.begin(a);
+      this.game.say('The void tears open…', 'danger');
+      return { ok: true };
+    }
     this.game.event('burst', x, y - 60, '#ffffff');
     this.game.sound('boss', x, y - 40, 1.6);
     this.game.say(spec.name + ' awakens!', 'danger');
@@ -90,6 +96,7 @@ export class Bosses extends System {
     for (const m of s.animals) if (m.minion && !m.deadUntil) m.deadUntil = s.elapsed + 999999;
     s.animals = s.animals.filter((m) => !(m.minion && m.deadUntil) && !(m === a));
     this.game.progress.record('boss:' + a.type);
+    if (a.type === 'unmaker') this.game.unmaker.defeated(a);
     this.game.pocket.cleared(a);
     if (s.pocket?.realm === 'fractured' && this.game.pocket.here(a.x))
       this.game.drops.spawn('fracture_shard', 3 + s.pocket.tier, a.x, a.y - 30);
@@ -98,10 +105,11 @@ export class Bosses extends System {
     this.game.sound('victory', a.x, a.y);
     this.game.event('burst', a.x, a.y - 40, '#fff0a0');
   }
-  private minion(type: string, x: number, y: number) {
+  /** Calls one of a boss's host beside it, up to `cap` at once. */
+  minion(type: string, x: number, y: number, cap = 6) {
     const spec = MOBS[type],
       s = this.game.s;
-    if (s.animals.filter((m) => m.minion && !m.deadUntil).length >= 6) return;
+    if (s.animals.filter((m) => m.minion && !m.deadUntil).length >= cap) return;
     s.animals.push({
       id: uniqueId(),
       type,
@@ -787,34 +795,20 @@ export class Bosses extends System {
             this.minion('season_wolf', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
         break;
       }
-      case 'unmaker': {
-        this.steer(
-          a,
-          p.x + Math.cos(t * 0.5) * 300,
-          p.y - 230 + Math.sin(t * 0.8) * 70,
-          spec.speed[1] * (rage ? 1.4 : 1),
-          dt,
-          1.4,
-        );
-        if (this.due(a, 'gaze', 1.6))
-          this.game.combat.mobShoot(a, 'eye_beam', 620, 58, rage ? 3 : 1, 0.12);
-        if (this.due(a, 'ring', rage ? 4 : 6)) this.ring(a, 'eye_beam', rage ? 16 : 12, 340, 52, t);
-        if (this.due(a, 'watchers', rage ? 10 : 15))
-          for (const dx of [-260, 260]) this.minion('watcher', a.x + dx, a.y - 60);
-        if (rage && this.due(a, 'void', 7)) {
-          a.x = p.x + (this.game.rng() < 0.5 ? -1 : 1) * 320;
-          a.y = p.y - 240;
-          this.game.event('burst', a.x, a.y - 60, '#b36cff');
-          this.game.sound('portal', a.x, a.y, 1);
-        }
+      case 'unmaker':
+        // The last great foe thinks for itself; see Unmaker.ts.
+        this.game.unmaker.step(a, dt);
+        if (a.intro) return;
         break;
-      }
     }
     // Touching a boss hurts.
     const cy = a.y - 60,
       r = a.type === 'unmaker' || a.type === 'sporemother' ? 90 : 64;
-    if (Math.hypot(p.x - a.x, p.y - 26 - cy) < r && t >= a.attackAt) {
-      a.attackAt = t + spec.cooldown;
+    // (The Unmaker keeps its own clock for this, apart from the one its moves run on.)
+    const touch = a.type === 'unmaker' ? (a.timers?.touch ?? 0) : a.attackAt;
+    if (Math.hypot(p.x - a.x, p.y - 26 - cy) < r && t >= touch) {
+      if (a.type === 'unmaker') (a.timers ??= {}).touch = t + spec.cooldown;
+      else a.attackAt = t + spec.cooldown;
       this.game.combat.hurtPlayer(spec.damage, spec.name);
     }
     // Keep bosses from sinking out of reach below the ground.
