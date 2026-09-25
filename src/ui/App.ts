@@ -3,6 +3,7 @@ import { Game } from '../game/Game.ts';
 import { draw, pixelView, spawnEffects, type PixelView } from '../renderer/Renderer.ts';
 import { iconURL } from '../renderer/icons.ts';
 import { mobPortrait } from '../renderer/actors.ts';
+import { BOSS_STYLES, DEFAULT_BOSS_STYLE, WARDEN_FACES } from './bossStyles.ts';
 import { ART, GROUND } from '../renderer/art.ts';
 import { Audio } from '../audio/Audio.ts';
 import { musicScene } from '../audio/scenes.ts';
@@ -1467,6 +1468,26 @@ function renderHotbar() {
   const held = game.equipment.held();
   $('hotbar-name').textContent = held ? pretty(held) : '';
 }
+/** Dresses the boss bar in the colours, pattern, and lettering of the foe it belongs to. */
+function styleBossHud(key: string, face?: number) {
+  const hud = $('boss-hud'),
+    st = BOSS_STYLES[key] ?? DEFAULT_BOSS_STYLE,
+    fill = key === 'four_faced_warden' && face !== undefined ? WARDEN_FACES[face] : st.fill,
+    sig = key + ':' + fill.join();
+  if (hud.dataset.sig === sig) return;
+  hud.dataset.sig = sig;
+  hud.dataset.pattern = st.pattern;
+  hud.dataset.font = st.font;
+  hud.dataset.shape = st.shape;
+  hud.style.setProperty('--boss-a', fill[0]);
+  hud.style.setProperty('--boss-b', fill[1]);
+  hud.style.setProperty('--boss-track', st.track);
+  hud.style.setProperty('--boss-frame', st.frame);
+  hud.style.setProperty('--boss-name', st.name);
+  $('boss-glyph-l').textContent = st.glyphs[0];
+  $('boss-glyph-r').textContent = st.glyphs[1];
+  $('boss-epithet').textContent = st.epithet;
+}
 function updateUI(force = false) {
   if (!state.playing) return;
   const now = performance.now();
@@ -1611,12 +1632,16 @@ function updateUI(force = false) {
     game.s.animals.find((a) => a.id === game.s.altar.activeBoss && !a.deadUntil) ??
     game.bosses.active();
   $('boss-hud').classList.toggle('hidden', !boss);
+  $('hud').classList.toggle('boss-fight', !!boss);
   if (boss) {
+    const key = boss.type === 'boss' ? 'direwolf' + game.s.altar.level : boss.type;
+    styleBossHud(key, boss.timers?.face);
     $('boss-name').textContent = (
       boss.type === 'boss' ? D.BOSSES[game.s.altar.level - 1].name : D.MOBS[boss.type].name
     ).toUpperCase();
     $('boss-bar').style.width = clamp((boss.hp / boss.maxHp) * 100, 0, 100) + '%';
     $('boss-value').textContent = `${Math.ceil(boss.hp)} / ${boss.maxHp}`;
+    $('boss-hud').classList.toggle('enraged', boss.hp < boss.maxHp / 2);
   }
   // A banner names a realm for a few seconds after you step into it.
   const b = game.pocket.banner,

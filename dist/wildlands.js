@@ -19833,7 +19833,7 @@
         solid: new Uint8Array(size),
         size
       };
-    const R2 = buf.r, G = buf.g, B = buf.b, S = buf.solid;
+    const R2 = buf.r, G = buf.g, B = buf.b, S2 = buf.solid;
     const [sr, sg, sb] = skyLight(g);
     const realm = data_exports.inPocket(g.s.player.x) ? data_exports.activeRealm() : null, starless = realm?.inst.mods.includes("starless") ? 0.15 : 1, realmAmbient = realm?.tpl.ambient.map((v) => v * starless);
     const layerAmbient = (y) => realmAmbient ? realmAmbient : y >= data_exports.LAYERS[4].top ? [0.3, 0.1, 0.07] : y >= data_exports.LAYERS[3].top ? [0.22, 0.09, 0.07] : y >= data_exports.LAYERS[2].top ? [0.05, 0.055, 0.08] : [0.06, 0.06, 0.07];
@@ -19842,7 +19842,7 @@
     for (let j = 0; j < gh; j++)
       for (let i = 0; i < gw; i++) {
         const tx = tx0 + i, ty = ty0 + j, k = j * gw + i, kind = g.tileAt(tx, ty), x = tx * T + T / 2, y = ty * T + T / 2;
-        S[k] = kind ? 1 : 0;
+        S2[k] = kind ? 1 : 0;
         let [r, gg, b] = !kind && y > data_exports.surfaceAt(x) + 64 - (dim === "mycelia" ? 999 : 0) ? layerAmbient(y) : [0, 0, 0];
         if (!kind) {
           if (y < data_exports.surfaceAt(x) || dim === "skyreach") {
@@ -19876,7 +19876,7 @@
       B[k] = Math.max(B[k], b);
     }
     const step = (k, from) => {
-      const keep = !S[k] ? AIR_KEEP : S[from] ? SOLID_KEEP : 0.88, r = R2[from] * keep, gg = G[from] * keep, b = B[from] * keep;
+      const keep = !S2[k] ? AIR_KEEP : S2[from] ? SOLID_KEEP : 0.88, r = R2[from] * keep, gg = G[from] * keep, b = B[from] * keep;
       if (r > R2[k]) R2[k] = r;
       if (gg > G[k]) G[k] = gg;
       if (b > B[k]) B[k] = b;
@@ -22283,6 +22283,298 @@
     c.imageSmoothingEnabled = false;
     c.drawImage(art, 0, 0, w * view2.scale, h * view2.scale);
   }
+
+  // src/ui/bossStyles.ts
+  var S = (epithet, fill, track2, frame2, name, pattern, font, glyphs, shape = "notched") => ({ epithet, fill, track: track2, frame: frame2, name, pattern, font, glyphs, shape });
+  var BOSS_STYLES = {
+    // The Effergy's Direwolves (by altar level).
+    direwolf1: S(
+      "First of the Old Hunt",
+      ["#6a3a8a", "#d8a0ff"],
+      "#1a1022",
+      "#8a6aa8",
+      "#f0e0ff",
+      "segments",
+      "caps",
+      ["\u263E", "\u263D"],
+      "jagged"
+    ),
+    direwolf2: S(
+      "Second of the Old Hunt",
+      ["#8a2a1a", "#ff8a3a"],
+      "#220c06",
+      "#c8583a",
+      "#ffe0c0",
+      "segments",
+      "caps",
+      ["\u263E", "\u263D"],
+      "jagged"
+    ),
+    direwolf3: S(
+      "Last of the Old Hunt",
+      ["#3a1a6a", "#b36cff"],
+      "#0e061a",
+      "#8a4ac8",
+      "#e8d0ff",
+      "segments",
+      "caps",
+      ["\u263E", "\u263D"],
+      "jagged"
+    ),
+    // Dungeons and dimensions.
+    hollow_king: S(
+      "Lord of the Mossy Crypt",
+      ["#3a5a2a", "#9ab88a"],
+      "#141c10",
+      "#6a7a5a",
+      "#dfe8c8",
+      "cracks",
+      "serif",
+      ["\u271D", "\u271D"],
+      "plate"
+    ),
+    rime_colossus: S(
+      "Heart of the Frost Keep",
+      ["#5a8ab0", "#dff6ff"],
+      "#10202c",
+      "#9fd8ec",
+      "#f0faff",
+      "shimmer",
+      "caps",
+      ["\u2744", "\u2744"],
+      "box"
+    ),
+    pharaoh: S(
+      "Queen Beneath the Sands",
+      ["#8a6a1a", "#f0d080"],
+      "#241a08",
+      "#d8b848",
+      "#fff0c0",
+      "ticks",
+      "serif",
+      ["\u2625", "\u2625"],
+      "plate"
+    ),
+    archdemon: S(
+      "Master of the Cinder Citadel",
+      ["#6a0a0a", "#ff4a1a"],
+      "#1a0404",
+      "#c8301a",
+      "#ffd0b0",
+      "pulse",
+      "caps",
+      ["\u26E7", "\u26E7"],
+      "jagged"
+    ),
+    sporemother: S(
+      "Root of the Mycelial Deep",
+      ["#2a6a60", "#58e0d0"],
+      "#0a1c1a",
+      "#3a9a8a",
+      "#d0fff4",
+      "bubbles",
+      "pixel",
+      ["\u273A", "\u273A"],
+      "plate"
+    ),
+    tempest_roc: S(
+      "Storm Above Skyreach",
+      ["#5a7aa8", "#f8e08a"],
+      "#101826",
+      "#c8c0b0",
+      "#fff8e0",
+      "stripes",
+      "caps",
+      ["\u26A1", "\u26A1"],
+      "notched"
+    ),
+    unmaker: S(
+      "The End of All Things",
+      ["#2a0a3a", "#ff5a8a"],
+      "#06020a",
+      "#b36cff",
+      "#ffd0f0",
+      "pulse",
+      "serif",
+      ["\u25C9", "\u25C9"],
+      "jagged"
+    ),
+    // Band I.
+    orchard_mother: S(
+      "Matriarch of the Drowned Orchard",
+      ["#3a6a5a", "#c8583a"],
+      "#0e1c18",
+      "#5ac8c0",
+      "#e8fff8",
+      "bubbles",
+      "pixel",
+      ["\u2766", "\u2766"],
+      "plate"
+    ),
+    kiln_beast: S(
+      "The Fire That Never Went Out",
+      ["#5a2a1a", "#ffb060"],
+      "#1c0a06",
+      "#ff8a3a",
+      "#fff0c0",
+      "drip",
+      "caps",
+      ["\u25B2", "\u25B2"],
+      "jagged"
+    ),
+    warren_queen: S(
+      "She Who Burrows",
+      ["#6a4a1a", "#ffd070"],
+      "#1a1206",
+      "#e8a030",
+      "#fff0c0",
+      "segments",
+      "pixel",
+      ["\u25C6", "\u25C6"],
+      "notched"
+    ),
+    // Band II.
+    lumen_stag: S(
+      "Light of the Glasswood",
+      ["#8ab8d8", "#ffffff"],
+      "#101c28",
+      "#bfe8ff",
+      "#ffffff",
+      "shimmer",
+      "serif",
+      ["\u2727", "\u2727"],
+      "plate"
+    ),
+    ossuary_hydra: S(
+      "The Many-Headed Fen",
+      ["#4a5a3a", "#e6dcc6"],
+      "#141810",
+      "#d8ceb4",
+      "#f4f0e0",
+      "cracks",
+      "caps",
+      ["\u2620", "\u2620"],
+      "jagged"
+    ),
+    // Band III.
+    engine_saint: S(
+      "Patron of the Last Machine",
+      ["#8a6a2a", "#f0c870"],
+      "#1c1408",
+      "#d8a048",
+      "#fff0c0",
+      "ticks",
+      "caps",
+      ["\u2699", "\u2699"],
+      "box"
+    ),
+    mirage_tyrant: S(
+      "Lord of What Is Not There",
+      ["#ffb060", "#fff0c0"],
+      "#241808",
+      "#f0c0c8",
+      "#fff8f0",
+      "shimmer",
+      "serif",
+      ["\u25CC", "\u25CC"],
+      "plate"
+    ),
+    the_hymnal: S(
+      "The Choir That Never Ceased",
+      ["#6a88b0", "#e8f4ff"],
+      "#101826",
+      "#c8904a",
+      "#f0f8ff",
+      "ticks",
+      "serif",
+      ["\u266A", "\u266B"],
+      "plate"
+    ),
+    // Band IV.
+    mother_of_rot: S(
+      "All Sickness Is Her Child",
+      ["#4a5a1a", "#b8c870"],
+      "#141808",
+      "#8a9a3a",
+      "#eef0c0",
+      "drip",
+      "pixel",
+      ["\u2623", "\u2623"],
+      "jagged"
+    ),
+    the_astronomer: S(
+      "Keeper of the Drowned Sky",
+      ["#2a2e60", "#bfd0ff"],
+      "#06081a",
+      "#9ab0ff",
+      "#e8f0ff",
+      "shimmer",
+      "serif",
+      ["\u2726", "\u2726"],
+      "notched"
+    ),
+    pauper_king: S(
+      "Sovereign of the Gutter",
+      ["#8a6a1a", "#fff0a0"],
+      "#1c1606",
+      "#f0c850",
+      "#fff4c8",
+      "stripes",
+      "serif",
+      ["\u2654", "\u2654"],
+      "plate"
+    ),
+    // Band V.
+    the_leviathan: S(
+      "What Waits Below",
+      ["#1a4a6a", "#9ae0ff"],
+      "#040c14",
+      "#4a9ac0",
+      "#d8f4ff",
+      "bubbles",
+      "caps",
+      ["\u2248", "\u2248"],
+      "plate"
+    ),
+    anvil_god: S(
+      "Smith of the World",
+      ["#8a2a0a", "#ffd070"],
+      "#1a0804",
+      "#ff6a2a",
+      "#fff0d0",
+      "cracks",
+      "caps",
+      ["\u2692", "\u2692"],
+      "box"
+    ),
+    four_faced_warden: S(
+      "It Keeps All Four Seasons",
+      ["#8ad070", "#d8703a"],
+      "#141c10",
+      "#f0c850",
+      "#fff8e0",
+      "stripes",
+      "serif",
+      ["\u2740", "\u2744"],
+      "notched"
+    )
+  };
+  var DEFAULT_BOSS_STYLE = S(
+    "A great foe",
+    ["#8b2635", "#e68668"],
+    "#271c1c",
+    "#cba19c",
+    "#f5e0d7",
+    "solid",
+    "caps",
+    ["\u2726", "\u2726"]
+  );
+  var WARDEN_FACES = [
+    ["#5a8a3a", "#b8f090"],
+    ["#c8883a", "#fff0a0"],
+    ["#8a3a1a", "#f09060"],
+    ["#5a7aa8", "#e8f4ff"]
+  ];
 
   // src/audio/theory.ts
   var LETTERS = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
@@ -28134,6 +28426,22 @@
     const held = game.equipment.held();
     $("hotbar-name").textContent = held ? pretty(held) : "";
   }
+  function styleBossHud(key, face) {
+    const hud = $("boss-hud"), st = BOSS_STYLES[key] ?? DEFAULT_BOSS_STYLE, fill = key === "four_faced_warden" && face !== void 0 ? WARDEN_FACES[face] : st.fill, sig = key + ":" + fill.join();
+    if (hud.dataset.sig === sig) return;
+    hud.dataset.sig = sig;
+    hud.dataset.pattern = st.pattern;
+    hud.dataset.font = st.font;
+    hud.dataset.shape = st.shape;
+    hud.style.setProperty("--boss-a", fill[0]);
+    hud.style.setProperty("--boss-b", fill[1]);
+    hud.style.setProperty("--boss-track", st.track);
+    hud.style.setProperty("--boss-frame", st.frame);
+    hud.style.setProperty("--boss-name", st.name);
+    $("boss-glyph-l").textContent = st.glyphs[0];
+    $("boss-glyph-r").textContent = st.glyphs[1];
+    $("boss-epithet").textContent = st.epithet;
+  }
   function updateUI(force = false) {
     if (!state.playing) return;
     const now = performance.now();
@@ -28197,10 +28505,14 @@
     $("interaction-prompt").innerHTML = prompt;
     const boss2 = game.s.animals.find((a) => a.id === game.s.altar.activeBoss && !a.deadUntil) ?? game.bosses.active();
     $("boss-hud").classList.toggle("hidden", !boss2);
+    $("hud").classList.toggle("boss-fight", !!boss2);
     if (boss2) {
+      const key = boss2.type === "boss" ? "direwolf" + game.s.altar.level : boss2.type;
+      styleBossHud(key, boss2.timers?.face);
       $("boss-name").textContent = (boss2.type === "boss" ? BOSSES[game.s.altar.level - 1].name : MOBS[boss2.type].name).toUpperCase();
       $("boss-bar").style.width = clamp3(boss2.hp / boss2.maxHp * 100, 0, 100) + "%";
       $("boss-value").textContent = `${Math.ceil(boss2.hp)} / ${boss2.maxHp}`;
+      $("boss-hud").classList.toggle("enraged", boss2.hp < boss2.maxHp / 2);
     }
     const b = game.pocket.banner, showBanner = !!b && game.s.elapsed - b.at < 5 && game.pocket.here();
     $("realm-banner").classList.toggle("hidden", !showBanner);

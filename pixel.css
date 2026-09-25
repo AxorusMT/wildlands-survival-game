@@ -967,3 +967,209 @@ small.spoiled {
 .disease-note.stage-3 {
   border-color: #a02a2a;
 }
+
+/* ── Boss bar: centred at the top, dressed for each foe ─────────────────────── */
+#boss-hud {
+  --boss-a: #8b2635;
+  --boss-b: #e68668;
+  --boss-track: #271c1c;
+  --boss-frame: #cba19c;
+  --boss-name: #f5e0d7;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, 50vw);
+  padding: 8px 18px 7px;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  text-align: center;
+  color: var(--boss-name);
+  background:
+    var(--dither) 0 0 / 6px 6px,
+    color-mix(in srgb, var(--boss-track) 88%, transparent);
+  border: var(--px) solid #0a0806;
+  box-shadow:
+    inset 0 0 0 var(--px) var(--boss-frame),
+    var(--px) var(--px) 0 var(--px) #0007;
+  text-shadow: var(--px) var(--px) 0 #0a0806;
+  animation: boss-in 0.5s steps(5) both;
+  z-index: 6;
+}
+#boss-hud[data-shape='notched'] {
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+}
+#boss-hud[data-shape='plate'] {
+  clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%);
+  padding-inline: 34px;
+}
+#boss-hud[data-shape='jagged'] {
+  clip-path: polygon(0 0, 8% 6px, 16% 0, 24% 6px, 32% 0, 40% 6px, 50% 0, 60% 6px, 68% 0, 76% 6px, 84% 0, 92% 6px, 100% 0, 100% 100%, 92% calc(100% - 6px), 84% 100%, 76% calc(100% - 6px), 68% 100%, 60% calc(100% - 6px), 50% 100%, 40% calc(100% - 6px), 32% 100%, 24% calc(100% - 6px), 16% 100%, 8% calc(100% - 6px), 0 100%);
+  padding-block: 12px 11px;
+}
+#hud.boss-fight .hud-location {
+  visibility: hidden;
+}
+.boss-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#boss-name {
+  font: 700 18px var(--pixel);
+  letter-spacing: 0.08em;
+  color: var(--boss-name);
+}
+#boss-hud[data-font='caps'] #boss-name {
+  font: 400 16px var(--caps);
+  letter-spacing: 0.22em;
+}
+#boss-hud[data-font='serif'] #boss-name {
+  font:
+    italic 700 19px Georgia,
+    serif;
+  letter-spacing: 0.06em;
+}
+.boss-glyph {
+  font-size: 14px;
+  color: var(--boss-b);
+}
+#boss-epithet {
+  font: 400 10px var(--caps);
+  letter-spacing: 0.18em;
+  color: var(--boss-frame);
+  text-transform: uppercase;
+}
+#boss-hud .boss-track {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  margin: 3px 0 1px;
+  background: var(--boss-track);
+  border: var(--px) solid #0a0806;
+  box-shadow: 0 0 0 var(--px) var(--boss-frame);
+  overflow: hidden;
+}
+#boss-hud .boss-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--boss-a), var(--boss-b));
+  transition: width 0.25s steps(4);
+}
+/* A notch at half health: past it, the foe is enraged. */
+.boss-rage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: #0a0806;
+  opacity: 0.7;
+}
+#boss-hud.enraged .boss-rage {
+  opacity: 0;
+}
+#boss-hud.enraged .boss-glyph {
+  animation: boss-throb 0.6s steps(2) infinite;
+}
+#boss-value {
+  font: 400 10px var(--caps);
+  letter-spacing: 0.12em;
+  opacity: 0.8;
+}
+#boss-hud[data-pattern='segments'] .boss-track i {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 14px, #0a0806 14px 16px),
+    linear-gradient(90deg, var(--boss-a), var(--boss-b));
+}
+#boss-hud[data-pattern='stripes'] .boss-track i {
+  background: repeating-linear-gradient(135deg, var(--boss-a) 0 6px, var(--boss-b) 6px 12px);
+  background-size: 17px 17px;
+  animation: boss-slide 1s linear infinite;
+}
+#boss-hud[data-pattern='ticks'] .boss-track i {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 6px, #0a080655 6px 8px),
+    linear-gradient(180deg, var(--boss-b), var(--boss-a));
+}
+#boss-hud[data-pattern='drip'] .boss-track i {
+  background:
+    radial-gradient(circle at 50% 100%, var(--boss-b) 0 3px, transparent 3.5px) 0 0 / 12px 12px,
+    linear-gradient(180deg, var(--boss-b), var(--boss-a));
+  animation: boss-drip 1.2s steps(6) infinite;
+}
+#boss-hud[data-pattern='shimmer'] .boss-track i {
+  background:
+    linear-gradient(100deg, transparent 30%, #ffffff88 45%, transparent 60%) 0 0 / 200% 100%,
+    linear-gradient(90deg, var(--boss-a), var(--boss-b));
+  animation: boss-shimmer 2.2s steps(22) infinite;
+}
+#boss-hud[data-pattern='pulse'] .boss-track i {
+  animation: boss-pulse 0.9s steps(3) infinite;
+}
+#boss-hud[data-pattern='bubbles'] .boss-track i {
+  background:
+    radial-gradient(circle, #ffffff66 0 2px, transparent 2.5px) 0 0 / 10px 8px,
+    linear-gradient(90deg, var(--boss-a), var(--boss-b));
+  animation: boss-rise 1.6s steps(8) infinite;
+}
+#boss-hud[data-pattern='cracks'] .boss-track i {
+  background:
+    repeating-linear-gradient(60deg, transparent 0 10px, #0a080688 10px 11px, transparent 11px 23px),
+    repeating-linear-gradient(-50deg, transparent 0 17px, #0a080666 17px 18px),
+    linear-gradient(90deg, var(--boss-a), var(--boss-b));
+}
+@keyframes boss-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -14px);
+  }
+}
+@keyframes boss-slide {
+  to {
+    background-position: 17px 0;
+  }
+}
+@keyframes boss-drip {
+  to {
+    background-position:
+      0 12px,
+      0 0;
+  }
+}
+@keyframes boss-shimmer {
+  from {
+    background-position:
+      100% 0,
+      0 0;
+  }
+  to {
+    background-position:
+      -100% 0,
+      0 0;
+  }
+}
+@keyframes boss-pulse {
+  50% {
+    filter: brightness(1.45);
+  }
+}
+@keyframes boss-rise {
+  to {
+    background-position:
+      0 -16px,
+      0 0;
+  }
+}
+@keyframes boss-throb {
+  50% {
+    transform: scale(1.3);
+  }
+}
+@media (max-width: 800px) {
+  #boss-hud {
+    width: 70vw;
+    top: 8px;
+  }
+}
