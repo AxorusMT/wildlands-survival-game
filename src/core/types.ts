@@ -101,7 +101,7 @@ export interface Drop extends Point {
 }
 /** A passing event for the renderer and audio: felling, crumbling, chips, pickups. */
 export interface WorldEvent extends Point {
-  type: 'chip' | 'fell' | 'crumble' | 'dig' | 'pickup' | 'sizzle' | 'sfx';
+  type: 'chip' | 'fell' | 'crumble' | 'dig' | 'pickup' | 'sizzle' | 'sfx' | 'damage' | 'burst';
   kind: string;
   dir?: number;
   /** Loudness for sound events, around 1. */
@@ -164,6 +164,12 @@ export interface Player extends Point {
   ward?: boolean;
   attackAt: number;
   invuln: number;
+  /** Worn armour, by slot: item ids. */
+  armor?: { head?: string; body?: string; legs?: string };
+  /** When the held item was last used, for its animation. */
+  usedAt?: number;
+  /** Aim angle from level toward the cursor, up negative (radians). */
+  aim?: number;
 }
 export interface Vitals {
   health: number;

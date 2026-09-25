@@ -1,6 +1,7 @@
 import * as D from '../data/index.ts';
 import { Game } from '../game/Game.ts';
-import { draw, spawnEffects } from '../renderer/Renderer.ts';
+import { draw, pixelView, spawnEffects, type PixelView } from '../renderer/Renderer.ts';
+import { iconURL } from '../renderer/icons.ts';
 import { Audio } from '../audio/Audio.ts';
 import { musicScene } from '../audio/scenes.ts';
 import { SILENCE, type AmbienceLevels } from '../audio/sfx.ts';
@@ -45,13 +46,53 @@ const state = {
 };
 const UI_RULES = {
   seedRange: 1_000_000,
-  maxPixelRatio: 2,
   hudRefreshMs: 170,
   autoSaveSeconds: 40,
   maxFrameSeconds: 0.1,
   menuFocalX: D.BIOME_CENTERS.meadow[0],
 };
 const pretty = (id: string) => D.ITEMS[id]?.[0] || id;
+/** Journal sketches are drawn in vector; rasterise each at low resolution and show it pixelated. */
+const pixelArt = new Map<string, string>();
+function pixelate(root: HTMLElement) {
+  for (const svg of root.querySelectorAll('svg')) {
+    const source = svg.outerHTML,
+      done = pixelArt.get(source),
+      img = document.createElement('img');
+    img.className = (svg.getAttribute('class') ?? '') + ' pixelated';
+    img.alt = '';
+    svg.replaceWith(img);
+    if (done) {
+      img.src = done;
+      continue;
+    }
+    const vb = (svg.getAttribute('viewBox') ?? '0 0 600 310').split(' ').map(Number),
+      w = Math.round(vb[2] / 2),
+      h = Math.round(vb[3] / 2),
+      raw = new Image();
+    raw.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = w;
+      cv.height = h;
+      const k = cv.getContext('2d')!;
+      k.drawImage(raw, 0, 0, w, h);
+      // Posterise and harden edges so the sketch reads as drawn pixel by pixel.
+      const data = k.getImageData(0, 0, w, h),
+        d = data.data;
+      for (let i = 0; i < d.length; i += 4) {
+        for (let c = 0; c < 3; c++) d[i + c] = Math.round(d[i + c] / 24) * 24;
+        d[i + 3] = d[i + 3] > 60 ? 255 : 0;
+      }
+      k.putImageData(data, 0, 0);
+      const url = cv.toDataURL();
+      pixelArt.set(source, url);
+      img.src = url;
+    };
+    raw.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source);
+  }
+}
+/** A pixel icon for an item, framed like an inventory slot. */
+const icon = (id: string) => `<span class="icon-slot"><img src="${iconURL(id)}" alt=""></span>`;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 const fmt = (n: number) => String(Math.floor(n)).padStart(2, '0');
 const timeText = () => {
@@ -71,11 +112,24 @@ const itemUseLabel = (id: string) =>
             ? 'USE'
             : '';
 const sound = (kind: string) => Audio.effect(kind);
+let view: PixelView = pixelView(innerWidth, innerHeight, 1);
 function resize() {
-  const ratio = Math.min(devicePixelRatio || 1, UI_RULES.maxPixelRatio);
-  canvas.width = Math.round(innerWidth * ratio);
-  canvas.height = Math.round(innerHeight * ratio);
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  // The world is pixel art at a whole-number scale; the canvas matches the device pixels exactly.
+  const ratio = devicePixelRatio || 1;
+  view = pixelView(innerWidth, innerHeight, ratio);
+  canvas.width = view.artW * view.scale;
+  canvas.height = view.artH * view.scale;
+  canvas.style.width = canvas.width / ratio + 'px';
+  canvas.style.height = canvas.height / ratio + 'px';
+  ctx.imageSmoothingEnabled = false;
+}
+/** A pointer position on the canvas in world coordinates. */
+function worldAt(e: MouseEvent) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: state.camera.x + (e.clientX - rect.left) / view.cssPerWorld,
+    y: state.camera.y + (e.clientY - rect.top) / view.cssPerWorld,
+  };
 }
 addEventListener('resize', resize);
 resize();
@@ -109,6 +163,7 @@ function renderIntro() {
   const p = introPages[state.intro];
   $('intro-count').textContent = `${fmt(state.intro + 1)} / 03`;
   $('intro-art').innerHTML = p.art;
+  pixelate($('intro-art'));
   $('intro-eyebrow').textContent = p.eyebrow;
   $('intro-title').textContent = p.title;
   $('intro-copy').textContent = p.copy;
@@ -312,16 +367,12 @@ addEventListener('blur', () => keys.clear());
 canvas.addEventListener('click', (e) => {
   if (!state.playing || state.journal || game.s.dead) return;
   if (game.s.placing) {
-    const rect = canvas.getBoundingClientRect(),
-      x = e.clientX - rect.left + state.camera.x,
-      y = e.clientY - rect.top + state.camera.y;
+    const { x, y } = worldAt(e);
     const r = game.place(game.s.placing, x, y);
     if (!r.ok) message(r.reason);
     updateUI(true);
   } else {
-    const rect = canvas.getBoundingClientRect(),
-      x = e.clientX - rect.left + state.camera.x,
-      y = e.clientY - rect.top + state.camera.y;
+    const { x, y } = worldAt(e);
     if (game.tileAt(Math.floor(x / D.TILE), Math.floor(y / D.TILE))) doMine(x, y);
     else doAttack();
   }
@@ -354,6 +405,8 @@ function renderJournal() {
   if (tab === 'vitals') renderVitals(left, right);
   if (tab === 'notes') renderNotes(left, right);
   if (tab === 'beasts') renderBeasts(left, right);
+  pixelate(left);
+  pixelate(right);
 }
 function sketch(type: string) {
   if (type === 'pack')
@@ -402,7 +455,7 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
                   e.fresh === undefined
                     ? ''
                     : `<small class="${game.itemState(e)}">${game.itemState(e).toUpperCase()} · ${Math.max(0, Math.ceil(e.fresh / 60))} min</small>`;
-              return `<div class="book-row"><div><strong>${pretty(e.id)}</strong>${fresh}</div><div><span class="qty">×${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
+              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">×${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
             })
             .join('')}</div>`,
       )
@@ -465,7 +518,7 @@ function renderRecipes(left: HTMLElement, right: HTMLElement) {
   )
     .map(
       ([id, n]) =>
-        `<div class="book-row"><span>${pretty(id)}</span><span class="qty ${game.count(id) < n ? 'red' : ''}">${game.count(id)} / ${n}</span></div>`,
+        `<div class="book-row"><span class="with-icon">${icon(id)}${pretty(id)}</span><span class="qty ${game.count(id) < n ? 'red' : ''}">${game.count(id)} / ${n}</span></div>`,
     )
     .join(
       '',
@@ -474,7 +527,7 @@ function renderRecipes(left: HTMLElement, right: HTMLElement) {
   right.innerHTML = `<h2>Recipes</h2><p class="lede">Select a recipe, then make it when its station and materials are within reach.</p>${recipes
     .map(
       (r, i) =>
-        `${i === 0 || recipes[i - 1].tier !== r.tier ? `<h3 class="recipe-group">Tier ${r.tier} · ${['', 'First fire', 'Copper age', 'Iron age', 'Forgework', 'Black glass', 'Effergy'][r.tier]}</h3>` : ''}<div class="recipe-row"><div class="recipe-head"><strong>${pretty(r.id)}</strong><button data-craft="${r.id}" ${game.canCraft(r.id) ? '' : 'disabled'}>${game.dev.unlocked.has(r.id) ? 'MAKE ✦' : 'MAKE'}</button></div><small>${Object.entries(
+        `${i === 0 || recipes[i - 1].tier !== r.tier ? `<h3 class="recipe-group">Tier ${r.tier} · ${['', 'First fire', 'Copper age', 'Iron age', 'Forgework', 'Black glass', 'Effergy'][r.tier]}</h3>` : ''}<div class="recipe-row"><div class="recipe-head"><strong class="with-icon">${icon(r.id)}${pretty(r.id)}</strong><button data-craft="${r.id}" ${game.canCraft(r.id) ? '' : 'disabled'}>${game.dev.unlocked.has(r.id) ? 'MAKE ✦' : 'MAKE'}</button></div><small>${Object.entries(
           r.cost,
         )
           .map(([id, n]) => `${n} ${pretty(id).toLowerCase()}`)
@@ -773,8 +826,8 @@ function updateUI(force = false) {
 }
 function camera() {
   const p = game.s.player;
-  state.camera.x = clamp(p.x - innerWidth / 2, 0, Math.max(0, D.WORLD_W - innerWidth));
-  state.camera.y = clamp(p.y - innerHeight / 2, 0, Math.max(0, D.WORLD_H - innerHeight));
+  state.camera.x = clamp(p.x - view.worldW / 2, 0, Math.max(0, D.WORLD_W - view.worldW));
+  state.camera.y = clamp(p.y - 24 - view.worldH / 2, 0, Math.max(0, D.WORLD_H - view.worldH));
 }
 /** How loud each ambient bed should be for where the player stands. */
 function ambienceLevels(): AmbienceLevels {
@@ -833,14 +886,14 @@ function drawWorld(now = performance.now()) {
   camera();
   if (!state.playing) {
     state.camera.x = clamp(
-      3600 + Math.sin(performance.now() / 12000) * 380 - innerWidth * 0.2,
+      3600 + Math.sin(performance.now() / 12000) * 380 - view.worldW * 0.2,
       0,
-      D.WORLD_W - innerWidth,
+      D.WORLD_W - view.worldW,
     );
     state.camera.y = clamp(
-      D.surfaceAt(UI_RULES.menuFocalX) - innerHeight * 0.62,
+      D.surfaceAt(UI_RULES.menuFocalX) - view.worldH * 0.62,
       0,
-      D.WORLD_H - innerHeight,
+      D.WORLD_H - view.worldH,
     );
   }
   const events = game.takeEvents();
@@ -859,7 +912,7 @@ function drawWorld(now = performance.now()) {
       maybeThunder(now);
     }
   } else Audio.setAmbience(SILENCE);
-  draw(ctx, game, state.camera, innerWidth, innerHeight, !state.playing);
+  draw(ctx, game, state.camera, view, !state.playing);
 }
 function frame(now: number) {
   const dt = Math.min((now - state.lastFrame) / 1000, UI_RULES.maxFrameSeconds);

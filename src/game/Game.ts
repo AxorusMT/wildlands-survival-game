@@ -189,6 +189,14 @@ export class Game {
     const ice = this.near('icebox', 135);
     return !!(ice && ice.fuel > 0);
   }
+  /** The item in the player's hand. */
+  heldItem() {
+    return this.s.player.weapon;
+  }
+  /** Seconds one use of an item takes (the swing animation length). */
+  useDuration(_id: string) {
+    return 0.3;
+  }
   timeOfDay() {
     return this.environment.timeOfDay();
   }
