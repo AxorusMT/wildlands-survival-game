@@ -316,6 +316,8 @@ export function drawTree(
 // ── Plants ───────────────────────────────────────────────────────────────────────────────────
 
 const PLANT_KINDS = new Set([
+  'bog_apple',
+  'cinderflax',
   'berry',
   'herb',
   'fiber',
@@ -400,6 +402,25 @@ function plantSprite(kind: string, stage: number, art: RegionArt): Sprite {
           p.rect(10, 5, 2, 2, '#e8577a');
         }
         break;
+      case 'bog_apple':
+        p.line(9, 15, 9, 7, '#5a4a3a');
+        p.ellipse(9, 7, 7, 5, g[1]);
+        p.ellipse(7, 6, 4, 3, g[2]);
+        if (!bare)
+          for (const [x, y] of [
+            [5, 8],
+            [11, 5],
+            [13, 9],
+            [8, 10],
+          ].slice(0, full ? 4 : 2))
+            p.rect(x, y, 2, 2, '#b8583a');
+        break;
+      case 'cinderflax':
+        for (let x = 3; x < 16; x += 2) {
+          p.line(x, 15, x + (x % 3) - 1, bare ? 11 : 4, x % 4 ? '#7a6a54' : '#948068');
+          if (!bare) p.set(x + (x % 3) - 1, 3 + (x % 2), '#ff8a3a');
+        }
+        break;
       case 'willow':
         p.line(9, 15, 9, 5, '#6a5440');
         for (let x = 3; x < 16; x += 2)
@@ -447,6 +468,8 @@ export const MINERALS: Record<string, Mineral> = {
   ruby: { rock: '#5a5058', crystal: '#e8304a', glow: true },
   sapphire: { rock: '#50566a', crystal: '#3a7ae8', glow: true },
   emerald: { rock: '#4e5a52', crystal: '#2ac870', glow: true },
+  kilnstone_ore: { rock: '#6a4a3a', fleck: '#ff8a3a', shine: '#ffc070' },
+  burrow_amber: { rock: '#5a4028', crystal: '#e8a030', glow: true },
   coal: { rock: '#5a5a5e', fleck: '#1c1c20', shine: '#8a8a96' },
   ice: { rock: '#8fb8d0', crystal: '#dff4ff' },
   obsidian: { rock: '#3a3448', crystal: '#2a2433', shine: '#9a8ac0' },

@@ -2,7 +2,7 @@ import { dist } from '../../core/math.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { RECIPES } from '../../data/recipes.ts';
 import { WEAPONS } from '../../data/resources.ts';
-import { TILE, TILE_ROWS, WORLD_H, regionBounds } from '../../data/world.ts';
+import { TILE, TILE_ROWS, WORLD_H, dimensionAt, regionBounds } from '../../data/world.ts';
 import { uniqueId } from '../ids.ts';
 import { RULES } from '../rules.ts';
 
@@ -75,6 +75,8 @@ export class Crafting extends System {
       this.game.s.structures.some((st) => st.type === id)
     )
       return { ok: false, reason: 'Only one ' + itemName(id) + ' may stand.' };
+    if (id === 'waystone' && dimensionAt(x))
+      return { ok: false, reason: 'A Waystone must stand in the wildlands.' };
     if (dist({ x, y }, this.game.s.player) > RULES.placeReach)
       return { ok: false, reason: 'Place it within reach.' };
     const [lo, hi] = regionBounds(x);

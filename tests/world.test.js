@@ -136,7 +136,7 @@ test('saves keep only changed tiles, and older narrow-world records move into th
   storage.setItem('wildlands-save-v1', JSON.stringify(old));
   const migrated = new Game(3);
   assert.equal(migrated.load(storage), true);
-  assert.equal(migrated.s.layout, 4);
+  assert.equal(migrated.s.layout, 5);
   assert.equal(migrated.biome().id, 'meadow');
   assert.ok(migrated.s.nodes.length > 800);
 });

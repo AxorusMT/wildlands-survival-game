@@ -83,7 +83,11 @@ export class Interaction extends System {
       this.game.realms.socket();
       return { ok: true, action: 'rift', structure: st };
     }
-    if (st.type === 'portal') return this.game.realms.goHome();
+    if (st.type === 'portal')
+      return this.game.pocket.here(st.x) ? this.game.pocket.leave() : this.game.realms.goHome();
+    if (st.type === 'waystone') return { ok: true, action: 'atlas', structure: st };
+    if (st.type === 'shrine') return this.game.pocket.pray(st);
+    if (st.type === 'kiln') return { ok: false, reason: 'An old kiln. It still smelts ore.' };
     if (st.type === 'door') return this.game.town.toggleDoor(st);
     if (st.type === 'bed') return this.game.town.sleep(st);
     if (st.type === 'chair' || st.type === 'table') {

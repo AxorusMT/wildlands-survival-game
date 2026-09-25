@@ -12,3 +12,4 @@ export * from './mobs.ts';
 export * from './dungeons.ts';
 export * from './dimensions.ts';
 export * from './town.ts';
+export * from './realms/index.ts';

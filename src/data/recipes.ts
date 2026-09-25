@@ -162,6 +162,26 @@ export const RECIPES: Recipe[] = (
     ['bucket', { iron_ingot: 3 }, 'workbench', 3],
     ['rope', { fiber: 3 }, null, 1, 10],
     ['grappling_hook', { iron_ingot: 4, rope: 20, hide: 1 }, 'workbench', 3],
+    // ── Realms: Waystones, fragments, and keys ──
+    ['waystone', { stone: 40, iron_ingot: 8, crystal: 4 }, 'workbench', 3],
+    ['orchard_fragment', { crystal: 1, reeds: 6, raw_fish: 2 }, 'workbench', 3],
+    ['steppe_fragment', { crystal: 1, sulfur: 4, coal: 4 }, 'workbench', 3],
+    ['warren_fragment', { crystal: 1, clay: 6, bone: 4 }, 'workbench', 3],
+    ['orchard_key', { orchard_fragment: 3 }, 'waystone', 3],
+    ['steppe_key', { steppe_fragment: 3 }, 'waystone', 3],
+    ['warren_key', { warren_fragment: 3 }, 'waystone', 3],
+    // The Drowned Orchard.
+    ['tidecaller_spear', { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, 'workbench', 4],
+    ['brine_wand', { brinewood: 6, tide_pearl: 4, crystal: 2 }, 'workbench', 4],
+    ['brinewood_wall', { brinewood: 1 }, 'workbench', 4, 4],
+    // The Ashen Steppe.
+    ['ashcloth', { cinderflax: 3 }, 'workbench', 3],
+    ['kiln_ingot', { kilnstone_ore: 3, coal: 1 }, 'furnace', 4],
+    ['kiln_greataxe', { kiln_ingot: 8, ash_hide: 2, wood: 3 }, 'workbench', 4],
+    ['ember_sling', { ashcloth: 4, kiln_ingot: 3, sulfur: 4 }, 'workbench', 4],
+    // The Hollow Warren.
+    ['amber_repeater', { burrow_amber: 10, wood: 6, silk: 4 }, 'workbench', 4],
+    ['amber_pick', { burrow_amber: 12, gold_ingot: 2, wood: 3 }, 'workbench', 4],
     // ── Armour ──
     ...ARMOR_RECIPES,
   ] as [string, Record<string, number>, string | null, number, number?][]

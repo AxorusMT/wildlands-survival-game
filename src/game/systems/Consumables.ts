@@ -66,6 +66,7 @@ export class Consumables extends System {
       smoked_meat: [38, 32],
       trail_ration: [48, 28],
       potato_stew: [41, 20],
+      bog_apple: [12, 1],
     };
     if (food[id]) {
       v.calories = clamp(v.calories + (rotten ? 3 : food[id][0]), 0, RULES.maxVital);

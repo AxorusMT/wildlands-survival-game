@@ -407,6 +407,50 @@ Object.assign(STATIC, {
       p.rect(2, 26, 2, 2, IRON);
     }),
 });
+// Realm furnishings.
+Object.assign(STATIC, {
+  waystone: () =>
+    sprite(26, 48, 13, 47, (p) => {
+      stones(p, 1, 40, 24, 8, '#5a5a62');
+      p.poly(
+        [
+          [6, 41],
+          [9, 4],
+          [13, 0],
+          [17, 4],
+          [20, 41],
+        ],
+        '#6a6a74',
+      );
+      p.line(9, 4, 6, 41, '#8a8a96');
+      for (const [x, y] of [
+        [12, 12],
+        [13, 20],
+        [12, 28],
+      ])
+        p.rect(x, y, 2, 3, '#2a2a34');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  shrine: () =>
+    sprite(22, 30, 11, 29, (p) => {
+      stones(p, 0, 24, 22, 6, '#6a6470');
+      p.rect(4, 6, 14, 18, '#7a7484');
+      p.rect(4, 6, 14, 1, '#9a94a4');
+      p.rect(2, 3, 18, 4, '#5a5462');
+      p.rect(8, 12, 6, 7, '#2a2630');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  kiln: () =>
+    sprite(40, 34, 20, 33, (p) => {
+      p.ellipse(20, 22, 18, 14, '#8a5a44');
+      p.rect(2, 22, 36, 12, '#8a5a44');
+      for (let y = 12; y < 34; y += 5)
+        for (let x = (y % 10 ? 0 : 3) + 2; x < 38; x += 7) p.rect(x, y, 5, 1, '#6a4030');
+      p.rect(13, 20, 14, 14, '#1c100c');
+      p.rect(16, 0, 8, 10, '#6a4030');
+      p.shadeEdges(0.25, -0.3);
+    }),
+});
 const staticSprite = (k: string) => cached('st:' + k, STATIC[k]);
 
 /** A dungeon chest trimmed to match its halls, open once looted. */
@@ -635,6 +679,42 @@ export function drawStructure(
       } else flameAt(c, x, y - 10, t, 1, s.id);
       return;
     }
+    case 'waystone': {
+      blit(c, staticSprite('waystone'), x, y);
+      // Its runes glow while a realm is open, and a thread of light rises from its crown.
+      const open = !!g.s.pocket,
+        pulse = 0.5 + 0.5 * Math.sin(t * 3 + s.id);
+      c.fillStyle = open ? '#9af0ff' : '#6a6a88';
+      c.globalAlpha = open ? 0.6 + pulse * 0.4 : 0.5;
+      for (const [rx, ry] of [
+        [0, -35],
+        [1, -27],
+        [0, -19],
+      ])
+        c.fillRect(x + rx - 1, y + ry, 2, 3);
+      if (open) {
+        c.globalAlpha = 0.35 + pulse * 0.3;
+        for (let i = 0; i < 14; i++) c.fillRect(x, y - 50 - i * 2 - Math.floor((t * 10) % 2), 1, 1);
+      }
+      c.globalAlpha = 1;
+      return;
+    }
+    case 'shrine': {
+      blit(c, staticSprite('shrine'), x, y);
+      if (s.crop !== 'spent') {
+        c.fillStyle = '#fff0a0';
+        c.globalAlpha = 0.6 + Math.sin(t * 3 + s.id) * 0.3;
+        c.fillRect(x - 1, y - 16, 2, 3);
+        c.fillRect(x, y - 26 - Math.round((t * 6) % 6), 1, 1);
+        c.globalAlpha = 1;
+      }
+      return;
+    }
+    case 'kiln':
+      blit(c, staticSprite('kiln'), x, y);
+      flameAt(c, x, y - 4, t, 2, s.id);
+      smoke(c, x, y - 40, t, s.id, 0.7);
+      return;
     case 'door':
       blit(c, staticSprite(s.crop === 'open' ? 'door_open' : 'door_closed'), x, y);
       return;

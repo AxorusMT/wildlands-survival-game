@@ -13,6 +13,7 @@ import {
   caveY,
   underworldFloor,
 } from '../../data/world.ts';
+import { REALMS } from '../../data/realms/index.ts';
 import { uniqueId } from '../ids.ts';
 import { RULES } from '../rules.ts';
 import { ANIMAL_HP } from '../WorldGenerator.ts';
@@ -269,6 +270,32 @@ export class Dev extends System {
         return [`Weather: ${w}.`];
       },
     },
+    realm: {
+      usage: 'realm <id> [tier] | realm home | realm close',
+      help: 'Open a generated realm (orchard, steppe, warren) at a tier and step in, go home, or collapse it.',
+      run: ([id, tier]) => {
+        const pocket = this.game.pocket;
+        if (id === 'home') return pocket.leave().ok ? ['Home.'] : ['! No realm is open.'];
+        if (id === 'close') {
+          pocket.close();
+          return ['The realm collapses.'];
+        }
+        const tpl = REALMS.find((r) => r.id === id);
+        if (!tpl) return ['! Usage: realm <' + REALMS.map((r) => r.id).join('|') + '> [1-5]'];
+        const t = Math.max(1, Math.min(5, Number(tier) || 1)),
+          rec = pocket.record(tpl.id),
+          god = this.game.dev.god;
+        rec.best = Math.max(rec.best, t - 1);
+        this.game.dev.god = true;
+        const r = pocket.open(tpl.id, t);
+        this.game.dev.god = god;
+        return r.ok
+          ? [
+              `Opened the ${tpl.name}, tier ${t}${this.game.s.pocket?.mods.length ? ' · ' + this.game.s.pocket.mods.join(', ') : ''}.`,
+            ]
+          : ['! ' + r.reason];
+      },
+    },
     pos: {
       usage: 'pos',
       help: 'Show where you are.',
@@ -303,15 +330,17 @@ export class Dev extends System {
             ? ['all', ...RECIPES.map((r) => r.id)]
             : cmd === 'summon'
               ? MOBS
-              : cmd === 'tp'
-                ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES]
-                : cmd === 'time'
-                  ? Object.keys(TIMES)
-                  : cmd === 'weather'
-                    ? WEATHERS
-                    : cmd === 'help'
-                      ? Object.keys(this.commands)
-                      : [];
+              : cmd === 'realm'
+                ? [...REALMS.map((r) => r.id), 'home', 'close']
+                : cmd === 'tp'
+                  ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES]
+                  : cmd === 'time'
+                    ? Object.keys(TIMES)
+                    : cmd === 'weather'
+                      ? WEATHERS
+                      : cmd === 'help'
+                        ? Object.keys(this.commands)
+                        : [];
     return words.length === 2 ? pool.filter((id) => id.startsWith(last)) : [];
   }
 

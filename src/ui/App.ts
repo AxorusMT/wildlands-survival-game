@@ -40,6 +40,10 @@ const state = {
   chest: null as Structure | null,
   /** The settler whose wares the Town page shows. */
   shop: null as string | null,
+  /** The Atlas page: generated realms (by the selected one), or the Rift Gate. */
+  atlasView: 'realms' as 'realms' | 'rift',
+  atlasRealm: 'orchard',
+  atlasTier: 1,
   camera: { x: 0, y: 0 },
   lastFrame: performance.now(),
   lastUI: 0,
@@ -264,7 +268,7 @@ document.querySelectorAll<HTMLButtonElement>('.book-tabs button').forEach(
       renderJournal();
     }),
 );
-const TABS = ['pack', 'gear', 'recipes', 'vitals', 'notes', 'beasts', 'rift', 'town'];
+const TABS = ['pack', 'gear', 'recipes', 'vitals', 'notes', 'beasts', 'atlas', 'town'];
 function toggleJournal(force?: boolean) {
   if (!state.playing || game.s.dead) return;
   state.journal = force === undefined ? !state.journal : force;
@@ -304,7 +308,14 @@ function doInteract() {
       toggleJournal(true);
     }
     if (result.action === 'rift') {
-      state.tab = 'rift';
+      state.tab = 'atlas';
+      state.atlasView = 'rift';
+      toggleJournal(true);
+    }
+    if (result.action === 'atlas') {
+      state.tab = 'atlas';
+      state.atlasView = 'realms';
+      sound('page');
       toggleJournal(true);
     }
     if (result.action === 'shop') {
@@ -452,7 +463,7 @@ function renderJournal() {
     vitals: '04',
     notes: '05',
     beasts: '06',
-    rift: '07',
+    atlas: '07',
     town: '08',
   };
   $('page-number').textContent = page[tab];
@@ -466,7 +477,10 @@ function renderJournal() {
   if (tab === 'notes') renderNotes(left, right);
   if (tab === 'beasts') renderBeasts(left, right);
   if (tab === 'gear') renderGear(left, right);
-  if (tab === 'rift') renderRift(left, right);
+  if (tab === 'atlas') {
+    if (state.atlasView === 'rift') renderRift(left, right);
+    else renderAtlas(left, right);
+  }
   if (tab === 'town') renderTown(left, right);
   pixelate(left);
   pixelate(right);
@@ -901,14 +915,18 @@ function renderRift(left: HTMLElement, right: HTMLElement) {
   left.innerHTML = `<h2>The Rift</h2><p class="lede">Four dungeons keep four sigils. Set them in the Rift Gate and it opens onto other worlds.</p><h3>Sigils</h3><div class="book-list">${['sigil_crypt', 'sigil_frost', 'sigil_sun', 'sigil_cinder'].map(sigil).join('')}</div><h3>Dungeons</h3>${D.DUNGEONS.map((d) => `<div class="biome-entry"><strong>${d.def.name}</strong><small>${d.def.note} ${game.s.bosses[d.def.boss] ? '· Its master is slain.' : ''}</small></div>`).join('')}`;
   right.innerHTML = `<h2>Destinations</h2><p class="lede">${gate ? (near ? 'The Gate hums beside you.' : 'Stand at your Rift Gate to travel.') : 'Build a Rift Gate at a forge: obsidian, crystal, hellstone, and grave dust from the Crypt.'}</p>${D.DIMENSIONS.map(
     (dim) => {
-      const need = { mycelia: 1, skyreach: 2, void: 4 }[dim.id],
+      const need = ({ mycelia: 1, skyreach: 2, void: 4 } as Record<string, number>)[dim.id] ?? 99,
         open = sigils.length >= need,
         biome = D.BIOMES.find((b) => b.id === dim.id);
       return `<div class="recipe-row"><div class="recipe-head"><strong>${dim.name}</strong><button data-travel="${dim.id}" ${open && near ? '' : 'disabled'}>TRAVEL</button></div><small>${biome?.note ?? ''}</small><small>${open ? 'OPEN' : 'NEEDS ' + need + ' SIGILS'} · ${game.s.discoveries.includes(dim.id) ? 'VISITED' : 'UNVISITED'}</small></div>`;
     },
   ).join(
     '',
-  )}<div class="note-block">In each world a portal by the arrival point leads home to the Gate.</div>`;
+  )}<div class="note-block">In each world a portal by the arrival point leads home to the Gate.</div><div class="book-actions"><button class="quiet" data-view-realms>‹ THE REALMS</button></div>`;
+  right.querySelector<HTMLButtonElement>('[data-view-realms]')!.onclick = () => {
+    state.atlasView = 'realms';
+    renderJournal();
+  };
   right.querySelectorAll<HTMLButtonElement>('[data-travel]').forEach(
     (b) =>
       (b.onclick = () => {
@@ -993,6 +1011,75 @@ function renderTown(left: HTMLElement, right: HTMLElement) {
     .querySelectorAll<HTMLButtonElement>('[data-sell]')
     .forEach((b) => (b.onclick = () => act(town.sell(b.dataset.sell ?? ''))));
 }
+function renderAtlas(left: HTMLElement, right: HTMLElement) {
+  const pocket = game.pocket,
+    open = game.s.pocket,
+    stone = pocket.waystoneNear();
+  const tier = (t: number) => D.TIER_NAMES[t] ?? String(t);
+  left.innerHTML = `<h2>The Atlas</h2><p class="lede">Each realm lies behind its own key. Turn one in a Waystone and the realm is built anew: its tier sets how hard it bites and how much it gives.</p>${
+    open
+      ? `<div class="note-block">Open now: <strong>${D.realmById(open.realm)?.name}</strong> · Tier ${tier(open.tier)}${open.mods.length ? ' · ' + open.mods.map((m) => D.modById(m)?.name).join(', ') : ''}${open.cleared ? ' · its master is slain' : ''}.</div>`
+      : ''
+  }<h3>Realms</h3><div class="book-list">${D.REALMS.map((r) => {
+    const rec = pocket.record(r.id);
+    return `<div class="book-row ${state.atlasRealm === r.id ? 'selected' : ''}"><div class="with-icon">${icon(r.key)}<div><strong>${r.name}</strong><small>Band ${tier(r.band)} · ${rec.visits ? 'best tier ' + (rec.best ? tier(rec.best) : '—') : 'unvisited'}${rec.relic ? ' · relic found' : ''}</small></div></div><div><span class="qty">×${game.count(r.key)}</span><button data-realm="${r.id}">VIEW</button></div></div>`;
+  }).join(
+    '',
+  )}</div><div class="book-actions"><button class="quiet" data-view-rift>THE RIFT GATE ›</button></div>`;
+  const r = D.realmById(state.atlasRealm) ?? D.REALMS[0],
+    rec = pocket.record(r.id),
+    max = pocket.maxTier(r.id);
+  state.atlasTier = Math.min(Math.max(1, state.atlasTier), max);
+  const keys = game.count(r.key),
+    canOpen = (!!stone || game.dev.god) && (keys > 0 || game.dev.god);
+  right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> · ${r.hazard.text}</p><p>Great foe: <strong>${D.MOBS[r.boss]?.name}</strong> · relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? ' (found)' : ''}<br>Signature: <strong>${pretty(r.material)}</strong> · Temperature ${r.temp}°C</p><h3>Tier</h3><div class="farm-choice">${[
+    1, 2, 3, 4, 5,
+  ]
+    .map(
+      (t) =>
+        `<button class="tiny-button ${t === state.atlasTier ? 'active' : ''}" data-tier="${t}" ${t > max ? 'disabled' : ''}>${tier(t)}</button>`,
+    )
+    .join(
+      '',
+    )}</div><p class="muted">Monsters ×${D.TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, ×${D.TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm · loot ×${D.TIER_SCALE.loot(state.atlasTier).toFixed(2)} · ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? '' : 's'}.</p><div class="book-actions"><button data-open-realm ${canOpen ? '' : 'disabled'}>OPEN · 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? '' : 'disabled'}>RETURN TO ${D.realmById(open.realm)?.name.toUpperCase()}</button>` : ''}</div><div class="note-block">${stone ? 'The Waystone hums beside you.' : 'Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal.'} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a workbench or found in the realms.</div>${
+    open?.realm === r.id && open.mods.length
+      ? `<h3>This expedition</h3><div class="book-list">${open.mods
+          .map((m) => D.modById(m))
+          .map(
+            (m) =>
+              `<div class="book-row"><div><strong>${m?.name}</strong><small>${m?.text}</small></div><span class="qty">${m?.kind === 'boon' ? 'BOON' : 'BANE'}</span></div>`,
+          )
+          .join('')}</div>`
+      : ''
+  }`;
+  left.querySelectorAll<HTMLButtonElement>('[data-realm]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.atlasRealm = b.dataset.realm ?? 'orchard';
+        renderJournal();
+      }),
+  );
+  left.querySelector<HTMLButtonElement>('[data-view-rift]')!.onclick = () => {
+    state.atlasView = 'rift';
+    renderJournal();
+  };
+  right.querySelectorAll<HTMLButtonElement>('[data-tier]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.atlasTier = Number(b.dataset.tier);
+        renderJournal();
+      }),
+  );
+  const go = (r2: { ok: boolean; reason?: string }) => {
+    if (!r2.ok) message(r2.reason);
+    else toggleJournal(false);
+    updateUI(true);
+  };
+  const openBtn = right.querySelector<HTMLButtonElement>('[data-open-realm]');
+  if (openBtn) openBtn.onclick = () => go(pocket.open(r.id, state.atlasTier));
+  const resume = right.querySelector<HTMLButtonElement>('[data-resume]');
+  if (resume) resume.onclick = () => go(pocket.resume());
+}
 /** Redraws the quick slots when their contents change. */
 function renderHotbar() {
   const s = game.s,
@@ -1058,7 +1145,9 @@ function updateUI(force = false) {
   else if (
     near &&
     near.type === 'structure' &&
-    ['dungeon_chest', 'boss_altar', 'rift_gate', 'portal'].includes(near.object.type)
+    ['dungeon_chest', 'boss_altar', 'rift_gate', 'portal', 'waystone', 'shrine'].includes(
+      near.object.type,
+    )
   )
     prompt = `<b>E</b> ${
       near.object.type === 'dungeon_chest'
@@ -1068,8 +1157,16 @@ function updateUI(force = false) {
             ? 'The altar burns'
             : 'Call ' + D.MOBS[near.object.kind ?? '']?.name
           : near.object.type === 'portal'
-            ? 'Return home through the portal'
-            : 'Open the Rift'
+            ? game.pocket.here(near.object.x)
+              ? 'Return to your Waystone'
+              : 'Return home through the portal'
+            : near.object.type === 'waystone'
+              ? 'Open the Atlas'
+              : near.object.type === 'shrine'
+                ? near.object.crop === 'spent'
+                  ? 'The shrine is quiet'
+                  : 'Pray at the shrine'
+                : 'Open the Rift'
     }`;
   else if (near && near.type === 'settler') {
     const who = D.settlerById(near.object.settler ?? '');
@@ -1121,6 +1218,15 @@ function updateUI(force = false) {
     ).toUpperCase();
     $('boss-bar').style.width = clamp((boss.hp / boss.maxHp) * 100, 0, 100) + '%';
     $('boss-value').textContent = `${Math.ceil(boss.hp)} / ${boss.maxHp}`;
+  }
+  // A banner names a realm for a few seconds after you step into it.
+  const b = game.pocket.banner,
+    showBanner = !!b && game.s.elapsed - b.at < 5 && game.pocket.here();
+  $('realm-banner').classList.toggle('hidden', !showBanner);
+  if (showBanner && $('realm-banner').dataset.at !== String(b.at)) {
+    $('realm-banner').dataset.at = String(b.at);
+    $('realm-banner').innerHTML =
+      `<small>TIER ${D.TIER_NAMES[b.tier]}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => D.modById(m)?.name).join(' · ')}</span>` : ''}<em>${D.realmById(game.s.pocket?.realm ?? '')?.hazard.name ?? ''}</em>`;
   }
   const msg = game.messages[0];
   if (msg && msg !== state.seenMessage) {

@@ -20,12 +20,13 @@ The world is drawn at low resolution into an art buffer (one art pixel is two wo
 TypeScript source is in `src/`. `src/main.ts` bundles the UI, audio, simulation, data and renderer into `dist/wildlands.js` for the offline page. Run `npm install` once, then `npm run format`, `npm run typecheck`, `npm test` and `npm run build` after changes. The compiler uses strict type checking.
 
 - **Rules and data:** gameplay rules are in `src/game/rules.ts`. World geometry, dungeons, dimensions, items, gear and creatures are in `src/data/`.
-- **Systems:** each concern has its own system in `src/game/systems/`: the hotbar and equipment, combat and projectiles, bosses, and the realms (dungeon furnishings, the Rift, traps and falling stars).
+- **Systems:** each concern has its own system in `src/game/systems/`: the hotbar and equipment, combat and projectiles, bosses, the Rift and dungeon furnishings (`Realms.ts`), and the generated realms (`Pocket.ts`).
+- **Generated realms:** each realm is a template in `src/data/realms/`. It builds its land from a seed and lists its creatures, resources, hazard, boss and loot.
 - **Renderer:** `src/renderer/` is split into the pixel core (`px.ts`), tiles, sky, lighting, nature, structures, actors, icons and effects.
 
 ## Music
 
-The soundtrack is twenty-two one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
+The soundtrack is twenty-five one-minute looping tracks, synthesised live by the browser. There are no audio files. Tracks are written as data in `src/audio/tracks/` using the small notation in `src/audio/score.ts`: melodies, chord progressions, arpeggios, bass patterns, drum grids, and filter or volume automation. Bar lines in a melody are checked when the track is built. `src/audio/instruments.ts` holds the General MIDI-style voices and drum kit. `src/audio/engine.ts` schedules notes ahead of the clock through a mixer with reverb, tempo-synced echo, sidechain ducking, and crossfades between tracks. `src/audio/scenes.ts` picks the track:
 
 | Track                     | Plays                                     |
 | ------------------------- | ----------------------------------------- |
@@ -51,6 +52,9 @@ The soundtrack is twenty-two one-minute looping tracks, synthesised live by the 
 | The Hollow Between        | The Hollow Void                           |
 | Unmaker                   | The final fight                           |
 | Lamplight on the Square   | A town of two or more settlers            |
+| Brine and Blossom         | The Drowned Orchard                       |
+| The Kiln Road             | The Ashen Steppe                          |
+| Under the Amber           | The Hollow Warren                         |
 
 Surface changes wait a moment before the music follows, so walking along a border does not flip tracks. The menu, boss, and death tracks cut in straight away. Music is muffled while the journal is open over the game.
 
@@ -68,21 +72,22 @@ Sound effects are synthesised live too (`src/audio/sfx.ts`), and are panned and 
 
 Press ` (backquote) during play to open the field console. Tab completes commands and names, and ↑/↓ recalls earlier lines. Console switches last for the session and are not saved.
 
-| Command                                  | Effect                                                           |
-| ---------------------------------------- | ---------------------------------------------------------------- |
-| `give <item> [qty]`                      | Put items in the pack (`give obsidian pick 2`)                   |
-| `items [filter]`, `recipes [filter]`     | List item and recipe ids                                         |
-| `unlock <recipe\|all>`, `lock …`         | Make recipes craftable anywhere, without materials               |
-| `god`                                    | No damage; every need stays met                                  |
-| `noclip`                                 | Fly through rock with WASD                                       |
-| `speed <x>`                              | Scale movement speed                                             |
-| `summon <mob> [count]`                   | Any creature or boss, e.g. `summon skeleton 3`, `summon unmaker` |
-| `kill [radius\|all]`                     | Slay nearby creatures                                            |
-| `heal`                                   | Restore every vital and cure illness                             |
-| `tp <x [y] \| region \| layer \| place>` | `tp alpine`, `tp lower_hell`, `tp crypt`, `tp skyreach`, …       |
-| `time <hh:mm\|dawn\|noon\|dusk\|night>`  | Set the time of day                                              |
-| `weather <clear\|cloudy\|rain\|storm>`   | Change the weather                                               |
-| `pos`, `help`, `clear`                   | Where you are, the command list, and clear the log               |
+| Command                                  | Effect                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------ |
+| `give <item> [qty]`                      | Put items in the pack (`give obsidian pick 2`)                     |
+| `items [filter]`, `recipes [filter]`     | List item and recipe ids                                           |
+| `unlock <recipe\|all>`, `lock …`         | Make recipes craftable anywhere, without materials                 |
+| `god`                                    | No damage; every need stays met                                    |
+| `noclip`                                 | Fly through rock with WASD                                         |
+| `speed <x>`                              | Scale movement speed                                               |
+| `summon <mob> [count]`                   | Any creature or boss, e.g. `summon skeleton 3`, `summon unmaker`   |
+| `kill [radius\|all]`                     | Slay nearby creatures                                              |
+| `heal`                                   | Restore every vital and cure illness                               |
+| `tp <x [y] \| region \| layer \| place>` | `tp alpine`, `tp lower_hell`, `tp crypt`, `tp skyreach`, …         |
+| `time <hh:mm\|dawn\|noon\|dusk\|night>`  | Set the time of day                                                |
+| `weather <clear\|cloudy\|rain\|storm>`   | Change the weather                                                 |
+| `realm <id> [tier]`, `realm home\|close` | Open a generated realm (`realm warren 3`), go home, or collapse it |
+| `pos`, `help`, `clear`                   | Where you are, the command list, and clear the log                 |
 
 ## Controls
 
@@ -105,7 +110,7 @@ Press ` (backquote) during play to open the field console. Tab completes command
 
 The hotbar fills itself with tools, weapons, blocks, placeables and consumables as you pick them up. Picks crack tiles over several strikes, depending on their hardness. Blocks and torches go wherever the cursor points. Swords hit everything in their arc, and bows and staves fire at the cursor.
 
-Recipes are made from the **Recipes** page. Select **Details** to inspect a recipe. Structures are crafted into the pack, then placed by clicking nearby ground. Stand by a station to make its recipes. Use items, equip weapons, stow goods in a chest, and plant seeds from **Pack**. **Gear** shows your armour, accessories, health, mana, defense, set bonus and active effects, and lets you assign quick slots. Open **Vitals** to see exposure, diagnosis, treatment and the wash action. **Beasts** holds the Effergy folio and a bestiary of everything you have slain. **Rift** tracks the four sigils and the worlds they open. **Town** lists your settlers and their shops. **Notes** contains the tutorial, expedition chapters, side elevation map, manual save, and return to menu. The main menu has an expedition guide and saved music and effects sliders.
+Recipes are made from the **Recipes** page. Select **Details** to inspect a recipe. Structures are crafted into the pack, then placed by clicking nearby ground. Stand by a station to make its recipes. Use items, equip weapons, stow goods in a chest, and plant seeds from **Pack**. **Gear** shows your armour, accessories, health, mana, defense, set bonus and active effects, and lets you assign quick slots. Open **Vitals** to see exposure, diagnosis, treatment and the wash action. **Beasts** holds the Effergy folio and a bestiary of everything you have slain. **Atlas** lists the generated realms, opens them at a Waystone, and leads to the Rift page, which tracks the four sigils and the worlds they open. **Town** lists your settlers and their shops. **Notes** contains the tutorial, expedition chapters, side elevation map, manual save, and return to menu. The main menu has an expedition guide and saved music and effects sliders.
 
 The game automatically saves to browser local storage every 40 seconds and when returning to the menu or closing the page. **Continue field record** reloads it. Perishable food and water, icebox fuel, and campfire fuel age while the game is closed. A death lets you recover in the meadow with reduced loose supplies or load the last saved record.
 
@@ -155,6 +160,23 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 - **Boss summons:** each boss is called with an item crafted from its world: the Spore lure, the Storm totem and the Void seal.
 - **The end:** the Unmaker's final fight has its own theme, and defeating it wins the Crown of the Wildlands.
 
+### Waystones and generated realms
+
+Beyond the Rift lie realms that are built anew every time you enter.
+
+- **Waystones:** craft one at a workbench from stone, iron ingots and crystal, and set it down in the wildlands. Use it to open the **Atlas** page.
+- **Keys:** each realm needs its own key. Three key fragments make a key at a Waystone. You can craft fragments at a workbench, buy them from the Tinker, or find them in the realms.
+- **Opening a realm:** turning a key builds the realm from a fresh seed in a strip of its own, and you arrive beside a portal home. The realm stays open until you turn another key.
+- **Tiers I–V:** each tier gives monsters more health and harm and gives more loot. Clearing a tier's boss unlocks the next one.
+- **Modifiers:** a realm rolls one modifier per tier above I. Boons include Bountiful, Rich veins, Treasure trove, Lucky and Low gravity. Banes include Fortified, Savage, Swarming, Frenzied, Hunted, Hungering, Frostbound, Scorched, Starless, Unstable, Blighted and Echoing. Every modifier adds to the loot.
+- **Inside each realm:** you'll find resources, chests, two shrines that each grant a blessing once, a roaming elite, and the boss's altar. The first boss kill in each realm wins its **relic**.
+
+| Realm           | Hazard                                                | Signature                                         | Gear                                                           | Boss and relic                                   |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------ |
+| Drowned Orchard | The tide rises and falls; wading slows and chills you | Brinewood, tide pearls, crab shell                | Tidecaller set (swim freely), tidecaller spear, brine wand     | The Orchard Mother · Tide conch                  |
+| Ashen Steppe    | Ash storms choke and blind in the open                | Cinderflax, kilnstone, old kilns that still smelt | Ashwalker set (storm-proof), kiln greataxe, ember sling        | The Kiln Beast · Kiln heart                      |
+| Hollow Warren   | Cave-ins: dust, then falling rock                     | Burrow amber, beetle carapace                     | Amberguard set (sense cave-ins), amber repeater, amber pickaxe | The Warren Queen, who burrows · Queen's mandible |
+
 ### Homes and the town
 
 - **Building:** place **back walls** (dirt, stone, wood, brick, glass and the stones of every dungeon and world), **doors**, **chairs**, **tables** and **beds**. Walls must touch ground or another wall. A **hammer** knocks walls down and picks furniture back up. Dungeon walls need an iron hammer.
@@ -168,7 +190,7 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 
 ### Gear, potions, and crystals
 
-- **Armour:** fourteen sets (copper, iron, silver, gold, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
+- **Armour:** seventeen sets (copper, iron, silver, gold, the three Band I realm sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
 - **Accessories:** three can be worn at once, including double jumps, gliding, speed, regeneration, light, lava resistance and more.
 - **Ranged weapons:** bows fire arrows (plain, fire, crystal), and staves spend mana: embers, bone shards, icicles, homing sun bolts, spores and void beams.
 - **Healing:** healing draughts heal instantly and bring on a short potion sickness.
@@ -176,7 +198,7 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 182 recipes and 287 items, and 40 kinds of creature including 7 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 207 recipes and 334 items, and 58 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 
@@ -189,6 +211,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the dungeons (loot, traps, guardians, altars and brick);
 - boss fights and sigils, the Rift Gate, travel and portals home, and every dimension's walls, life and boss;
 - the hotbar (digging, building and torches), armour and set bonuses, potions, buffs and crystals, bows, staves and mana, and monsters of the deep;
+- generated realms: seeds, keys and tiers, furnishing, modifiers, hazards, bosses and relics, and saving an open realm;
 - homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
 - save migration from every earlier layout;
 - the music and sound.

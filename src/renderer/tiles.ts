@@ -426,7 +426,8 @@ const chunks = new Map<string, Chunk>();
 let chunkTiles: number[] | null = null;
 
 function chunkSig(g: RenderGame, cx: number, cy: number) {
-  let s = 17;
+  // A realm's chunks also depend on which realm (and seed) fills the pocket strip.
+  let s = D.inPocket(cx * CH * T) ? 17 + (D.activeRealm()?.inst.seed ?? 0) : 17;
   for (let ty = cy * CH - 1; ty <= cy * CH + CH; ty++)
     for (let tx = cx * CH - 1; tx <= cx * CH + CH; tx++)
       s = (Math.imul(s, 31) + g.tileAt(tx, ty) * 64 + g.wallEditAt(tx, ty) + 3) | 0;

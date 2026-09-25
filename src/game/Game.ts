@@ -12,7 +12,8 @@ import type {
   Structure,
 } from '../core/types.ts';
 import { RANGED } from '../data/gear.ts';
-import { biomeAt, layerAt, lavaAt } from '../data/world.ts';
+import { setActiveRealm } from '../data/realms/index.ts';
+import { biomeAt, layerAt, lavaAt, syncPocket } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
 import { Bosses } from './systems/Bosses.ts';
@@ -28,13 +29,14 @@ import { Hands } from './systems/Hands.ts';
 import { Interaction } from './systems/Interaction.ts';
 import { Inventory } from './systems/Inventory.ts';
 import { Physics } from './systems/Physics.ts';
+import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
 import { Survival } from './systems/Survival.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Town } from './systems/Town.ts';
 import { Wildlife } from './systems/Wildlife.ts';
-import { SaveSystem } from './SaveSystem.ts';
+import { LAYOUT, SaveSystem } from './SaveSystem.ts';
 import { WorldGenerator } from './WorldGenerator.ts';
 /**
  * The expedition simulation. Game owns the saved record (`s`), the seeded random source, and
@@ -66,6 +68,7 @@ export class Game {
   readonly combat = new Combat(this);
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
+  readonly pocket = new Pocket(this);
   readonly hands = new Hands(this);
   readonly town = new Town(this);
   readonly devtools = new Dev(this);
@@ -79,9 +82,12 @@ export class Game {
   /** Starts a fresh expedition from a seed. */
   newGame(seed: number = RULES.defaultSeed): this {
     this.rng = seededRandom(seed);
+    // A fresh world starts with the pocket strip empty.
+    setActiveRealm(null);
+    syncPocket();
     this.s = {
       version: 3,
-      layout: 4,
+      layout: LAYOUT,
       seed,
       elapsed: 0,
       day: 1,
@@ -142,6 +148,8 @@ export class Game {
       wallEdits: {},
       spawn: null,
       town: { homes: {} },
+      pocket: null,
+      realms: {},
       placing: null,
       dead: false,
       lastSave: Date.now(),
@@ -169,6 +177,7 @@ export class Game {
     this.drops.step(dt);
     this.equipment.update(dt);
     this.realms.update(dt);
+    this.pocket.update(dt);
     this.town.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
@@ -206,7 +215,9 @@ export class Game {
     return lavaAt(p.x, p.y - 8);
   }
   near(type: string, radius = 110) {
-    return this.s.structures.find((st) => st.type === type && dist(st, this.s.player) <= radius);
+    // The old kilns of the Ashen Steppe still burn hot enough to smelt.
+    const ok = (t: string) => t === type || (type === 'furnace' && t === 'kiln');
+    return this.s.structures.find((st) => ok(st.type) && dist(st, this.s.player) <= radius);
   }
   nearLitFire() {
     const f = this.near('campfire', 155);

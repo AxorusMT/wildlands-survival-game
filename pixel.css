@@ -706,3 +706,59 @@ canvas.icon {
 #dev-log ::selection {
   background: #4a6450;
 }
+
+/* ── Realm banner ──────────────────────────────────────────────────────────── */
+#realm-banner {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 14px 28px 12px;
+  background:
+    var(--dither) 0 0 / 6px 6px,
+    #1c2620e0;
+  border: var(--px) solid #0c120e;
+  box-shadow:
+    inset 0 0 0 var(--px) #4a6450,
+    var(--px) var(--px) 0 var(--px) #0007;
+  color: #e8f0d8;
+  text-align: center;
+  animation: banner-in 0.6s steps(6) both;
+}
+#realm-banner.hidden {
+  display: none;
+}
+#realm-banner small {
+  font: 400 11px var(--caps);
+  color: var(--gold);
+  letter-spacing: 0.2em;
+}
+#realm-banner strong {
+  font: 700 30px var(--pixel);
+  text-shadow: var(--px) var(--px) 0 #0c120e;
+}
+#realm-banner span {
+  font: 400 12px var(--caps);
+  color: #ff9a7a;
+}
+#realm-banner em {
+  font: 400 13px var(--pixel);
+  font-style: normal;
+  color: #9fb8a0;
+}
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+}
+.book-row.selected {
+  background: #0000000f;
+}
+.tiny-button.active {
+  background: #b1664c;
+  color: #fff6de;
+}

@@ -33,6 +33,8 @@ export interface RegionArt {
   cap: 'grass' | 'snow' | 'sand' | 'dust' | 'moss' | 'mycel' | 'none';
   flowers: string[];
   snowy?: boolean;
+  /** An otherworldly sky: no sun, moon, or clouds, and the stars always out. */
+  alien?: boolean;
 }
 
 export const ART: Record<string, RegionArt> = {
@@ -160,6 +162,53 @@ export const ART: Record<string, RegionArt> = {
     cap: 'grass',
     flowers: ['#ffffff', '#ffd86a', '#8ad0ff'],
   },
+  // ── Generated realms ──
+  orchard: {
+    sky: ['#7fb0b8', '#ece6c8'],
+    hills: ['#9ab8b0', '#7c9e94', '#5e8478', '#46685e'],
+    skyline: 'rolling',
+    tree: 'willow',
+    leaves: ['#3e6a5a', '#5a8a6a', '#8ab88a'],
+    bark: '#5a4a3a',
+    grass: ['#4a7a60', '#6a9a70', '#94c088'],
+    cap: 'grass',
+    flowers: ['#f0a0b0', '#f8e0a0', '#e86a5a'],
+  },
+  steppe: {
+    sky: ['#a88a7a', '#e8c8a0'],
+    hills: ['#b8a090', '#9a8070', '#7a6254', '#5a463a'],
+    skyline: 'mesa',
+    tree: 'dead',
+    leaves: ['#6a6254', '#86806a', '#a09a84'],
+    bark: '#4a3a30',
+    grass: ['#7a6a54', '#948068', '#b09a80'],
+    cap: 'dust',
+    flowers: ['#ff8a3a'],
+  },
+  warren: {
+    sky: ['#140d06', '#3a2612'],
+    hills: ['#3a2a18', '#302214', '#281c10', '#20160c'],
+    skyline: 'spires',
+    tree: 'shroom',
+    leaves: ['#c8882a', '#e8a840', '#ffd070'],
+    bark: '#8a6a4a',
+    grass: ['#8a6a3a', '#a8844a', '#c8a060'],
+    cap: 'none',
+    flowers: ['#ffd070'],
+    alien: true,
+  },
+  pocket: {
+    sky: ['#0a080c', '#1a1420'],
+    hills: ['#1a1420', '#16121c', '#120e18', '#0e0a14'],
+    skyline: 'spires',
+    tree: 'dead',
+    leaves: ['#3a3040', '#4a4050', '#5a5060'],
+    bark: '#2a2230',
+    grass: ['#2a2230', '#3a3040', '#4a4050'],
+    cap: 'none',
+    flowers: [],
+    alien: true,
+  },
   void: {
     sky: ['#07040f', '#2a1440'],
     hills: ['#22123a', '#1c0f30', '#160c26', '#10081c'],
@@ -242,6 +291,13 @@ export const GROUND: Record<number, GroundStyle> = {
   26: { base: '#e0c890', pattern: 'bigbrick', accent: '#fff0c0', wall: '#6a5a3a' },
   27: { base: '#1e1a22', pattern: 'obsidian', accent: '#3a3440', wall: '#0a080c' },
   28: { base: '#2f7a72', pattern: 'crystal', accent: '#c0fff4', glow: '#58e0d0', wall: '#10302c' },
+  // Generated realms.
+  30: { base: '#5a6a58', pattern: 'mud', cap: 'region', wall: '#26302a' },
+  31: { base: '#6e6258', pattern: 'soil', cap: 'region', wall: '#2a2420' },
+  32: { base: '#8a5a44', pattern: 'strata', accent: '#e8884a', wall: '#3a2018' },
+  33: { base: '#7a5a36', pattern: 'soil', wall: '#2e2014' },
+  34: { base: '#c8882a', pattern: 'crystal', accent: '#ffd070', glow: '#e8a030', wall: '#3a2410' },
+  35: { base: '#6a7a6a', pattern: 'planks', wall: '#2a322a' },
 };
 export const groundOf = (kind: number) => GROUND[kind] ?? GROUND[2];
 

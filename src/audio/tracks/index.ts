@@ -19,6 +19,9 @@ import { pandemonium } from './pandemonium.ts';
 import { skyreach } from './skyreach.ts';
 import { storm } from './storm.ts';
 import { tomb } from './tomb.ts';
+import { orchard } from './orchard.ts';
+import { steppe } from './steppe.ts';
+import { warren } from './warren.ts';
 import { town } from './town.ts';
 import { voidsong } from './voidsong.ts';
 
@@ -46,6 +49,9 @@ export const TRACK_LIST: Track[] = [
   voidsong,
   finalBoss,
   town,
+  orchard,
+  steppe,
+  warren,
 ];
 
 export const TRACKS: Record<string, Track> = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));

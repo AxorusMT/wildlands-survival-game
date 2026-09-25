@@ -45,14 +45,19 @@ export class Combat extends System {
       p = s.player;
     if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
     const cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1,
-      taken = Math.max(1, Math.round(amount * cloth - this.game.equipment.defense() * 0.5));
+      scaled = amount * this.game.pocket.damageScale(),
+      taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
     s.vitals.health -= taken;
     s.vitals.morale = clamp(s.vitals.morale - 4, 0, RULES.maxVital);
     p.invuln = 0.7;
     p.vy = Math.min(p.vy, -160);
     this.game.sound('hurt');
     this.game.event('damage', p.x, p.y - 50, String(taken), 1);
-    if (disease && this.game.rng() < disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0))
+    if (
+      disease &&
+      this.game.rng() <
+        (disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0)) * this.game.pocket.diseaseScale()
+    )
       this.game.contract(disease[0]);
     this.game.say(source + ' · ' + taken + ' damage.', 'danger');
     if (s.vitals.health <= 0) this.game.survival.update(0);
@@ -295,6 +300,11 @@ export class Combat extends System {
           flame_jet: 'Flames',
           bone_shard: 'Bone shards',
           sun_bolt: 'A sun bolt',
+          falling_rock: 'Falling rock',
+          brine_spit: 'Brine spit',
+          amber_glob: 'Burning amber',
+          ash_burst: 'Choking ash',
+          kiln_ember: 'A kiln ember',
         } as Record<string, string>
       )[kind] ?? 'A blow'
     );

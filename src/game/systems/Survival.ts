@@ -164,9 +164,11 @@ export class Survival extends System {
     if (this.game.equipment.has('cold')) target = Math.max(target, 36.8);
     target = clamp(target, 30, 41);
     v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
+    const drain = this.game.pocket.drainScale();
     v.hydration = clamp(
       v.hydration -
         dt *
+          drain *
           (0.045 +
             (cold > 26 ? 0.045 : 0) +
             (cold > 40 ? (p.ward ? 0.05 : 0.14) : 0) +
@@ -174,7 +176,7 @@ export class Survival extends System {
       0,
       100,
     );
-    v.calories = clamp(v.calories - dt * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
+    v.calories = clamp(v.calories - dt * drain * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
     v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
     v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
     v.hygiene = clamp(

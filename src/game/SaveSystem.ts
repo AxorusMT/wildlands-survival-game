@@ -10,12 +10,19 @@ import {
   TILE_COLS,
   dungeonAt,
 } from '../data/world.ts';
+import { setActiveRealm } from '../data/realms/index.ts';
+import { syncPocket } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
 import { System } from './systems/System.ts';
 
-/** World layout version: 3 is the wide, five-layer world; 4 adds dungeons and dimensions. */
-export const LAYOUT = 4;
+/**
+ * World layout version: 3 is the wide, five-layer world; 4 adds dungeons and dimensions; 5 adds
+ * the pocket strip for generated realms, which widens the tile grid.
+ */
+export const LAYOUT = 5;
+/** Tile columns in layout 4, before the pocket strip widened the grid. */
+const LAYOUT4_COLS = 1918;
 /** Tile columns in layout 3, before the dimensions widened the grid. */
 const LAYOUT3_COLS = 938;
 /** Region width in layouts 1 and 2, which laid the same regions out evenly. */
@@ -89,6 +96,10 @@ export class SaveSystem extends System {
       this.game.rng = seededRandom(parsed.seed + Math.floor(parsed.elapsed));
       this.game.messages = [];
       this.fillDefaults();
+      // The open realm must fill the pocket strip before its tiles are rebuilt.
+      setActiveRealm(this.game.s.pocket ?? null);
+      syncPocket();
+      if ((parsed.layout ?? 1) === 4) this.widenForPocket();
       if ((parsed.layout ?? 1) === 3) this.addDeepPlaces();
       else if ((parsed.layout ?? 1) < LAYOUT) this.migrateLayout();
       else {
@@ -130,10 +141,27 @@ export class SaveSystem extends System {
     s.wallEdits ??= {};
     s.town ??= { homes: {} };
     s.spawn ??= null;
+    s.pocket ??= null;
+    s.realms ??= {};
     this.game.combat.projectiles = [];
     // Old records fill the quick slots with what they carry.
     if (s.hotbar.every((x) => x === null))
       for (const e of s.inventory) this.game.equipment.offer(e.id);
+  }
+  /** Layout-4 records keep every change: tile and wall edits move to the wider grid. */
+  private widenForPocket() {
+    const s = this.game.s,
+      move = (edits: Record<number, number>) => {
+        const out: Record<number, number> = {};
+        for (const [index, kind] of Object.entries(edits ?? {})) {
+          const i = +index;
+          out[Math.floor(i / LAYOUT4_COLS) * TILE_COLS + (i % LAYOUT4_COLS)] = kind;
+        }
+        return out;
+      };
+    s.tileEdits = move(s.tileEdits);
+    s.wallEdits = move(s.wallEdits);
+    s.layout = LAYOUT;
   }
   /**
    * Layout-3 records keep their land exactly: changed tiles move to the wider grid, and the

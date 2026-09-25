@@ -69,7 +69,10 @@ export class Wildlife extends System {
     const spec = MOBS[animal.type];
     animal.deadUntil =
       this.game.s.elapsed +
-      (animal.type === 'boss' || spec?.boss || animal.minion ? 999999 : (spec?.respawn ?? 120));
+      (animal.type === 'boss' || spec?.boss || animal.minion || animal.echo
+        ? 999999
+        : (spec?.respawn ?? 120));
+    this.game.pocket.echo(animal);
     if (animal.type === 'boss') {
       const cfg = BOSSES[this.game.s.altar.level - 1];
       for (const [id, qty] of Object.entries(cfg.rewards)) this.game.add(id, qty);
@@ -85,11 +88,12 @@ export class Wildlife extends System {
       return;
     }
     const at = animal.x === undefined ? this.game.s.player : animal;
+    const more = this.game.pocket.lootScale(at.x);
     if (spec && !animal.minion && animal.type !== 'deer') {
       // Silver marks, more from tougher foes, many from the great ones.
       const coins = Math.max(
         1,
-        Math.round((spec.hp / 20) * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1)),
+        Math.round((spec.hp / 20) * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more),
       );
       this.game.drops.spawn('coin', coins, at.x, at.y - 20);
     }
@@ -98,7 +102,7 @@ export class Wildlife extends System {
         if (this.game.rng() < chance)
           this.game.drops.spawn(
             id,
-            min + Math.floor(this.game.rng() * (max - min + 1)),
+            Math.max(1, Math.round((min + Math.floor(this.game.rng() * (max - min + 1))) * more)),
             at.x,
             at.y - 20,
           );
@@ -291,7 +295,8 @@ export class Wildlife extends System {
     const d = dist(a, p),
       hunting = spec.sight > 0 && d < spec.sight && !s.dead,
       face = Math.sign(p.x - a.x) || 1,
-      [walk, run] = spec.speed,
+      pace = this.game.pocket.speedScale(a),
+      [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace],
       t = s.elapsed;
     a.timers ??= {};
     if (d < 900 && Math.random() < dt * 0.04) this.cry(a, 'call');

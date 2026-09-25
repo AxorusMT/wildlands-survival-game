@@ -8,9 +8,11 @@ import {
   TILE_ROWS,
   TILE_YIELD,
   WORLD_H,
+  POCKET,
   dimensionAt,
   naturalWallKind,
 } from '../../data/world.ts';
+import { activeRealm } from '../../data/realms/index.ts';
 import { DOOR_TILE } from '../../data/town.ts';
 import { RULES } from '../rules.ts';
 
@@ -48,8 +50,13 @@ export class Terrain extends System {
     const tx = clamp(Math.floor(x / TILE), 0, TILE_COLS - 1),
       dim = dimensionAt(x);
     // Under the Mycelial Deep's rock sky, the ground is the cavern floor, not the ceiling.
+    const realm = dim === POCKET ? activeRealm() : null;
     const from =
-      dim?.id === 'mycelia' ? Math.max(0, Math.floor((MYC.floor(x - dim.start) - 96) / TILE)) : 0;
+      dim?.id === 'mycelia'
+        ? Math.max(0, Math.floor((MYC.floor(x - dim.start) - 96) / TILE))
+        : realm?.tpl.sky === 'cavern'
+          ? Math.max(0, Math.floor((realm.geo.floors[0](x - POCKET.start) - 96) / TILE))
+          : 0;
     for (let ty = from; ty < TILE_ROWS; ty++) if (this.tileAt(tx, ty)) return ty * TILE;
     return WORLD_H - TILE;
   }

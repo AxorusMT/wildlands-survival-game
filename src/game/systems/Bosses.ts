@@ -29,6 +29,13 @@ export class Bosses extends System {
     if (!spec || !shrine) return { ok: false, reason: 'The altar is silent.' };
     if (this.active()) return { ok: false, reason: 'A great foe is already abroad.' };
     const beaten = s.bosses[boss] ?? 0;
+    // A realm's great foe answers once per expedition, and needs no offering.
+    const realm = this.game.pocket.here(altar.x);
+    if (realm) {
+      if (this.game.pocket.bossDown())
+        return { ok: false, reason: 'Its master is gone. Open a new expedition to face it again.' };
+      free = true;
+    }
     if (
       !free &&
       (beaten > 0 ||
@@ -43,7 +50,8 @@ export class Bosses extends System {
         };
       this.game.remove(shrine.item);
     }
-    const flying = spec.move !== 'walker' && spec.move !== 'hopper';
+    // Fliers swoop in from above; the Warren Queen bursts out of the tunnel wall.
+    const flying = spec.move !== 'walker' && spec.move !== 'hopper' && boss !== 'warren_queen';
     const x = altar.x + (s.player.x < altar.x ? 260 : -260),
       y = flying ? altar.y - 260 : altar.y;
     const a: Animal = {
@@ -66,6 +74,7 @@ export class Bosses extends System {
       vy: 0,
       timers: { start: s.elapsed },
     };
+    if (realm) a.maxHp = a.hp = Math.round(spec.hp * this.game.pocket.hpScale());
     s.animals.push(a);
     this.game.event('burst', x, y - 60, '#ffffff');
     this.game.sound('boss', x, y - 40, 1.6);
@@ -79,6 +88,7 @@ export class Bosses extends System {
     for (const m of s.animals) if (m.minion && !m.deadUntil) m.deadUntil = s.elapsed + 999999;
     s.animals = s.animals.filter((m) => !(m.minion && m.deadUntil) && !(m === a));
     this.game.progress.record('boss:' + a.type);
+    this.game.pocket.cleared(a);
     s.vitals.morale = clamp(s.vitals.morale + 30, 0, RULES.maxVital);
     this.game.say(MOBS[a.type].name + ' is defeated!', 'victory');
     this.game.sound('victory', a.x, a.y);
@@ -317,6 +327,113 @@ export class Bosses extends System {
         }
         break;
       }
+      // ── Band I realms ──
+      case 'orchard_mother': {
+        a.timers ??= {};
+        const charging = t < (a.timers.charge ?? 0);
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = charging
+          ? (a.vx ?? 0)
+          : Math.abs(p.x - a.x) > 90
+            ? face * (rage ? spec.speed[1] : spec.speed[0] * 1.6)
+            : 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (!charging && this.due(a, 'charge', rage ? 5 : 7)) {
+          a.vx = face * 420;
+          a.timers.charge = t + 1;
+          a.warning = 0.5;
+          this.game.sound('boss', a.x, a.y, 1);
+        }
+        if (this.due(a, 'spit', 2.6))
+          this.game.combat.mobShoot(a, 'brine_spit', 380, 30, rage ? 4 : 3, 0.22);
+        if (rage && this.due(a, 'wave', 6)) {
+          for (const dir of [-1, 1])
+            this.game.combat.spawn(
+              'shockwave',
+              { x: a.x, y: a.y - 14 },
+              dir > 0 ? 0 : Math.PI,
+              300,
+              30,
+              'mob',
+            );
+          this.game.sound('splash', a.x, a.y, 1.4);
+        }
+        if (this.due(a, 'brood', rage ? 9 : 13))
+          for (const dx of [-130, 130])
+            this.minion('bog_crab', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        break;
+      }
+      case 'kiln_beast': {
+        a.timers ??= {};
+        const charging = t < (a.timers.charge ?? 0);
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = charging ? (a.vx ?? 0) : Math.abs(p.x - a.x) > 160 ? face * spec.speed[0] * 1.4 : 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (!charging && this.due(a, 'charge', rage ? 4 : 6)) {
+          a.vx = face * 520;
+          a.timers.charge = t + 0.9;
+          a.warning = 0.5;
+          this.game.sound('boss', a.x, a.y, 1.2);
+        }
+        if (this.due(a, 'breath', 3))
+          this.game.combat.mobShoot(a, 'kiln_ember', 470, 30, rage ? 6 : 4, 0.16);
+        if (rage && this.due(a, 'ash', 6)) this.ring(a, 'ash_burst', 10, 220, 26, t);
+        if (this.due(a, 'rain', rage ? 6 : 9))
+          for (let i = 0; i < 6; i++)
+            this.game.combat.spawn(
+              'kiln_ember',
+              { x: p.x + (i - 3) * 90, y: p.y - 460 },
+              Math.PI / 2,
+              200,
+              28,
+              'mob',
+            );
+        break;
+      }
+      case 'warren_queen': {
+        a.timers ??= {};
+        const hidden = t < (a.timers.hide ?? 0);
+        if (hidden) {
+          // Burrowing: she sinks into the earth, then bursts out beneath you.
+          a.y += 160 * dt;
+          if (t + dt >= a.timers.hide) {
+            a.x = p.x + (this.game.rng() - 0.5) * 60;
+            a.y = p.y + 30;
+            a.vy = -300;
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                'shockwave',
+                { x: a.x, y: p.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                320,
+                30,
+                'mob',
+              );
+            for (let i = 0; i < 6; i++)
+              this.game.combat.spawn(
+                'amber_glob',
+                { x: a.x, y: p.y - 30 },
+                -Math.PI / 2 + (i - 2.5) * 0.28,
+                420,
+                24,
+                'mob',
+              );
+            this.game.sound('slam', a.x, a.y, 1.4);
+            this.game.event('dig', a.x, p.y, '33');
+          }
+        } else this.steer(a, p.x - face * 190, p.y - 30, spec.speed[1], dt, 1.8);
+        if (!hidden && this.due(a, 'burrow', rage ? 6 : 8)) {
+          a.timers.hide = t + 1.6;
+          a.warning = 1.6;
+          this.game.say('The Queen burrows into the earth!', 'danger');
+        }
+        if (!hidden && this.due(a, 'glob', 2.4))
+          this.game.combat.mobShoot(a, 'amber_glob', 420, 26, rage ? 4 : 3, 0.2);
+        if (this.due(a, 'brood', rage ? 8 : 12))
+          for (const dx of [-140, 140])
+            this.minion('warren_rat', p.x + dx, this.game.floorNear(p.x + dx, p.y - 40));
+        break;
+      }
       case 'unmaker': {
         this.steer(
           a,
@@ -351,6 +468,7 @@ export class Bosses extends System {
     if (
       spec.move !== 'walker' &&
       spec.move !== 'hopper' &&
+      !(a.timers?.hide && t < a.timers.hide) &&
       this.game.tileAt(Math.floor(a.x / TILE), Math.floor((a.y - 40) / TILE))
     )
       a.y -= 120 * dt;

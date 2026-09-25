@@ -18,11 +18,19 @@ export const WALLS: Record<string, number> = {
   voidstone_wall: 23,
   obsidian_wall: 25,
   sandstone_wall: 26,
+  brinewood_wall: 35,
 };
 /** The wall item a natural or placed wall of each material gives back when hammered. */
 export const WALL_ITEM: Record<number, string> = Object.fromEntries(
   Object.entries(WALLS).map(([id, kind]) => [kind, id]),
 );
+Object.assign(WALL_ITEM, {
+  30: 'dirt_wall',
+  31: 'dirt_wall',
+  32: 'stone_wall',
+  33: 'dirt_wall',
+  34: 'stone_wall',
+});
 Object.assign(WALL_ITEM, {
   3: 'sandstone_wall',
   4: 'dirt_wall',
@@ -77,6 +85,7 @@ export const SETTLERS: Settler[] = [
       'Five fallen stars make a mana crystal. They only fall on clear nights, out under the sky.',
       'The Mossy Crypt lies beneath the forest. Its king has kept his throne too long.',
       'Set a sigil in the Rift Gate and it opens. Four sigils, four dungeons.',
+      'A Waystone and a realm key open a whole new world. Each time, a different one; each tier, a harder one.',
     ],
     colors: ['#5d7560', '#c9a24e', '#7d6444'],
   },
@@ -158,6 +167,9 @@ export const SETTLERS: Settler[] = [
       ['bucket', 20],
       ['cloud_jar', 400],
       ['magma_stone', 350],
+      ['orchard_fragment', 45],
+      ['steppe_fragment', 45],
+      ['warren_fragment', 45],
     ],
     lines: [
       'A hook, a rope, a little nerve. Walls are only suggestions.',
@@ -294,5 +306,21 @@ export const BASE_VALUE: Record<string, number> = {
   beast_core: 150,
   life_crystal: 200,
   life_fruit: 300,
+  brinewood: 8,
+  tide_pearl: 45,
+  crab_shell: 10,
+  bog_apple: 4,
+  cinderflax: 6,
+  ashcloth: 20,
+  kilnstone_ore: 14,
+  ash_hide: 12,
+  burrow_amber: 16,
+  beetle_carapace: 12,
+  orchard_fragment: 40,
+  steppe_fragment: 40,
+  warren_fragment: 40,
+  mother_heart: 250,
+  kiln_core: 250,
+  queen_jelly: 250,
   coin: 1,
 };

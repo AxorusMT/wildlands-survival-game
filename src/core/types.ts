@@ -1,4 +1,5 @@
 // Shared shapes for game data and the saved field record.
+import type { RealmInstance } from '../data/realms/index.ts';
 
 export type ItemCategory =
   | 'material'
@@ -151,6 +152,10 @@ export interface Animal extends Point {
   minion?: boolean;
   /** A settler of the town, by id; settlers cannot be harmed. */
   settler?: string;
+  /** A Hunted realm's elite, which tracks the player. */
+  hunter?: boolean;
+  /** Split from a slain monster in an Echoing realm; does not split again or return. */
+  echo?: boolean;
   hitAt?: number;
   howlAt?: number;
   howlCue?: number;
@@ -262,6 +267,10 @@ export interface GameState {
   spawn?: { x: number; y: number } | null;
   /** Each settler's home, by settler id: the seat of their room. */
   town: { homes: Record<string, { x: number; y: number }> };
+  /** The generated realm open in the pocket strip, if any. */
+  pocket?: RealmInstance | null;
+  /** What the expedition has done in each realm. */
+  realms?: Record<string, { visits: number; best: number; kills: number; relic: boolean }>;
   placing: string | null;
   dead: boolean;
   lastSave: number;

@@ -4,7 +4,8 @@
 import { fbm1, fbm2, noise1 } from '../core/noise.ts';
 
 export interface Dimension {
-  id: 'mycelia' | 'skyreach' | 'void';
+  /** A handcrafted dimension, or (for the pocket strip) the generated realm now in it. */
+  id: string;
   name: string;
   start: number;
   end: number;
@@ -196,22 +197,20 @@ function voidTile(x: number, y: number): number {
 }
 
 /** Tile kind at a position in a dimension, with x measured from the strip's start. */
-export function dimensionTile(dim: Dimension['id'], x: number, y: number): number {
+export function dimensionTile(dim: string, x: number, y: number): number {
   if (x < 64 || x > DIM_WIDTH - 64) return DT.bedrock;
   if (dim === 'mycelia') return myceliaTile(x, y);
   if (dim === 'skyreach') return skyTile(x, y);
   return voidTile(x, y);
 }
 /** Where the ground is for placing things: the first solid tile below `y` in a column. */
-export function dimensionFloor(dim: Dimension['id'], x: number): number {
+export function dimensionFloor(dim: string, x: number): number {
   if (dim === 'mycelia') return MYC.floor(x);
   if (dim === 'void') return VOID.floor(x);
   return SKY_SEA;
 }
 /** Ladders in local coordinates for each dimension (the world adds the strip offset). */
-export function dimensionLadders(
-  dim: Dimension['id'],
-): { x: number; top: number; bottom: number }[] {
+export function dimensionLadders(dim: string): { x: number; top: number; bottom: number }[] {
   if (dim === 'mycelia')
     return MYC.ladders.map((x) => ({ x, top: MYC.floor(x) - 4, bottom: MYC.tunnel(x) + 30 }));
   if (dim === 'skyreach') return SKY_LADDERS;
