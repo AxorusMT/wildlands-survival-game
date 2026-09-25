@@ -243,10 +243,11 @@ export class Ailments extends System {
           this.contract(id, id !== 'pneumonia');
         }
       };
-    hold('cold', v.bodyTemp < 34.6, 60, 'hypothermia');
-    hold('freeze', v.bodyTemp < 33.4, 45, 'frostbite');
+    hold('cold', v.bodyTemp < 34.6, 90, 'hypothermia');
+    // Frostbite needs freezing air, not just a chilled body.
+    hold('freeze', v.bodyTemp < 33.4 && this.game.temperature() < 0, 45, 'frostbite');
     hold('heat', v.bodyTemp > 39.2, 60, 'heatstroke');
-    hold('wetcold', v.wetness > 60 && v.bodyTemp < 35.8, 120, 'pneumonia');
+    hold('wetcold', v.wetness > 60 && v.bodyTemp < 35.5, 300, 'pneumonia');
     hold('greens', v.vitamins < 10, 240, 'scurvy');
     // Twenty minutes without sunlight bends the bones.
     hold('dark', !this.game.survival.sunlit(), 1200, 'rickets');

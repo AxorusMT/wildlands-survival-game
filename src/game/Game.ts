@@ -179,6 +179,12 @@ export class Game {
     this.combat.projectiles = [];
     this.world.generate();
     this.s.player.y = this.groundTopAt(RULES.spawnX) + 1;
+    // The expedition sets out in plain clothes: a linen underlayer and a hide vest.
+    for (const id of ['linen_underlayer', 'hide_vest']) {
+      this.inventory.add(id, 1);
+      this.equipment.wear(id);
+    }
+    this.messages = [];
     this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
     return this;
   }

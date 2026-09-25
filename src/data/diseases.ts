@@ -178,10 +178,10 @@ export const DISEASES: Record<string, Disease> = {
     item: 'warming_brew',
     kind: 'exposure',
     incubate: 0,
-    worsen: 180,
+    worsen: 240,
     effect: { speed: 0.15, stamina: 0.4 },
     cures: { warming_brew: 2 },
-    chain: ['pneumonia', 0.003],
+    chain: ['pneumonia', 0.0015],
     symptoms: ['Shivering', 'Clumsy and slow', 'Shivering has stopped'],
   },
   frostbite: {

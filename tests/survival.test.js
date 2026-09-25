@@ -186,7 +186,7 @@ test('ailments pass off, chain, and some cannot be cured too late', () => {
 test('cold, heat, and a diet without greens bring ailments that ease when the cause is gone', () => {
   const g = fresh();
   g.s.vitals.bodyTemp = 34;
-  for (let i = 0; i < 70; i++) g.ailments.update(1);
+  for (let i = 0; i < 100; i++) g.ailments.update(1);
   assert.ok(g.ailments.has('hypothermia'));
   assert.ok(g.ailments.speedScale() < 1, 'it slows you');
   g.s.vitals.bodyTemp = 37;

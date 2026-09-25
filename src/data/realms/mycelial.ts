@@ -1,4 +1,4 @@
-// The Mycelial Deep in template form (Band II). The Deep beyond the Rift Gate is this realm at seed
+// The Mycelial Deep in template form (Band III: its myconite is eighth-tier metal). The Deep beyond the Rift Gate is this realm at seed
 // 0; a Waystone and a key regrow it from any other seed, with its spores, its creatures, and the
 // Sporemother in her Heart Hollow, at whatever tier you dare.
 import { DIM_WIDTH, myceliaGeometry } from '../dimensions.ts';
@@ -28,7 +28,7 @@ function build(seed: number): RealmGeometry {
 export const MYCELIAL: RealmTemplate = {
   id: 'mycelial',
   name: 'Mycelial Deep',
-  band: 2,
+  band: 3,
   note: 'The Mycelial Deep, regrown from a new seed for every expedition. Spore blooms fill the air every minute; the Sporemother waits in the Heart Hollow.',
   sky: 'cavern',
   temp: 19,
@@ -68,7 +68,7 @@ export const MYCELIAL: RealmTemplate = {
   chests: 4,
   chestLoot: [
     ['mycelial_fragment', 1, 2, 0.6],
-    ['glasswood_fragment', 1, 1, 0.3],
+    ['barrow_fragment', 1, 1, 0.3],
     ['myconite_ore', 4, 8, 0.8],
     ['lungwort_tea', 1, 2, 0.6],
     ['healing_draught', 2, 3, 1],

@@ -575,10 +575,10 @@
       item: "warming_brew",
       kind: "exposure",
       incubate: 0,
-      worsen: 180,
+      worsen: 240,
       effect: { speed: 0.15, stamina: 0.4 },
       cures: { warming_brew: 2 },
-      chain: ["pneumonia", 3e-3],
+      chain: ["pneumonia", 15e-4],
       symptoms: ["Shivering", "Clumsy and slow", "Shivering has stopped"]
     },
     frostbite: {
@@ -982,7 +982,7 @@
       name: "Bow",
       text: "Arrows at range; the arrow adds its own damage",
       ranged: "bow",
-      dmg: 0.55,
+      dmg: 0.62,
       reach: 0,
       pace: 1,
       suffix: "bow",
@@ -994,7 +994,7 @@
       name: "Crossbow",
       text: "Slow to load; its bolts hit hard and pass through",
       ranged: "bow",
-      dmg: 0.95,
+      dmg: 1.06,
       reach: 0,
       pace: 1,
       suffix: "crossbow",
@@ -1006,7 +1006,7 @@
       name: "Staff",
       text: "Mana shaped into bolts",
       ranged: "magic",
-      dmg: 0.62,
+      dmg: 0.66,
       reach: 0,
       pace: 1,
       suffix: "staff",
@@ -3244,8 +3244,8 @@
     ["warren_key", { warren_fragment: 3 }, "waystone", 3],
     // Band II keys are made from Band I spoils; Band III keys from Band II.
     ["glasswood_fragment", { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, "workbench", 5],
-    ["mycelial_fragment", { glowcap: 6, kiln_ingot: 1, tide_pearl: 1 }, "workbench", 5],
-    ["mycelial_key", { mycelial_fragment: 3 }, "waystone", 5],
+    ["mycelial_fragment", { glowcap: 6, prism_glass: 2, marrow_ingot: 1 }, "forge", 7],
+    ["mycelial_key", { mycelial_fragment: 3 }, "waystone", 7],
     ["marches_fragment", { bone: 10, kiln_ingot: 2, crab_shell: 3 }, "workbench", 5],
     ["barrow_fragment", { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, "forge", 7],
     ["saltflats_fragment", { salt: 10, prism_glass: 3, marrow_ingot: 2 }, "forge", 7],
@@ -5381,7 +5381,7 @@
   var MYCELIAL = {
     id: "mycelial",
     name: "Mycelial Deep",
-    band: 2,
+    band: 3,
     note: "The Mycelial Deep, regrown from a new seed for every expedition. Spore blooms fill the air every minute; the Sporemother waits in the Heart Hollow.",
     sky: "cavern",
     temp: 19,
@@ -5421,7 +5421,7 @@
     chests: 4,
     chestLoot: [
       ["mycelial_fragment", 1, 2, 0.6],
-      ["glasswood_fragment", 1, 1, 0.3],
+      ["barrow_fragment", 1, 1, 0.3],
       ["myconite_ore", 4, 8, 0.8],
       ["lungwort_tea", 1, 2, 0.6],
       ["healing_draught", 2, 3, 1],
@@ -11051,10 +11051,10 @@
           this.contract(id, id !== "pneumonia");
         }
       };
-      hold("cold", v.bodyTemp < 34.6, 60, "hypothermia");
-      hold("freeze", v.bodyTemp < 33.4, 45, "frostbite");
+      hold("cold", v.bodyTemp < 34.6, 90, "hypothermia");
+      hold("freeze", v.bodyTemp < 33.4 && this.game.temperature() < 0, 45, "frostbite");
       hold("heat", v.bodyTemp > 39.2, 60, "heatstroke");
-      hold("wetcold", v.wetness > 60 && v.bodyTemp < 35.8, 120, "pneumonia");
+      hold("wetcold", v.wetness > 60 && v.bodyTemp < 35.5, 300, "pneumonia");
       hold("greens", v.vitamins < 10, 240, "scurvy");
       hold("dark", !this.game.survival.sunlit(), 1200, "rickets");
     }
@@ -16245,7 +16245,8 @@
         0,
         100
       );
-      let target = 37 + (cold2 - (underground ? 6 : 15)) * 0.19 - v.wetness * 0.022 + (fire ? 4.5 : 0) + (shelter ? 1.8 : 0) + (p.cloak && cold2 < 15 ? 2.7 : 0) + (p.coat && cold2 < 15 ? 1.4 : 0);
+      let target = 37 + (cold2 - (underground ? 6 : 15)) * 0.19 - // Being wet chills you most when it is truly cold; in a mild night it only takes the edge off.
+      v.wetness * 0.022 * (cold2 < 15 ? clamp((15 - cold2) / 15, 0.35, 1) : 0.35) + (fire ? 4.5 : 0) + (shelter ? 1.8 : 0) + (p.cloak && cold2 < 15 ? 2.7 : 0) + (p.coat && cold2 < 15 ? 1.4 : 0);
       if (this.game.equipment.has("cold")) target = Math.max(target, 36.8);
       if ((this.game.s.buffs.warm_belly ?? 0) > 0 && cold2 < 15) target += 2.2;
       target = clamp(target, 30, 41);
@@ -17609,6 +17610,11 @@
       this.combat.projectiles = [];
       this.world.generate();
       this.s.player.y = this.groundTopAt(RULES.spawnX) + 1;
+      for (const id of ["linen_underlayer", "hide_vest"]) {
+        this.inventory.add(id, 1);
+        this.equipment.wear(id);
+      }
+      this.messages = [];
       this.say("Field record I \xB7 Stranded in the meadow. Find wood, stone, and fiber.");
       return this;
     }
@@ -29977,6 +29983,23 @@
     const w = game.durability.wear(id);
     return w >= 100 ? ' \xB7 <b class="worn">WORN OUT</b>' : w >= 1 ? ` \xB7 ${Math.round(100 - w)}% sound` : "";
   };
+  var itemTip = (id, fresh) => {
+    const weapon = WEAPONS[id] && id !== "fists" && game.armoury.known(id), bits = [weapon ? game.armoury.title(id) : pretty(id), ITEMS[id]?.[1] ?? "item"];
+    if (weapon) bits.push(Math.round(game.armoury.stats(id).damage) + " damage");
+    if (ARMOR[id]) bits.push(ARMOR[id].defense + " defense");
+    const c = CLOTHING[id];
+    if (c)
+      bits.push(
+        `${c.layer} layer \xB7 +${c.insul}\xB0 cold \xB7 +${c.heat}\xB0 heat \xB7 ${Math.round(c.water * 100)}% dry`
+      );
+    if (fresh !== void 0) {
+      const st = game.itemState({ id, qty: 1, fresh });
+      bits.push(`${st} \xB7 ${Math.max(0, Math.ceil(fresh / 60))} min left`);
+    }
+    const w = wearText(id).replace(/<[^>]+>/g, "").replace(/^ · /, "");
+    if (w) bits.push(w.toLowerCase());
+    return bits.join(" \xB7 ").replace(/"/g, "&quot;");
+  };
   var itemUseLabel = (id) => {
     const cat = ITEMS[id]?.[1];
     if (cat === "armor" || cat === "accessory" || CLOTHING[id]) return worn(id) ? "REMOVE" : "WEAR";
@@ -30442,7 +30465,7 @@
         const use = itemUseLabel(e.id), fresh = freshness(e);
         const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
         const stow = state.larder && ITEMS[e.id]?.[2];
-        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, "")}</small>` : ""}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
+        return `<div class="book-row" title="${itemTip(e.id, e.fresh)}"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, "")}</small>` : ""}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
     const stall = state.merchant;
@@ -31200,7 +31223,7 @@
     state.hotbarSig = sig;
     $("hotbar").innerHTML = s.hotbar.map((id, i) => {
       const n = id ? game.count(id) : 0;
-      return `<div class="slot ${i === s.hotbarIndex ? "active" : ""}" data-slot="${i}" title="${id ? pretty(id) : ""}"><b>${(i + 1) % 10}</b>${id ? `<img src="${iconURL(id)}" alt="">` : ""}${n > 1 ? `<small>${n}</small>` : ""}</div>`;
+      return `<div class="slot ${i === s.hotbarIndex ? "active" : ""}" data-slot="${i}" title="${id ? itemTip(id) : ""}"><b>${(i + 1) % 10}</b>${id ? `<img src="${iconURL(id)}" alt="">` : ""}${n > 1 ? `<small>${n}</small>` : ""}</div>`;
     }).join("");
     $("hotbar").querySelectorAll("[data-slot]").forEach((el) => el.onclick = () => game.equipment.select(Number(el.dataset.slot)));
     const held = game.equipment.held();
@@ -31259,9 +31282,9 @@
     $("world-time").textContent = timeText();
     $("condition-line").textContent = game.vitalReasons()[0];
     const chips = game.ailments.showing().map(
-      (a) => `<span class="ail stage-${a.stage}" title="${DISEASES[a.id].name}: ${DISEASES[a.id].symptoms[a.stage - 1]}">${DISEASES[a.id].name.toUpperCase()} ${"\u25CF".repeat(a.stage)}${"\u25CB".repeat(3 - a.stage)}</span>`
+      (a) => `<span class="ail stage-${a.stage}" title="${DISEASES[a.id].name} (${STAGE_NAMES[a.stage].toLowerCase()}): ${DISEASES[a.id].symptoms[a.stage - 1]}. From: ${DISEASES[a.id].cause.toLowerCase()}. Treat with: ${DISEASES[a.id].treat.toLowerCase()}.">${DISEASES[a.id].name.toUpperCase()} ${"\u25CF".repeat(a.stage)}${"\u25CB".repeat(3 - a.stage)}</span>`
     ).join("");
-    const off = game.ailments.list().some((a) => a.stage === 0) ? '<span class="ail off">FEELING OFF</span>' : "";
+    const off = game.ailments.list().some((a) => a.stage === 0) ? '<span class="ail off" title="Something is incubating. Rest, keep clean, and check the journal\u2019s Health page before it shows.">FEELING OFF</span>' : "";
     $("ailments").innerHTML = chips + off;
     $("weapon-name").textContent = game.s.player.weapon === "fists" ? pretty("fists") : game.armoury.title(game.s.player.weapon);
     const step = TUTORIAL[game.s.tutorial.step] || CHAPTERS[game.s.chapter];

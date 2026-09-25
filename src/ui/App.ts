@@ -143,6 +143,27 @@ const wearText = (id: string) => {
       ? ` · ${Math.round(100 - w)}% sound`
       : '';
 };
+/** Hover text for an item: what it is, and how it stands (damage, defence, warmth, freshness, wear). */
+const itemTip = (id: string, fresh?: number) => {
+  const weapon = D.WEAPONS[id] && id !== 'fists' && game.armoury.known(id),
+    bits = [weapon ? game.armoury.title(id) : pretty(id), D.ITEMS[id]?.[1] ?? 'item'];
+  if (weapon) bits.push(Math.round(game.armoury.stats(id).damage) + ' damage');
+  if (D.ARMOR[id]) bits.push(D.ARMOR[id].defense + ' defense');
+  const c = D.CLOTHING[id];
+  if (c)
+    bits.push(
+      `${c.layer} layer · +${c.insul}° cold · +${c.heat}° heat · ${Math.round(c.water * 100)}% dry`,
+    );
+  if (fresh !== undefined) {
+    const st = game.itemState({ id, qty: 1, fresh });
+    bits.push(`${st} · ${Math.max(0, Math.ceil(fresh / 60))} min left`);
+  }
+  const w = wearText(id)
+    .replace(/<[^>]+>/g, '')
+    .replace(/^ · /, '');
+  if (w) bits.push(w.toLowerCase());
+  return bits.join(' · ').replace(/"/g, '&quot;');
+};
 const itemUseLabel = (id: string) => {
   const cat = D.ITEMS[id]?.[1];
   if (cat === 'armor' || cat === 'accessory' || D.CLOTHING[id]) return worn(id) ? 'REMOVE' : 'WEAR';
@@ -655,7 +676,7 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
               const weapon = D.WEAPONS[e.id] && game.armoury.known(e.id),
                 q = weapon ? D.QUALITIES[game.armoury.entry(e.id).q] : null;
               const stow = state.larder && D.ITEMS[e.id]?.[2];
-              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, '')}</small>` : ''}</div></div><div><span class="qty">×${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
+              return `<div class="book-row" title="${itemTip(e.id, e.fresh)}"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}${game.durability.wears(e.id) && game.durability.wear(e.id) >= 1 ? `<small>${wearText(e.id).replace(/^ · /, '')}</small>` : ''}</div></div><div><span class="qty">×${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
             })
             .join('')}</div>`,
       )
@@ -1738,7 +1759,7 @@ function renderHotbar() {
   $('hotbar').innerHTML = s.hotbar
     .map((id, i) => {
       const n = id ? game.count(id) : 0;
-      return `<div class="slot ${i === s.hotbarIndex ? 'active' : ''}" data-slot="${i}" title="${id ? pretty(id) : ''}"><b>${(i + 1) % 10}</b>${id ? `<img src="${iconURL(id)}" alt="">` : ''}${n > 1 ? `<small>${n}</small>` : ''}</div>`;
+      return `<div class="slot ${i === s.hotbarIndex ? 'active' : ''}" data-slot="${i}" title="${id ? itemTip(id) : ''}"><b>${(i + 1) % 10}</b>${id ? `<img src="${iconURL(id)}" alt="">` : ''}${n > 1 ? `<small>${n}</small>` : ''}</div>`;
     })
     .join('');
   $('hotbar')
@@ -1828,11 +1849,11 @@ function updateUI(force = false) {
     .showing()
     .map(
       (a) =>
-        `<span class="ail stage-${a.stage}" title="${D.DISEASES[a.id].name}: ${D.DISEASES[a.id].symptoms[a.stage - 1]}">${D.DISEASES[a.id].name.toUpperCase()} ${'●'.repeat(a.stage)}${'○'.repeat(3 - a.stage)}</span>`,
+        `<span class="ail stage-${a.stage}" title="${D.DISEASES[a.id].name} (${D.STAGE_NAMES[a.stage].toLowerCase()}): ${D.DISEASES[a.id].symptoms[a.stage - 1]}. From: ${D.DISEASES[a.id].cause.toLowerCase()}. Treat with: ${D.DISEASES[a.id].treat.toLowerCase()}.">${D.DISEASES[a.id].name.toUpperCase()} ${'●'.repeat(a.stage)}${'○'.repeat(3 - a.stage)}</span>`,
     )
     .join('');
   const off = game.ailments.list().some((a) => a.stage === 0)
-    ? '<span class="ail off">FEELING OFF</span>'
+    ? '<span class="ail off" title="Something is incubating. Rest, keep clean, and check the journal’s Health page before it shows.">FEELING OFF</span>'
     : '';
   $('ailments').innerHTML = chips + off;
   $('weapon-name').textContent =

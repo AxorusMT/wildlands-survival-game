@@ -64,38 +64,65 @@
         <button id="journal-button" title="Open journal (J)">JOURNAL <b>J</b></button>
       </header>
       <div class="hud-left">
-        <div class="hud-stat">
+        <div
+          class="hud-stat"
+          title="Health: lost to wounds, hunger, thirst, cold and ailments. Rest, eat well and treat illness to recover."
+        >
           <span>HEALTH</span>
           <div class="hud-track"><i id="health-bar"></i></div>
           <b id="health-value">100</b>
         </div>
-        <div class="hud-stat">
+        <div
+          class="hud-stat"
+          title="Water: drains steadily, faster in heat and when working. Drink safe water; wild water can make you ill."
+        >
           <span>WATER</span>
           <div class="hud-track"><i id="hydration-bar"></i></div>
           <b id="hydration-value">68</b>
         </div>
-        <div class="hud-stat">
+        <div
+          class="hud-stat"
+          title="Food: calories burn with work and cold. Cooked, varied meals keep you strong; spoiled food makes you sick."
+        >
           <span>FOOD</span>
           <div class="hud-track"><i id="calories-bar"></i></div>
           <b id="calories-value">70</b>
         </div>
-        <div class="hud-stat">
+        <div
+          class="hud-stat"
+          title="Stamina: spent running, jumping, striking and mining. Rest to recover; hunger and fatigue slow it."
+        >
           <span>STAMINA</span>
           <div class="hud-track"><i id="stamina-bar"></i></div>
           <b id="stamina-value">100</b>
         </div>
-        <div class="hud-stat mana">
+        <div
+          class="hud-stat mana"
+          title="Mana: powers staves and tomes. Refills over time, faster with Arcana skills."
+        >
           <span>MANA</span>
           <div class="hud-track"><i id="mana-bar"></i></div>
           <b id="mana-value">20</b>
         </div>
-        <div class="hud-stat air hidden" id="air-stat">
+        <div
+          class="hud-stat air hidden"
+          id="air-stat"
+          title="Air: runs out under deep water or in toxic air. Surface, find a diving bell, or wear a respirator."
+        >
           <span>AIR</span>
           <div class="hud-track"><i id="air-bar"></i></div>
           <b id="air-value">40</b>
         </div>
-        <div class="hud-defense">DEFENSE <b id="defense-value">0</b></div>
-        <div class="hud-renown">
+        <div
+          class="hud-defense"
+          title="Defense: armour and clothing blunt each blow by this much. Upgrade, socket and infuse armour at the forge."
+        >
+          DEFENSE <b id="defense-value">0</b>
+        </div>
+        <div
+          class="hud-renown"
+          title="Renown: earned by everything you do. Each level grants a skill point to spend in the journal’s Skills page."
+        >
           RENOWN <b id="renown-value">1</b> <span id="renown-points"></span>
           <div class="renown-track"><i id="renown-bar"></i></div>
         </div>
@@ -103,7 +130,10 @@
         <p id="condition-line">Stable · the meadow gives you a little time.</p>
         <div id="ailments" aria-live="polite"></div>
       </div>
-      <div class="hud-right">
+      <div
+        class="hud-right"
+        title="Your current field task. The journal’s Notes page lists them all."
+      >
         <span class="small-label">CURRENT FIELD TASK</span
         ><strong id="objective-text">Gather fallen wood</strong
         ><small id="objective-progress">0 / 3</small>

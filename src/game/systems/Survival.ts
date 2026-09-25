@@ -229,7 +229,8 @@ export class Survival extends System {
     let target =
       37 +
       (cold - (underground ? 6 : 15)) * 0.19 -
-      v.wetness * 0.022 +
+      // Being wet chills you most when it is truly cold; in a mild night it only takes the edge off.
+      v.wetness * 0.022 * (cold < 15 ? clamp((15 - cold) / 15, 0.35, 1) : 0.35) +
       (fire ? 4.5 : 0) +
       (shelter ? 1.8 : 0) +
       (p.cloak && cold < 15 ? 2.7 : 0) +

@@ -152,6 +152,13 @@ The world changes as you work it. Chopped trees topple and leave stumps that slo
   | Warm belly | The cold bites less         |
   | Feasted    | Well fed and fiery together |
 
+- **Exposure:** being wet chills you, and it chills you hardest when the air is cold, so a rainy summer night is uncomfortable rather than deadly.
+  - **Hypothermia** sets in after about a minute and a half with your body below 34.6°.
+  - **Frostbite** needs freezing air as well.
+  - **Pneumonia** takes five minutes of being soaked and chilled.
+
+  A new expedition starts dressed in a linen underlayer and a hide vest.
+
 - **Vitamins:** fruit, greens and preserves keep your vitamins up. Run out for long and scurvy sets in.
 - **Water:** wild water can carry dysentery, so boil it. Water in the generated realms is **brackish** and can carry cholera; only a **water filter** makes it safe.
 - **Ailments:** twenty diseases and injuries, each following the same course:
@@ -252,7 +259,7 @@ Beyond the Rift lie realms that are built anew every time you enter.
   - **swarm:** never comes alone.
 - **Completion:** the Atlas shows how much of each realm you have done.
 - **Resistances:** each creature resists some kinds of harm and fears others, and its Codex entry says which. The weapon's infusion sets the kind of harm, so choose it for the realm.
-- **The Mycelial Deep:** it now exists in template form too. The Deep beyond the Rift Gate is its seed 0, and Waystone expeditions regrow it with spore blooms (a respirator keeps them out).
+- **The Mycelial Deep:** it now exists in template form too, as a Band III realm. Its fragments are made at a forge from glowcaps, prism glass and a marrow ingot, and its keys at the seventh Waystone tier. The Deep beyond the Rift Gate is its seed 0, and Waystone expeditions regrow it with spore blooms (a respirator keeps them out).
 
 | Realm                      | Hazard                                                                          | Signature                                         | Gear                                                                                   | Boss and relic                                                              |
 | -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -326,6 +333,8 @@ Each weapon also has its own upgrade line:
 - **Evolutions:** at +5 and again at +10 you choose one of two paths for the family. For example, a battleaxe can become Serrated or Balanced, then Reaper or Berserk; a bow can gain Volley or become a Sniper.
 - **Infusions:** fire (burning), frost (slows), venom (poison), void (ignores half of armour), holy (+50% against the undead) and storm (lightning leaps to a second foe).
 - **Gems:** ruby (damage), sapphire (magic), emerald (critical hits), topaz (speed), onyx (armour piercing) and opal (life drain). Topaz, onyx and opal are found in the realms.
+
+Ranged families (bow, crossbow and staff) hit a little softer than melee to pay for their safety. The balance tests hold each band's great foes to between about 12 s and a minute for a +5 Common melee weapon of that band's tier, and to about 15–90 s for a ranged one. A weapon from the band before takes far longer.
 
 Signature weapons, such as the Tidecaller spear and the Hellrazor, belong to a family and tier but stand outside the grid.
 
@@ -415,6 +424,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the weapon hierarchy: a complete, ever-stronger grid, quality, the anvil and evolutions, family mechanics, infusions and gems, crossbows and tomes;
 - generated realms: seeds, keys and tiers, furnishing, modifiers, hazards, bosses and relics, and saving an open realm;
 - homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
+- balance: time to kill for every band and family, bands gated in order, how long food keeps in the warm and in cold storage, and a night spent in the open;
 - save migration from every earlier layout;
 - the music and sound.
 
