@@ -34,13 +34,13 @@
   --gold: #e0c070;
   --dither: conic-gradient(#0000 25%, #00000012 0 50%, #0000 0 75%, #00000012 0);
 }
-html,
-body,
-button,
-input,
-select {
-  font-variant-ligatures: none;
-  font-feature-settings: 'liga' 0;
+/* Pixelify's "fi" ligature reads as an "A" at small sizes; the font shorthand used across the
+   styles would reset a plain declaration, so this one is marked important. */
+* {
+  font-variant-ligatures: none !important;
+  font-feature-settings:
+    'liga' 0,
+    'dlig' 0 !important;
 }
 html,
 body {

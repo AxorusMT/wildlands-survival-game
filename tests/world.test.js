@@ -32,8 +32,10 @@ test('regions are wide, each with its own lie of the land, and every slope is wa
     return D.TILE_ROWS;
   };
   const shaft = (tx) => D.SHAFTS.some((s) => Math.abs(s.x - tx * D.TILE) < 90);
-  for (let tx = 1; tx < D.TILE_COLS; tx++)
-    if (!shaft(tx) && !shaft(tx - 1))
+  // Dungeon facades are built with walls; everywhere else the land is walkable.
+  const dungeon = (tx) => D.DUNGEONS.some((d) => tx >= d.tx0 - 1 && tx <= d.tx0 + d.cols + 1);
+  for (let tx = 1; tx < Math.floor(D.OVERWORLD_W / D.TILE); tx++)
+    if (!shaft(tx) && !shaft(tx - 1) && !dungeon(tx))
       assert.ok(Math.abs(top(tx) - top(tx - 1)) <= 1, `step at column ${tx}`);
 });
 
@@ -48,16 +50,21 @@ test('the world descends through five layers linked by ladder shafts', () => {
   assert.equal(layerOf(5), 'lower_mines');
   assert.equal(layerOf(7), 'upper_hell');
   // Every shaft is open from top to bottom, and some reach the underworld floor clear of lava.
+  // (Dungeon and dimension ladders are carved into their own tiles rather than the caves.)
+  const open = (x, y) =>
+    x < D.OVERWORLD_W && !D.dungeonAt(x, y)
+      ? D.caveAt(x, y)
+      : !D.baseTileAt(Math.floor(x / D.TILE), Math.floor(y / D.TILE));
   for (const s of D.SHAFTS)
-    for (let y = Math.max(s.top, D.surfaceAt(s.x)); y < s.bottom; y += 16)
-      assert.ok(D.caveAt(s.x, y), `shaft at ${Math.round(s.x)} blocked at ${Math.round(y)}`);
+    for (let y = Math.max(s.top, s.x < D.OVERWORLD_W ? D.surfaceAt(s.x) : 0); y < s.bottom; y += 16)
+      assert.ok(open(s.x, y), `shaft at ${Math.round(s.x)} blocked at ${Math.round(y)}`);
   const hellLadders = D.SHAFTS.filter((s) => s.bottom > D.LAYERS[4].top);
   assert.ok(hellLadders.length >= 3);
   for (const s of hellLadders) assert.equal(D.lavaAt(s.x, s.bottom - 10), false);
   // Deeper rock needs better picks, and lava lies in the underworld.
   assert.ok(D.MINE_TIER[D.Ground.hellrock] > D.MINE_TIER[D.Ground.deepstone]);
   let lava = 0;
-  for (let px = 0; px < D.WORLD_W; px += 64) if (D.lavaAt(px, D.LAVA_Y + 20)) lava++;
+  for (let px = 0; px < D.OVERWORLD_W; px += 64) if (D.lavaAt(px, D.LAVA_Y + 20)) lava++;
   assert.ok(lava > 20);
 });
 
@@ -129,7 +136,7 @@ test('saves keep only changed tiles, and older narrow-world records move into th
   storage.setItem('wildlands-save-v1', JSON.stringify(old));
   const migrated = new Game(3);
   assert.equal(migrated.load(storage), true);
-  assert.equal(migrated.s.layout, 3);
+  assert.equal(migrated.s.layout, 4);
   assert.equal(migrated.biome().id, 'meadow');
   assert.ok(migrated.s.nodes.length > 800);
 });

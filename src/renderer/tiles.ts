@@ -247,8 +247,11 @@ class Canvas {
 /** Kind of rock that would stand here, so the wall behind a cave matches the ground around it. */
 function wallKind(tx: number, ty: number) {
   const x = tx * T + T / 2,
-    y = ty * T + T / 2,
-    depth = y - D.surfaceAt(x),
+    y = ty * T + T / 2;
+  const dungeon = D.dungeonAt(x, y);
+  if (dungeon) return dungeon.def.brick;
+  if (D.regionAt(x) === 'mycelia') return 20;
+  const depth = y - D.surfaceAt(x),
     biome = D.biomeAt(x, y).id;
   if (depth < 76)
     return biome === 'desert'
@@ -266,7 +269,8 @@ function wallKind(tx: number, ty: number) {
   return 2;
 }
 const isBack = (g: RenderGame, tx: number, ty: number) =>
-  !g.tileAt(tx, ty) && (ty + 0.5) * T > D.surfaceAt((tx + 0.5) * T);
+  !g.tileAt(tx, ty) &&
+  ((ty + 0.5) * T > D.surfaceAt((tx + 0.5) * T) || !!D.dungeonAt((tx + 0.5) * T, (ty + 0.5) * T));
 
 function paintWall(c: Canvas, g: RenderGame, tx: number, ty: number, ox: number, oy: number) {
   // A wall is the rock around it, set back: its own texture, darkened and cooled.

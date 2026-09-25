@@ -29,6 +29,7 @@ export class Inventory extends System {
       else this.game.s.inventory.push({ id, qty });
     }
     this.game.progress.record(id, qty);
+    this.game.equipment.offer(id);
   }
   remove(id: string, qty = 1) {
     if (this.count(id) < qty) return false;
@@ -43,6 +44,7 @@ export class Inventory extends System {
       if (!qty) break;
     }
     this.game.s.inventory = this.game.s.inventory.filter((e) => e.qty > 0);
+    this.game.equipment.tidy();
     return true;
   }
   canAfford(cost: Record<string, number>) {

@@ -307,7 +307,108 @@ const STATIC: Record<string, () => Sprite> = {
       p.shadeEdges(0.25, -0.3);
     }),
 };
+Object.assign(STATIC, {
+  starforge: () =>
+    sprite(40, 30, 20, 29, (p) => {
+      stones(p, 0, 12, 40, 18, '#3e3a50');
+      p.rect(4, 16, 32, 8, '#140e1c');
+      p.rect(6, 4, 28, 8, '#5a4a7a');
+      p.rect(6, 4, 28, 1, '#8a7ab0');
+      for (let i = 0; i < 5; i++) p.set(9 + i * 6, 7, '#f8e08a');
+      p.rect(16, 0, 8, 4, '#6a5a8a');
+      p.shadeEdges();
+    }),
+  trap_spikes: () =>
+    sprite(28, 7, 14, 6, (p) => {
+      p.rect(0, 5, 28, 2, '#4a4040');
+      for (let i = 0; i < 7; i++)
+        p.poly(
+          [
+            [1 + i * 4, 5],
+            [2.5 + i * 4, 0],
+            [4 + i * 4, 5],
+          ],
+          '#b8bcc0',
+        );
+    }),
+  trap_dart: () =>
+    sprite(8, 10, 4, 5, (p) => {
+      p.rect(0, 0, 8, 10, '#5a5448');
+      p.rect(0, 0, 8, 1, '#8a8070');
+      p.rect(5, 4, 3, 2, '#141010');
+      p.set(2, 2, '#a89868');
+    }),
+  trap_flame: () =>
+    sprite(16, 5, 8, 4, (p) => {
+      p.rect(0, 1, 16, 4, '#3a2a2a');
+      p.rect(2, 0, 12, 2, '#5a3a30');
+      for (let x = 4; x < 12; x += 3) p.set(x, 0, '#1a0a0a');
+    }),
+});
 const staticSprite = (k: string) => cached('st:' + k, STATIC[k]);
+
+/** A dungeon chest trimmed to match its halls, open once looted. */
+function chestSprite(kind: string, open: boolean): Sprite {
+  const trim: Record<string, [string, string]> = {
+    crypt: ['#5a6a4a', '#9ab88a'],
+    frost_keep: ['#6a8aa8', '#dff6ff'],
+    tomb: ['#8a6a3a', '#f0c860'],
+    citadel: ['#3a2228', '#ff8a3a'],
+    mycelia: ['#4a3f5e', '#58e0d0'],
+    skyreach: ['#c8c0b0', '#f8e08a'],
+    void: ['#2a1c3a', '#b36cff'],
+  };
+  const [body, metal] = trim[kind] ?? ['#7a5a3c', '#d8b848'];
+  return cached(`dchest:${kind}:${open}`, () =>
+    sprite(22, 16, 11, 15, (p) => {
+      const [, d, m, l] = ramp(body);
+      p.rect(0, 6, 22, 10, m);
+      p.rect(0, 6, 22, 1, l);
+      p.rect(0, 15, 22, 1, d);
+      if (open) {
+        p.rect(0, 0, 22, 3, d);
+        p.rect(1, 3, 20, 3, '#141010');
+      } else {
+        p.rect(0, 1, 22, 5, shade(body, 0.1));
+        p.rect(0, 1, 22, 1, l);
+        p.rect(9, 5, 4, 4, metal);
+        p.set(10, 7, '#141010');
+      }
+      for (const x of [2, 18]) p.rect(x, open ? 6 : 1, 2, open ? 10 : 15, metal);
+    }),
+  );
+}
+/** A boss altar: a dais with the foe's emblem, burning while the fight is on. */
+function altarSprite(boss: string, lit: boolean): Sprite {
+  const hue: Record<string, string> = {
+    hollow_king: '#9ae8c0',
+    rime_colossus: '#bfe8f8',
+    pharaoh: '#ffd86a',
+    archdemon: '#ff6a2a',
+    sporemother: '#58e0d0',
+    tempest_roc: '#e8f0ff',
+    unmaker: '#b36cff',
+  };
+  const c = hue[boss] ?? '#ffffff';
+  return cached(`altar:${boss}:${lit}`, () =>
+    sprite(36, 24, 18, 23, (p) => {
+      stones(p, 0, 18, 36, 6, '#4a4450');
+      stones(p, 5, 12, 26, 6, '#5a5462');
+      p.poly(
+        [
+          [12, 12],
+          [14, 2],
+          [22, 2],
+          [24, 12],
+        ],
+        '#3e3946',
+      );
+      p.rect(15, 5, 6, 5, lit ? c : shade(c, -0.55));
+      p.set(17, 6, lit ? '#ffffff' : shade(c, -0.3));
+      p.shadeEdges();
+    }),
+  );
+}
 
 /** Crop growth: a sprite per crop and stage (0–3). */
 function cropSprite(crop: string, stage: number): Sprite {
@@ -457,7 +558,54 @@ export function drawStructure(
     }
     case 'torch': {
       blit(c, staticSprite('torch'), x, y);
-      flameAt(c, x, y - 10, t, 1, s.id);
+      if (s.kind === 'frost' || s.kind === 'soul') {
+        const col =
+            s.kind === 'frost'
+              ? ['#3a8ad8', '#8ad0ff', '#e8f8ff']
+              : ['#2a9a6a', '#7ae8b0', '#e8fff0'],
+          f = Math.floor(t * 9 + s.id) % 3;
+        c.fillStyle = col[0];
+        c.fillRect(x - 2, y - 14 - (f === 1 ? 1 : 0), 4, 5);
+        c.fillStyle = col[1];
+        c.fillRect(x - 1, y - 15 - (f % 2), 2, 5);
+        c.fillStyle = col[2];
+        c.fillRect(x, y - 13, 1, 2);
+      } else flameAt(c, x, y - 10, t, 1, s.id);
+      return;
+    }
+    case 'dungeon_chest':
+      blit(c, chestSprite(s.kind ?? '', s.crop === 'open'), x, y);
+      return;
+    case 'boss_altar': {
+      const lit = g.bosses.active()?.type === s.kind;
+      blit(c, altarSprite(s.kind ?? '', lit), x, y);
+      if (!lit && Math.sin(t * 2 + s.id) > 0.6) {
+        c.fillStyle = 'rgba(255,255,255,0.6)';
+        c.fillRect(x - 1 + Math.round(Math.sin(t * 3) * 3), y - 26 - Math.round((t * 8) % 8), 1, 1);
+      }
+      return;
+    }
+    case 'trap_spikes': {
+      const hit = g.s.elapsed - s.triggeredAt < 0.4;
+      blit(c, staticSprite(k), x, y + (hit ? 0 : 1));
+      return;
+    }
+    case 'trap_dart':
+      blit(c, staticSprite(k), x, y, s.kind === '-1');
+      return;
+    case 'trap_flame': {
+      blit(c, staticSprite(k), x, y);
+      const since = g.s.elapsed - s.triggeredAt;
+      if (since < 0.7) flameAt(c, x, y - 3, t, 2, s.id);
+      else if (since > 2.4) {
+        c.fillStyle = '#ff8a3a';
+        c.fillRect(x - 1 + (Math.floor(t * 12) % 3), y - 5, 1, 1);
+      }
+      return;
+    }
+    case 'starforge': {
+      blit(c, staticSprite(k), x, y);
+      flameAt(c, x, y - 7, t, 1, s.id);
       return;
     }
     case 'drying_rack': {
@@ -498,8 +646,11 @@ export function drawStructure(
     }
     case 'rift_gate':
     case 'portal': {
-      const dest = (s.store && Object.keys(s.store)[0]) || 'void';
-      const colors = DIM_COLORS[dest] ?? DIM_COLORS.void;
+      const dest =
+        Object.keys(s.store ?? {})
+          .filter((key) => key in DIM_COLORS)
+          .pop() ?? (k === 'portal' ? 'home' : 'void');
+      const colors = k === 'portal' ? DIM_COLORS.home : (DIM_COLORS[dest] ?? DIM_COLORS.void);
       if (k === 'rift_gate') {
         const open = (s.fuel ?? 0) > 0;
         if (open) portalSwirl(c, x, y - 35, t, 18, 24, colors);

@@ -1,8 +1,11 @@
 import { clamp } from '../../core/math.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { RECIPES } from '../../data/recipes.ts';
+import { MOBS as MOB_SPECS } from '../../data/mobs.ts';
 import {
   BIOME_SPANS,
+  DIMENSIONS,
+  DUNGEONS,
   LAVA_Y,
   LAYERS,
   WORLD_H,
@@ -30,17 +33,11 @@ export const newDevState = (): DevState => ({
   unlocked: new Set(),
 });
 
-export const MOBS = [
-  'deer',
-  'wolf',
-  'boar',
-  'bat',
-  'scorpion',
-  'ember_bat',
-  'hellhound',
-  'direwolf',
-];
+/** Everything the console can summon: every creature and boss, and the Direwolf. */
+export const MOBS = [...Object.keys(MOB_SPECS), 'direwolf'];
 const FLIERS = ['bat', 'ember_bat'];
+/** Places the console can send you, beyond regions and layers. */
+const PLACES = [...DUNGEONS.map((d) => d.def.id), ...DIMENSIONS.map((d) => d.id)];
 const TIMES: Record<string, number> = {
   dawn: 6 * 60,
   morning: 9 * 60,
@@ -166,6 +163,28 @@ export class Dev extends System {
           return ['The Direwolf answers.'];
         }
         const count = clamp(Math.floor(Number(n ?? 1)) || 1, 1, 30);
+        const spec = MOB_SPECS[found.id];
+        if (spec?.boss) {
+          const r = this.game.bosses.summon({ x: p.x + side * 60, y: p.y, kind: found.id }, true);
+          return r.ok ? [spec.name + ' answers.'] : ['! ' + r.reason];
+        }
+        if (
+          spec &&
+          !['deer', 'wolf', 'boar', 'bat', 'scorpion', 'ember_bat', 'hellhound'].includes(found.id)
+        ) {
+          for (let i = 0; i < count; i++) {
+            const x = p.x + side * (140 + i * 46);
+            this.game.world.addAnimal(
+              found.id,
+              x,
+              spec.move === 'walker' || spec.move === 'hopper'
+                ? this.game.floorNear(x, p.y - 20)
+                : p.y - 90,
+              { body: true, vx: 0, vy: 0 },
+            );
+          }
+          return [`Summoned ${count} × ${spec.name.toLowerCase()}.`];
+        }
         for (let i = 0; i < count; i++) {
           const x = clamp(p.x + side * (140 + i * 46), 30, WORLD_W - 30),
             flier = FLIERS.includes(found.id),
@@ -217,8 +236,8 @@ export class Dev extends System {
       },
     },
     tp: {
-      usage: 'tp <x [y] | biome | layer>',
-      help: 'Teleport to a position, a region, or a depth layer.',
+      usage: 'tp <x [y] | biome | layer | dungeon | dimension>',
+      help: 'Teleport to a position, region, depth layer, dungeon (crypt, frost_keep, tomb, citadel), or dimension (mycelia, skyreach, void).',
       run: (args) => this.teleport(args),
     },
     time: {
@@ -285,7 +304,7 @@ export class Dev extends System {
             : cmd === 'summon'
               ? MOBS
               : cmd === 'tp'
-                ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id)]
+                ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES]
                 : cmd === 'time'
                   ? Object.keys(TIMES)
                   : cmd === 'weather'
@@ -303,8 +322,9 @@ export class Dev extends System {
   }
 
   private restore() {
+    this.game.s.mana = this.game.equipment.maxMana();
     Object.assign(this.game.s.vitals, {
-      health: 100,
+      health: this.game.maxHealth(),
       hydration: 100,
       calories: 100,
       protein: 100,
@@ -356,6 +376,18 @@ export class Dev extends System {
       return put(x, y);
     }
     const target = args[0].toLowerCase();
+    const dungeon = DUNGEONS.find((d) => d.def.id.startsWith(target));
+    if (dungeon) {
+      // Arrive outside the door: beside the facade, or at the Citadel's western gate.
+      const x = dungeon.def.facade === 'none' ? dungeon.tx0 * 32 - 80 : dungeon.entrance.x - 400;
+      const y = dungeon.def.facade === 'none' ? dungeon.entrance.y - 20 : this.game.groundTopAt(x);
+      return put(x, this.game.floorNear(x, y - 40) + 1);
+    }
+    const dim = DIMENSIONS.find((d) => d.id.startsWith(target));
+    if (dim) {
+      const x = dim.start + dim.arrive + 80;
+      return put(x, this.game.groundTopAt(x) + 1);
+    }
     const span = BIOME_SPANS.find((s) => s.id.startsWith(target));
     if (span) return put(span.center, this.game.groundTopAt(span.center) + 1);
     const layer = LAYERS.find((l) => l.id.startsWith(target) || l.id.replace('_', '') === target);

@@ -1,7 +1,8 @@
 import { clamp } from '../core/math.ts';
 import type { Animal } from '../core/types.ts';
 import { BIOMES } from '../data/biomes.ts';
-import { NODES } from '../data/resources.ts';
+import { MOBS } from '../data/mobs.ts';
+import { NODES, TREE_NODES } from '../data/resources.ts';
 import {
   BIOME_SPANS,
   ENTRANCES,
@@ -38,13 +39,22 @@ const UNDERGROUND: {
     layer: 'lower_mines',
     levels: [4, 5],
     perKm: 7,
-    kinds: () => ['iron_ore', 'iron_ore', 'coal', 'coal', 'crystal', 'sulfur', 'mushroom'],
+    kinds: () => [
+      'iron_ore',
+      'iron_ore',
+      'coal',
+      'coal',
+      'crystal',
+      'sulfur',
+      'mushroom',
+      'life_crystal',
+    ],
   },
   {
     layer: 'upper_hell',
     levels: [6, 7],
     perKm: 5,
-    kinds: () => ['sulfur', 'sulfur', 'obsidian', 'obsidian', 'crystal'],
+    kinds: () => ['sulfur', 'sulfur', 'obsidian', 'obsidian', 'crystal', 'life_crystal'],
   },
   {
     layer: 'lower_hell',
@@ -60,16 +70,12 @@ const DEEP_LIFE: [string, number[], number][] = [
   ['bat', [4, 5], 0.6],
   ['ember_bat', [6, 7], 0.8],
   ['hellhound', [0], 0.8],
+  ['cave_spider', [2, 3, 4], 0.5],
 ];
-export const ANIMAL_HP: Record<string, number> = {
-  deer: 42,
-  wolf: 66,
-  boar: 88,
-  bat: 33,
-  scorpion: 54,
-  ember_bat: 70,
-  hellhound: 190,
-};
+/** Starting health of each creature. */
+export const ANIMAL_HP: Record<string, number> = Object.fromEntries(
+  Object.entries(MOBS).map(([id, spec]) => [id, spec.hp]),
+);
 
 export class WorldGenerator extends System {
   /** Tile grid rebuilt from the world's pure geometry. */
@@ -117,9 +123,26 @@ export class WorldGenerator extends System {
     }
     this.generateNodes();
     for (const span of BIOME_SPANS) this.populate(span);
+    this.game.realms.populate();
   }
 
-  private addAnimal(type: string, x: number, y: number, extra: Partial<Animal> = {}) {
+  /** Puts a resource on the ground at (x, y) unless something already crowds the spot. */
+  placeNode(kind: string, x: number, y: number) {
+    if (!NODES[kind] || !this.nodeFits(kind, x, y)) return false;
+    this.game.s.nodes.push({
+      id: uniqueId(),
+      kind,
+      x,
+      y,
+      hp: NODES[kind].hp,
+      depletedUntil: 0,
+      phase: this.game.rng() * Math.PI * 2,
+    });
+    this.remember(kind, x, y);
+    return true;
+  }
+
+  addAnimal(type: string, x: number, y: number, extra: Partial<Animal> = {}) {
     const hp = ANIMAL_HP[type];
     this.game.s.animals.push({
       id: uniqueId(),
@@ -155,6 +178,13 @@ export class WorldGenerator extends System {
       badlands: ['wolf', 'wolf', 'scorpion'],
     };
     const kinds = surface[span.id];
+    // Slimes bounce about the gentler regions.
+    if (['meadow', 'forest', 'marsh', 'coast'].includes(span.id))
+      for (let i = 0; i < Math.round(scale * 0.8); i++) {
+        const x = span.start + ((i + 0.5) / Math.round(scale * 0.8)) * width;
+        if (Math.abs(x - RULES.spawnX) > 500)
+          this.addAnimal('slime', x, this.game.groundTopAt(x) - 1, { body: true, vx: 0, vy: 0 });
+      }
     const total = Math.round(kinds.length * scale * 0.85);
     for (let i = 0; i < total; i++) {
       const type = kinds[i % kinds.length];
@@ -280,7 +310,7 @@ export class WorldGenerator extends System {
   }
   // Resources keep a readable footprint: trees space from trees, small finds from each other.
   nodeFits(kind: string, x: number, y: number) {
-    const tree = (k: string) => k === 'wood' || k === 'resin' || k === 'honey';
+    const tree = (k: string) => TREE_NODES.has(k);
     const width = (k: string) =>
       tree(k) ? 92 : k === 'water' ? 74 : k === 'cache' ? 44 : NODES[k]?.tool ? 38 : 30;
     const key = Math.floor(x / 200);

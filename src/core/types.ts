@@ -11,7 +11,13 @@ export type ItemCategory =
   | 'weapon'
   | 'clothing'
   | 'trophy'
-  | 'structure';
+  | 'structure'
+  | 'armor'
+  | 'accessory'
+  | 'block'
+  | 'potion'
+  | 'ammo'
+  | 'key';
 
 export interface Point {
   x: number;
@@ -37,6 +43,8 @@ export interface Recipe {
   cost: Record<string, number>;
   station: string | null;
   tier: number;
+  /** How many one craft makes (1 unless set). */
+  yield?: number;
 }
 export interface NodeSpec {
   yield: [number, number];
@@ -130,6 +138,15 @@ export interface Animal extends Point {
   hoverY?: number;
   /** A deer that has bolted keeps running until it is well clear. */
   fleeing?: boolean;
+  /** Creatures of the deep places move with real physics against the tiles. */
+  body?: boolean;
+  vx?: number;
+  vy?: number;
+  grounded?: boolean;
+  /** Timers for a boss's or monster's special moves, by name. */
+  timers?: Record<string, number>;
+  /** Summoned by a boss; gone when the fight ends. */
+  minion?: boolean;
   hitAt?: number;
   howlAt?: number;
   howlCue?: number;
@@ -143,6 +160,10 @@ export interface Structure extends Point {
   crop: string | null;
   plantedAt: number;
   triggeredAt: number;
+  /** What a world furnishing belongs to: a boss for an altar, a dimension for a portal, a trap's facing. */
+  kind?: string;
+  /** Part of a dungeon or dimension, not built by the player. */
+  fixed?: boolean;
 }
 export interface FieldCache extends Point {
   id: number;
@@ -217,6 +238,20 @@ export interface GameState {
   chapter: number;
   discoveries: string[];
   altar: Altar;
+  /** Ten quick slots of item ids, and which is in hand. */
+  hotbar: (string | null)[];
+  hotbarIndex: number;
+  /** Accessories worn (up to three). */
+  accessories: string[];
+  maxHealth: number;
+  mana: number;
+  maxMana: number;
+  /** Seconds left on each timed effect. */
+  buffs: Record<string, number>;
+  /** Bosses of the deep places: times defeated. */
+  bosses: Record<string, number>;
+  /** Sigils set into the Rift Gate. */
+  rift: { sigils: string[] };
   placing: string | null;
   dead: boolean;
   lastSave: number;

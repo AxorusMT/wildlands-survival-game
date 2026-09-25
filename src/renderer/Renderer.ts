@@ -6,7 +6,8 @@ import { D } from './art.ts';
 import { drawDrops, drawParticles, drawWeather } from './effects.ts';
 import { drawLighting, gatherLights } from './lighting.ts';
 import { drawCache, drawNode, drawTree, TREE_KINDS } from './nature.ts';
-import { PX, cached, makeCanvas, ramp, sprite, type PixelView } from './px.ts';
+import { PROJECTILES } from '../data/gear.ts';
+import { PX, TA, cached, hash, makeCanvas, ramp, sprite, type PixelView } from './px.ts';
 import { drawSky } from './sky.ts';
 import { drawStructure } from './structures.ts';
 import { drawGround, drawLava, drawWalls } from './tiles.ts';
@@ -64,12 +65,134 @@ function drawLadders(c: CanvasRenderingContext2D, ax: number, ay: number, w: num
   }
 }
 
+/** Shots in flight: a bright head with a short trail, lit where they glow. */
+function drawProjectiles(
+  c: CanvasRenderingContext2D,
+  g: RenderGame,
+  ax: number,
+  ay: number,
+  w: number,
+  h: number,
+) {
+  for (const b of g.combat.projectiles) {
+    const spec = PROJECTILES[b.kind] ?? PROJECTILES.arrow,
+      x = Math.round(b.x / PX - ax),
+      y = Math.round(b.y / PX - ay);
+    if (x < -40 || x > w + 40 || y < -40 || y > h + 40) continue;
+    const ang = Math.atan2(b.vy, b.vx),
+      dx = Math.cos(ang),
+      dy = Math.sin(ang);
+    if (['arrow', 'dart', 'bone_shard', 'feather', 'icicle'].includes(b.kind)) {
+      const len = b.kind === 'dart' ? 4 : 7;
+      c.fillStyle = spec.color;
+      for (let i = 0; i < len; i++)
+        c.fillRect(Math.round(x - dx * i), Math.round(y - dy * i), 1, 1);
+      c.fillStyle = b.kind === 'arrow' ? '#aab0b2' : '#ffffff';
+      c.fillRect(Math.round(x + dx), Math.round(y + dy), 1, 1);
+      continue;
+    }
+    if (b.kind === 'lightning') {
+      c.fillStyle = spec.color;
+      let lx = x;
+      for (let yy = y - 120; yy < y; yy += 3) {
+        lx += Math.round((hash(yy, Math.floor(g.s.elapsed * 30)) - 0.5) * 4);
+        c.fillRect(lx, yy, 2, 3);
+      }
+      continue;
+    }
+    const r = Math.max(1, Math.round(spec.size / PX / 2));
+    if (spec.drag) {
+      // Clouds: a soft dithered puff.
+      c.globalAlpha = 0.55;
+      c.fillStyle = spec.color;
+      for (let j = -r; j <= r; j++)
+        for (let i = -r; i <= r; i++)
+          if (i * i + j * j <= r * r && (i + j + Math.floor(g.s.elapsed * 8)) % 2 === 0)
+            c.fillRect(x + i, y + j, 1, 1);
+      c.globalAlpha = 1;
+      continue;
+    }
+    c.fillStyle = spec.glow ?? spec.color;
+    c.globalAlpha = 0.5;
+    for (let i = 1; i < 5; i++)
+      c.fillRect(Math.round(x - dx * i * 2) - 1, Math.round(y - dy * i * 2) - 1, 2, 2);
+    c.globalAlpha = 1;
+    c.fillStyle = spec.color;
+    c.fillRect(x - r, y - r + 1, r * 2, r * 2 - 1);
+    c.fillRect(x - r + 1, y - r, r * 2 - 1, r * 2 + 1);
+    c.fillStyle = '#ffffff';
+    c.fillRect(x - 1, y - 1, 1, 1);
+  }
+}
+/** The tile under the cursor, outlined when the held item works on it. */
+function drawCursor(
+  c: CanvasRenderingContext2D,
+  g: RenderGame,
+  ax: number,
+  ay: number,
+  cursor: Point | null,
+) {
+  if (!cursor) return;
+  const kind = g.equipment.useKind(g.equipment.held());
+  if (kind !== 'pick' && kind !== 'block' && kind !== 'structure') return;
+  const tx = Math.floor(cursor.x / D.TILE),
+    ty = Math.floor(cursor.y / D.TILE),
+    x = tx * TA - ax,
+    y = ty * TA - ay,
+    p = g.s.player,
+    far = Math.hypot(tx * D.TILE + 16 - p.x, ty * D.TILE + 16 - (p.y - 24)) > 180;
+  c.fillStyle = far ? 'rgba(255,120,100,0.5)' : 'rgba(255,248,220,0.7)';
+  for (let i = 0; i < TA; i += 2) {
+    c.fillRect(x + i, y, 1, 1);
+    c.fillRect(x + i, y + TA - 1, 1, 1);
+    c.fillRect(x, y + i, 1, 1);
+    c.fillRect(x + TA - 1, y + i, 1, 1);
+  }
+}
+/** Cracks spreading across tiles that have been struck but not yet broken. */
+function drawCracks(
+  c: CanvasRenderingContext2D,
+  g: RenderGame,
+  ax: number,
+  ay: number,
+  cursor: Point | null,
+) {
+  if (!cursor) return;
+  const tx0 = Math.floor(cursor.x / D.TILE) - 3,
+    ty0 = Math.floor(cursor.y / D.TILE) - 3;
+  for (let ty = ty0; ty < ty0 + 7; ty++)
+    for (let tx = tx0; tx < tx0 + 7; tx++) {
+      const n = Math.min(3, g.hands.crackAt(tx, ty));
+      if (!n) continue;
+      const crack = cached('crack' + n, () =>
+        sprite(
+          TA,
+          TA,
+          0,
+          0,
+          (p) => {
+            const lines = [
+              [8, 8, 3, 3],
+              [8, 8, 13, 5],
+              [8, 8, 6, 14],
+              [8, 8, 14, 12],
+            ];
+            for (const [x0, y0, x1, y1] of lines.slice(0, n + 1)) p.line(x0, y0, x1, y1, '#1a1410');
+          },
+          false,
+        ),
+      );
+      c.drawImage(crack.cv, tx * TA - ax - 1, ty * TA - ay - 1);
+    }
+}
+
 export function draw(
   c: CanvasRenderingContext2D,
   g: RenderGame,
   cam: Point,
   view: PixelView,
   menu = false,
+  cursor: Point | null = null,
 ) {
   const w = view.artW,
     h = view.artH;
@@ -86,6 +209,7 @@ export function draw(
   drawLava(a, g, ax, ay, w, h, now);
   drawLadders(a, ax, ay, w, h);
   drawGround(a, visibleChunks, ax, ay);
+  drawCracks(a, g, ax, ay, cursor);
   const on = (o: Point, pad = 80) => {
     const x = o.x / PX - ax,
       y = o.y / PX - ay;
@@ -108,8 +232,10 @@ export function draw(
   for (const m of g.s.animals) if (!m.deadUntil && on(m)) drawAnimal(a, g, m, sx(m), sy(m), t);
   drawDrops(a, g, ax, ay, w, h, t);
   if (!menu) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
+  drawProjectiles(a, g, ax, ay, w, h);
   drawParticles(a, ax, ay, now);
   drawLighting(a, g, ax, ay, w, h, gatherLights(g, t, menu));
+  drawCursor(a, g, ax, ay, cursor);
   drawWeather(a, g, ax, ay, w, h, fx, menu);
   c.imageSmoothingEnabled = false;
   c.drawImage(art, 0, 0, w * view.scale, h * view.scale);

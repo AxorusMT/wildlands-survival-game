@@ -420,6 +420,333 @@ export const MOBS: Record<string, MobArt> = {
     light: [0.85, 0.32, 0.12],
   },
 };
+Object.assign(MOBS, {
+  slime: { tpl: 'slime', body: '#5ab84a', eye: '#10240c', w: 14, h: 10, top: 16 },
+  cave_spider: {
+    tpl: 'crawler',
+    body: '#4a3a44',
+    belly: '#8a6a7a',
+    eye: '#ff5a5a',
+    w: 22,
+    h: 8,
+    parts: ['claws'],
+    top: 16,
+  },
+  // The Mossy Crypt.
+  skeleton: {
+    tpl: 'biped',
+    body: '#e6dcc6',
+    belly: '#8a8070',
+    eye: '#ff6a4a',
+    w: 12,
+    h: 28,
+    parts: ['bones', 'sword'],
+    top: 34,
+  },
+  skeleton_archer: {
+    tpl: 'biped',
+    body: '#e6dcc6',
+    belly: '#6a7a5a',
+    eye: '#9aff6a',
+    w: 12,
+    h: 28,
+    parts: ['bones', 'hood'],
+    top: 34,
+  },
+  bone_bat: {
+    tpl: 'flyer',
+    body: '#d8ccb0',
+    belly: '#a89878',
+    eye: '#ff6a4a',
+    w: 20,
+    h: 9,
+    parts: ['ears'],
+    top: 16,
+  },
+  crypt_ghoul: {
+    tpl: 'biped',
+    body: '#6a8a5a',
+    belly: '#4a5a3a',
+    eye: '#f0e060',
+    w: 14,
+    h: 28,
+    parts: ['claws'],
+    top: 34,
+  },
+  // The Frost Keep.
+  frost_wraith: {
+    tpl: 'floater',
+    body: '#bfe4f4',
+    belly: '#6aa8c8',
+    eye: '#1a3a5a',
+    w: 18,
+    h: 24,
+    parts: ['ghost'],
+    top: 30,
+    light: [0.3, 0.55, 0.8],
+  },
+  ice_golem: {
+    tpl: 'biped',
+    body: '#8fc0d8',
+    belly: '#5a8aa8',
+    eye: '#e8fbff',
+    w: 22,
+    h: 36,
+    parts: ['armor'],
+    top: 44,
+  },
+  snow_slime: { tpl: 'slime', body: '#e8f4fa', eye: '#3a5a7a', w: 16, h: 12, top: 18 },
+  // The Sunken Tomb.
+  mummy: {
+    tpl: 'biped',
+    body: '#c8b890',
+    belly: '#8a7a5a',
+    eye: '#ff4a2a',
+    w: 14,
+    h: 30,
+    parts: ['bandage'],
+    top: 36,
+  },
+  scarab: {
+    tpl: 'crawler',
+    body: '#2a5a6a',
+    belly: '#e8c040',
+    eye: '#e8c040',
+    w: 18,
+    h: 9,
+    parts: ['shell'],
+    top: 16,
+  },
+  tomb_serpent: { tpl: 'worm', body: '#c8a040', eye: '#2a1a1a', w: 34, h: 8, top: 16 },
+  // The Cinder Citadel.
+  imp: {
+    tpl: 'biped',
+    body: '#b8402a',
+    belly: '#4a1a1a',
+    eye: '#ffd27a',
+    w: 10,
+    h: 18,
+    parts: ['wings', 'horns', 'float'],
+    top: 24,
+    light: [0.8, 0.35, 0.12],
+  },
+  cinder_knight: {
+    tpl: 'biped',
+    body: '#3a2a2e',
+    belly: '#8a3a2a',
+    eye: '#ff8a3a',
+    w: 16,
+    h: 34,
+    parts: ['armor', 'shield', 'sword', 'horns'],
+    top: 40,
+    light: [0.5, 0.2, 0.08],
+  },
+  magma_slime: {
+    tpl: 'slime',
+    body: '#e05a2a',
+    belly: '#ffd27a',
+    eye: '#3a0a0a',
+    w: 16,
+    h: 12,
+    parts: ['core'],
+    top: 18,
+    light: [0.9, 0.4, 0.12],
+  },
+  // The Mycelial Deep.
+  shroomling: {
+    tpl: 'biped',
+    body: '#b8a8c8',
+    belly: '#58e0d0',
+    eye: '#1a1414',
+    w: 12,
+    h: 22,
+    parts: ['cap'],
+    top: 28,
+    light: [0.2, 0.6, 0.55],
+  },
+  spore_bat: {
+    tpl: 'flyer',
+    body: '#3a5a5a',
+    belly: '#58e0d0',
+    eye: '#e8fff8',
+    w: 20,
+    h: 9,
+    parts: ['ears'],
+    top: 16,
+    light: [0.2, 0.6, 0.55],
+  },
+  spore_slime: {
+    tpl: 'slime',
+    body: '#3ab0a4',
+    belly: '#c0fff4',
+    eye: '#0a2a28',
+    w: 18,
+    h: 13,
+    parts: ['core'],
+    top: 20,
+    light: [0.2, 0.55, 0.5],
+  },
+  mycelid: {
+    tpl: 'quad',
+    body: '#6a5a8a',
+    belly: '#58e0d0',
+    eye: '#58e0d0',
+    w: 28,
+    h: 18,
+    parts: ['spines', 'tail', 'snout'],
+    top: 30,
+    light: [0.15, 0.45, 0.4],
+  },
+  // Skyreach.
+  harpy: {
+    tpl: 'flyer',
+    body: '#c89a6a',
+    belly: '#f0e0c8',
+    eye: '#3a2a1a',
+    w: 26,
+    h: 12,
+    parts: ['beak', 'tail'],
+    top: 20,
+  },
+  cloud_slime: {
+    tpl: 'slime',
+    body: '#f0f4ff',
+    belly: '#bfe4ff',
+    eye: '#6a8ab8',
+    w: 18,
+    h: 13,
+    top: 20,
+  },
+  wind_wisp: {
+    tpl: 'floater',
+    body: '#dff6ff',
+    eye: '#ffffff',
+    w: 10,
+    h: 12,
+    top: 18,
+    light: [0.5, 0.6, 0.7],
+  },
+  sky_ram: {
+    tpl: 'quad',
+    body: '#f0ece0',
+    belly: '#c8c0b0',
+    eye: '#2a2020',
+    w: 28,
+    h: 20,
+    parts: ['horns', 'mane', 'tail'],
+    top: 32,
+  },
+  // The Hollow Void.
+  void_wisp: {
+    tpl: 'floater',
+    body: '#b36cff',
+    eye: '#ffffff',
+    w: 10,
+    h: 12,
+    top: 18,
+    light: [0.5, 0.25, 0.85],
+  },
+  void_stalker: {
+    tpl: 'quad',
+    body: '#2a1c3a',
+    belly: '#b36cff',
+    eye: '#ff6ad5',
+    w: 32,
+    h: 18,
+    parts: ['ears', 'tail', 'snout', 'spines'],
+    top: 30,
+    light: [0.3, 0.12, 0.5],
+  },
+  watcher: {
+    tpl: 'floater',
+    body: '#4a2a5a',
+    belly: '#b36cff',
+    eye: '#0a0610',
+    w: 18,
+    h: 18,
+    parts: ['eye'],
+    top: 24,
+    light: [0.4, 0.15, 0.55],
+  },
+  // Bosses.
+  hollow_king: {
+    tpl: 'biped',
+    body: '#e6dcc6',
+    belly: '#2a3a2a',
+    eye: '#9ae8c0',
+    w: 26,
+    h: 56,
+    parts: ['robe', 'crown', 'staff', 'bones'],
+    top: 66,
+    light: [0.35, 0.8, 0.6],
+  },
+  rime_colossus: {
+    tpl: 'biped',
+    body: '#9fd0e8',
+    belly: '#4a7a98',
+    eye: '#ffffff',
+    w: 44,
+    h: 64,
+    parts: ['armor', 'horns'],
+    top: 72,
+    light: [0.3, 0.5, 0.7],
+  },
+  pharaoh: {
+    tpl: 'biped',
+    body: '#d8b870',
+    belly: '#2a5a8a',
+    eye: '#ffd86a',
+    w: 24,
+    h: 52,
+    parts: ['robe', 'crown', 'staff', 'bandage'],
+    top: 62,
+    light: [0.8, 0.65, 0.3],
+  },
+  archdemon: {
+    tpl: 'biped',
+    body: '#8a2a2a',
+    belly: '#2a0a0a',
+    eye: '#ffd27a',
+    w: 34,
+    h: 60,
+    parts: ['wings', 'horns', 'armor', 'float', 'sword'],
+    top: 70,
+    light: [0.9, 0.35, 0.12],
+  },
+  sporemother: {
+    tpl: 'slime',
+    body: '#6a4a8a',
+    belly: '#58e0d0',
+    eye: '#e8fff8',
+    w: 70,
+    h: 46,
+    parts: ['core', 'crown'],
+    top: 56,
+    light: [0.3, 0.7, 0.65],
+  },
+  tempest_roc: {
+    tpl: 'flyer',
+    body: '#5a6a8a',
+    belly: '#e8f0ff',
+    eye: '#fff0a0',
+    w: 90,
+    h: 30,
+    parts: ['beak', 'tail'],
+    top: 36,
+    light: [0.4, 0.45, 0.6],
+  },
+  unmaker: {
+    tpl: 'floater',
+    body: '#2a1c3a',
+    belly: '#ff5a8a',
+    eye: '#0a0610',
+    w: 64,
+    h: 64,
+    parts: ['eye'],
+    top: 76,
+    light: [0.7, 0.25, 0.6],
+  },
+} satisfies Record<string, MobArt>);
 /** Registers art for new creature types (dungeons and dimensions add theirs at load). */
 export function addMobArt(types: Record<string, MobArt>) {
   Object.assign(MOBS, types);
@@ -509,96 +836,190 @@ function paintQuad(p: Painter, a: MobArt, frame: number, ox: number, oy: number)
 function paintBiped(p: Painter, a: MobArt, frame: number, ox: number, oy: number) {
   const [dk, d, m, l] = ramp(a.body),
     sec = a.belly ?? d,
+    [sd, , sm, sl] = ramp(sec),
     parts = new Set(a.parts ?? []),
     H = a.h,
     W = a.w,
-    legH = Math.round(H * 0.32),
-    torsoH = Math.round(H * 0.36),
-    headH = H - legH - torsoH,
+    headH = Math.max(4, Math.round(H * 0.22)),
+    torsoH = Math.round(H * 0.4),
+    legH = H - headH - torsoH,
     s = Math.sin((frame / 6) * Math.PI * 2),
-    float = parts.has('robe') || parts.has('float');
-  const hipY = oy - legH,
+    robe = parts.has('robe'),
+    float = robe || parts.has('float');
+  const hipY = oy - legH - (float && !robe ? 3 : 0),
     topY = hipY - torsoH,
     tw = Math.max(4, Math.round(W * 0.5)),
     tx = ox - Math.floor(tw / 2);
+  // Limbs thicken with size, so a colossus is not drawn on stilts.
+  const t = Math.max(1, Math.round(W / 9)),
+    stride = Math.round(s * Math.max(3, W / 6));
+  const limb = (x0: number, y0: number, x1: number, y1: number, c: string) => {
+    for (let k = 0; k < t; k++) p.line(x0 + k, y0, x1 + k, y1, c);
+  };
   if (parts.has('wings')) {
-    const flap = Math.round(Math.sin((frame / 6) * Math.PI * 2) * 3);
-    p.poly(
-      [
-        [tx, topY + 2],
-        [tx - W * 0.7, topY - 4 + flap],
-        [tx - W * 0.6, topY + torsoH + flap],
-        [tx, topY + torsoH - 1],
-      ],
-      shade(sec, -0.2),
-    );
+    const flap = Math.round(s * Math.max(3, H / 12)),
+      span = W * 0.9;
+    const wing: [number, number][] = [
+      [tx + 1, topY + 2],
+      [tx - span, topY - H * 0.12 + flap],
+      [tx - span * 0.8, topY + torsoH * 0.6 + flap],
+      [tx - span * 0.45, topY + torsoH * 0.45 + flap],
+      [tx - span * 0.3, topY + torsoH + flap],
+      [tx + 1, topY + torsoH - 1],
+    ];
+    p.poly(wing, shade(sec, -0.15));
+    for (let i = 1; i < 4; i++)
+      p.line(
+        tx,
+        topY + 2,
+        Math.round(tx - span * (1 - i * 0.2)),
+        Math.round(topY + torsoH * 0.2 * i + flap),
+        shade(sec, -0.45),
+      );
   }
   // Back arm and leg.
-  p.line(tx, topY + 2, tx - Math.round(s * 2) - 1, topY + torsoH, d);
-  if (!float) {
-    p.line(ox - 1, hipY, ox - 1 - Math.round(s * 3), oy - 1, d);
-    p.line(ox, hipY, ox - Math.round(s * 3), oy - 1, d);
-  }
-  if (float)
+  limb(tx - t + 1, topY + 2, tx - t - Math.round(s * 2), topY + torsoH, d);
+  if (!float) limb(ox - t, hipY, ox - t - stride, oy - 1, d);
+  if (robe) {
+    // A long robe, flaring to a ragged hem that sways as it drifts.
+    const hem = oy - 2,
+      sway = frame % 2;
     p.poly(
       [
-        [tx - 1, hipY - 2],
-        [tx + tw + 1, hipY - 2],
-        [tx + tw + 2 + (frame % 2), oy - 2],
-        [tx - 2 - (frame % 2), oy - 2],
+        [tx, topY],
+        [tx + tw, topY],
+        [tx + tw + Math.round(W * 0.18) + sway, hem],
+        [tx - Math.round(W * 0.18) - sway, hem],
       ],
-      parts.has('robe') ? sec : m,
+      sm,
     );
-  // Torso.
-  p.rect(tx, topY, tw, torsoH, parts.has('robe') ? sec : m);
-  p.rect(tx, topY, tw, 1, l);
-  if (parts.has('bones')) for (let y = topY + 1; y < hipY - 1; y += 2) p.rect(tx, y, tw, 1, dk);
+    for (let x = tx - Math.round(W * 0.18) - 1; x < tx + tw + Math.round(W * 0.18) + 2; x++)
+      if ((x + frame) % 3 === 0) p.clear(x, hem);
+    for (let k = 1; k < 4; k++)
+      p.line(
+        tx + Math.round((tw * k) / 4),
+        topY + 3,
+        tx + Math.round((tw * k) / 4) + (k - 2) * 2,
+        hem - 1,
+        sd,
+      );
+    p.line(tx + 1, topY + 1, tx - Math.round(W * 0.16), hem - 1, sl);
+  } else if (float) {
+    p.poly(
+      [
+        [tx, hipY - 1],
+        [tx + tw, hipY - 1],
+        [ox + 1, oy - 2],
+      ],
+      m,
+    );
+  }
+  // Torso, lit from the upper left.
+  if (!robe) {
+    p.rect(tx, topY, tw, torsoH, m);
+    p.rect(tx, topY, 1, torsoH, l);
+    p.rect(tx + tw - 1, topY, 1, torsoH, d);
+    p.rect(tx, topY, tw, 1, l);
+  } else {
+    p.rect(tx, topY, tw, Math.round(torsoH * 0.35), sec);
+    p.rect(tx, topY, tw, 1, sl);
+  }
+  if (parts.has('bones'))
+    for (let y = topY + 2; y < topY + Math.min(torsoH, 12) - 1; y += 2) {
+      p.rect(tx + 1, y, tw - 2, 1, '#e6dcc6');
+      p.set(ox, y + 1, '#e6dcc6');
+    }
   if (parts.has('bandage'))
-    for (let y = topY; y < oy - 2; y += 3) p.line(tx - 1, y, tx + tw, y + 1, shade(a.body, 0.3));
+    for (let y = topY; y < (robe ? oy - 4 : hipY); y += 3)
+      p.line(tx - 1, y, tx + tw, y + 1, shade(a.body, 0.3));
   if (parts.has('armor')) {
-    p.rect(tx, topY, tw, 2, sec);
-    p.rect(tx + 1, topY + 3, tw - 2, torsoH - 4, sec);
+    p.rect(tx - 1, topY, tw + 2, Math.max(2, Math.round(torsoH * 0.2)), sm);
+    p.rect(tx - 1, topY, tw + 2, 1, sl);
+    p.rect(tx + 1, topY + Math.round(torsoH * 0.3), tw - 2, Math.round(torsoH * 0.55), sm);
+    p.rect(tx + 1, topY + Math.round(torsoH * 0.3), 1, Math.round(torsoH * 0.55), sl);
+    p.rect(ox, topY + Math.round(torsoH * 0.3), 1, Math.round(torsoH * 0.55), sd);
   }
   // Front leg.
   if (!float) {
-    p.line(ox + 1, hipY, ox + 1 + Math.round(s * 3), oy - 1, m);
-    p.line(ox + 2, hipY, ox + 2 + Math.round(s * 3), oy - 1, m);
-    p.set(ox + 3 + Math.round(s * 3), oy - 1, dk);
+    limb(ox + 1, hipY, ox + 1 + stride, oy - 1, m);
+    p.rect(ox + 1 + stride, oy - 1, t + 1, 1, dk);
   }
   // Head.
-  const hw = Math.max(4, Math.round(headH * 0.95)),
+  const hw = Math.max(4, Math.round(Math.min(headH * 1.05, tw * 0.9))),
     hx = ox - Math.floor(hw / 2) + 1,
-    hy = topY - headH;
+    hy = topY - headH,
+    eyeY = hy + Math.round(headH * 0.45),
+    eye = a.eye ?? '#1b1716';
   if (parts.has('cap')) {
     p.rect(hx, hy + 2, hw, headH - 2, '#e8dcc8');
     p.ellipse(ox + 1, hy + 2, hw * 0.9, 3, a.belly ?? '#c85a44');
     p.set(ox, hy + 1, shade(a.belly ?? '#c85a44', 0.4));
-    p.set(ox + 2, hy + 5, a.eye ?? '#1b1716');
+    p.set(ox + 2, hy + 5, eye);
+  } else if (parts.has('bones')) {
+    // A skull: a rounded cranium, dark sockets with a spark in each, and a jaw.
+    p.ellipse(hx + hw / 2, hy + headH * 0.42, hw / 2 + 0.5, headH * 0.45, '#e6dcc6');
+    p.rect(
+      hx + 1,
+      hy + Math.round(headH * 0.6),
+      hw - 2,
+      Math.max(1, Math.round(headH * 0.35)),
+      '#d8ccb0',
+    );
+    const sock = Math.max(1, Math.round(hw / 5));
+    for (const ex of [hx + Math.round(hw * 0.2), hx + hw - Math.round(hw * 0.2) - sock]) {
+      p.rect(ex, eyeY - 1, sock, sock + 1, '#141010');
+      p.set(ex + Math.floor(sock / 2), eyeY, eye);
+    }
+    for (let x = hx + 2; x < hx + hw - 2; x += 2) p.set(x, hy + headH - 2, '#141010');
   } else {
-    p.rect(hx, hy, hw, headH, parts.has('hood') ? sec : parts.has('bones') ? '#e6dcc6' : m);
+    p.rect(hx, hy, hw, headH, parts.has('hood') ? sec : m);
     p.rect(hx, hy, hw, 1, l);
+    p.rect(hx, hy, 1, headH, l);
     if (parts.has('hood')) p.rect(hx + 2, hy + 2, hw - 2, headH - 3, '#120e14');
-    p.set(hx + hw - 2, hy + Math.round(headH * 0.45), a.eye ?? '#1b1716');
-    if (hw > 5) p.set(hx + hw - 4, hy + Math.round(headH * 0.45), a.eye ?? '#1b1716');
+    p.set(hx + hw - 2, eyeY, eye);
+    if (hw > 5) p.set(hx + hw - 4, eyeY, eye);
+    if (hw > 9) {
+      p.set(hx + hw - 3, eyeY, eye);
+      p.set(hx + hw - 5, eyeY, eye);
+    }
   }
   if (parts.has('horns')) {
-    p.line(hx, hy, hx - 2, hy - 3, '#2a1a1a');
-    p.line(hx + hw - 1, hy, hx + hw + 1, hy - 3, '#2a1a1a');
+    const hl = Math.max(3, Math.round(headH * 0.6));
+    p.line(hx, hy + 1, hx - Math.round(hl / 2), hy - hl, '#2a1a1a');
+    p.line(hx + hw - 1, hy + 1, hx + hw - 1 + Math.round(hl / 2), hy - hl, '#2a1a1a');
+    p.set(hx - Math.round(hl / 2), hy - hl, '#d8c8a0');
+    p.set(hx + hw - 1 + Math.round(hl / 2), hy - hl, '#d8c8a0');
   }
   if (parts.has('crown')) {
-    p.rect(hx, hy - 2, hw, 2, '#e8c84a');
-    for (let x = hx; x < hx + hw; x += 2) p.set(x, hy - 3, '#e8c84a');
+    const ch = Math.max(2, Math.round(headH * 0.3));
+    p.rect(hx - 1, hy - 1, hw + 2, 2, '#e8c84a');
+    for (let x = hx - 1; x < hx + hw + 1; x += Math.max(2, Math.round(hw / 4)))
+      p.rect(x, hy - ch, 1, ch, '#e8c84a');
+    p.set(ox, hy, '#ff5a5a');
   }
   // Front arm, with whatever it holds.
   const ax = tx + tw,
     ay = topY + torsoH - 1 + Math.round(s);
-  p.line(tx + tw - 1, topY + 2, ax + Math.round(s * 2), ay, m);
-  if (parts.has('sword')) p.line(ax + 1, ay, ax + 6, ay - 6, '#c8ccd0');
-  if (parts.has('staff')) {
-    p.line(ax + 1, ay + 4, ax + 1, ay - torsoH - headH, '#6a4a30');
-    p.rect(ax, ay - torsoH - headH - 2, 3, 3, a.eye ?? '#b36cff');
+  limb(tx + tw - t, topY + 2, ax + Math.round(s * 2) - t + 1, ay, robe ? sm : m);
+  if (parts.has('sword')) {
+    const len = Math.max(6, Math.round(H / 4));
+    for (let k = 0; k < Math.ceil(t / 2); k++)
+      p.line(ax + 1 + k, ay, ax + len + k, ay - len, '#c8ccd0');
+    p.rect(ax - 1, ay, 3, 1, '#8a7040');
   }
-  if (parts.has('shield')) p.rect(ax - 1, ay - 4, 3, 7, sec);
+  if (parts.has('staff')) {
+    p.line(ax + 1, oy - 2, ax + 1, hy - 2, '#6a4a30');
+    p.ellipse(ax + 1, hy - 4, 2.5, 2.5, eye);
+    p.set(ax, hy - 5, '#ffffff');
+  }
+  if (parts.has('shield'))
+    p.rect(
+      ax - 1,
+      ay - Math.round(torsoH * 0.4),
+      Math.max(3, t + 1),
+      Math.round(torsoH * 0.7),
+      sec,
+    );
   if (parts.has('claws')) {
     p.set(ax + 1, ay + 1, '#ece4d0');
     p.set(ax + 2, ay, '#ece4d0');

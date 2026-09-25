@@ -257,7 +257,7 @@ export const hitShake = (n: ResourceNode, t: number) => {
   return since >= 0 && since < 0.25 ? (Math.floor(since * 40) % 2 ? 1 : -1) : 0;
 };
 const regionOf = (n: { x: number; y: number }) => D.biomeAt(n.x, n.y).id;
-export const TREE_KINDS = new Set(['wood', 'resin', 'honey']);
+export { TREE_NODES as TREE_KINDS } from '../data/resources.ts';
 
 /** A tree at art position (x, y): standing, toppling after the last chop, or a regrowing stump. */
 export function drawTree(
@@ -419,7 +419,9 @@ function plantSprite(kind: string, stage: number, art: RegionArt): Sprite {
         break;
       default:
         p.ellipse(9, 11, 6, 4, g[1]);
-        p.rect(8, 4, 3, 3, kind === 'voidlily' ? '#ff6ad5' : '#ffd86a');
+        p.rect(8, 4, 3, 3, kind === 'void_lily' ? '#ff6ad5' : '#ffd86a');
+        p.set(9, 5, '#ffffff');
+        p.line(9, 7, 9, 12, g[0]);
     }
   });
 }
@@ -449,6 +451,7 @@ export const MINERALS: Record<string, Mineral> = {
   myconite_ore: { rock: '#4a3f5e', crystal: '#58e0d0', glow: true },
   starmetal_ore: { rock: '#8a8aa0', fleck: '#f8e08a', shine: '#ffffff', glow: true },
   voidsteel_ore: { rock: '#2a1c3a', crystal: '#b36cff', glow: true },
+  life_crystal: { rock: '#5a4a5a', crystal: '#ff4a6a', glow: true },
 };
 function mineralSprite(kind: string, size: number, variant: number): Sprite {
   const m = MINERALS[kind] ?? MINERALS.stone,

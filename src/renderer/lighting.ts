@@ -3,7 +3,8 @@
 // scene with multiply blending so caves are dark and every torch matters.
 import { MOBS } from './actors.ts';
 import { D, GROUND, skyLight } from './art.ts';
-import { TA, makeCanvas } from './px.ts';
+import { PROJECTILES } from '../data/gear.ts';
+import { TA, makeCanvas, rgb } from './px.ts';
 import type { RenderGame } from './types.ts';
 
 const T = D.TILE;
@@ -17,13 +18,36 @@ export type Light = [x: number, y: number, r: number, g: number, b: number];
 export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
   const out: Light[] = [];
   const p = g.s.player;
-  if (!menu) out.push([p.x, p.y - 24, 0.78, 0.72, 0.62]);
+  if (!menu) {
+    const fx = g.equipment.effects(),
+      bright = fx.has('buff:shine') || fx.has('light');
+    out.push(bright ? [p.x, p.y - 24, 1.25, 1.15, 0.95] : [p.x, p.y - 24, 0.78, 0.72, 0.62]);
+    if (g.heldItem() === 'torch')
+      out.push([p.x + (Math.cos(p.face) >= 0 ? 16 : -16), p.y - 40, 1.2, 0.9, 0.55]);
+  }
+  for (const b of g.combat.projectiles) {
+    const spec = PROJECTILES[b.kind];
+    if (!spec?.glow) continue;
+    const [r, gg, bb] = rgb(spec.glow);
+    out.push([b.x, b.y, (r / 255) * 0.9, (gg / 255) * 0.9, (bb / 255) * 0.9]);
+  }
   for (const s of g.s.structures) {
     const f = 0.92 + Math.sin(t * 11 + s.id) * 0.05;
     if (s.type === 'campfire' && s.fuel > 0) out.push([s.x, s.y - 20, 1.25 * f, 0.85 * f, 0.5 * f]);
     else if (s.type === 'lantern' && s.fuel > 0) out.push([s.x, s.y - 40, 1.1, 0.95, 0.62]);
     else if (s.type === 'crystal_lantern') out.push([s.x, s.y - 40, 0.62, 1.05, 1.1]);
-    else if (s.type === 'torch') out.push([s.x, s.y - 20, 1.15 * f, 0.9 * f, 0.55 * f]);
+    else if (s.type === 'torch')
+      out.push(
+        s.kind === 'frost'
+          ? [s.x, s.y - 20, 0.45 * f, 0.75 * f, 1.15 * f]
+          : s.kind === 'soul'
+            ? [s.x, s.y - 20, 0.4 * f, 1.05 * f, 0.7 * f]
+            : [s.x, s.y - 20, 1.15 * f, 0.9 * f, 0.55 * f],
+      );
+    else if (s.type === 'starforge') out.push([s.x, s.y - 20, 1.0, 0.8, 0.5]);
+    else if (s.type === 'boss_altar') out.push([s.x, s.y - 30, 0.45, 0.4, 0.5]);
+    else if (s.type === 'trap_flame' && g.s.elapsed - s.triggeredAt < 0.8)
+      out.push([s.x, s.y - 30, 1.1, 0.6, 0.25]);
     else if (s.type === 'furnace' || s.type === 'forge') out.push([s.x, s.y - 20, 1.0, 0.6, 0.3]);
     else if (s.type === 'effergy') out.push([s.x, s.y - 60, 0.85, 0.72, 1.0]);
     else if (s.type === 'rift_gate' || s.type === 'portal')
@@ -104,7 +128,10 @@ export function drawLighting(
         x = tx * T + T / 2,
         y = ty * T + T / 2;
       S[k] = kind ? 1 : 0;
-      let [r, gg, b] = !kind && y > D.surfaceAt(x) + 64 ? layerAmbient(y) : [0, 0, 0];
+      let [r, gg, b] =
+        !kind && y > D.surfaceAt(x) + 64 - (dim === 'mycelia' ? 999 : 0)
+          ? layerAmbient(y)
+          : [0, 0, 0];
       if (!kind) {
         if (y < D.surfaceAt(x) || dim === 'skyreach') {
           r = sr * skyFactor;
@@ -118,9 +145,10 @@ export function drawLighting(
       } else {
         const glow = GROUND[kind]?.glow;
         if (glow) {
-          r = 0.55;
-          gg = 0.3;
-          b = 0.9;
+          const c = rgb(glow);
+          r = (c[0] / 255) * 0.8;
+          gg = (c[1] / 255) * 0.8;
+          b = (c[2] / 255) * 0.8;
         }
       }
       R[k] = r;

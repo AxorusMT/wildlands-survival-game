@@ -11,19 +11,25 @@ import type {
   SaveStorage,
   Structure,
 } from '../core/types.ts';
+import { RANGED } from '../data/gear.ts';
 import { biomeAt, layerAt, lavaAt } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
+import { Bosses } from './systems/Bosses.ts';
+import { Combat } from './systems/Combat.ts';
 import { Consumables } from './systems/Consumables.ts';
 import { Crafting } from './systems/Crafting.ts';
 import { Dev, newDevState } from './systems/Dev.ts';
 import { Drops } from './systems/Drops.ts';
 import { Effergy } from './systems/Effergy.ts';
 import { Environment } from './systems/Environment.ts';
+import { Equipment, HOTBAR_SLOTS } from './systems/Equipment.ts';
+import { Hands } from './systems/Hands.ts';
 import { Interaction } from './systems/Interaction.ts';
 import { Inventory } from './systems/Inventory.ts';
 import { Physics } from './systems/Physics.ts';
 import { Progress } from './systems/Progress.ts';
+import { Realms } from './systems/Realms.ts';
 import { Survival } from './systems/Survival.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Wildlife } from './systems/Wildlife.ts';
@@ -55,6 +61,11 @@ export class Game {
   readonly wildlife = new Wildlife(this);
   readonly effergy = new Effergy(this);
   readonly drops = new Drops(this);
+  readonly equipment = new Equipment(this);
+  readonly combat = new Combat(this);
+  readonly bosses = new Bosses(this);
+  readonly realms = new Realms(this);
+  readonly hands = new Hands(this);
   readonly devtools = new Dev(this);
   readonly world = new WorldGenerator(this);
   readonly saves = new SaveSystem(this);
@@ -68,7 +79,7 @@ export class Game {
     this.rng = seededRandom(seed);
     this.s = {
       version: 3,
-      layout: 3,
+      layout: 4,
       seed,
       elapsed: 0,
       day: 1,
@@ -117,12 +128,22 @@ export class Game {
       chapter: 0,
       discoveries: ['meadow'],
       altar: { level: 1, xp: 0, attuned: null, kills: 0, activeBoss: null },
+      hotbar: new Array(HOTBAR_SLOTS).fill(null),
+      hotbarIndex: 0,
+      accessories: [],
+      maxHealth: 100,
+      mana: 20,
+      maxMana: 20,
+      buffs: {},
+      bosses: {},
+      rift: { sigils: [] },
       placing: null,
       dead: false,
       lastSave: Date.now(),
     };
     this.messages = [];
     this.events = [];
+    this.combat.projectiles = [];
     this.world.generate();
     this.s.player.y = this.groundTopAt(RULES.spawnX) + 1;
     this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
@@ -139,7 +160,10 @@ export class Game {
     this.environment.collectRain(dt);
     this.s.player.invuln = Math.max(0, this.s.player.invuln - dt);
     for (const a of this.s.animals) this.wildlife.step(a, dt);
+    this.combat.step(dt);
     this.drops.step(dt);
+    this.equipment.update(dt);
+    this.realms.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
   }
@@ -189,13 +213,21 @@ export class Game {
     const ice = this.near('icebox', 135);
     return !!(ice && ice.fuel > 0);
   }
-  /** The item in the player's hand. */
+  /** The item in the player's hand: the active quick slot, else the ready weapon. */
   heldItem() {
-    return this.s.player.weapon;
+    return this.equipment.held() ?? this.s.player.weapon;
   }
   /** Seconds one use of an item takes (the swing animation length). */
-  useDuration(_id: string) {
-    return 0.3;
+  useDuration(id: string) {
+    return RANGED[id] ? Math.min(0.3, RANGED[id].delay) : 0.3;
+  }
+  /** Uses the held item toward a world point (the mouse cursor). */
+  useAt(x: number, y: number) {
+    return this.hands.useAt({ x, y });
+  }
+  /** Most health the player can have. */
+  maxHealth() {
+    return this.equipment.maxHealth();
   }
   timeOfDay() {
     return this.environment.timeOfDay();

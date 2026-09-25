@@ -4,6 +4,14 @@
 import type { Biome } from '../core/types.ts';
 import { fbm1, fbm2, noise1 } from '../core/noise.ts';
 import { BIOMES } from './biomes.ts';
+import {
+  DIM_GAP,
+  dimensionLadders,
+  dimensionTile,
+  makeDimensions,
+  type Dimension,
+} from './dimensions.ts';
+import { DUNGEON_DEFS, NATURAL, buildDungeon, layoutTile, type DungeonLayout } from './dungeons.ts';
 
 export const SIDE_ORDER = [
   'coast',
@@ -46,8 +54,11 @@ const MAP_LABEL_Y = 610;
 export const BIOME_CENTERS: Record<string, [number, number]> = Object.fromEntries(
   BIOME_SPANS.map((s) => [s.id, [s.center, MAP_LABEL_Y]]),
 );
+/** The overworld's width; the dimensions lie in walled strips east of it. */
+export const OVERWORLD_W = BIOME_SPANS[BIOME_SPANS.length - 1].end;
+export const DIMENSIONS: Dimension[] = makeDimensions(OVERWORLD_W);
 export const TILE = 32,
-  WORLD_W = BIOME_SPANS[BIOME_SPANS.length - 1].end,
+  WORLD_W = DIMENSIONS[DIMENSIONS.length - 1].end + DIM_GAP,
   WORLD_H = 4480,
   TILE_COLS = Math.ceil(WORLD_W / TILE),
   TILE_ROWS = Math.ceil(WORLD_H / TILE);
@@ -64,6 +75,7 @@ export const Ground = {
   deepstone: 8,
   ash: 9,
   hellrock: 10,
+  bedrock: 27,
 } as const;
 /** Pickaxe tier needed to break each ground kind. */
 export const MINE_TIER: Record<number, number> = {
@@ -76,19 +88,68 @@ export const MINE_TIER: Record<number, number> = {
   8: 3,
   9: 4,
   10: 5,
+  11: 0,
+  12: 1,
+  13: 1,
+  14: 0,
+  15: 6,
+  16: 6,
+  17: 6,
+  18: 7,
+  19: 0,
+  20: 6,
+  21: 0,
+  22: 7,
+  23: 8,
+  24: 8,
+  25: 5,
+  26: 1,
+  27: 99,
+  28: 0,
 };
 /** What each ground kind yields, and an occasional bonus find. */
 export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number] }> = {
   1: { item: 'dirt' },
   2: { item: 'stone' },
-  3: { item: 'dirt' },
+  3: { item: 'sand' },
   4: { item: 'clay' },
   5: { item: 'ice' },
   6: { item: 'stone', bonus: ['obsidian', 0.22] },
   8: { item: 'stone', bonus: ['coal', 0.12] },
   9: { item: 'stone', bonus: ['sulfur', 0.3] },
   10: { item: 'stone', bonus: ['hellstone', 0.14] },
+  11: { item: 'planks' },
+  12: { item: 'stone_brick' },
+  13: { item: 'clay_brick' },
+  14: { item: 'glass' },
+  15: { item: 'crypt_brick' },
+  16: { item: 'frost_brick' },
+  17: { item: 'tomb_brick' },
+  18: { item: 'citadel_brick' },
+  19: { item: 'mycelium', bonus: ['glowcap', 0.12] },
+  20: { item: 'fungal_stone', bonus: ['myconite_ore', 0.08] },
+  21: { item: 'cloud' },
+  22: { item: 'skystone', bonus: ['starmetal_ore', 0.08] },
+  23: { item: 'voidstone', bonus: ['voidsteel_ore', 0.08] },
+  24: { item: 'void_crystal' },
+  25: { item: 'obsidian_brick' },
+  26: { item: 'sandstone_brick' },
+  28: { item: 'glowshroom_block' },
 };
+
+// ─── Regions ──────────────────────────────────────────────────────────────────
+/** Which strip of the world x lies in: the overworld or a dimension. */
+export function dimensionAt(x: number): Dimension | null {
+  if (x < OVERWORLD_W) return null;
+  for (const d of DIMENSIONS) if (x < d.end + DIM_GAP / 2) return d;
+  return DIMENSIONS[DIMENSIONS.length - 1];
+}
+export const regionAt = (x: number) => dimensionAt(x)?.id ?? 'overworld';
+/** Horizontal limits of the strip containing x, for the camera and for movement. */
+export function regionBounds(x: number): [number, number] {
+  const d = dimensionAt(x);
+  return d ? [d.start, d.end] : [0, OVERWORLD_W];
+}
 
 // ─── Depth layers ─────────────────────────────────────────────────────────────
 export interface Layer {
@@ -108,7 +169,13 @@ export const LAYERS: Layer[] = [
   { id: 'upper_hell', name: 'Upper Hell', top: 2750, temp: 46 },
   { id: 'lower_hell', name: 'Lower Hell', top: 3600, temp: 68 },
 ];
+/** Each dimension counts as a layer of its own for music, temperature, and the HUD. */
+export const DIM_LAYERS: Record<string, Layer> = Object.fromEntries(
+  DIMENSIONS.map((d) => [d.id, { id: d.id, name: d.name, top: 0, temp: d.temp }]),
+);
 export function layerAt(x: number, y: number): Layer {
+  const dim = dimensionAt(x);
+  if (dim) return DIM_LAYERS[dim.id];
   if (y < surfaceAt(x) + SURFACE_BAND) return LAYERS[0];
   for (let i = LAYERS.length - 1; i > 1; i--) if (y >= LAYERS[i].top) return LAYERS[i];
   return LAYERS[1];
@@ -182,7 +249,7 @@ function roughSurface(x: number) {
   return Math.max(170, Math.min(800, y));
 }
 const SURFACE: Float32Array = (() => {
-  const n = Math.ceil(WORLD_W / SURFACE_STEP) + 1,
+  const n = Math.ceil(OVERWORLD_W / SURFACE_STEP) + 1,
     h = new Float32Array(n);
   for (let i = 0; i < n; i++) h[i] = roughSurface(i * SURFACE_STEP);
   // Raise the low side of anything steeper than the limit, leaving scree below cliffs.
@@ -191,7 +258,10 @@ const SURFACE: Float32Array = (() => {
   return h;
 })();
 export function surfaceAt(x: number): number {
-  const f = Math.max(0, Math.min(WORLD_W, x)) / SURFACE_STEP,
+  // The Mycelial Deep is all cavern (walls everywhere); Skyreach and the Void are all sky.
+  const dim = dimensionAt(x);
+  if (dim) return dim.id === 'mycelia' ? 0 : WORLD_H;
+  const f = Math.max(0, Math.min(OVERWORLD_W, x)) / SURFACE_STEP,
     i = Math.min(SURFACE.length - 2, Math.floor(f)),
     t = f - i;
   return SURFACE[i] * (1 - t) + SURFACE[i + 1] * t;
@@ -239,17 +309,77 @@ export const underworldFloor = (x: number) =>
 /** Open underworld below this line is molten. */
 export const LAVA_Y = 4262;
 
+// ─── Dungeons ─────────────────────────────────────────────────────────────────
+/** The four dungeons, laid out once against the land around them. */
+export const DUNGEONS: DungeonLayout[] = DUNGEON_DEFS.map((def) => {
+  if (def.facade === 'none') {
+    // The Citadel needs dry ground at its gates, clear of the lava sea.
+    const span = (def.cellsX * 12 + 2) * TILE;
+    let x = def.x;
+    for (let d = 0; d < 2400; d += TILE) {
+      const ok = (cx: number) =>
+        underworldFloor(cx - 60) < LAVA_Y - 50 && underworldFloor(cx + span + 60) < LAVA_Y - 50;
+      if (ok(def.x - d)) {
+        x = def.x - d;
+        break;
+      }
+      if (ok(def.x + d)) {
+        x = def.x + d;
+        break;
+      }
+    }
+    x = Math.floor(x / TILE) * TILE;
+    return buildDungeon({ ...def, x }, Math.floor(underworldFloor(x - 20) / TILE), TILE);
+  }
+  const mid = def.x + ((def.cellsX * 12 + 2) * TILE) / 2;
+  return buildDungeon(def, Math.floor(surfaceAt(mid) / TILE), TILE);
+});
+/** The dungeon whose walls enclose a point, if any. */
+export function dungeonAt(x: number, y: number): DungeonLayout | null {
+  const tx = Math.floor(x / TILE),
+    ty = Math.floor(y / TILE);
+  for (const d of DUNGEONS) {
+    const v = layoutTile(d, tx, ty);
+    if (v !== NATURAL) return d;
+  }
+  return null;
+}
+const inDungeonBox = (x: number, y0: number, y1: number, pad = 0) =>
+  DUNGEONS.some(
+    (d) =>
+      x > d.tx0 * TILE - pad &&
+      x < (d.tx0 + d.cols) * TILE + pad &&
+      y1 > d.ty0 * TILE - pad &&
+      y0 < (d.ty0 + d.rows) * TILE + pad,
+  );
+
 export interface Shaft {
   x: number;
   top: number;
   bottom: number;
+  /** A cave mouth on the surface, marked with a frame. */
+  mouth?: boolean;
 }
 const shaftAt = (x: number, top: number, bottom: number): Shaft => ({ x, top, bottom });
-/** Surface cave mouths: two per region. */
-export const ENTRANCES = BIOME_SPANS.flatMap((s) => [
-  s.start + (s.end - s.start) * 0.28,
-  s.start + (s.end - s.start) * 0.74,
-]);
+/** Surface cave mouths: two per region, stepped aside where a dungeon stands. */
+export const ENTRANCES = BIOME_SPANS.flatMap((s) =>
+  [0.28, 0.74].map((f) => {
+    const x = s.start + (s.end - s.start) * f,
+      d = DUNGEONS.find(
+        (d) =>
+          inDungeonBox(x, 0, 2000, 160) &&
+          x > d.tx0 * TILE - 160 &&
+          x < (d.tx0 + d.cols) * TILE + 160,
+      );
+    if (!d) return x;
+    const west = d.tx0 * TILE - 260,
+      east = (d.tx0 + d.cols) * TILE + 260;
+    return f < 0.5 ? (west > s.start + 200 ? west : east) : east < s.end - 200 ? east : west;
+  }),
+).filter(
+  (x, i, all) =>
+    !inDungeonBox(x, 0, 2000, 160) && !all.some((o, j) => j < i && Math.abs(o - x) < 500),
+);
 /** Where an underworld ladder can land clear of the lava, searching out from x. */
 function dryLanding(x: number) {
   for (let d = 0; d < 900; d += 32)
@@ -258,7 +388,7 @@ function dryLanding(x: number) {
 }
 /** Climbable shafts with ladders that tie the layers together. */
 export const SHAFTS: Shaft[] = [
-  ...ENTRANCES.map((x) => shaftAt(x, surfaceAt(x) - 4, caveY(x, 3) + 40)),
+  ...ENTRANCES.map((x) => ({ ...shaftAt(x, surfaceAt(x) - 4, caveY(x, 3) + 40), mouth: true })),
   ...BIOME_SPANS.flatMap((s, i) => {
     const at = (f: number) => s.start + (s.end - s.start) * f;
     const list = [
@@ -273,8 +403,12 @@ export const SHAFTS: Shaft[] = [
       const x = dryLanding(at(0.66));
       list.push(shaftAt(x, caveY(x, 7), underworldFloor(x) - 6));
     }
-    return list;
+    return list.filter((sh) => !inDungeonBox(sh.x, sh.top, sh.bottom, 60));
   }),
+  ...DUNGEONS.flatMap((d) => d.shafts),
+  ...DIMENSIONS.flatMap((d) =>
+    dimensionLadders(d.id).map((l) => shaftAt(d.start + l.x, l.top, l.bottom)),
+  ),
 ];
 const SHAFT_HALF = 47;
 export function inShaft(x: number, y: number, slack = 0) {
@@ -311,6 +445,7 @@ export function caveAt(x: number, y: number): boolean {
 }
 /** Molten rock: open ground in the underworld below the lava line, and upper-hell cavern pools. */
 export function lavaAt(x: number, y: number): boolean {
+  if (x >= OVERWORLD_W || (y > 2800 && dungeonAt(x, y))) return false;
   if (y > LAVA_Y && y < WORLD_H) return inUnderworld(x, y);
   if (y > 3470 && y < LAYERS[4].top - 60 && inCavern(x, y, 0)) {
     for (const level of [6, 7])
@@ -326,12 +461,16 @@ function spanIndex(x: number) {
   return BIOME_SPANS.length - 1;
 }
 export function biomeAt(x: number, y: number): Biome {
+  const dim = dimensionAt(x);
+  if (dim) return BIOMES.find((b) => b.id === dim.id)!;
   const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
   const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;
   return BIOMES.find((b) => b.id === id)!;
 }
 /** The two regions to blend at x for skies and hills, and how far to lean into the second. */
 export function biomeBlend(x: number, band = 520): [string, string, number] {
+  const dim = dimensionAt(x);
+  if (dim) return [dim.id, dim.id, 0];
   const i = spanIndex(x),
     s = BIOME_SPANS[i];
   if (i > 0 && x - s.start < band) {
@@ -346,8 +485,18 @@ export function biomeBlend(x: number, band = 520): [string, string, number] {
 }
 export function baseTileAt(tx: number, ty: number): number {
   const x = tx * TILE + TILE / 2,
-    y = ty * TILE + TILE / 2,
-    surface = surfaceAt(x);
+    y = ty * TILE + TILE / 2;
+  if (x >= OVERWORLD_W) {
+    const dim = dimensionAt(x)!;
+    // Bedrock fills the gaps between strips.
+    if (x < dim.start || x >= dim.end) return Ground.bedrock;
+    return dimensionTile(dim.id, x - dim.start, y);
+  }
+  for (const d of DUNGEONS) {
+    const v = layoutTile(d, tx, ty);
+    if (v !== NATURAL) return v;
+  }
+  const surface = surfaceAt(x);
   if (y < surface || caveAt(x, y)) return Ground.air;
   const biome = biomeAt(x, y).id,
     depth = y - surface;

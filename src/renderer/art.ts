@@ -240,6 +240,8 @@ export const GROUND: Record<number, GroundStyle> = {
   24: { base: '#a06cf0', pattern: 'crystal', accent: '#f0d8ff', glow: '#b36cff' },
   25: { base: '#262030', pattern: 'obsidian', accent: '#7a6aa0', wall: '#0e0a14' },
   26: { base: '#e0c890', pattern: 'bigbrick', accent: '#fff0c0', wall: '#6a5a3a' },
+  27: { base: '#1e1a22', pattern: 'obsidian', accent: '#3a3440', wall: '#0a080c' },
+  28: { base: '#2f7a72', pattern: 'crystal', accent: '#c0fff4', glow: '#58e0d0', wall: '#10302c' },
 };
 export const groundOf = (kind: number) => GROUND[kind] ?? GROUND[2];
 

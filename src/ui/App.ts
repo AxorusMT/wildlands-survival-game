@@ -43,6 +43,10 @@ const state = {
   seenMessage: null as GameMessage | null,
   lastAmbience: 0,
   nextThunder: 0,
+  /** The pointer on the canvas (CSS pixels) and whether the use button is held. */
+  pointer: { x: 0, y: 0, inside: false },
+  using: false,
+  hotbarSig: '',
 };
 const UI_RULES = {
   seedRange: 1_000_000,
@@ -99,18 +103,20 @@ const timeText = () => {
   const t = game.timeOfDay();
   return `DAY ${game.s.day} · ${fmt(t / 60)}:${fmt(t % 60)} · ${game.s.weather.toUpperCase()}`;
 };
-const itemUseLabel = (id: string) =>
-  D.ITEMS[id][1] === 'structure'
-    ? 'PLACE'
-    : D.WEAPONS[id]
-      ? 'EQUIP'
-      : ['direwolf_cloak', 'hide_coat', 'explorer_boots', 'cinder_ward'].includes(id)
-        ? 'WEAR'
-        : id === 'fishing_rod'
-          ? 'FISH'
-          : ['food', 'water', 'medicine'].includes(D.ITEMS[id][1])
-            ? 'USE'
-            : '';
+const worn = (id: string) =>
+  Object.values(game.s.player.armor ?? {}).includes(id) || game.s.accessories.includes(id);
+const itemUseLabel = (id: string) => {
+  const cat = D.ITEMS[id]?.[1];
+  if (cat === 'armor' || cat === 'accessory') return worn(id) ? 'REMOVE' : 'WEAR';
+  if (cat === 'structure') return 'PLACE';
+  if (cat === 'block') return 'HOLD';
+  if (cat === 'potion') return 'DRINK';
+  if (D.WEAPONS[id]) return 'EQUIP';
+  if (['direwolf_cloak', 'hide_coat', 'explorer_boots', 'cinder_ward'].includes(id)) return 'WEAR';
+  if (id === 'fishing_rod') return 'FISH';
+  if (cat && ['food', 'water', 'medicine'].includes(cat)) return 'USE';
+  return '';
+};
 const sound = (kind: string) => Audio.effect(kind);
 let view: PixelView = pixelView(innerWidth, innerHeight, 1);
 function resize() {
@@ -124,13 +130,15 @@ function resize() {
   ctx.imageSmoothingEnabled = false;
 }
 /** A pointer position on the canvas in world coordinates. */
-function worldAt(e: MouseEvent) {
+function worldAt(e: { clientX: number; clientY: number }) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: state.camera.x + (e.clientX - rect.left) / view.cssPerWorld,
     y: state.camera.y + (e.clientY - rect.top) / view.cssPerWorld,
   };
 }
+/** Where the cursor points in the world right now (the camera moves under a still mouse). */
+const cursorWorld = () => worldAt({ clientX: state.pointer.x, clientY: state.pointer.y });
 addEventListener('resize', resize);
 resize();
 const introPages = [
@@ -247,11 +255,12 @@ document.querySelectorAll<HTMLButtonElement>('.book-tabs button').forEach(
   (b) =>
     (b.onclick = () => {
       const tab = b.dataset.tab;
-      if (tab && ['pack', 'recipes', 'vitals', 'notes', 'beasts'].includes(tab)) state.tab = tab;
+      if (tab && TABS.includes(tab)) state.tab = tab;
       sound('page');
       renderJournal();
     }),
 );
+const TABS = ['pack', 'gear', 'recipes', 'vitals', 'notes', 'beasts', 'rift'];
 function toggleJournal(force?: boolean) {
   if (!state.playing || game.s.dead) return;
   state.journal = force === undefined ? !state.journal : force;
@@ -288,6 +297,10 @@ function doInteract() {
     if (result.action === 'chest') {
       state.chest = result.structure ?? null;
       state.tab = 'pack';
+      toggleJournal(true);
+    }
+    if (result.action === 'rift') {
+      state.tab = 'rift';
       toggleJournal(true);
     }
   }
@@ -342,11 +355,17 @@ addEventListener('keydown', (e) => {
     return;
   }
   if (state.journal) {
-    const tabs = ['pack', 'recipes', 'vitals', 'notes', 'beasts'];
-    if (/^[1-5]$/.test(key)) {
-      state.tab = tabs[Number(key) - 1];
+    if (/^[1-7]$/.test(key)) {
+      state.tab = TABS[Number(key) - 1];
       renderJournal();
     }
+    return;
+  }
+  // Number keys pick a quick slot (0 is the tenth).
+  if (/^[0-9]$/.test(key)) {
+    game.equipment.select(key === '0' ? 9 : Number(key) - 1);
+    sound('equip');
+    updateUI(true);
     return;
   }
   if (key === 'e') doInteract();
@@ -364,23 +383,51 @@ addEventListener('keydown', (e) => {
 });
 addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
 addEventListener('blur', () => keys.clear());
-canvas.addEventListener('click', (e) => {
+canvas.addEventListener('pointermove', (e) => {
+  state.pointer.x = e.clientX;
+  state.pointer.y = e.clientY;
+  state.pointer.inside = true;
+});
+canvas.addEventListener('pointerleave', () => (state.pointer.inside = false));
+canvas.addEventListener('pointerdown', (e) => {
+  state.pointer.x = e.clientX;
+  state.pointer.y = e.clientY;
   if (!state.playing || state.journal || game.s.dead) return;
-  if (game.s.placing) {
+  if (e.button === 2) {
+    doInteract();
+    return;
+  }
+  if (e.button !== 0) return;
+  if (game.s.placing && !game.equipment.held()?.includes(game.s.placing)) {
     const { x, y } = worldAt(e);
     const r = game.place(game.s.placing, x, y);
     if (!r.ok) message(r.reason);
     updateUI(true);
-  } else {
-    const { x, y } = worldAt(e);
-    if (game.tileAt(Math.floor(x / D.TILE), Math.floor(y / D.TILE))) doMine(x, y);
-    else doAttack();
+    return;
   }
+  state.using = true;
+  useHeld(true);
 });
-canvas.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  if (state.playing && !state.journal) doAttack();
-});
+addEventListener('pointerup', () => (state.using = false));
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+canvas.addEventListener(
+  'wheel',
+  (e) => {
+    if (!state.playing || state.journal) return;
+    e.preventDefault();
+    game.equipment.select(game.s.hotbarIndex + (e.deltaY > 0 ? 1 : -1));
+    updateUI(true);
+  },
+  { passive: false },
+);
+/** Uses the held item at the cursor; while the button stays down this repeats each frame. */
+function useHeld(first = false) {
+  const { x, y } = cursorWorld();
+  const r = game.useAt(x, y);
+  if (!r.ok && r.reason && first && r.reason !== 'Recovering from the last strike.')
+    message(r.reason);
+  if (r.ok) updateUI(first);
+}
 function renderJournal() {
   const tab = state.tab,
     left = $('page-left'),
@@ -390,10 +437,12 @@ function renderJournal() {
     .forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
   const page: Record<string, string> = {
     pack: '01',
-    recipes: '02',
-    vitals: '03',
-    notes: '04',
-    beasts: '05',
+    gear: '02',
+    recipes: '03',
+    vitals: '04',
+    notes: '05',
+    beasts: '06',
+    rift: '07',
   };
   $('page-number').textContent = page[tab];
   $('right-page-heading').textContent = tab === 'notes' ? 'FIELD NOTES' : tab.toUpperCase();
@@ -405,6 +454,8 @@ function renderJournal() {
   if (tab === 'vitals') renderVitals(left, right);
   if (tab === 'notes') renderNotes(left, right);
   if (tab === 'beasts') renderBeasts(left, right);
+  if (tab === 'gear') renderGear(left, right);
+  if (tab === 'rift') renderRift(left, right);
   pixelate(left);
   pixelate(right);
 }
@@ -429,6 +480,10 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
   const order = [
     'weapon',
     'tool',
+    'armor',
+    'accessory',
+    'ammo',
+    'potion',
     'clothing',
     'food',
     'water',
@@ -437,6 +492,8 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
     'metal',
     'material',
     'trophy',
+    'key',
+    'block',
     'structure',
   ];
   const groups = [...new Set(items.map((e) => D.ITEMS[e.id][1]))].sort(
@@ -747,6 +804,102 @@ function renderBeasts(left: HTMLElement, right: HTMLElement) {
       updateUI(true);
     };
 }
+function renderGear(left: HTMLElement, right: HTMLElement) {
+  const eq = game.equipment,
+    p = game.s.player,
+    set = eq.fullSet(),
+    setInfo = set ? D.ARMOR_SETS.find((x) => x.key === set) : null;
+  const slot = (label: string, id?: string) =>
+    `<div class="book-row"><div class="with-icon">${id ? icon(id) : '<span class="icon-slot"></span>'}<div><strong>${id ? pretty(id) : 'Empty'}</strong><small>${label}${id && D.ARMOR[id] ? ' · ' + D.ARMOR[id].defense + ' defense' : ''}</small></div></div>${id ? `<button data-wear="${id}">REMOVE</button>` : ''}</div>`;
+  const buffs = Object.entries(game.s.buffs)
+    .filter(([id]) => id !== 'potion_sickness')
+    .map(
+      ([id, left]) =>
+        `<div>• ${D.BUFFS[id]?.name ?? id} · ${D.BUFFS[id]?.text ?? ''} (${Math.ceil(left)}s)</div>`,
+    )
+    .join('');
+  left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot('Head', p.armor?.head)}${slot('Body', p.armor?.body)}${slot('Legs', p.armor?.legs)}</div><h3>Accessories · ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot('Accessory', game.s.accessories[i])).join('')}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> · Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> · Damage <strong>×${eq.damageBonus().toFixed(2)}</strong> · Speed <strong>×${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set · ${setInfo.bonusText}</div>` : ''}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ''}`;
+  const wearables = game.s.inventory.filter((e) =>
+    ['armor', 'accessory'].includes(D.ITEMS[e.id]?.[1] ?? ''),
+  );
+  right.innerHTML = `<h2>Wardrobe</h2><p class="lede">Armour and charms in the pack. Life crystals raise your health; five fallen stars make a mana crystal.</p><div class="book-list">${
+    wearables
+      .map(
+        (e) =>
+          `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong><small>${D.ARMOR[e.id] ? D.ARMOR[e.id].defense + ' defense · ' + D.ARMOR[e.id].slot : (D.ACCESSORIES[e.id]?.text ?? '')}</small></div></div><button data-wear="${e.id}">${worn(e.id) ? 'REMOVE' : 'WEAR'}</button></div>`,
+      )
+      .join('') || '<p>No armour yet. Forge it from ingots at a workbench, forge, or starforge.</p>'
+  }</div><h3>Quick slots</h3><p class="muted">Numbers 1–0 or the mouse wheel choose a slot; click to use what it holds. Assign a slot from here:</p><div class="book-list">${game.s.hotbar
+    .map(
+      (id, i) =>
+        `<div class="book-row"><span class="with-icon"><b class="qty">${(i + 1) % 10}</b>&nbsp;${id ? icon(id) + pretty(id) : '<span class="muted">empty</span>'}</span>${id ? `<button data-clear="${i}">CLEAR</button>` : ''}</div>`,
+    )
+    .join('')}</div>`;
+  for (const root of [left, right])
+    root.querySelectorAll<HTMLButtonElement>('[data-wear]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          const r = game.use(b.dataset.wear ?? '');
+          if (!r.ok) message(r.reason);
+          renderJournal();
+          updateUI(true);
+        }),
+    );
+  right.querySelectorAll<HTMLButtonElement>('[data-clear]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        game.equipment.assign(Number(b.dataset.clear), null);
+        renderJournal();
+        updateUI(true);
+      }),
+  );
+}
+function renderRift(left: HTMLElement, right: HTMLElement) {
+  const gate = game.s.structures.find((st) => st.type === 'rift_gate'),
+    near = gate && Math.hypot(gate.x - game.s.player.x, gate.y - game.s.player.y) < 170,
+    sigils = game.s.rift.sigils;
+  const sigil = (id: string) =>
+    `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${D.DUNGEONS.find((d) => d.def.boss === D.MOBS_BY_SIGIL[id])?.def.name ?? ''}</small></div></div><span class="qty">${sigils.includes(id) ? 'SET' : game.count(id) ? 'CARRIED' : '—'}</span></div>`;
+  left.innerHTML = `<h2>The Rift</h2><p class="lede">Four dungeons keep four sigils. Set them in the Rift Gate and it opens onto other worlds.</p><h3>Sigils</h3><div class="book-list">${['sigil_crypt', 'sigil_frost', 'sigil_sun', 'sigil_cinder'].map(sigil).join('')}</div><h3>Dungeons</h3>${D.DUNGEONS.map((d) => `<div class="biome-entry"><strong>${d.def.name}</strong><small>${d.def.note} ${game.s.bosses[d.def.boss] ? '· Its master is slain.' : ''}</small></div>`).join('')}`;
+  right.innerHTML = `<h2>Destinations</h2><p class="lede">${gate ? (near ? 'The Gate hums beside you.' : 'Stand at your Rift Gate to travel.') : 'Build a Rift Gate at a forge: obsidian, crystal, hellstone, and grave dust from the Crypt.'}</p>${D.DIMENSIONS.map(
+    (dim) => {
+      const need = { mycelia: 1, skyreach: 2, void: 4 }[dim.id],
+        open = sigils.length >= need,
+        biome = D.BIOMES.find((b) => b.id === dim.id);
+      return `<div class="recipe-row"><div class="recipe-head"><strong>${dim.name}</strong><button data-travel="${dim.id}" ${open && near ? '' : 'disabled'}>TRAVEL</button></div><small>${biome?.note ?? ''}</small><small>${open ? 'OPEN' : 'NEEDS ' + need + ' SIGILS'} · ${game.s.discoveries.includes(dim.id) ? 'VISITED' : 'UNVISITED'}</small></div>`;
+    },
+  ).join(
+    '',
+  )}<div class="note-block">In each world a portal by the arrival point leads home to the Gate.</div>`;
+  right.querySelectorAll<HTMLButtonElement>('[data-travel]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        const r = game.realms.travel(b.dataset.travel ?? '');
+        if (!r.ok) message(r.reason);
+        else toggleJournal(false);
+        updateUI(true);
+      }),
+  );
+}
+/** Redraws the quick slots when their contents change. */
+function renderHotbar() {
+  const s = game.s,
+    sig =
+      s.hotbar.map((id) => (id ? id + ':' + game.count(id) : '-')).join(',') + '|' + s.hotbarIndex;
+  if (sig === state.hotbarSig) return;
+  state.hotbarSig = sig;
+  $('hotbar').innerHTML = s.hotbar
+    .map((id, i) => {
+      const n = id ? game.count(id) : 0;
+      return `<div class="slot ${i === s.hotbarIndex ? 'active' : ''}" data-slot="${i}" title="${id ? pretty(id) : ''}"><b>${(i + 1) % 10}</b>${id ? `<img src="${iconURL(id)}" alt="">` : ''}${n > 1 ? `<small>${n}</small>` : ''}</div>`;
+    })
+    .join('');
+  $('hotbar')
+    .querySelectorAll<HTMLElement>('[data-slot]')
+    .forEach((el) => (el.onclick = () => game.equipment.select(Number(el.dataset.slot))));
+  const held = game.equipment.held();
+  $('hotbar-name').textContent = held ? pretty(held) : '';
+}
 function updateUI(force = false) {
   if (!state.playing) return;
   const now = performance.now();
@@ -754,12 +907,26 @@ function updateUI(force = false) {
   state.lastUI = now;
   const v = game.s.vitals;
   (['health', 'hydration', 'calories', 'stamina'] as (keyof Vitals)[]).forEach((id) => {
-    $(id + '-bar').style.width = clamp(v[id], 0, 100) + '%';
+    const most = id === 'health' ? game.maxHealth() : 100;
+    $(id + '-bar').style.width = clamp((v[id] / most) * 100, 0, 100) + '%';
     $(id + '-value').textContent = String(Math.round(v[id]));
   });
-  const layer = game.layer();
-  $('biome-name').textContent =
-    layer.id === 'surface'
+  const maxMana = game.equipment.maxMana();
+  $('mana-bar').style.width = clamp((game.s.mana / maxMana) * 100, 0, 100) + '%';
+  $('mana-value').textContent = String(Math.round(game.s.mana));
+  $('defense-value').textContent = String(game.equipment.defense());
+  $('buffs').innerHTML = Object.entries(game.s.buffs)
+    .map(
+      ([id, left]) =>
+        `<span style="color:${D.BUFFS[id]?.color ?? '#fff'}">${(D.BUFFS[id]?.name ?? id).toUpperCase()} ${Math.ceil(left)}s</span>`,
+    )
+    .join(' ');
+  renderHotbar();
+  const layer = game.layer(),
+    place = game.realms.placeName();
+  $('biome-name').textContent = place
+    ? place.toUpperCase()
+    : layer.id === 'surface'
       ? game.biome().name.toUpperCase()
       : layer.id === 'upper_mines'
         ? game.biome().name.toUpperCase() + ' · ' + layer.name.toUpperCase()
@@ -774,7 +941,24 @@ function updateUI(force = false) {
     : 'EXPEDITION COMPLETE';
   const near = game.nearestInteractable();
   let prompt = '';
+  const held = game.equipment.held();
   if (game.s.placing) prompt = `<b>CLICK</b> Place ${pretty(game.s.placing)} · Esc cancels`;
+  else if (
+    near &&
+    near.type === 'structure' &&
+    ['dungeon_chest', 'boss_altar', 'rift_gate', 'portal'].includes(near.object.type)
+  )
+    prompt = `<b>E</b> ${
+      near.object.type === 'dungeon_chest'
+        ? 'Open the chest'
+        : near.object.type === 'boss_altar'
+          ? game.bosses.active()
+            ? 'The altar burns'
+            : 'Call ' + D.MOBS[near.object.kind ?? '']?.name
+          : near.object.type === 'portal'
+            ? 'Return home through the portal'
+            : 'Open the Rift'
+    }`;
   else if (near) {
     const action =
       near.type === 'node'
@@ -799,12 +983,19 @@ function updateUI(force = false) {
                     ? 'Add wood'
                     : 'Use ' + pretty(near.object.type);
     prompt = `<b>E</b> ${action}`;
-  } else prompt = '<b>E</b> Explore and gather';
+  } else
+    prompt = held
+      ? `<b>CLICK</b> ${game.hands.describe(cursorWorld())}`
+      : '<b>E</b> Explore and gather';
   $('interaction-prompt').innerHTML = prompt;
-  const boss = game.s.animals.find((a) => a.id === game.s.altar.activeBoss && !a.deadUntil);
+  const boss =
+    game.s.animals.find((a) => a.id === game.s.altar.activeBoss && !a.deadUntil) ??
+    game.bosses.active();
   $('boss-hud').classList.toggle('hidden', !boss);
   if (boss) {
-    $('boss-name').textContent = D.BOSSES[game.s.altar.level - 1].name.toUpperCase();
+    $('boss-name').textContent = (
+      boss.type === 'boss' ? D.BOSSES[game.s.altar.level - 1].name : D.MOBS[boss.type].name
+    ).toUpperCase();
     $('boss-bar').style.width = clamp((boss.hp / boss.maxHp) * 100, 0, 100) + '%';
     $('boss-value').textContent = `${Math.ceil(boss.hp)} / ${boss.maxHp}`;
   }
@@ -826,7 +1017,8 @@ function updateUI(force = false) {
 }
 function camera() {
   const p = game.s.player;
-  state.camera.x = clamp(p.x - view.worldW / 2, 0, Math.max(0, D.WORLD_W - view.worldW));
+  const [lo, hi] = D.regionBounds(p.x);
+  state.camera.x = clamp(p.x - view.worldW / 2, lo, Math.max(lo, hi - view.worldW));
   state.camera.y = clamp(p.y - 24 - view.worldH / 2, 0, Math.max(0, D.WORLD_H - view.worldH));
 }
 /** How loud each ambient bed should be for where the player stands. */
@@ -912,7 +1104,14 @@ function drawWorld(now = performance.now()) {
       maybeThunder(now);
     }
   } else Audio.setAmbience(SILENCE);
-  draw(ctx, game, state.camera, view, !state.playing);
+  draw(
+    ctx,
+    game,
+    state.camera,
+    view,
+    !state.playing,
+    state.playing && state.pointer.inside && !state.journal ? cursorWorld() : null,
+  );
 }
 function frame(now: number) {
   const dt = Math.min((now - state.lastFrame) / 1000, UI_RULES.maxFrameSeconds);
@@ -926,6 +1125,7 @@ function frame(now: number) {
         (keys.has('w') || keys.has('arrowup') || keys.has(' ') ? 1 : 0);
     game.move(dx, dy, dt);
     game.tick(dt);
+    if (state.using) useHeld();
     if (!game.s.dead && game.s.elapsed - state.lastAuto > UI_RULES.autoSaveSeconds) {
       game.save(localStorage, true);
       state.lastAuto = game.s.elapsed;
@@ -935,7 +1135,9 @@ function frame(now: number) {
     musicScene({
       playing: state.playing,
       dead: game.s.dead,
-      boss: !!game.s.altar.activeBoss,
+      boss: !!game.s.altar.activeBoss || !!game.bosses.active(),
+      bossType: game.bosses.active()?.type ?? null,
+      dungeon: D.dungeonAt(game.s.player.x, game.s.player.y - 20)?.def.id ?? null,
       layer: game.layer().id,
       weather: game.s.weather,
       biome: game.biome().id,

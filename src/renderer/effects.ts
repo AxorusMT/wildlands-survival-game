@@ -97,7 +97,7 @@ export function spawnEffects(g: RenderGame, events: WorldEvent[], now = performa
           color: '#9fd0e4',
           life: 0.6,
         }));
-      else if (e.kind === 'wood' || e.kind === 'resin' || e.kind === 'honey') {
+      else if (D.TREE_NODES.has(e.kind)) {
         burst(e, now, 6, () => ({
           vx: (rnd() - 0.5) * 220,
           vy: -140 - rnd() * 160,

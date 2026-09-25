@@ -1,5 +1,6 @@
 import { clamp } from '../../core/math.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
+import { ACCESSORIES, ARMOR, BLOCKS } from '../../data/gear.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import { RULES } from '../rules.ts';
 
@@ -35,12 +36,22 @@ export class Consumables extends System {
       return { ok: true };
     }
     if (id === 'fishing_rod') return this.game.fish();
+    if (ARMOR[id] || ACCESSORIES[id]) return this.game.equipment.wear(id);
+    const drunk = this.game.equipment.drink(id);
+    if (drunk) return drunk;
+    if (BLOCKS[id] !== undefined || id === 'torch') {
+      const slot = this.game.s.hotbar.indexOf(id);
+      if (slot >= 0) this.game.equipment.select(slot);
+      this.game.say(itemName(id) + ' in hand. Click where it should go.');
+      return { ok: true };
+    }
     if (ITEMS[id][1] === 'structure') {
       this.game.s.placing = id;
       this.game.say('Choose a nearby place for ' + itemName(id) + '.');
       return { ok: true };
     }
     const food: Record<string, [number, number]> = {
+      glowcap: [10, 3],
       berry: [8, 0],
       mushroom: [9, 2],
       honey: [13, 0],
