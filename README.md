@@ -188,6 +188,42 @@ Beyond the Rift lie realms that are built anew every time you enter.
 - **Town bonus:** two or more settlers nearby give a gentle healing bonus, and the town gets its own music.
 - **Silver, gold, and gems:** silver and gold ores, and rubies, sapphires and emeralds, lie in the mines. Silver and gold make tools, broadswords and armour between iron and steel, and the gems make staves.
 
+### The weapon hierarchy
+
+One table in `src/data/weapons.ts` governs every weapon: eleven material tiers by ten families. The **Armoury**, reached from the Gear page, shows the whole grid and which weapons you have found.
+
+| Tier | Material  | Tier | Material   |
+| ---- | --------- | ---- | ---------- |
+| 1    | Flint     | 7    | Cinder     |
+| 2    | Copper    | 8    | Myconite   |
+| 3    | Iron      | 9    | Starmetal  |
+| 4    | Steel     | 10   | Voidsteel  |
+| 5    | Obsidian  | 11   | Riftforged |
+| 6    | Hellstone |      |            |
+
+| Family     | Its gift at every tier                                |
+| ---------- | ----------------------------------------------------- |
+| Blade      | Every third blow in quick succession strikes for ×1.8 |
+| Greatsword | Slow, heavy cleaves across a wide arc                 |
+| Spear      | The longest melee reach                               |
+| Battleaxe  | Blows open bleeding wounds                            |
+| Warhammer  | Staggers foes and cracks their armour                 |
+| Whip       | Long, quick lashes that mark foes to take more harm   |
+| Bow        | Arrows at range                                       |
+| Crossbow   | Slow to load; bolts hit hard and pass through         |
+| Staff      | Mana shaped into bolts                                |
+| Tome       | A torrent of small seeking sparks                     |
+
+Each weapon also has its own upgrade line:
+
+- **Quality:** rolled when the weapon first comes to you. It is Crude, Common, Fine, Masterwork or Mythic (×0.85 to ×1.4 damage), and it also sets how many gem sockets the weapon has. Finds inside higher-tier realms roll better. Reforging at the anvil rerolls it.
+- **Level:** +1 to +10 at the anvil (a workbench, forge or starforge, by tier), paid in the tier's material and silver marks. Each level adds 7% damage.
+- **Evolutions:** at +5 and again at +10 you choose one of two paths for the family. For example, a battleaxe can become Serrated or Balanced, then Reaper or Berserk; a bow can gain Volley or become a Sniper.
+- **Infusions:** fire (burning), frost (slows), venom (poison), void (ignores half of armour), holy (+50% against the undead) and storm (lightning leaps to a second foe).
+- **Gems:** ruby (damage), sapphire (magic), emerald (critical hits), topaz (speed), onyx (armour piercing) and opal (life drain). Topaz, onyx and opal are found in the realms.
+
+Signature weapons, such as the Tidecaller spear and the Hellrazor, belong to a family and tier but stand outside the grid.
+
 ### Gear, potions, and crystals
 
 - **Armour:** seventeen sets (copper, iron, silver, gold, the three Band I realm sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
@@ -198,7 +234,7 @@ Beyond the Rift lie realms that are built anew every time you enter.
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 207 recipes and 334 items, and 58 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 311 recipes and 441 items (134 weapons), and 58 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 
@@ -211,6 +247,7 @@ Run `npm test` with a recent Node.js release. It checks:
 - the dungeons (loot, traps, guardians, altars and brick);
 - boss fights and sigils, the Rift Gate, travel and portals home, and every dimension's walls, life and boss;
 - the hotbar (digging, building and torches), armour and set bonuses, potions, buffs and crystals, bows, staves and mana, and monsters of the deep;
+- the weapon hierarchy: a complete, ever-stronger grid, quality, the anvil and evolutions, family mechanics, infusions and gems, crossbows and tomes;
 - generated realms: seeds, keys and tiers, furnishing, modifiers, hazards, bosses and relics, and saving an open realm;
 - homes, doors, walls and hammers, settlers moving in and out, trade and coins, bed spawns, and the silver and gold tier;
 - save migration from every earlier layout;

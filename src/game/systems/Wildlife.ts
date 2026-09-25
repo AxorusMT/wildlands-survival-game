@@ -29,13 +29,15 @@ export class Wildlife extends System {
       const face = Math.cos(p.face) >= 0 ? 1 : -1;
       const r = this.game.combat.fire(p.weapon, { x: p.x + face * 400, y: p.y - 30 });
       if (r.ok) {
-        p.attackAt = this.game.s.elapsed + RANGED[p.weapon].delay;
+        p.attackAt =
+          this.game.s.elapsed + RANGED[p.weapon].delay * this.game.armoury.stats(p.weapon).pace;
         p.usedAt = this.game.s.elapsed;
       }
       return { ...r, hit: false };
     }
     if (v.stamina < RULES.attackStamina) return { ok: false, reason: 'Too exhausted to strike.' };
-    p.attackAt = this.game.s.elapsed + RULES.attackCooldownSeconds;
+    p.attackAt =
+      this.game.s.elapsed + RULES.attackCooldownSeconds * this.game.armoury.stats(p.weapon).pace;
     p.usedAt = this.game.s.elapsed;
     v.stamina -= RULES.attackStamina;
     v.hydration = clamp(v.hydration - 0.25, 0, RULES.maxVital);
@@ -133,6 +135,8 @@ export class Wildlife extends System {
       }
       return;
     }
+    this.afflict(a, dt);
+    if (a.deadUntil) return;
     // Creatures far from the player rest; only nearby life is simulated.
     const p = s.player;
     if (Math.abs(a.x - p.x) > 2600 && !MOBS[a.type]?.boss && a.type !== 'boss') return;
@@ -141,6 +145,34 @@ export class Wildlife extends System {
     this.stepLegacy(a, dt);
   }
 
+  /** Bleeding, burning, and poison wear a creature down; stuns and slows run out. */
+  private afflict(a: Animal, dt: number) {
+    const fx = a.fx,
+      t = this.game.s.elapsed;
+    if (!fx) return;
+    let harm = 0;
+    for (const k of ['bleed', 'burn', 'poison'] as const) {
+      const d = fx[k];
+      if (!d) continue;
+      if (t >= d[0]) delete fx[k];
+      else harm += d[1] * dt;
+    }
+    if (fx.mark && t >= fx.mark[0]) delete fx.mark;
+    if (!harm) return;
+    a.hp -= harm;
+    a.dotShown = (a.dotShown ?? 0) + harm;
+    if (a.dotShown >= 12) {
+      this.game.event(
+        'damage',
+        a.x,
+        a.y - 44,
+        String(Math.round(a.dotShown)),
+        fx.burn ? 3 : fx.poison ? 4 : 5,
+      );
+      a.dotShown = 0;
+    }
+    if (a.hp <= 0) this.kill(a);
+  }
   /** Surface animals, tunnel bats, hellhounds, and the Direwolf: kept to their floor lines. */
   private stepLegacy(a: Animal, dt: number) {
     const s = this.game.s,
@@ -292,12 +324,13 @@ export class Wildlife extends System {
       p = s.player,
       spec = MOBS[a.type];
     if (!spec) return;
-    const d = dist(a, p),
+    const t = s.elapsed,
+      d = dist(a, p),
       hunting = spec.sight > 0 && d < spec.sight && !s.dead,
       face = Math.sign(p.x - a.x) || 1,
-      pace = this.game.pocket.speedScale(a),
-      [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace],
-      t = s.elapsed;
+      stunned = (a.fx?.stun ?? 0) > t,
+      pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1),
+      [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace];
     a.timers ??= {};
     if (d < 900 && Math.random() < dt * 0.04) this.cry(a, 'call');
     if (spec.move === 'walker' || spec.move === 'hopper') {
@@ -367,7 +400,7 @@ export class Wildlife extends System {
       this.moveBody(a, dt, true);
     }
     if (Math.abs(a.vx ?? 0) > 5) a.angle = (a.vx ?? 0) > 0 ? 0 : Math.PI;
-    if (!hunting) return;
+    if (!hunting || stunned) return;
     // Contact: touching a monster hurts.
     const cy = a.y - 22;
     if (

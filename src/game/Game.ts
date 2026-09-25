@@ -16,6 +16,7 @@ import { setActiveRealm } from '../data/realms/index.ts';
 import { biomeAt, layerAt, lavaAt, syncPocket } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
+import { Armoury } from './systems/Armoury.ts';
 import { Bosses } from './systems/Bosses.ts';
 import { Combat } from './systems/Combat.ts';
 import { Consumables } from './systems/Consumables.ts';
@@ -66,6 +67,7 @@ export class Game {
   readonly drops = new Drops(this);
   readonly equipment = new Equipment(this);
   readonly combat = new Combat(this);
+  readonly armoury = new Armoury(this);
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
   readonly pocket = new Pocket(this);
@@ -150,6 +152,7 @@ export class Game {
       town: { homes: {} },
       pocket: null,
       realms: {},
+      armoury: {},
       placing: null,
       dead: false,
       lastSave: Date.now(),

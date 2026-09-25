@@ -37,12 +37,24 @@
     DUNGEON_DEFS: () => DUNGEON_DEFS,
     EDGE: () => EDGE,
     ENTRANCES: () => ENTRANCES,
+    EVOLUTIONS: () => EVOLUTIONS,
+    FAMILIES: () => FAMILIES,
+    GEMS: () => GEMS,
+    GEN_ITEMS: () => GEN_ITEMS,
+    GEN_PROJECTILES: () => GEN_PROJECTILES,
+    GEN_RANGED: () => GEN_RANGED,
+    GEN_RECIPES: () => GEN_RECIPES,
+    GEN_WEAPONS: () => GEN_WEAPONS,
+    GRID: () => GRID,
     Ground: () => Ground,
     HOUSE_NEEDS: () => HOUSE_NEEDS,
+    INFUSIONS: () => INFUSIONS,
     ISLANDS: () => ISLANDS,
     ITEMS: () => ITEMS,
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
+    LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    MAX_LEVEL: () => MAX_LEVEL,
     MAX_TIER: () => MAX_TIER,
     MINE_TIER: () => MINE_TIER,
     MOBS: () => MOBS,
@@ -55,6 +67,7 @@
     POCKET: () => POCKET,
     POTIONS: () => POTIONS,
     PROJECTILES: () => PROJECTILES,
+    QUALITIES: () => QUALITIES,
     RANGED: () => RANGED,
     REALMS: () => REALMS,
     REALM_IDS: () => REALM_IDS,
@@ -65,9 +78,11 @@
     SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
     SIDE_ORDER: () => SIDE_ORDER,
+    SIGNATURE: () => SIGNATURE,
     SKY_LADDERS: () => SKY_LADDERS,
     SKY_SEA: () => SKY_SEA,
     SURFACE_BAND: () => SURFACE_BAND,
+    TIERS: () => TIERS,
     TIER_NAMES: () => TIER_NAMES,
     TIER_SCALE: () => TIER_SCALE,
     TILE: () => TILE,
@@ -77,16 +92,19 @@
     TOOL_TIERS: () => TOOL_TIERS,
     TREE_NODES: () => TREE_NODES,
     TUTORIAL: () => TUTORIAL,
+    UNDEAD: () => UNDEAD,
     VOICES: () => VOICES,
     VOID: () => VOID,
     VOID_LADDERS: () => VOID_LADDERS,
     WALLS: () => WALLS,
     WALL_ITEM: () => WALL_ITEM,
     WEAPONS: () => WEAPONS,
+    WEAPON_CLASS: () => WEAPON_CLASS,
     WORLD_H: () => WORLD_H,
     WORLD_W: () => WORLD_W,
     activeRealm: () => activeRealm,
     allShafts: () => allShafts,
+    anvilFor: () => anvilFor,
     ashStorm: () => ashStorm,
     baseTileAt: () => baseTileAt,
     baselineAt: () => baselineAt,
@@ -100,9 +118,11 @@
     dimensionLadders: () => dimensionLadders,
     dimensionTile: () => dimensionTile,
     dungeonAt: () => dungeonAt,
+    familyById: () => familyById,
     flatten: () => flatten,
     inPocket: () => inPocket,
     inShaft: () => inShaft,
+    infusionById: () => infusionById,
     isAggressive: () => isAggressive,
     islandTop: () => islandTop,
     itemName: () => itemName,
@@ -116,17 +136,21 @@
     nodeForm: () => nodeForm,
     pocketShafts: () => pocketShafts,
     realmById: () => realmById,
+    reforgeCost: () => reforgeCost,
     regionAt: () => regionAt,
     regionBounds: () => regionBounds,
     rollMods: () => rollMods,
+    rollQuality: () => rollQuality,
     seedOf: () => seedOf,
     setActiveRealm: () => setActiveRealm,
     settlerById: () => settlerById,
     surfaceAt: () => surfaceAt,
     syncPocket: () => syncPocket,
     tideLevel: () => tideLevel,
+    tierOf: () => tierOf,
     underworldCeiling: () => underworldCeiling,
     underworldFloor: () => underworldFloor,
+    upgradeCost: () => upgradeCost,
     walkable: () => walkable,
     weighted: () => weighted
   });
@@ -339,6 +363,560 @@
       treat: "Antivenom or cultured antibiotic",
       item: "antivenom"
     }
+  };
+
+  // src/data/weapons.ts
+  var TIERS = [
+    {
+      tier: 1,
+      mat: "flint",
+      name: "Flint",
+      bar: "flint",
+      station: null,
+      base: 16,
+      color: "#8a9094",
+      glow: "#c8d0d4"
+    },
+    {
+      tier: 2,
+      mat: "copper",
+      name: "Copper",
+      bar: "copper_ingot",
+      station: "workbench",
+      base: 26,
+      color: "#d0844a",
+      glow: "#f0b070"
+    },
+    {
+      tier: 3,
+      mat: "iron",
+      name: "Iron",
+      bar: "iron_ingot",
+      station: "workbench",
+      base: 38,
+      color: "#a8a4a0",
+      glow: "#e0dcd8"
+    },
+    {
+      tier: 4,
+      mat: "steel",
+      name: "Steel",
+      bar: "steel_ingot",
+      station: "forge",
+      base: 50,
+      color: "#dfe3e6",
+      glow: "#ffffff"
+    },
+    {
+      tier: 5,
+      mat: "obsidian",
+      name: "Obsidian",
+      bar: "obsidian",
+      station: "forge",
+      base: 64,
+      color: "#4a3a64",
+      glow: "#a07fd0"
+    },
+    {
+      tier: 6,
+      mat: "hellstone",
+      name: "Hellstone",
+      bar: "hellstone_ingot",
+      station: "forge",
+      base: 80,
+      color: "#e04a2a",
+      glow: "#ff8a3a"
+    },
+    {
+      tier: 7,
+      mat: "cinder",
+      name: "Cinder",
+      bar: "cinder_core",
+      station: "forge",
+      base: 100,
+      color: "#ff8a3a",
+      glow: "#ffc070"
+    },
+    {
+      tier: 8,
+      mat: "myconite",
+      name: "Myconite",
+      bar: "myconite_ingot",
+      station: "starforge",
+      base: 126,
+      color: "#58e0d0",
+      glow: "#9ef0e0"
+    },
+    {
+      tier: 9,
+      mat: "starmetal",
+      name: "Starmetal",
+      bar: "starmetal_ingot",
+      station: "starforge",
+      base: 154,
+      color: "#f8e08a",
+      glow: "#fff4c0"
+    },
+    {
+      tier: 10,
+      mat: "voidsteel",
+      name: "Voidsteel",
+      bar: "voidsteel_ingot",
+      station: "starforge",
+      base: 192,
+      color: "#b36cff",
+      glow: "#d8a8ff"
+    },
+    {
+      tier: 11,
+      mat: "rift",
+      name: "Riftforged",
+      bar: "void_essence",
+      station: "starforge",
+      base: 240,
+      color: "#ff6ad5",
+      glow: "#ffb0ec"
+    }
+  ];
+  var tierOf = (t) => TIERS[Math.max(0, Math.min(TIERS.length - 1, t - 1))];
+  var FAMILIES = [
+    {
+      id: "blade",
+      name: "Blade",
+      text: "Every third blow in quick succession strikes for \xD71.8",
+      dmg: 1,
+      reach: 64,
+      pace: 1,
+      suffix: "sword",
+      bars: 5,
+      extra: { wood: 2 }
+    },
+    {
+      id: "greatsword",
+      name: "Greatsword",
+      text: "Slow, heavy cleaves that hit everything in a wide arc",
+      dmg: 1.42,
+      reach: 78,
+      pace: 1.45,
+      suffix: "greatsword",
+      bars: 8,
+      extra: { wood: 2, hide: 1 }
+    },
+    {
+      id: "spear",
+      name: "Spear",
+      text: "The longest reach of any melee weapon",
+      dmg: 0.92,
+      reach: 98,
+      pace: 0.95,
+      suffix: "spear",
+      bars: 4,
+      extra: { wood: 4 }
+    },
+    {
+      id: "battleaxe",
+      name: "Battleaxe",
+      text: "Blows open wounds that bleed for three seconds",
+      dmg: 1.1,
+      reach: 62,
+      pace: 1.15,
+      suffix: "battleaxe",
+      bars: 6,
+      extra: { wood: 3 }
+    },
+    {
+      id: "warhammer",
+      name: "Warhammer",
+      text: "Staggers foes and cracks their armour",
+      dmg: 1.24,
+      reach: 58,
+      pace: 1.35,
+      suffix: "warhammer",
+      bars: 8,
+      extra: { wood: 3, stone: 4 }
+    },
+    {
+      id: "whip",
+      name: "Whip",
+      text: "Long, quick lashes that mark foes to take more harm",
+      dmg: 0.6,
+      reach: 124,
+      pace: 0.8,
+      suffix: "whip",
+      bars: 3,
+      extra: { hide: 3 }
+    },
+    {
+      id: "bow",
+      name: "Bow",
+      text: "Arrows at range; the arrow adds its own damage",
+      ranged: "bow",
+      dmg: 0.55,
+      reach: 0,
+      pace: 1,
+      suffix: "bow",
+      bars: 4,
+      extra: { fiber: 4, wood: 3 }
+    },
+    {
+      id: "crossbow",
+      name: "Crossbow",
+      text: "Slow to load; its bolts hit hard and pass through",
+      ranged: "bow",
+      dmg: 0.95,
+      reach: 0,
+      pace: 1,
+      suffix: "crossbow",
+      bars: 6,
+      extra: { wood: 4, silk: 2 }
+    },
+    {
+      id: "staff",
+      name: "Staff",
+      text: "Mana shaped into bolts",
+      ranged: "magic",
+      dmg: 0.62,
+      reach: 0,
+      pace: 1,
+      suffix: "staff",
+      bars: 4,
+      extra: { crystal: 2 }
+    },
+    {
+      id: "tome",
+      name: "Tome",
+      text: "A torrent of small seeking sparks for little mana each",
+      ranged: "magic",
+      dmg: 0.27,
+      reach: 0,
+      pace: 1,
+      suffix: "tome",
+      bars: 3,
+      extra: { linen: 2, crystal: 1 }
+    }
+  ];
+  var familyById = (id) => FAMILIES.find((f) => f.id === id);
+  var CANON = {
+    iron_sword: ["blade", 3],
+    steel_sword: ["blade", 4],
+    obsidian_blade: ["blade", 5],
+    hellfire_blade: ["blade", 6],
+    myconite_sword: ["blade", 8],
+    star_saber: ["blade", 9],
+    rift_blade: ["blade", 11],
+    void_reaver: ["greatsword", 10],
+    flint_spear: ["spear", 1],
+    copper_spear: ["spear", 2],
+    wooden_bow: ["bow", 1],
+    iron_bow: ["bow", 3]
+  };
+  var SIGNATURE = {
+    silver_broadsword: ["blade", 3],
+    gold_broadsword: ["blade", 4],
+    tidecaller_spear: ["spear", 4],
+    kiln_greataxe: ["battleaxe", 5],
+    eclipse_blade: ["blade", 6],
+    frostbrand: ["blade", 6],
+    sunspear: ["spear", 7],
+    hellrazor: ["blade", 7],
+    bone_bow: ["bow", 6],
+    storm_bow: ["bow", 9],
+    amber_repeater: ["crossbow", 4],
+    ruby_staff: ["staff", 3],
+    emerald_staff: ["staff", 3],
+    sapphire_staff: ["staff", 4],
+    brine_wand: ["staff", 4],
+    ember_sling: ["staff", 4],
+    ember_wand: ["staff", 5],
+    lich_staff: ["staff", 6],
+    glacier_staff: ["staff", 6],
+    sun_staff: ["staff", 7],
+    spore_staff: ["staff", 8],
+    void_staff: ["staff", 10]
+  };
+  var GRID = TIERS.flatMap(
+    (t) => FAMILIES.map((f) => {
+      const canon = Object.entries(CANON).find(([, [fam, tier]]) => fam === f.id && tier === t.tier);
+      if (canon) return { id: canon[0], name: "", family: f.id, tier: t.tier, generated: false };
+      const FIRST = {
+        blade: "Flint knife",
+        greatsword: "Flint cleaver",
+        warhammer: "Stone maul",
+        whip: "Hide whip",
+        staff: "Gnarled staff",
+        tome: "Birchbark tome",
+        crossbow: "Sling crossbow"
+      };
+      const name = t.tier === 1 && FIRST[f.id] || `${t.name} ${f.suffix}`;
+      return { id: `${t.mat}_${f.suffix}`, name, family: f.id, tier: t.tier, generated: true };
+    })
+  );
+  var WEAPON_CLASS = {
+    ...Object.fromEntries(GRID.map((w) => [w.id, [w.family, w.tier]])),
+    ...SIGNATURE
+  };
+  var GEN_WEAPONS = {};
+  var GEN_RANGED = {};
+  var GEN_PROJECTILES = {
+    bolt: { color: "#c8b890", gravity: 160, life: 2, size: 9, pierce: 1 }
+  };
+  var GEN_ITEMS = [];
+  var GEN_RECIPES = [];
+  for (const w of GRID) {
+    if (!w.generated) continue;
+    const t = tierOf(w.tier), f = familyById(w.family);
+    GEN_WEAPONS[w.id] = [w.tier, Math.round(t.base * f.dmg), f.reach];
+    if (f.id === "bow")
+      GEN_RANGED[w.id] = { kind: "bow", projectile: "arrow", delay: 0.55, speed: 700 + w.tier * 30 };
+    if (f.id === "crossbow")
+      GEN_RANGED[w.id] = { kind: "bow", projectile: "bolt", delay: 0.95, speed: 900 + w.tier * 30 };
+    if (f.id === "staff") {
+      GEN_RANGED[w.id] = {
+        kind: "magic",
+        projectile: `${t.mat}_orb`,
+        delay: 0.45,
+        speed: 560 + w.tier * 20,
+        mana: 4 + Math.ceil(w.tier / 2)
+      };
+      GEN_PROJECTILES[`${t.mat}_orb`] = { color: t.color, glow: t.glow, life: 1.3, size: 9 };
+    }
+    if (f.id === "tome") {
+      GEN_RANGED[w.id] = {
+        kind: "magic",
+        projectile: `${t.mat}_spark`,
+        delay: 0.14,
+        speed: 520 + w.tier * 15,
+        mana: 1 + Math.floor(w.tier / 4)
+      };
+      GEN_PROJECTILES[`${t.mat}_spark`] = {
+        color: t.glow,
+        glow: t.color,
+        life: 1.1,
+        size: 6,
+        homing: 4
+      };
+    }
+    GEN_ITEMS.push([w.id, w.name]);
+    const cost = {
+      [t.bar]: Math.max(1, Math.round(f.bars * (w.tier === 11 ? 0.6 : 1)))
+    };
+    if (w.tier === 11) cost.voidsteel_ingot = f.bars;
+    for (const [k, n] of Object.entries(f.extra)) if (w.tier > 1 || k !== "silk") cost[k] = n;
+    if (w.tier === 1) {
+      delete cost.silk;
+      delete cost.linen;
+      if (f.id === "tome") cost.fiber = 4;
+    }
+    GEN_RECIPES.push([w.id, cost, t.station ?? (w.tier === 1 ? null : "workbench"), w.tier]);
+  }
+  var QUALITIES = [
+    { id: "crude", name: "Crude", mult: 0.85, sockets: 0, weight: 15, color: "#8a8070" },
+    { id: "common", name: "Common", mult: 1, sockets: 1, weight: 50, color: "#6a5a44" },
+    { id: "fine", name: "Fine", mult: 1.1, sockets: 1, weight: 22, color: "#7ac070" },
+    { id: "masterwork", name: "Masterwork", mult: 1.22, sockets: 2, weight: 10, color: "#5a9ae8" },
+    { id: "mythic", name: "Mythic", mult: 1.4, sockets: 3, weight: 3, color: "#e89a3a" }
+  ];
+  function rollQuality(rng2, luck = 1) {
+    const weights = QUALITIES.map((q, i) => q.weight * (i >= 2 ? luck : 1));
+    let r = rng2() * weights.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < weights.length; i++) if ((r -= weights[i]) <= 0) return i;
+    return 1;
+  }
+  var MAX_LEVEL = 10;
+  var LEVEL_DAMAGE = 0.07;
+  function upgradeCost(tier, level) {
+    const t = tierOf(tier);
+    return { [t.bar]: 2 + level, coin: 10 * tier * (level + 1) };
+  }
+  function reforgeCost(tier) {
+    const t = tierOf(tier);
+    return { [t.bar]: 3, coin: 40 * tier };
+  }
+  var anvilFor = (tier) => tier >= 8 ? "starforge" : tier >= 4 ? "forge" : "workbench";
+  var E = (id, name, text, mods) => ({
+    id,
+    name,
+    text,
+    mods
+  });
+  var EVOLUTIONS = {
+    blade: [
+      [
+        E("keen", "Keen", "+10% critical chance", { crit: 0.1 }),
+        E("swift", "Swift", "Swings 15% faster", { pace: -0.15 })
+      ],
+      [
+        E("duelist", "Duelist", "The third blow strikes \xD72.4", { combo: 2.4 }),
+        E("executioner", "Executioner", "+50% against foes below 30% health", { execute: 0.5 })
+      ]
+    ],
+    greatsword: [
+      [
+        E("wide", "Wide", "+20% reach", { reach: 0.2 }),
+        E("heavy", "Heavy", "+15% damage", { dmg: 0.15 })
+      ],
+      [
+        E("cleaver", "Cleaver", "Cleaves open bleeding wounds", { bleed: 0.25 }),
+        E("titan", "Titan", "Blows stagger foes", { stagger: true })
+      ]
+    ],
+    spear: [
+      [
+        E("long", "Long", "+20% reach", { reach: 0.2 }),
+        E("barbed", "Barbed", "Thrusts cause bleeding", { bleed: 0.2 })
+      ],
+      [
+        E("impaler", "Impaler", "+30% against great foes", { boss: 0.3 }),
+        E("phalanx", "Phalanx", "+4 defense while held", { defense: 4 })
+      ]
+    ],
+    battleaxe: [
+      [
+        E("serrated", "Serrated", "Bleeding doubles", { bleed: 0.3 }),
+        E("balanced", "Balanced", "Swings 15% faster", { pace: -0.15 })
+      ],
+      [
+        E("reaper", "Reaper", "Heal 3% of the damage you deal", { heal: 0.03 }),
+        E("berserk", "Berserk", "+30% while below half health", { berserk: 0.3 })
+      ]
+    ],
+    warhammer: [
+      [
+        E("crusher", "Crusher", "Armour stays cracked twice as long", { sunder: 8 }),
+        E("weighty", "Weighty", "+15% damage", { dmg: 0.15 })
+      ],
+      [
+        E("earthshaker", "Earthshaker", "Blows strike everything nearby", { reach: 0.35 }),
+        E("juggernaut", "Juggernaut", "+6 defense while held", { defense: 6 })
+      ]
+    ],
+    whip: [
+      [
+        E("lash", "Lash", "+20% reach", { reach: 0.2 }),
+        E("venomous", "Venomous", "Lashes poison", { poison: 0.25 })
+      ],
+      [
+        E("ringmaster", "Ringmaster", "Marked foes take +30% instead of +15%", { mark: 0.3 }),
+        E("flayer", "Flayer", "Lashes cause bleeding", { bleed: 0.3 })
+      ]
+    ],
+    bow: [
+      [
+        E("eagle", "Eagle", "Draw 20% faster", { pace: -0.2 }),
+        E("heavy_draw", "Heavy draw", "+20% damage", { dmg: 0.2 })
+      ],
+      [
+        E("volley", "Volley", "Loose three arrows at once", { count: 2 }),
+        E("sniper", "Sniper", "+60% damage, slower draw", { dmg: 0.6, pace: 0.3 })
+      ]
+    ],
+    crossbow: [
+      [
+        E("quickload", "Quickload", "Reload 20% faster", { pace: -0.2 }),
+        E("broadhead", "Broadhead", "Bolts cause bleeding", { bleed: 0.25 })
+      ],
+      [
+        E("repeater", "Repeater", "Two bolts at once", { count: 1 }),
+        E("ballista", "Ballista", "Bolts pass through four foes", { pierce: 3 })
+      ]
+    ],
+    staff: [
+      [
+        E("focused", "Focused", "20% less mana", { mana: -0.2 }),
+        E("charged", "Charged", "+20% damage", { dmg: 0.2 })
+      ],
+      [
+        E("split", "Split", "Two more bolts in a fan", { count: 2 }),
+        E("seeker", "Seeker", "Bolts seek their foes", { homing: 3 })
+      ]
+    ],
+    tome: [
+      [
+        E("fluent", "Fluent", "25% less mana", { mana: -0.25 }),
+        E("searing", "Searing", "+20% damage", { dmg: 0.2 })
+      ],
+      [
+        E("torrent", "Torrent", "Two streams at once", { count: 1 }),
+        E("leech", "Leech", "Heal 2% of the damage you deal", { heal: 0.02 })
+      ]
+    ]
+  };
+  var INFUSIONS = [
+    {
+      id: "fire",
+      name: "Fire",
+      text: "Sets foes burning",
+      item: "fire_infusion",
+      color: "#ff8a3a",
+      recipe: { kiln_ingot: 2, sulfur: 4 }
+    },
+    {
+      id: "frost",
+      name: "Frost",
+      text: "Slows foes by 40%",
+      item: "frost_infusion",
+      color: "#9fd8ec",
+      recipe: { frost_shard: 3, ice: 6 }
+    },
+    {
+      id: "venom",
+      name: "Venom",
+      text: "Poisons foes",
+      item: "venom_infusion",
+      color: "#7bc05a",
+      recipe: { venom: 4, crab_shell: 2 }
+    },
+    {
+      id: "void",
+      name: "Void",
+      text: "Ignores half of all armour",
+      item: "void_infusion",
+      color: "#b36cff",
+      recipe: { void_essence: 2, crystal: 2 }
+    },
+    {
+      id: "holy",
+      name: "Holy",
+      text: "+50% against the undead",
+      item: "holy_infusion",
+      color: "#fff0a0",
+      recipe: { sun_gold: 2, tide_pearl: 2 }
+    },
+    {
+      id: "storm",
+      name: "Storm",
+      text: "Lightning leaps to a second foe",
+      item: "storm_infusion",
+      color: "#bfe4ff",
+      recipe: { sky_silk: 2, fallen_star: 2 }
+    }
+  ];
+  var infusionById = (id) => INFUSIONS.find((i) => i.id === id);
+  var UNDEAD = /* @__PURE__ */ new Set([
+    "skeleton",
+    "skeleton_archer",
+    "bone_bat",
+    "crypt_ghoul",
+    "frost_wraith",
+    "mummy",
+    "hollow_king",
+    "pharaoh",
+    "drowned",
+    "void_wisp",
+    "watcher",
+    "unmaker"
+  ]);
+  var GEMS = {
+    ruby: { name: "Ruby", text: "+8% damage", mods: { dmg: 0.08 } },
+    sapphire: {
+      name: "Sapphire",
+      text: "+12% magic damage, 10% less mana",
+      mods: { magic: 0.12, mana: -0.1 }
+    },
+    emerald: { name: "Emerald", text: "+5% critical chance", mods: { crit: 0.05 } },
+    topaz: { name: "Topaz", text: "Swings and shots 8% faster", mods: { pace: -0.08 } },
+    onyx: { name: "Onyx", text: "Ignores a quarter of armour", mods: { armorPierce: 0.25 } },
+    opal: { name: "Opal", text: "Heal 2% of the damage you deal", mods: { heal: 0.02 } }
   };
 
   // src/data/gear.ts
@@ -587,7 +1165,8 @@
       count: 2,
       spread: 0.3
     },
-    void_staff: { kind: "magic", projectile: "void_beam", delay: 0.3, speed: 1100, mana: 12 }
+    void_staff: { kind: "magic", projectile: "void_beam", delay: 0.3, speed: 1100, mana: 12 },
+    ...GEN_RANGED
   };
   var AMMO = {
     arrow: { damage: 6 },
@@ -621,7 +1200,8 @@
     shockwave: { color: "#dff6ff", glow: "#9fd8ec", life: 1.6, size: 18, pierce: 99 },
     lightning: { color: "#fff8c0", glow: "#fff0a0", life: 0.5, size: 18, pierce: 99 },
     eye_beam: { color: "#ff5a8a", glow: "#ff9ac0", life: 2.4, size: 11 },
-    flame_jet: { color: "#ffb347", glow: "#ff6a2a", life: 0.7, size: 16, fire: true, pierce: 99 }
+    flame_jet: { color: "#ffb347", glow: "#ff6a2a", life: 0.7, size: 16, fire: true, pierce: 99 },
+    ...GEN_PROJECTILES
   };
   var BLOCKS = {
     dirt: 1,
@@ -1295,7 +1875,15 @@
         [id.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), "wall"]
       ])
     ),
-    ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, "armor"]]))
+    ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, "armor"]])),
+    // The weapon hierarchy.
+    ...Object.fromEntries(GEN_ITEMS.map(([id, name]) => [id, [name, "weapon"]])),
+    ...Object.fromEntries(
+      INFUSIONS.map((i) => [i.item, [`${i.name} infusion`, "material"]])
+    ),
+    topaz: ["Topaz", "ore"],
+    onyx: ["Onyx", "ore"],
+    opal: ["Opal", "ore"]
   };
   var itemName = (id) => ITEMS[id]?.[0] || id;
 
@@ -1523,7 +2111,12 @@
     ["amber_repeater", { burrow_amber: 10, wood: 6, silk: 4 }, "workbench", 4],
     ["amber_pick", { burrow_amber: 12, gold_ingot: 2, wood: 3 }, "workbench", 4],
     // ── Armour ──
-    ...ARMOR_RECIPES
+    ...ARMOR_RECIPES,
+    // ── The weapon hierarchy, and infusions ──
+    ...GEN_RECIPES,
+    ...INFUSIONS.map(
+      (i) => [i.item, i.recipe, "workbench", 4]
+    )
   ].map(([id, cost, station, tier, yieldQty]) => ({
     id,
     cost,
@@ -1571,6 +2164,9 @@
     cinderflax: { yield: [2, 3], hp: 2, regen: 200 },
     kilnstone_ore: { yield: [2, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
     burrow_amber: { yield: [1, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
+    topaz: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    onyx: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    opal: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     // The dimensions.
     glowcap: { yield: [1, 3], hp: 2, regen: 200 },
     sunbloom: { yield: [1, 2], hp: 2, regen: 240 },
@@ -1648,7 +2244,7 @@
     hellrazor: [7, 114, 76],
     myconite_sword: [8, 128, 74],
     star_saber: [9, 152, 78],
-    void_reaver: [10, 192, 82],
+    void_reaver: [10, 272, 86],
     rift_blade: [11, 245, 92],
     // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
     wooden_bow: [1, 9, 0],
@@ -1660,7 +2256,9 @@
     glacier_staff: [6, 62, 0],
     sun_staff: [7, 84, 0],
     spore_staff: [8, 76, 0],
-    void_staff: [10, 150, 0]
+    void_staff: [10, 150, 0],
+    // The rest of the hierarchy, generated from its table.
+    ...GEN_WEAPONS
   };
 
   // src/core/noise.ts
@@ -2266,7 +2864,8 @@
       ["herb", 2],
       ["iron_ore", 1],
       ["silver_ore", 1],
-      ["water", 1]
+      ["water", 1],
+      ["opal", 1]
     ],
     nodeCount: 70,
     mobs: [
@@ -2370,7 +2969,8 @@
       ["sulfur", 2],
       ["wood", 2],
       ["stone", 2],
-      ["cactus_fruit", 1]
+      ["cactus_fruit", 1],
+      ["topaz", 1]
     ],
     nodeCount: 72,
     mobs: [
@@ -2485,7 +3085,8 @@
       ["iron_ore", 2],
       ["ruby", 1],
       ["emerald", 1],
-      ["clay", 1]
+      ["clay", 1],
+      ["onyx", 1]
     ],
     nodeCount: 66,
     mobs: [
@@ -4139,13 +4740,6 @@
     saveKey: "wildlands-save-v1"
   };
 
-  // src/game/ids.ts
-  var nextId = 0;
-  var uniqueId = () => ++nextId;
-  function reserveIds(highest) {
-    nextId = Math.max(nextId, highest);
-  }
-
   // src/game/systems/System.ts
   var System = class {
     game;
@@ -4153,6 +4747,204 @@
       this.game = game2;
     }
   };
+
+  // src/game/systems/Armoury.ts
+  var DEFAULT = { q: 1, lvl: 0, gems: [], evo: [] };
+  var Armoury = class extends System {
+    get all() {
+      return this.game.s.armoury ??= {};
+    }
+    entry(id) {
+      return this.all[id] ?? DEFAULT;
+    }
+    known(id) {
+      return !!this.all[id];
+    }
+    /** Family and tier of a weapon; older or odd weapons are classed by what they do. */
+    classOf(id) {
+      const c = WEAPON_CLASS[id];
+      if (c) return c;
+      const tier = WEAPONS[id]?.[0] ?? 1, r = RANGED[id];
+      return [r ? r.kind === "bow" ? "bow" : "staff" : "blade", tier];
+    }
+    /** First time a weapon comes into the pack: roll its quality. */
+    acquire(id, luck = 1) {
+      if (!WEAPONS[id] || id === "fists" || this.all[id]) return;
+      const q = rollQuality(this.game.rng, luck);
+      this.all[id] = { q, lvl: 0, gems: [], evo: [] };
+      if (q >= 2)
+        this.game.say(
+          `${QUALITIES[q].name} ${itemName(id).toLowerCase()}!`,
+          q >= 3 ? "victory" : "good"
+        );
+    }
+    /** The weapon's full name: quality, name, and level. */
+    title(id) {
+      const e = this.entry(id);
+      return `${e.q !== 1 ? QUALITIES[e.q].name + " " : ""}${itemName(id)}${e.lvl ? " +" + e.lvl : ""}`;
+    }
+    /** The weapon's mods from evolutions and gems, summed. */
+    mods(id) {
+      const e = this.entry(id), [family] = this.classOf(id), evos = EVOLUTIONS[family].flat(), out = {};
+      const add = (m) => {
+        for (const [k, v] of Object.entries(m))
+          if (typeof v === "boolean") out[k] = v || !!out[k];
+          else out[k] = (out[k] ?? 0) + v;
+      };
+      for (const id2 of e.evo) {
+        const evo = evos.find((x) => x.id === id2);
+        if (evo) add(evo.mods);
+      }
+      for (const g of e.gems) if (GEMS[g]) add(GEMS[g].mods);
+      return out;
+    }
+    stats(id) {
+      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists;
+      const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0));
+      return {
+        id,
+        family,
+        tier,
+        damage,
+        reach: base[2] * (1 + (m.reach ?? 0)),
+        pace: Math.max(0.4, f.pace + (m.pace ?? 0)),
+        crit: 0.05 + (m.crit ?? 0),
+        count: m.count ?? 0,
+        pierce: m.pierce ?? 0,
+        bleed: (family === "battleaxe" ? 0.15 : 0) + (m.bleed ?? 0),
+        poison: m.poison ?? 0,
+        heal: m.heal ?? 0,
+        execute: m.execute ?? 0,
+        berserk: m.berserk ?? 0,
+        boss: m.boss ?? 0,
+        homing: m.homing ?? 0,
+        mana: Math.max(0.3, 1 + (m.mana ?? 0)),
+        defense: m.defense ?? 0,
+        stagger: family === "warhammer" || !!m.stagger,
+        sunder: family === "warhammer" ? 4 + (m.sunder ?? 0) : 0,
+        mark: family === "whip" ? 0.15 + (m.mark ?? 0) : 0,
+        combo: family === "blade" ? m.combo ?? 1.8 : 1,
+        magic: m.magic ?? 0,
+        armorPierce: Math.min(0.9, m.armorPierce ?? 0),
+        infusion: e.inf
+      };
+    }
+    // ─── The anvil ─────────────────────────────────────────────────────────────
+    atAnvil(id) {
+      const [, tier] = this.classOf(id), station = anvilFor(tier);
+      if (this.game.dev.god || this.game.near(station, 140)) return null;
+      return `Stand at a ${itemName(station).toLowerCase()} to work a tier ${tier} weapon.`;
+    }
+    owned(id) {
+      if (!WEAPONS[id] || id === "fists") return "That is not a weapon.";
+      if (!this.game.count(id)) return "You do not carry that weapon.";
+      return null;
+    }
+    pay(cost) {
+      if (this.game.dev.god) return true;
+      if (!this.game.canAfford(cost)) return false;
+      for (const [k, n] of Object.entries(cost)) this.game.remove(k, n);
+      return true;
+    }
+    record(id) {
+      return this.all[id] ??= { ...DEFAULT, gems: [], evo: [] };
+    }
+    /** Whether the weapon waits on a choice of evolution before it can climb further. */
+    pendingEvolution(id) {
+      const e = this.entry(id);
+      if (e.lvl >= 5 && e.evo.length < 1) return 0;
+      if (e.lvl >= 10 && e.evo.length < 2) return 1;
+      return -1;
+    }
+    upgrade(id) {
+      const why = this.owned(id) ?? this.atAnvil(id);
+      if (why) return { ok: false, reason: why };
+      const e = this.record(id), [, tier] = this.classOf(id);
+      if (e.lvl >= MAX_LEVEL) return { ok: false, reason: "It can be improved no further." };
+      if (this.pendingEvolution(id) >= 0)
+        return { ok: false, reason: "Choose how it evolves first." };
+      const cost = upgradeCost(tier, e.lvl);
+      if (!this.pay(cost))
+        return {
+          ok: false,
+          reason: "The anvil wants " + Object.entries(cost).map(([k, n]) => `${n} ${itemName(k).toLowerCase()}`).join(" and ") + "."
+        };
+      e.lvl++;
+      this.game.sound("craft_anvil");
+      this.game.say(`${this.title(id)}.`, e.lvl === 5 || e.lvl === 10 ? "victory" : "good");
+      this.game.progress.record("upgrade:" + e.lvl);
+      if (e.lvl === 5 || e.lvl === 10)
+        this.game.say("It can evolve: choose its path in the Armoury.", "good");
+      return { ok: true };
+    }
+    evolve(id, choice) {
+      const why = this.owned(id);
+      if (why) return { ok: false, reason: why };
+      const stage = this.pendingEvolution(id);
+      if (stage < 0) return { ok: false, reason: "Nothing to choose yet." };
+      const [family] = this.classOf(id), evo = EVOLUTIONS[family][stage === 1 ? 1 : 0][choice];
+      this.record(id).evo.push(evo.id);
+      this.game.sound("crystal");
+      this.game.say(`${itemName(id)} becomes ${evo.name}: ${evo.text.toLowerCase()}.`, "victory");
+      return { ok: true };
+    }
+    /** Rerolls quality at the anvil. */
+    reforge(id) {
+      const why = this.owned(id) ?? this.atAnvil(id);
+      if (why) return { ok: false, reason: why };
+      const [, tier] = this.classOf(id), cost = reforgeCost(tier);
+      if (!this.pay(cost)) return { ok: false, reason: "Reforging needs more materials and marks." };
+      const e = this.record(id);
+      e.q = rollQuality(this.game.rng, 1.2);
+      e.gems = e.gems.slice(0, QUALITIES[e.q].sockets);
+      this.game.sound("craft_anvil");
+      this.game.say(`Reforged: ${this.title(id)}.`, e.q >= 3 ? "victory" : "good");
+      return { ok: true };
+    }
+    infuse(id, infusion) {
+      const why = this.owned(id);
+      if (why) return { ok: false, reason: why };
+      const inf = infusionById(infusion);
+      if (!inf) return { ok: false, reason: "No such infusion." };
+      if (!this.game.dev.god && !this.game.count(inf.item))
+        return { ok: false, reason: `You need a ${itemName(inf.item).toLowerCase()}.` };
+      if (!this.game.dev.god) this.game.remove(inf.item);
+      this.record(id).inf = inf.id;
+      this.game.sound("potion");
+      this.game.say(
+        `${itemName(id)} is infused with ${inf.name.toLowerCase()}: ${inf.text.toLowerCase()}.`,
+        "good"
+      );
+      return { ok: true };
+    }
+    socket(id, gem) {
+      const why = this.owned(id);
+      if (why) return { ok: false, reason: why };
+      if (!GEMS[gem]) return { ok: false, reason: "That will not fit a socket." };
+      const e = this.record(id);
+      if (e.gems.length >= QUALITIES[e.q].sockets)
+        return {
+          ok: false,
+          reason: `A ${QUALITIES[e.q].name.toLowerCase()} weapon has no free socket.`
+        };
+      if (!this.game.dev.god && !this.game.count(gem)) return { ok: false, reason: "You have none." };
+      if (!this.game.dev.god) this.game.remove(gem);
+      e.gems.push(gem);
+      this.game.sound("crystal");
+      this.game.say(
+        `${GEMS[gem].name} set into ${itemName(id).toLowerCase()}: ${GEMS[gem].text}.`,
+        "good"
+      );
+      return { ok: true };
+    }
+  };
+
+  // src/game/ids.ts
+  var nextId = 0;
+  var uniqueId = () => ++nextId;
+  function reserveIds(highest) {
+    nextId = Math.max(nextId, highest);
+  }
 
   // src/game/systems/Bosses.ts
   var LEASH = 2200;
@@ -4585,6 +5377,8 @@
   var bodyRadius = (a) => a.type === "boss" ? 60 : MOBS[a.type]?.boss ? a.type === "unmaker" || a.type === "sporemother" ? 90 : 70 : 30;
   var Combat = class extends System {
     projectiles = [];
+    combo = 0;
+    lastSwing = -9;
     // ─── Taking and dealing damage ─────────────────────────────────────────────
     /** Harms the player through armour; returns the damage actually taken. */
     hurtPlayer(amount, source, disease) {
@@ -4604,14 +5398,25 @@
       return taken;
     }
     /** Harms a creature through its defense, knocks it back, and kills it at zero. */
-    hurtMob(a, amount, from, magic = false) {
+    hurtMob(a, amount, from, magic = false, w) {
       if (a.deadUntil || a.settler) return 0;
       if (a.type === "boss" && (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier) {
         this.game.say("Ordinary steel glances off the Direwolf. Obsidian is required.", "danger");
         return 0;
       }
-      const spec = MOBS[a.type], crit = this.game.rng() < 0.05, raw = amount * this.game.equipment.damageBonus(magic) * (crit ? 2 : 1), taken = Math.max(1, Math.round(raw - (spec?.defense ?? 0) * 0.5));
+      const spec = MOBS[a.type], t = this.game.s.elapsed, v = this.game.s.vitals, crit = this.game.rng() < (w?.crit ?? 0.05);
+      let k = crit ? 2 : 1;
+      if (w) {
+        if (w.execute && a.hp < a.maxHp * 0.3) k *= 1 + w.execute;
+        if (w.berserk && v.health < this.game.maxHealth() / 2) k *= 1 + w.berserk;
+        if (w.boss && (spec?.boss || a.type === "boss")) k *= 1 + w.boss;
+        if (w.infusion === "holy" && UNDEAD.has(a.type)) k *= 1.5;
+        if (magic && w.magic) k *= 1 + w.magic;
+      }
+      if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+      const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1, pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === "void" ? 0.5 : 0)), armour = (spec?.defense ?? 0) * cracked * (1 - pierce), raw = amount * this.game.equipment.damageBonus(magic) * k, taken = Math.max(1, Math.round(raw - armour * 0.5));
       a.hp -= taken;
+      if (w) this.afflict(a, w, taken);
       a.warning = 0;
       const dir = Math.sign(a.x - from.x) || 1;
       if (!spec?.boss && a.type !== "boss") {
@@ -4626,18 +5431,46 @@
       else this.game.wildlife.cry(a, "hurt");
       return taken;
     }
+    /** What a weapon leaves behind on a blow: wounds, poison, fire, frost, stagger, cracks, marks. */
+    afflict(a, w, taken) {
+      const t = this.game.s.elapsed, great = !!MOBS[a.type]?.boss || a.type === "boss", fx = a.fx ??= {};
+      const dot = (key, frac, secs) => {
+        const dps = taken * frac / 1;
+        if (!fx[key] || fx[key][1] < dps || fx[key][0] < t) fx[key] = [t + secs, dps];
+      };
+      if (w.bleed) dot("bleed", w.bleed, 3);
+      if (w.poison) dot("poison", w.poison, 4);
+      if (w.infusion === "fire") dot("burn", 0.2, 3);
+      if (w.infusion === "venom") dot("poison", 0.22, 4);
+      if (w.infusion === "frost") fx.slow = t + 3;
+      if (w.stagger && !great) fx.stun = t + 0.5;
+      if (w.sunder) fx.sunder = t + w.sunder;
+      if (w.mark) fx.mark = [t + (w.mark > 0.2 ? 8 : 4), w.mark];
+      if (w.heal) this.game.equipment.heal(taken * w.heal);
+      if (w.infusion === "storm" && this.game.rng() < 0.3) {
+        const next = this.game.s.animals.filter((b) => b !== a && !b.deadUntil && !b.settler && dist(a, b) < 220).sort((m, n) => dist(a, m) - dist(a, n))[0];
+        if (next) {
+          this.game.event("burst", next.x, next.y - 20, infusionById("storm").color);
+          this.hurtMob(next, taken * 0.6, a);
+        }
+      }
+      if (w.infusion) this.game.event("burst", a.x, a.y - 20, infusionById(w.infusion).color);
+    }
     // ─── The player's weapons ──────────────────────────────────────────────────
     /** A melee swing in the facing direction: hits every creature within the arc. */
     swing(weaponId = this.game.s.player.weapon) {
-      const s = this.game.s, p = s.player, weapon = WEAPONS[weaponId] || WEAPONS.fists, face = Math.cos(p.face) >= 0 ? 1 : -1;
-      const reach = weapon[2] * 1.15, centre = { x: p.x, y: p.y - 26 };
+      const s = this.game.s, p = s.player, w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : "fists"), face = Math.cos(p.face) >= 0 ? 1 : -1;
+      const reach = w.reach * 1.15, wide = w.family === "greatsword" ? 1.5 : 1, centre = { x: p.x, y: p.y - 26 };
       const targets = s.animals.filter((a) => {
         if (a.deadUntil || a.settler) return false;
         const cy = a.y - bodyHeight(a), dx = a.x - centre.x;
-        return Math.abs(dx) < reach + bodyRadius(a) * 0.6 && Math.abs(cy - centre.y) < 70 + bodyRadius(a) * 0.5 && dx * face > -24;
+        return Math.abs(dx) < reach + bodyRadius(a) * 0.6 && Math.abs(cy - centre.y) < (70 + bodyRadius(a) * 0.5) * wide && dx * face > -24 * wide;
       });
-      const damage = weapon[1] * (s.vitals.stamina < 15 ? 0.72 : 1);
-      for (const a of targets) this.hurtMob(a, damage, p);
+      this.combo = s.elapsed - this.lastSwing < 1.3 ? this.combo + 1 : 1;
+      this.lastSwing = s.elapsed;
+      const combo = w.family === "blade" && this.combo % 3 === 0 ? w.combo : 1, damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1);
+      if (combo > 1 && targets.length) this.game.event("burst", p.x + face * 30, p.y - 30, "#fff0a0");
+      for (const a of targets) this.hurtMob(a, damage, p, false, w);
       if (targets.length === 1) {
         const a = targets[0];
         this.game.say(
@@ -4655,25 +5488,28 @@
     fire(weaponId, target) {
       const s = this.game.s, p = s.player, spec = RANGED[weaponId];
       if (!spec) return { ok: false, reason: "That is not a ranged weapon." };
-      let damage = WEAPONS[weaponId]?.[1] ?? 10, kind = spec.projectile, extra = {};
+      const w = this.game.armoury.stats(weaponId);
+      let damage = w.damage || 10, kind = spec.projectile, extra = { weapon: w };
       if (spec.kind === "bow") {
         const arrow = this.ammo();
         if (!arrow)
           return { ok: false, reason: "No arrows. Make them at a workbench from wood and flint." };
         this.game.remove(arrow);
         damage += AMMO[arrow].damage;
-        if (AMMO[arrow].effect === "fire") extra = { fire: true };
-        if (AMMO[arrow].effect === "pierce") extra = { pierce: 3 };
-        kind = arrow === "arrow" ? "arrow" : arrow;
+        if (AMMO[arrow].effect === "fire") extra.fire = true;
+        if (AMMO[arrow].effect === "pierce") extra.pierce = 3;
+        kind = spec.projectile === "bolt" ? "bolt" : arrow === "arrow" ? "arrow" : arrow;
         this.game.sound("bow");
       } else {
-        if (!this.game.equipment.spendMana(spec.mana ?? 5))
+        if (!this.game.equipment.spendMana(Math.max(1, Math.round((spec.mana ?? 5) * w.mana))))
           return { ok: false, reason: "Not enough mana." };
         this.game.sound("cast");
       }
-      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), count = spec.count ?? 1;
+      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), count = (spec.count ?? 1) + w.count, spread = spec.spread ?? (w.count ? 0.1 : 0), pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
+      if (w.homing) extra.homing = w.homing;
+      extra.pierce = pierce;
       for (let i = 0; i < count; i++) {
-        const a = angle + (i - (count - 1) / 2) * (spec.spread ?? 0);
+        const a = angle + (i - (count - 1) / 2) * spread;
         this.spawn(
           kind === "fire_arrow" || kind === "crystal_arrow" ? "arrow" : kind,
           origin,
@@ -4719,14 +5555,15 @@
           this.projectiles.splice(i, 1);
           continue;
         }
-        if (spec.homing) {
+        const homing = b.homing ?? spec.homing;
+        if (homing) {
           const target = b.from === "player" ? s.animals.filter((a) => !a.deadUntil && dist(a, b) < 520).sort((m, n) => dist(m, b) - dist(n, b))[0] : p;
           if (target) {
             const ty = target === p ? p.y - 26 : target.y - bodyHeight(target), want = Math.atan2(ty - b.y, target.x - b.x), have = Math.atan2(b.vy, b.vx), speed = Math.hypot(b.vx, b.vy);
             let turn = want - have;
             while (turn > Math.PI) turn -= Math.PI * 2;
             while (turn < -Math.PI) turn += Math.PI * 2;
-            const next = have + clamp(turn, -spec.homing * dt, spec.homing * dt);
+            const next = have + clamp(turn, -homing * dt, homing * dt);
             b.vx = Math.cos(next) * speed;
             b.vy = Math.sin(next) * speed;
           }
@@ -4751,7 +5588,13 @@
             if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
               continue;
             b.hit.add(a.id);
-            this.hurtMob(a, b.damage, b, !!RANGED[p.weapon] && RANGED[p.weapon].kind === "magic");
+            this.hurtMob(
+              a,
+              b.damage,
+              b,
+              !!RANGED[p.weapon] && RANGED[p.weapon].kind === "magic",
+              b.weapon
+            );
             if (b.fire) this.game.event("burst", a.x, a.y - 20, "#ff8a3a");
             if (b.pierce-- <= 0) {
               spent = true;
@@ -5980,6 +6823,7 @@
       if (fx.has("defense4")) d += 4;
       if (fx.has("void")) d += 8;
       if (fx.has("buff:ironskin")) d += 8;
+      d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
     /** Multiplier on damage dealt, from sets, accessories, and buffs. */
@@ -6128,7 +6972,7 @@
       if (s.dead) return { ok: false, reason: "You must recover first." };
       const held = this.game.equipment.held(), kind = this.game.equipment.useKind(held), t = s.elapsed;
       this.aim(target);
-      const pace = RANGED[held ?? ""] ? RANGED[held].delay : held && WEAPONS[held] ? Math.max(0.3, RULES.attackCooldownSeconds * 0.75) : PACE[kind] ?? 0.3;
+      const pace = RANGED[held ?? ""] ? RANGED[held].delay * this.game.armoury.stats(held).pace : held && WEAPONS[held] ? Math.max(0.3, RULES.attackCooldownSeconds * 0.75 * this.game.armoury.stats(held).pace) : PACE[kind] ?? 0.3;
       if (t < (p.usedAt ?? -9) + pace * (this.game.equipment.has("buff:mining") && (kind === "pick" || kind === "axe") ? 0.7 : 1))
         return { ok: false, reason: "" };
       if (Math.abs(target.x - p.x) > 4) p.face = target.x >= p.x ? 0 : Math.PI;
@@ -6151,7 +6995,7 @@
         const r = this.game.combat.fire(held, target);
         if (r.ok) {
           p.usedAt = t;
-          p.attackAt = t + RANGED[held].delay;
+          p.attackAt = t + RANGED[held].delay * this.game.armoury.stats(held).pace;
         }
         return r;
       }
@@ -6606,6 +7450,8 @@
       }
       this.game.progress.record(id, qty);
       this.game.equipment.offer(id);
+      const realm = this.game.s.pocket;
+      this.game.armoury.acquire(id, realm && this.game.pocket.here() ? 1 + realm.tier * 0.25 : 1);
     }
     remove(id, qty = 1) {
       if (this.count(id) < qty) return false;
@@ -8085,13 +8931,13 @@
         const face = Math.cos(p.face) >= 0 ? 1 : -1;
         const r = this.game.combat.fire(p.weapon, { x: p.x + face * 400, y: p.y - 30 });
         if (r.ok) {
-          p.attackAt = this.game.s.elapsed + RANGED[p.weapon].delay;
+          p.attackAt = this.game.s.elapsed + RANGED[p.weapon].delay * this.game.armoury.stats(p.weapon).pace;
           p.usedAt = this.game.s.elapsed;
         }
         return { ...r, hit: false };
       }
       if (v.stamina < RULES.attackStamina) return { ok: false, reason: "Too exhausted to strike." };
-      p.attackAt = this.game.s.elapsed + RULES.attackCooldownSeconds;
+      p.attackAt = this.game.s.elapsed + RULES.attackCooldownSeconds * this.game.armoury.stats(p.weapon).pace;
       p.usedAt = this.game.s.elapsed;
       v.stamina -= RULES.attackStamina;
       v.hydration = clamp(v.hydration - 0.25, 0, RULES.maxVital);
@@ -8179,11 +9025,40 @@
         }
         return;
       }
+      this.afflict(a, dt);
+      if (a.deadUntil) return;
       const p = s.player;
       if (Math.abs(a.x - p.x) > 2600 && !MOBS[a.type]?.boss && a.type !== "boss") return;
       if (MOBS[a.type]?.boss) return this.game.bosses.step(a, dt);
       if (a.body) return this.stepBody(a, dt);
       this.stepLegacy(a, dt);
+    }
+    /** Bleeding, burning, and poison wear a creature down; stuns and slows run out. */
+    afflict(a, dt) {
+      const fx = a.fx, t = this.game.s.elapsed;
+      if (!fx) return;
+      let harm = 0;
+      for (const k of ["bleed", "burn", "poison"]) {
+        const d = fx[k];
+        if (!d) continue;
+        if (t >= d[0]) delete fx[k];
+        else harm += d[1] * dt;
+      }
+      if (fx.mark && t >= fx.mark[0]) delete fx.mark;
+      if (!harm) return;
+      a.hp -= harm;
+      a.dotShown = (a.dotShown ?? 0) + harm;
+      if (a.dotShown >= 12) {
+        this.game.event(
+          "damage",
+          a.x,
+          a.y - 44,
+          String(Math.round(a.dotShown)),
+          fx.burn ? 3 : fx.poison ? 4 : 5
+        );
+        a.dotShown = 0;
+      }
+      if (a.hp <= 0) this.kill(a);
     }
     /** Surface animals, tunnel bats, hellhounds, and the Direwolf: kept to their floor lines. */
     stepLegacy(a, dt) {
@@ -8295,7 +9170,7 @@
     stepBody(a, dt) {
       const s = this.game.s, p = s.player, spec = MOBS[a.type];
       if (!spec) return;
-      const d = dist(a, p), hunting = spec.sight > 0 && d < spec.sight && !s.dead, face = Math.sign(p.x - a.x) || 1, pace = this.game.pocket.speedScale(a), [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace], t = s.elapsed;
+      const t = s.elapsed, d = dist(a, p), hunting = spec.sight > 0 && d < spec.sight && !s.dead, face = Math.sign(p.x - a.x) || 1, stunned = (a.fx?.stun ?? 0) > t, pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1), [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace];
       a.timers ??= {};
       if (d < 900 && Math.random() < dt * 0.04) this.cry(a, "call");
       if (spec.move === "walker" || spec.move === "hopper") {
@@ -8350,7 +9225,7 @@
         this.moveBody(a, dt, true);
       }
       if (Math.abs(a.vx ?? 0) > 5) a.angle = (a.vx ?? 0) > 0 ? 0 : Math.PI;
-      if (!hunting) return;
+      if (!hunting || stunned) return;
       const cy = a.y - 22;
       if (Math.abs(p.x - a.x) < spec.reach * 0.6 + 10 && Math.abs(p.y - 26 - cy) < spec.reach * 0.6 + 20 && t >= a.attackAt) {
         a.attackAt = t + spec.cooldown * 0.6;
@@ -8488,6 +9363,7 @@
       s.spawn ??= null;
       s.pocket ??= null;
       s.realms ??= {};
+      s.armoury ??= {};
       this.game.combat.projectiles = [];
       if (s.hotbar.every((x) => x === null))
         for (const e of s.inventory) this.game.equipment.offer(e.id);
@@ -8588,6 +9464,7 @@
     drops = new Drops(this);
     equipment = new Equipment(this);
     combat = new Combat(this);
+    armoury = new Armoury(this);
     bosses = new Bosses(this);
     realms = new Realms(this);
     pocket = new Pocket(this);
@@ -8669,6 +9546,7 @@
         town: { homes: {} },
         pocket: null,
         realms: {},
+        armoury: {},
         placing: null,
         dead: false,
         lastSave: Date.now()
@@ -9428,6 +10306,7 @@
     flint: "#6a7074",
     bone: "#e6dcc6",
     copper: "#d0844a",
+    rift: "#ff6ad5",
     tidecaller: "#5ac8c0",
     ashwalker: "#8a7a6a",
     amberguard: "#e8a030",
@@ -9611,6 +10490,15 @@
     amber_pick: ["pick", "#e8a030"],
     queens_mandible: ["fang", "#e8a030"],
     queen_jelly: ["bottle", "#ffe8a0"],
+    topaz: ["gem", "#f0b040"],
+    onyx: ["gem", "#3a3440"],
+    opal: ["gem", "#e8f0f8"],
+    fire_infusion: ["potion", "#ff8a3a"],
+    frost_infusion: ["potion", "#9fd8ec"],
+    venom_infusion: ["potion", "#7bc05a"],
+    void_infusion: ["potion", "#b36cff"],
+    holy_infusion: ["potion", "#fff0a0"],
+    storm_infusion: ["potion", "#bfe4ff"],
     // Homes and trade.
     coin: ["coin", "#dfe4ea"],
     chair: ["chair", "#8a6440"],
@@ -10082,6 +10970,28 @@
         p.line(8, 1, 6, 3, l);
         p.rect(9, 3, 3, 3, d);
         break;
+      case "crossbow":
+        p.line(2, 13, 13, 2, handle);
+        p.line(3, 13, 14, 2, handleD);
+        p.line(3, 5, 11, 13, m);
+        p.line(4, 4, 12, 12, l);
+        p.line(3, 5, 7, 9, "#e8e0d0");
+        break;
+      case "tome":
+        p.rect(3, 2, 10, 12, m);
+        p.rect(3, 2, 10, 1, l);
+        p.rect(3, 2, 1, 12, d);
+        p.rect(12, 3, 1, 10, "#e8dcb8");
+        p.rect(6, 6, 4, 4, col2 ?? ll);
+        p.set(7, 7, "#ffffff");
+        break;
+      case "whip":
+        diag(1, 15, 5, handle, 2);
+        p.line(6, 10, 10, 4, m);
+        p.line(10, 4, 14, 3, m);
+        p.line(14, 3, 15, 6, l);
+        p.set(15, 7, l);
+        break;
       case "crate":
         p.rect(2, 4, 12, 10, m);
         p.rect(2, 4, 12, 1, l);
@@ -10182,6 +11092,21 @@
       sword: "sword",
       blade: "sword",
       broadsword: "sword",
+      greatsword: "sword",
+      saber: "sword",
+      reaver: "sword",
+      razor: "sword",
+      brand: "sword",
+      knife: "sword",
+      cleaver: "sword",
+      battleaxe: "axe",
+      greataxe: "axe",
+      warhammer: "hammer",
+      maul: "hammer",
+      whip: "whip",
+      crossbow: "crossbow",
+      tome: "tome",
+      infusion: "bottle",
       spear: "spear",
       bow: "bow",
       staff: "staff",
@@ -10227,8 +11152,7 @@
       shard: "gem",
       dust: "seed",
       blaster: "gun",
-      repeater: "bow",
-      tome: "scroll",
+      repeater: "crossbow",
       brick: "block",
       bricks: "block",
       block: "block",
@@ -10280,8 +11204,8 @@
     if (!id || id === "fists") return "none";
     const [tpl] = guess(id);
     if (tpl === "spear") return "thrust";
-    if (tpl === "bow" || tpl === "staff" || tpl === "wand" || tpl === "gun") return "aim";
-    if (["axe", "pick", "sword", "hammer"].includes(tpl)) return "swing";
+    if (["bow", "staff", "wand", "gun", "crossbow", "tome"].includes(tpl)) return "aim";
+    if (["axe", "pick", "sword", "hammer", "whip"].includes(tpl)) return "swing";
     return "hold";
   }
 
@@ -11788,7 +12712,13 @@
           gravity: -40
         }));
       else if (e.type === "damage")
-        floatText(e.x, e.y, e.kind, e.dir === 1 ? "#ff6a5a" : "#f4ecd8", now);
+        floatText(
+          e.x,
+          e.y,
+          e.kind,
+          ["#f4ecd8", "#ff6a5a", "#ffe070", "#ff9a4a", "#8ad060", "#d05050"][e.dir ?? 0] ?? "#f4ecd8",
+          now
+        );
       else if (e.type === "burst")
         burst(e, now, 14, () => ({
           kind: "spark",
@@ -12465,6 +13395,9 @@
     ruby: { rock: "#5a5058", crystal: "#e8304a", glow: true },
     sapphire: { rock: "#50566a", crystal: "#3a7ae8", glow: true },
     emerald: { rock: "#4e5a52", crystal: "#2ac870", glow: true },
+    topaz: { rock: "#6a5a4a", crystal: "#f0b040", glow: true },
+    onyx: { rock: "#5a5460", crystal: "#1a161e" },
+    opal: { rock: "#6a7470", crystal: "#e8f0f8", glow: true },
     kilnstone_ore: { rock: "#6a4a3a", fleck: "#ff8a3a", shine: "#ffc070" },
     burrow_amber: { rock: "#5a4028", crystal: "#e8a030", glow: true },
     coal: { rock: "#5a5a5e", fleck: "#1c1c20", shine: "#8a8a96" },
@@ -14211,7 +15144,7 @@
     return (Number(m[3]) + 1) * 12 + LETTERS[m[1]] + acc;
   }
   var midiToHz = (midi) => 440 * 2 ** ((midi - 69) / 12);
-  var QUALITIES = {
+  var QUALITIES2 = {
     "": [0, 4, 7],
     m: [0, 3, 7],
     "5": [0, 7],
@@ -14236,12 +15169,12 @@
   var pitchClass = (letter, acc = "") => (LETTERS[letter.toLowerCase()] + (acc === "#" ? 1 : acc === "b" ? -1 : 0) + 12) % 12;
   function parseChord(symbol) {
     const m = /^([A-G])(#|b)?([^/]*)(?:\/([A-G])(#|b)?)?$/.exec(symbol);
-    if (!m || !(m[3] in QUALITIES)) throw new Error(`Bad chord "${symbol}"`);
+    if (!m || !(m[3] in QUALITIES2)) throw new Error(`Bad chord "${symbol}"`);
     const root = pitchClass(m[1], m[2]);
     return {
       root,
       bass: m[4] ? pitchClass(m[4], m[5]) : root,
-      intervals: QUALITIES[m[3]]
+      intervals: QUALITIES2[m[3]]
     };
   }
   function chordTones(chord, low) {
@@ -18400,6 +19333,9 @@
     atlasView: "realms",
     atlasRealm: "orchard",
     atlasTier: 1,
+    /** The Gear page: what you wear, or the Armoury's weapon hierarchy (and which weapon). */
+    gearView: "gear",
+    armourySel: "iron_sword",
     camera: { x: 0, y: 0 },
     lastFrame: performance.now(),
     lastUI: 0,
@@ -18808,7 +19744,10 @@
     if (tab === "vitals") renderVitals(left, right);
     if (tab === "notes") renderNotes(left, right);
     if (tab === "beasts") renderBeasts(left, right);
-    if (tab === "gear") renderGear(left, right);
+    if (tab === "gear") {
+      if (state.gearView === "armoury") renderArmoury(left, right);
+      else renderGear(left, right);
+    }
     if (tab === "atlas") {
       if (state.atlasView === "rift") renderRift(left, right);
       else renderAtlas(left, right);
@@ -18852,7 +19791,8 @@
     right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p>${groups.map(
       (category) => `<h3>${category}</h3><div class="book-list">${items.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
         const use = itemUseLabel(e.id), fresh = e.fresh === void 0 ? "" : `<small class="${game.itemState(e)}">${game.itemState(e).toUpperCase()} \xB7 ${Math.max(0, Math.ceil(e.fresh / 60))} min</small>`;
-        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
+        const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
+        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
     right.querySelectorAll("[data-use]").forEach(
@@ -19108,7 +20048,13 @@
     const buffs = Object.entries(game.s.buffs).filter(([id]) => id !== "potion_sickness").map(
       ([id, left2]) => `<div>\u2022 ${BUFFS[id]?.name ?? id} \xB7 ${BUFFS[id]?.text ?? ""} (${Math.ceil(left2)}s)</div>`
     ).join("");
-    left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot("Head", p.armor?.head)}${slot("Body", p.armor?.body)}${slot("Legs", p.armor?.legs)}</div><h3>Accessories \xB7 ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot("Accessory", game.s.accessories[i])).join("")}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> \xB7 Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> \xB7 Damage <strong>\xD7${eq.damageBonus().toFixed(2)}</strong> \xB7 Speed <strong>\xD7${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set \xB7 ${setInfo.bonusText}</div>` : ""}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ""}`;
+    left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot("Head", p.armor?.head)}${slot("Body", p.armor?.body)}${slot("Legs", p.armor?.legs)}</div><h3>Accessories \xB7 ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot("Accessory", game.s.accessories[i])).join("")}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> \xB7 Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> \xB7 Damage <strong>\xD7${eq.damageBonus().toFixed(2)}</strong> \xB7 Speed <strong>\xD7${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set \xB7 ${setInfo.bonusText}</div>` : ""}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ""}<div class="book-actions"><button data-armoury>THE ARMOURY \u203A</button></div>`;
+    left.querySelector("[data-armoury]").onclick = () => {
+      state.gearView = "armoury";
+      if (WEAPONS[game.s.player.weapon] && game.s.player.weapon !== "fists")
+        state.armourySel = game.s.player.weapon;
+      renderJournal();
+    };
     const wearables = game.s.inventory.filter(
       (e) => ["armor", "accessory"].includes(ITEMS[e.id]?.[1] ?? "")
     );
@@ -19205,6 +20151,54 @@
     right.querySelectorAll("[data-buy]").forEach((b) => b.onclick = () => act(town2.buy(state.shop ?? "", b.dataset.buy ?? "")));
     right.querySelectorAll("[data-sell]").forEach((b) => b.onclick = () => act(town2.sell(b.dataset.sell ?? "")));
   }
+  function renderArmoury(left, right) {
+    const arm = game.armoury, owned = (id2) => game.count(id2) > 0;
+    const cell = (id2, tier2) => {
+      const has2 = owned(id2), known = arm.known(id2), craftable = !!RECIPES.find((r) => r.id === id2);
+      return `<button class="armoury-cell ${has2 ? "owned" : known ? "known" : ""} ${state.armourySel === id2 ? "active" : ""}" data-weapon="${id2}" title="${pretty(id2)} \xB7 tier ${tier2}${craftable ? "" : " \xB7 found, not made"}"><img src="${iconURL(id2)}" alt=""></button>`;
+    };
+    const sig = Object.keys(SIGNATURE).filter((id2) => owned(id2) || arm.known(id2));
+    left.innerHTML = `<h2>The Armoury</h2><p class="lede">Ten families by eleven tiers; each weapon climbs to +10.</p><div class="armoury-grid"><span></span>${FAMILIES.map((f) => `<span class="armoury-head" title="${f.name}: ${f.text}">${f.name.slice(0, 4).toUpperCase()}</span>`).join("")}${TIERS.map(
+      (t) => `<span class="armoury-tier" title="${t.name}">${t.tier}</span>${FAMILIES.map((f) => {
+        const w = GRID.find((g) => g.tier === t.tier && g.family === f.id);
+        return cell(w.id, t.tier);
+      }).join("")}`
+    ).join(
+      ""
+    )}</div>${sig.length ? `<h3>Signature weapons</h3><div class="armoury-sig">${sig.map((id2) => cell(id2, SIGNATURE[id2][1])).join("")}</div>` : ""}<div class="book-actions"><button class="quiet" data-gear>\u2039 GEAR</button></div>`;
+    const id = state.armourySel, [family, tier] = arm.classOf(id), fam = familyById(family), e = arm.entry(id), st = arm.stats(id), q = QUALITIES[e.q], has = owned(id), recipe = RECIPES.find((r) => r.id === id), ranged = RANGED[id], stage = arm.pendingEvolution(id), evos = EVOLUTIONS[family];
+    const costText = (cost) => Object.entries(cost).map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`).join(", ");
+    const infusions = INFUSIONS.filter((i) => game.count(i.item) > 0 || game.dev.god), gems = Object.keys(GEMS).filter((g) => game.count(g) > 0 || game.dev.god);
+    right.innerHTML = `<h2 style="color:${has ? q.color : "inherit"}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} \xB7 tier ${tier} (${tierOf(tier).name}) \xB7 ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` \xB7 ${ranged.kind === "bow" ? "shots" : "mana " + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` \xB7 reach ${Math.round(st.reach)} \xB7 swing \xD7${st.pace.toFixed(2)}`} \xB7 crit ${Math.round(st.crit * 100)}%${st.defense ? ` \xB7 +${st.defense} defense` : ""}</p>${has ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? "disabled" : ""}>${game.s.player.weapon === id ? "IN HAND" : "READY IT"}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (\xD7${q.mult}) \xB7 level <strong>+${e.lvl}</strong> / ${MAX_LEVEL} \xB7 infusion <strong>${e.inf ? infusionById(e.inf)?.name : "none"}</strong> \xB7 sockets <strong>${e.gems.map((g) => GEMS[g].name).join(", ") || "\u2014"}</strong> (${e.gems.length}/${q.sockets})</p>${stage >= 0 ? `<h3>Evolve \xB7 choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0].map(
+      (ev, i) => `<div class="book-row"><div><strong>${ev.name}</strong><small>${ev.text}</small></div><button data-evolve="${i}">CHOOSE</button></div>`
+    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button></div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button></div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
+    left.querySelectorAll("[data-weapon]").forEach(
+      (b) => b.onclick = () => {
+        state.armourySel = b.dataset.weapon ?? id;
+        renderJournal();
+      }
+    );
+    left.querySelector("[data-gear]").onclick = () => {
+      state.gearView = "gear";
+      renderJournal();
+    };
+    const act = (r) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    const on = (sel, fn) => right.querySelectorAll(sel).forEach((b) => b.onclick = () => act(fn(b)));
+    on("[data-upgrade]", () => arm.upgrade(id));
+    on("[data-reforge]", () => arm.reforge(id));
+    on("[data-evolve]", (b) => arm.evolve(id, Number(b.dataset.evolve)));
+    on("[data-infuse]", (b) => arm.infuse(id, b.dataset.infuse ?? ""));
+    on("[data-gem]", (b) => arm.socket(id, b.dataset.gem ?? ""));
+    on("[data-ready]", () => {
+      game.s.player.weapon = id;
+      sound("equip");
+      return { ok: true };
+    });
+  }
   function renderAtlas(left, right) {
     const pocket = game.pocket, open = game.s.pocket, stone = pocket.waystoneNear();
     const tier = (t) => TIER_NAMES[t] ?? String(t);
@@ -19291,7 +20285,7 @@
     $("biome-name").textContent = place ? place.toUpperCase() : layer.id === "surface" ? game.biome().name.toUpperCase() : layer.id === "upper_mines" ? game.biome().name.toUpperCase() + " \xB7 " + layer.name.toUpperCase() : layer.name.toUpperCase();
     $("world-time").textContent = timeText();
     $("condition-line").textContent = game.vitalReasons()[0];
-    $("weapon-name").textContent = pretty(game.s.player.weapon);
+    $("weapon-name").textContent = game.s.player.weapon === "fists" ? pretty("fists") : game.armoury.title(game.s.player.weapon);
     const step = TUTORIAL[game.s.tutorial.step] || CHAPTERS[game.s.chapter];
     $("objective-text").textContent = step ? step[0] : "The final folio is complete.";
     $("objective-progress").textContent = step ? `${Math.min(step[2], game.s.tutorial.tally[step[1]] || 0)} / ${step[2]}` : "EXPEDITION COMPLETE";

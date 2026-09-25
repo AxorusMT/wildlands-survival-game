@@ -44,6 +44,9 @@ const state = {
   atlasView: 'realms' as 'realms' | 'rift',
   atlasRealm: 'orchard',
   atlasTier: 1,
+  /** The Gear page: what you wear, or the Armoury's weapon hierarchy (and which weapon). */
+  gearView: 'gear' as 'gear' | 'armoury',
+  armourySel: 'iron_sword',
   camera: { x: 0, y: 0 },
   lastFrame: performance.now(),
   lastUI: 0,
@@ -476,7 +479,10 @@ function renderJournal() {
   if (tab === 'vitals') renderVitals(left, right);
   if (tab === 'notes') renderNotes(left, right);
   if (tab === 'beasts') renderBeasts(left, right);
-  if (tab === 'gear') renderGear(left, right);
+  if (tab === 'gear') {
+    if (state.gearView === 'armoury') renderArmoury(left, right);
+    else renderGear(left, right);
+  }
   if (tab === 'atlas') {
     if (state.atlasView === 'rift') renderRift(left, right);
     else renderAtlas(left, right);
@@ -538,7 +544,9 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
                   e.fresh === undefined
                     ? ''
                     : `<small class="${game.itemState(e)}">${game.itemState(e).toUpperCase()} · ${Math.max(0, Math.ceil(e.fresh / 60))} min</small>`;
-              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">×${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
+              const weapon = D.WEAPONS[e.id] && game.armoury.known(e.id),
+                q = weapon ? D.QUALITIES[game.armoury.entry(e.id).q] : null;
+              return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== 'common' ? `style="color:${q.color}"` : ''}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">×${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ''}</div></div>`;
             })
             .join('')}</div>`,
       )
@@ -870,7 +878,13 @@ function renderGear(left: HTMLElement, right: HTMLElement) {
         `<div>• ${D.BUFFS[id]?.name ?? id} · ${D.BUFFS[id]?.text ?? ''} (${Math.ceil(left)}s)</div>`,
     )
     .join('');
-  left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot('Head', p.armor?.head)}${slot('Body', p.armor?.body)}${slot('Legs', p.armor?.legs)}</div><h3>Accessories · ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot('Accessory', game.s.accessories[i])).join('')}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> · Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> · Damage <strong>×${eq.damageBonus().toFixed(2)}</strong> · Speed <strong>×${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set · ${setInfo.bonusText}</div>` : ''}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ''}`;
+  left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot('Head', p.armor?.head)}${slot('Body', p.armor?.body)}${slot('Legs', p.armor?.legs)}</div><h3>Accessories · ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot('Accessory', game.s.accessories[i])).join('')}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> · Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> · Damage <strong>×${eq.damageBonus().toFixed(2)}</strong> · Speed <strong>×${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set · ${setInfo.bonusText}</div>` : ''}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ''}<div class="book-actions"><button data-armoury>THE ARMOURY ›</button></div>`;
+  left.querySelector<HTMLButtonElement>('[data-armoury]')!.onclick = () => {
+    state.gearView = 'armoury';
+    if (D.WEAPONS[game.s.player.weapon] && game.s.player.weapon !== 'fists')
+      state.armourySel = game.s.player.weapon;
+    renderJournal();
+  };
   const wearables = game.s.inventory.filter((e) =>
     ['armor', 'accessory'].includes(D.ITEMS[e.id]?.[1] ?? ''),
   );
@@ -1011,6 +1025,91 @@ function renderTown(left: HTMLElement, right: HTMLElement) {
     .querySelectorAll<HTMLButtonElement>('[data-sell]')
     .forEach((b) => (b.onclick = () => act(town.sell(b.dataset.sell ?? ''))));
 }
+function renderArmoury(left: HTMLElement, right: HTMLElement) {
+  const arm = game.armoury,
+    owned = (id: string) => game.count(id) > 0;
+  const cell = (id: string, tier: number) => {
+    const has = owned(id),
+      known = arm.known(id),
+      craftable = !!D.RECIPES.find((r) => r.id === id);
+    return `<button class="armoury-cell ${has ? 'owned' : known ? 'known' : ''} ${state.armourySel === id ? 'active' : ''}" data-weapon="${id}" title="${pretty(id)} · tier ${tier}${craftable ? '' : ' · found, not made'}"><img src="${iconURL(id)}" alt=""></button>`;
+  };
+  const sig = Object.keys(D.SIGNATURE).filter((id) => owned(id) || arm.known(id));
+  left.innerHTML = `<h2>The Armoury</h2><p class="lede">Ten families by eleven tiers; each weapon climbs to +10.</p><div class="armoury-grid"><span></span>${D.FAMILIES.map((f) => `<span class="armoury-head" title="${f.name}: ${f.text}">${f.name.slice(0, 4).toUpperCase()}</span>`).join('')}${D.TIERS.map(
+    (t) =>
+      `<span class="armoury-tier" title="${t.name}">${t.tier}</span>${D.FAMILIES.map((f) => {
+        const w = D.GRID.find((g) => g.tier === t.tier && g.family === f.id)!;
+        return cell(w.id, t.tier);
+      }).join('')}`,
+  ).join(
+    '',
+  )}</div>${sig.length ? `<h3>Signature weapons</h3><div class="armoury-sig">${sig.map((id) => cell(id, D.SIGNATURE[id][1])).join('')}</div>` : ''}<div class="book-actions"><button class="quiet" data-gear>‹ GEAR</button></div>`;
+  const id = state.armourySel,
+    [family, tier] = arm.classOf(id),
+    fam = D.familyById(family)!,
+    e = arm.entry(id),
+    st = arm.stats(id),
+    q = D.QUALITIES[e.q],
+    has = owned(id),
+    recipe = D.RECIPES.find((r) => r.id === id),
+    ranged = D.RANGED[id],
+    stage = arm.pendingEvolution(id),
+    evos = D.EVOLUTIONS[family];
+  const costText = (cost: Record<string, number>) =>
+    Object.entries(cost)
+      .map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`)
+      .join(', ');
+  const infusions = D.INFUSIONS.filter((i) => game.count(i.item) > 0 || game.dev.god),
+    gems = Object.keys(D.GEMS).filter((g) => game.count(g) > 0 || game.dev.god);
+  right.innerHTML = `<h2 style="color:${has ? q.color : 'inherit'}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} · tier ${tier} (${D.tierOf(tier).name}) · ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` · ${ranged.kind === 'bow' ? 'shots' : 'mana ' + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` · reach ${Math.round(st.reach)} · swing ×${st.pace.toFixed(2)}`} · crit ${Math.round(st.crit * 100)}%${st.defense ? ` · +${st.defense} defense` : ''}</p>${
+    has
+      ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? 'disabled' : ''}>${game.s.player.weapon === id ? 'IN HAND' : 'READY IT'}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (×${q.mult}) · level <strong>+${e.lvl}</strong> / ${D.MAX_LEVEL} · infusion <strong>${e.inf ? D.infusionById(e.inf)?.name : 'none'}</strong> · sockets <strong>${e.gems.map((g) => D.GEMS[g].name).join(', ') || '—'}</strong> (${e.gems.length}/${q.sockets})</p>${
+          stage >= 0
+            ? `<h3>Evolve · choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0]
+                .map(
+                  (ev, i) =>
+                    `<div class="book-row"><div><strong>${ev.name}</strong><small>${ev.text}</small></div><button data-evolve="${i}">CHOOSE</button></div>`,
+                )
+                .join('')}</div>`
+            : e.lvl < D.MAX_LEVEL
+              ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button></div><p class="muted">+${e.lvl + 1}: ${costText(D.upgradeCost(tier, e.lvl))} at a ${pretty(D.anvilFor(tier)).toLowerCase()} · reforge rerolls quality: ${costText(D.reforgeCost(tier))}.</p>`
+              : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button></div>`
+        }${
+          e.evo.length
+            ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(' → ')}.</p>`
+            : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(' or ')}. At +10: ${evos[1].map((v) => v.name).join(' or ')}.</p>`
+        }${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join('')}</div>` : ''}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${D.GEMS[g].text}">${D.GEMS[g].name.toUpperCase()}</button>`).join('')}</div>` : ''}`
+      : `<div class="note-block">${recipe ? `Made ${recipe.station ? 'at a ' + pretty(recipe.station).toLowerCase() : 'by hand'} from ${costText(recipe.cost)}.` : 'Not made by any hand: it must be found.'} Its quality is rolled when it first comes to you.</div>`
+  }`;
+  left.querySelectorAll<HTMLButtonElement>('[data-weapon]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.armourySel = b.dataset.weapon ?? id;
+        renderJournal();
+      }),
+  );
+  left.querySelector<HTMLButtonElement>('[data-gear]')!.onclick = () => {
+    state.gearView = 'gear';
+    renderJournal();
+  };
+  const act = (r: { ok: boolean; reason?: string }) => {
+    if (!r.ok) message(r.reason);
+    renderJournal();
+    updateUI(true);
+  };
+  const on = (sel: string, fn: (b: HTMLButtonElement) => { ok: boolean; reason?: string }) =>
+    right.querySelectorAll<HTMLButtonElement>(sel).forEach((b) => (b.onclick = () => act(fn(b))));
+  on('[data-upgrade]', () => arm.upgrade(id));
+  on('[data-reforge]', () => arm.reforge(id));
+  on('[data-evolve]', (b) => arm.evolve(id, Number(b.dataset.evolve) as 0 | 1));
+  on('[data-infuse]', (b) => arm.infuse(id, b.dataset.infuse ?? ''));
+  on('[data-gem]', (b) => arm.socket(id, b.dataset.gem ?? ''));
+  on('[data-ready]', () => {
+    game.s.player.weapon = id;
+    sound('equip');
+    return { ok: true };
+  });
+}
 function renderAtlas(left: HTMLElement, right: HTMLElement) {
   const pocket = game.pocket,
     open = game.s.pocket,
@@ -1132,7 +1231,8 @@ function updateUI(force = false) {
         : layer.name.toUpperCase();
   $('world-time').textContent = timeText();
   $('condition-line').textContent = game.vitalReasons()[0];
-  $('weapon-name').textContent = pretty(game.s.player.weapon);
+  $('weapon-name').textContent =
+    game.s.player.weapon === 'fists' ? pretty('fists') : game.armoury.title(game.s.player.weapon);
   const step = D.TUTORIAL[game.s.tutorial.step] || D.CHAPTERS[game.s.chapter];
   $('objective-text').textContent = step ? step[0] : 'The final folio is complete.';
   $('objective-progress').textContent = step

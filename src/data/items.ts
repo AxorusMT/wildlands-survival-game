@@ -1,5 +1,6 @@
 import type { ItemSpec } from '../core/types.ts';
 import { ARMOR_ITEMS } from './gear.ts';
+import { GEN_ITEMS, INFUSIONS } from './weapons.ts';
 import { WALLS } from './town.ts';
 
 export const ITEMS: Record<string, ItemSpec> = {
@@ -291,6 +292,14 @@ export const ITEMS: Record<string, ItemSpec> = {
     ]),
   ),
   ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, 'armor'] as ItemSpec])),
+  // The weapon hierarchy.
+  ...Object.fromEntries(GEN_ITEMS.map(([id, name]) => [id, [name, 'weapon'] as ItemSpec])),
+  ...Object.fromEntries(
+    INFUSIONS.map((i) => [i.item, [`${i.name} infusion`, 'material'] as ItemSpec]),
+  ),
+  topaz: ['Topaz', 'ore'],
+  onyx: ['Onyx', 'ore'],
+  opal: ['Opal', 'ore'],
 };
 
 /** The display name for an item id, falling back to the id itself. */

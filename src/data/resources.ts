@@ -1,4 +1,5 @@
 import type { NodeSpec, ToolTier, WeaponSpec } from '../core/types.ts';
+import { GEN_WEAPONS } from './weapons.ts';
 
 // Gatherable resources: yield range, required tool and tier, hit points, and regrowth seconds.
 export const NODES: Record<string, NodeSpec> = {
@@ -39,6 +40,9 @@ export const NODES: Record<string, NodeSpec> = {
   cinderflax: { yield: [2, 3], hp: 2, regen: 200 },
   kilnstone_ore: { yield: [2, 3], tool: 'pick', req: 3, hp: 4, regen: 0 },
   burrow_amber: { yield: [1, 3], tool: 'pick', req: 3, hp: 4, regen: 0 },
+  topaz: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
+  onyx: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
+  opal: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
   // The dimensions.
   glowcap: { yield: [1, 3], hp: 2, regen: 200 },
   sunbloom: { yield: [1, 2], hp: 2, regen: 240 },
@@ -121,7 +125,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   hellrazor: [7, 114, 76],
   myconite_sword: [8, 128, 74],
   star_saber: [9, 152, 78],
-  void_reaver: [10, 192, 82],
+  void_reaver: [10, 272, 86],
   rift_blade: [11, 245, 92],
   // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
   wooden_bow: [1, 9, 0],
@@ -134,4 +138,6 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   sun_staff: [7, 84, 0],
   spore_staff: [8, 76, 0],
   void_staff: [10, 150, 0],
+  // The rest of the hierarchy, generated from its table.
+  ...GEN_WEAPONS,
 };

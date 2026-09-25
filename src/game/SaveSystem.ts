@@ -143,6 +143,7 @@ export class SaveSystem extends System {
     s.spawn ??= null;
     s.pocket ??= null;
     s.realms ??= {};
+    s.armoury ??= {};
     this.game.combat.projectiles = [];
     // Old records fill the quick slots with what they carry.
     if (s.hotbar.every((x) => x === null))

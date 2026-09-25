@@ -1,5 +1,6 @@
 import type { Recipe } from '../core/types.ts';
 import { ARMOR_RECIPES } from './gear.ts';
+import { GEN_RECIPES, INFUSIONS } from './weapons.ts';
 
 // Recipe station means the player must stand near an existing structure of that type.
 export const RECIPES: Recipe[] = (
@@ -184,6 +185,11 @@ export const RECIPES: Recipe[] = (
     ['amber_pick', { burrow_amber: 12, gold_ingot: 2, wood: 3 }, 'workbench', 4],
     // ── Armour ──
     ...ARMOR_RECIPES,
+    // ── The weapon hierarchy, and infusions ──
+    ...GEN_RECIPES,
+    ...INFUSIONS.map(
+      (i) => [i.item, i.recipe, 'workbench', 4] as [string, Record<string, number>, string, number],
+    ),
   ] as [string, Record<string, number>, string | null, number, number?][]
 ).map(([id, cost, station, tier, yieldQty]) => ({
   id,

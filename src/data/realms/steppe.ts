@@ -85,6 +85,7 @@ export const STEPPE: RealmTemplate = {
     ['wood', 2],
     ['stone', 2],
     ['cactus_fruit', 1],
+    ['topaz', 1],
   ],
   nodeCount: 72,
   mobs: [

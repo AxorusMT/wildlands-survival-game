@@ -762,3 +762,66 @@ canvas.icon {
   background: #b1664c;
   color: #fff6de;
 }
+
+/* ── Armoury ───────────────────────────────────────────────────────────────── */
+.armoury-grid {
+  display: grid;
+  grid-template-columns: 22px repeat(10, 1fr);
+  grid-auto-rows: 25px;
+  gap: 2px;
+  margin: 6px 0 10px;
+}
+.armoury-head,
+.armoury-tier {
+  font: 400 9px var(--caps);
+  color: #7c624d;
+  text-align: center;
+  align-self: center;
+}
+.armoury-cell {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  height: 25px;
+  padding: 0;
+  background: #0000000d;
+  border: var(--px) solid #0000001a;
+  box-shadow: none;
+  cursor: pointer;
+}
+.armoury-cell img {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+.armoury-cell.known img {
+  opacity: 0.55;
+  filter: grayscale(0.3);
+}
+.armoury-cell.owned {
+  background: #fff4d8;
+  border-color: #b89a6a;
+}
+.armoury-cell.owned img {
+  opacity: 1;
+  filter: none;
+}
+.armoury-cell.active {
+  border-color: #b1664c;
+  background: #f4d8c0;
+}
+.armoury-sig {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+
+#weapon-name {
+  display: block;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

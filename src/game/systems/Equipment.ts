@@ -144,6 +144,8 @@ export class Equipment extends System {
     if (fx.has('defense4')) d += 4;
     if (fx.has('void')) d += 8;
     if (fx.has('buff:ironskin')) d += 8;
+    // A Phalanx spear or Juggernaut hammer guards you while it is your ready weapon.
+    d += this.game.armoury.stats(this.game.s.player.weapon).defense;
     return d;
   }
   /** Multiplier on damage dealt, from sets, accessories, and buffs. */

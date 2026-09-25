@@ -86,6 +86,7 @@ export const WARREN: RealmTemplate = {
     ['ruby', 1],
     ['emerald', 1],
     ['clay', 1],
+    ['onyx', 1],
   ],
   nodeCount: 66,
   mobs: [

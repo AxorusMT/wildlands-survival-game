@@ -30,6 +30,9 @@ export class Inventory extends System {
     }
     this.game.progress.record(id, qty);
     this.game.equipment.offer(id);
+    // A weapon's quality is rolled the first time it is found; realm finds run better.
+    const realm = this.game.s.pocket;
+    this.game.armoury.acquire(id, realm && this.game.pocket.here() ? 1 + realm.tier * 0.25 : 1);
   }
   remove(id: string, qty = 1) {
     if (this.count(id) < qty) return false;

@@ -5,7 +5,9 @@ import { itemName } from '../../data/items.ts';
 import { MOBS, mobName } from '../../data/mobs.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import { TILE } from '../../data/world.ts';
+import { UNDEAD, infusionById } from '../../data/weapons.ts';
 import { RULES } from '../rules.ts';
+import type { WeaponStats } from './Armoury.ts';
 
 import { System } from './System.ts';
 
@@ -22,6 +24,10 @@ export interface Projectile {
   pierce: number;
   hit: Set<number>;
   fire?: boolean;
+  /** The upgraded weapon that fired it, for its afflictions and bonuses. */
+  weapon?: WeaponStats;
+  /** Turn rate toward the nearest foe, for shots that seek (overrides the projectile's own). */
+  homing?: number;
 }
 /** Height of a creature's middle above its feet, for aiming and hits. */
 export const bodyHeight = (a: Animal) => (MOBS[a.type]?.boss ? 60 : 22);
@@ -37,6 +43,8 @@ export const bodyRadius = (a: Animal) =>
 
 export class Combat extends System {
   projectiles: Projectile[] = [];
+  private combo = 0;
+  private lastSwing = -9;
 
   // ─── Taking and dealing damage ─────────────────────────────────────────────
   /** Harms the player through armour; returns the damage actually taken. */
@@ -64,7 +72,7 @@ export class Combat extends System {
     return taken;
   }
   /** Harms a creature through its defense, knocks it back, and kills it at zero. */
-  hurtMob(a: Animal, amount: number, from: Point, magic = false) {
+  hurtMob(a: Animal, amount: number, from: Point, magic = false, w?: WeaponStats) {
     if (a.deadUntil || a.settler) return 0;
     if (
       a.type === 'boss' &&
@@ -74,10 +82,26 @@ export class Combat extends System {
       return 0;
     }
     const spec = MOBS[a.type],
-      crit = this.game.rng() < 0.05,
-      raw = amount * this.game.equipment.damageBonus(magic) * (crit ? 2 : 1),
-      taken = Math.max(1, Math.round(raw - (spec?.defense ?? 0) * 0.5));
+      t = this.game.s.elapsed,
+      v = this.game.s.vitals,
+      crit = this.game.rng() < (w?.crit ?? 0.05);
+    // The weapon's bonuses: executions, berserking, great foes, holy light, and marks.
+    let k = crit ? 2 : 1;
+    if (w) {
+      if (w.execute && a.hp < a.maxHp * 0.3) k *= 1 + w.execute;
+      if (w.berserk && v.health < this.game.maxHealth() / 2) k *= 1 + w.berserk;
+      if (w.boss && (spec?.boss || a.type === 'boss')) k *= 1 + w.boss;
+      if (w.infusion === 'holy' && UNDEAD.has(a.type)) k *= 1.5;
+      if (magic && w.magic) k *= 1 + w.magic;
+    }
+    if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+    const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1,
+      pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === 'void' ? 0.5 : 0)),
+      armour = (spec?.defense ?? 0) * cracked * (1 - pierce),
+      raw = amount * this.game.equipment.damageBonus(magic) * k,
+      taken = Math.max(1, Math.round(raw - armour * 0.5));
     a.hp -= taken;
+    if (w) this.afflict(a, w, taken);
     a.warning = 0;
     const dir = Math.sign(a.x - from.x) || 1;
     if (!spec?.boss && a.type !== 'boss') {
@@ -92,15 +116,46 @@ export class Combat extends System {
     else this.game.wildlife.cry(a, 'hurt');
     return taken;
   }
+  /** What a weapon leaves behind on a blow: wounds, poison, fire, frost, stagger, cracks, marks. */
+  private afflict(a: Animal, w: WeaponStats, taken: number) {
+    const t = this.game.s.elapsed,
+      great = !!MOBS[a.type]?.boss || a.type === 'boss',
+      fx = (a.fx ??= {});
+    const dot = (key: 'bleed' | 'burn' | 'poison', frac: number, secs: number) => {
+      const dps = (taken * frac) / 1;
+      if (!fx[key] || fx[key]![1] < dps || fx[key]![0] < t) fx[key] = [t + secs, dps];
+    };
+    if (w.bleed) dot('bleed', w.bleed, 3);
+    if (w.poison) dot('poison', w.poison, 4);
+    if (w.infusion === 'fire') dot('burn', 0.2, 3);
+    if (w.infusion === 'venom') dot('poison', 0.22, 4);
+    if (w.infusion === 'frost') fx.slow = t + 3;
+    if (w.stagger && !great) fx.stun = t + 0.5;
+    if (w.sunder) fx.sunder = t + w.sunder;
+    if (w.mark) fx.mark = [t + (w.mark > 0.2 ? 8 : 4), w.mark];
+    if (w.heal) this.game.equipment.heal(taken * w.heal);
+    // Storm: lightning leaps to the nearest other foe.
+    if (w.infusion === 'storm' && this.game.rng() < 0.3) {
+      const next = this.game.s.animals
+        .filter((b) => b !== a && !b.deadUntil && !b.settler && dist(a, b) < 220)
+        .sort((m, n) => dist(a, m) - dist(a, n))[0];
+      if (next) {
+        this.game.event('burst', next.x, next.y - 20, infusionById('storm')!.color);
+        this.hurtMob(next, taken * 0.6, a);
+      }
+    }
+    if (w.infusion) this.game.event('burst', a.x, a.y - 20, infusionById(w.infusion)!.color);
+  }
 
   // ─── The player's weapons ──────────────────────────────────────────────────
   /** A melee swing in the facing direction: hits every creature within the arc. */
   swing(weaponId = this.game.s.player.weapon) {
     const s = this.game.s,
       p = s.player,
-      weapon = WEAPONS[weaponId] || WEAPONS.fists,
+      w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : 'fists'),
       face = Math.cos(p.face) >= 0 ? 1 : -1;
-    const reach = weapon[2] * 1.15,
+    const reach = w.reach * 1.15,
+      wide = w.family === 'greatsword' ? 1.5 : 1,
       centre = { x: p.x, y: p.y - 26 };
     const targets = s.animals.filter((a) => {
       if (a.deadUntil || a.settler) return false;
@@ -108,12 +163,17 @@ export class Combat extends System {
         dx = a.x - centre.x;
       return (
         Math.abs(dx) < reach + bodyRadius(a) * 0.6 &&
-        Math.abs(cy - centre.y) < 70 + bodyRadius(a) * 0.5 &&
-        dx * face > -24
+        Math.abs(cy - centre.y) < (70 + bodyRadius(a) * 0.5) * wide &&
+        dx * face > -24 * wide
       );
     });
-    const damage = weapon[1] * (s.vitals.stamina < 15 ? 0.72 : 1);
-    for (const a of targets) this.hurtMob(a, damage, p);
+    // Blades build a combo: every third blow in quick succession lands harder.
+    this.combo = s.elapsed - this.lastSwing < 1.3 ? this.combo + 1 : 1;
+    this.lastSwing = s.elapsed;
+    const combo = w.family === 'blade' && this.combo % 3 === 0 ? w.combo : 1,
+      damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1);
+    if (combo > 1 && targets.length) this.game.event('burst', p.x + face * 30, p.y - 30, '#fff0a0');
+    for (const a of targets) this.hurtMob(a, damage, p, false, w);
     if (targets.length === 1) {
       const a = targets[0];
       this.game.say(
@@ -136,29 +196,35 @@ export class Combat extends System {
       p = s.player,
       spec = RANGED[weaponId];
     if (!spec) return { ok: false, reason: 'That is not a ranged weapon.' };
-    let damage = WEAPONS[weaponId]?.[1] ?? 10,
+    const w = this.game.armoury.stats(weaponId);
+    let damage = w.damage || 10,
       kind = spec.projectile,
-      extra: Partial<Projectile> = {};
+      extra: Partial<Projectile> = { weapon: w };
     if (spec.kind === 'bow') {
       const arrow = this.ammo();
       if (!arrow)
         return { ok: false, reason: 'No arrows. Make them at a workbench from wood and flint.' };
       this.game.remove(arrow);
       damage += AMMO[arrow].damage;
-      if (AMMO[arrow].effect === 'fire') extra = { fire: true };
-      if (AMMO[arrow].effect === 'pierce') extra = { pierce: 3 };
-      kind = arrow === 'arrow' ? 'arrow' : arrow;
+      if (AMMO[arrow].effect === 'fire') extra.fire = true;
+      if (AMMO[arrow].effect === 'pierce') extra.pierce = 3;
+      // Crossbows loose bolts, whatever arrows feed them.
+      kind = spec.projectile === 'bolt' ? 'bolt' : arrow === 'arrow' ? 'arrow' : arrow;
       this.game.sound('bow');
     } else {
-      if (!this.game.equipment.spendMana(spec.mana ?? 5))
+      if (!this.game.equipment.spendMana(Math.max(1, Math.round((spec.mana ?? 5) * w.mana))))
         return { ok: false, reason: 'Not enough mana.' };
       this.game.sound('cast');
     }
     const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 },
       angle = Math.atan2(target.y - origin.y, target.x - origin.x),
-      count = spec.count ?? 1;
+      count = (spec.count ?? 1) + w.count,
+      spread = spec.spread ?? (w.count ? 0.1 : 0),
+      pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
+    if (w.homing) extra.homing = w.homing;
+    extra.pierce = pierce;
     for (let i = 0; i < count; i++) {
-      const a = angle + (i - (count - 1) / 2) * (spec.spread ?? 0);
+      const a = angle + (i - (count - 1) / 2) * spread;
       this.spawn(
         kind === 'fire_arrow' || kind === 'crystal_arrow' ? 'arrow' : kind,
         origin,
@@ -225,7 +291,8 @@ export class Combat extends System {
         this.projectiles.splice(i, 1);
         continue;
       }
-      if (spec.homing) {
+      const homing = b.homing ?? spec.homing;
+      if (homing) {
         // Player shots seek the nearest creature; monster shots seek the player.
         const target =
           b.from === 'player'
@@ -241,7 +308,7 @@ export class Combat extends System {
           let turn = want - have;
           while (turn > Math.PI) turn -= Math.PI * 2;
           while (turn < -Math.PI) turn += Math.PI * 2;
-          const next = have + clamp(turn, -spec.homing * dt, spec.homing * dt);
+          const next = have + clamp(turn, -homing * dt, homing * dt);
           b.vx = Math.cos(next) * speed;
           b.vy = Math.sin(next) * speed;
         }
@@ -270,7 +337,13 @@ export class Combat extends System {
           if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
             continue;
           b.hit.add(a.id);
-          this.hurtMob(a, b.damage, b, !!RANGED[p.weapon] && RANGED[p.weapon].kind === 'magic');
+          this.hurtMob(
+            a,
+            b.damage,
+            b,
+            !!RANGED[p.weapon] && RANGED[p.weapon].kind === 'magic',
+            b.weapon,
+          );
           if (b.fire) this.game.event('burst', a.x, a.y - 20, '#ff8a3a');
           if (b.pierce-- <= 0) {
             spent = true;

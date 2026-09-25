@@ -90,6 +90,7 @@ export const ORCHARD: RealmTemplate = {
     ['iron_ore', 1],
     ['silver_ore', 1],
     ['water', 1],
+    ['opal', 1],
   ],
   nodeCount: 70,
   mobs: [

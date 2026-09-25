@@ -12,6 +12,7 @@ export const MATERIAL: Record<string, string> = {
   flint: '#6a7074',
   bone: '#e6dcc6',
   copper: '#d0844a',
+  rift: '#ff6ad5',
   tidecaller: '#5ac8c0',
   ashwalker: '#8a7a6a',
   amberguard: '#e8a030',
@@ -104,7 +105,10 @@ type Tpl =
   | 'door'
   | 'bucket'
   | 'rope'
-  | 'hook';
+  | 'hook'
+  | 'crossbow'
+  | 'tome'
+  | 'whip';
 /** Explicit icons; anything not listed is guessed from its id. */
 export const ICONS: Record<string, [Tpl, string, string?]> = {
   wood: ['log', '#8a6440'],
@@ -255,6 +259,15 @@ export const ICONS: Record<string, [Tpl, string, string?]> = {
   amber_pick: ['pick', '#e8a030'],
   queens_mandible: ['fang', '#e8a030'],
   queen_jelly: ['bottle', '#ffe8a0'],
+  topaz: ['gem', '#f0b040'],
+  onyx: ['gem', '#3a3440'],
+  opal: ['gem', '#e8f0f8'],
+  fire_infusion: ['potion', '#ff8a3a'],
+  frost_infusion: ['potion', '#9fd8ec'],
+  venom_infusion: ['potion', '#7bc05a'],
+  void_infusion: ['potion', '#b36cff'],
+  holy_infusion: ['potion', '#fff0a0'],
+  storm_infusion: ['potion', '#bfe4ff'],
   // Homes and trade.
   coin: ['coin', '#dfe4ea'],
   chair: ['chair', '#8a6440'],
@@ -729,6 +742,28 @@ function paint(p: Painter, tpl: Tpl, col: string, col2?: string) {
       p.line(8, 1, 6, 3, l);
       p.rect(9, 3, 3, 3, d);
       break;
+    case 'crossbow':
+      p.line(2, 13, 13, 2, handle);
+      p.line(3, 13, 14, 2, handleD);
+      p.line(3, 5, 11, 13, m);
+      p.line(4, 4, 12, 12, l);
+      p.line(3, 5, 7, 9, '#e8e0d0');
+      break;
+    case 'tome':
+      p.rect(3, 2, 10, 12, m);
+      p.rect(3, 2, 10, 1, l);
+      p.rect(3, 2, 1, 12, d);
+      p.rect(12, 3, 1, 10, '#e8dcb8');
+      p.rect(6, 6, 4, 4, col2 ?? ll);
+      p.set(7, 7, '#ffffff');
+      break;
+    case 'whip':
+      diag(1, 15, 5, handle, 2);
+      p.line(6, 10, 10, 4, m);
+      p.line(10, 4, 14, 3, m);
+      p.line(14, 3, 15, 6, l);
+      p.set(15, 7, l);
+      break;
     case 'crate':
       p.rect(2, 4, 12, 10, m);
       p.rect(2, 4, 12, 1, l);
@@ -830,6 +865,21 @@ function guess(id: string): [Tpl, string, string?] {
     sword: 'sword',
     blade: 'sword',
     broadsword: 'sword',
+    greatsword: 'sword',
+    saber: 'sword',
+    reaver: 'sword',
+    razor: 'sword',
+    brand: 'sword',
+    knife: 'sword',
+    cleaver: 'sword',
+    battleaxe: 'axe',
+    greataxe: 'axe',
+    warhammer: 'hammer',
+    maul: 'hammer',
+    whip: 'whip',
+    crossbow: 'crossbow',
+    tome: 'tome',
+    infusion: 'bottle',
     spear: 'spear',
     bow: 'bow',
     staff: 'staff',
@@ -875,8 +925,7 @@ function guess(id: string): [Tpl, string, string?] {
     shard: 'gem',
     dust: 'seed',
     blaster: 'gun',
-    repeater: 'bow',
-    tome: 'scroll',
+    repeater: 'crossbow',
     brick: 'block',
     bricks: 'block',
     block: 'block',
@@ -942,7 +991,7 @@ export function useStyle(id: string): 'swing' | 'thrust' | 'aim' | 'hold' | 'non
   if (!id || id === 'fists') return 'none';
   const [tpl] = guess(id);
   if (tpl === 'spear') return 'thrust';
-  if (tpl === 'bow' || tpl === 'staff' || tpl === 'wand' || tpl === 'gun') return 'aim';
-  if (['axe', 'pick', 'sword', 'hammer'].includes(tpl)) return 'swing';
+  if (['bow', 'staff', 'wand', 'gun', 'crossbow', 'tome'].includes(tpl)) return 'aim';
+  if (['axe', 'pick', 'sword', 'hammer', 'whip'].includes(tpl)) return 'swing';
   return 'hold';
 }

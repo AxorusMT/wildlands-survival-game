@@ -1,5 +1,6 @@
 // Gear beyond the first tools: armour sets, ranged and magic weapons, ammunition, placeable
 // blocks, potions and the buffs they give, and accessories. Item names live in items.ts.
+import { GEN_PROJECTILES, GEN_RANGED } from './weapons.ts';
 
 /** An armour slot and the defense a piece grants. */
 export type ArmorSlot = 'head' | 'body' | 'legs';
@@ -296,6 +297,7 @@ export const RANGED: Record<string, RangedSpec> = {
     spread: 0.3,
   },
   void_staff: { kind: 'magic', projectile: 'void_beam', delay: 0.3, speed: 1100, mana: 12 },
+  ...GEN_RANGED,
 };
 /** Arrows: extra damage and a special effect. */
 export const AMMO: Record<string, { damage: number; effect?: 'fire' | 'pierce' }> = {
@@ -345,6 +347,7 @@ export const PROJECTILES: Record<string, ProjectileSpec> = {
   lightning: { color: '#fff8c0', glow: '#fff0a0', life: 0.5, size: 18, pierce: 99 },
   eye_beam: { color: '#ff5a8a', glow: '#ff9ac0', life: 2.4, size: 11 },
   flame_jet: { color: '#ffb347', glow: '#ff6a2a', life: 0.7, size: 16, fire: true, pierce: 99 },
+  ...GEN_PROJECTILES,
 };
 
 /** Placeable blocks: item to tile kind. */
