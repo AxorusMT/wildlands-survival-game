@@ -7,6 +7,7 @@
     <title>Wildlands — A Field Record</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="book.css" />
+    <link rel="stylesheet" href="pixel.css" />
   </head>
   <body>
     <canvas id="world" aria-label="Wildlands game world"></canvas>
@@ -83,6 +84,13 @@
           <div class="hud-track"><i id="stamina-bar"></i></div>
           <b id="stamina-value">100</b>
         </div>
+        <div class="hud-stat mana">
+          <span>MANA</span>
+          <div class="hud-track"><i id="mana-bar"></i></div>
+          <b id="mana-value">20</b>
+        </div>
+        <div class="hud-defense">DEFENSE <b id="defense-value">0</b></div>
+        <div id="buffs" class="hud-buffs"></div>
         <p id="condition-line">Stable · the meadow gives you a little time.</p>
       </div>
       <div class="hud-right">
@@ -96,6 +104,8 @@
         <small id="boss-value"></small>
       </div>
       <div id="toast" role="status"></div>
+      <div id="hotbar-name" class="hud-hotbar-name"></div>
+      <div id="hotbar" class="hud-hotbar" aria-label="Quick slots"></div>
       <section id="dev-console" class="hidden" aria-label="Field console">
         <header>FIELD CONSOLE <span>` to close · help for commands</span></header>
         <div id="dev-log" role="log" aria-live="polite"></div>
@@ -143,9 +153,10 @@
           </div>
         </div>
         <nav class="book-tabs" aria-label="Journal pages">
-          <button data-tab="pack">PACK</button><button data-tab="recipes">RECIPES</button
-          ><button data-tab="vitals">VITALS</button><button data-tab="notes">FIELD NOTES</button
-          ><button data-tab="beasts">BEASTS</button>
+          <button data-tab="pack">PACK</button><button data-tab="gear">GEAR</button
+          ><button data-tab="recipes">RECIPES</button><button data-tab="vitals">VITALS</button
+          ><button data-tab="notes">FIELD NOTES</button><button data-tab="beasts">BEASTS</button
+          ><button data-tab="rift">RIFT</button>
         </nav>
       </div>
     </section>

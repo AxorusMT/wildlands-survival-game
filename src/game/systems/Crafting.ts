@@ -2,7 +2,7 @@ import { dist } from '../../core/math.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { RECIPES } from '../../data/recipes.ts';
 import { WEAPONS } from '../../data/resources.ts';
-import { TILE, TILE_ROWS, WORLD_H, WORLD_W } from '../../data/world.ts';
+import { TILE, TILE_ROWS, WORLD_H, regionBounds } from '../../data/world.ts';
 import { uniqueId } from '../ids.ts';
 import { RULES } from '../rules.ts';
 
@@ -18,6 +18,11 @@ export class Crafting extends System {
       (this.game.s.structures.some((x) => x.type === 'effergy') || this.game.count('effergy'))
     )
       return 'Only one Effergy may be owned.';
+    if (
+      id === 'rift_gate' &&
+      (this.game.s.structures.some((x) => x.type === 'rift_gate') || this.game.count('rift_gate'))
+    )
+      return 'Only one Rift Gate may stand.';
     if (this.free(id)) return null;
     if (r.station && !this.game.near(r.station)) return 'Stand near a ' + itemName(r.station) + '.';
     if (r.station === 'campfire' && !this.game.nearLitFire()) return 'The campfire needs fuel.';
@@ -33,7 +38,7 @@ export class Crafting extends System {
     const r = RECIPES.find((r) => r.id === id)!;
     if (!this.free(id))
       for (const [item, qty] of Object.entries(r.cost)) this.game.remove(item, qty);
-    this.game.add(id);
+    this.game.add(id, r.yield ?? 1);
     this.game.sound(
       r.station === 'forge' || r.station === 'furnace'
         ? 'craft_anvil'
@@ -44,8 +49,8 @@ export class Crafting extends System {
             : 'craft_wood',
     );
     this.game.progress.record('craft:' + id);
-    this.game.say('Made ' + itemName(id) + '.', 'good');
-    if (ITEMS[id][1] === 'structure') this.game.s.placing = id;
+    this.game.say('Made ' + (r.yield ? r.yield + ' ' : '') + itemName(id) + '.', 'good');
+    if (ITEMS[id][1] === 'structure' && id !== 'torch') this.game.s.placing = id;
     if (WEAPONS[id] && WEAPONS[id][0] > WEAPONS[this.game.s.player.weapon][0])
       this.game.s.player.weapon = id;
     return { ok: true };
@@ -53,14 +58,18 @@ export class Crafting extends System {
   place(id: string, x: number, y: number) {
     if (ITEMS[id]?.[1] !== 'structure' || !this.game.count(id))
       return { ok: false, reason: 'That structure is not in your pack.' };
-    if (id === 'effergy' && this.game.s.structures.some((st) => st.type === id))
-      return { ok: false, reason: 'Only one Effergy may be owned.' };
+    if (
+      (id === 'effergy' || id === 'rift_gate') &&
+      this.game.s.structures.some((st) => st.type === id)
+    )
+      return { ok: false, reason: 'Only one ' + itemName(id) + ' may stand.' };
     if (dist({ x, y }, this.game.s.player) > RULES.placeReach)
       return { ok: false, reason: 'Place it within reach.' };
+    const [lo, hi] = regionBounds(x);
     if (
-      x < RULES.placeEdgePadding ||
+      x < lo + RULES.placeEdgePadding + 32 ||
       y < RULES.placeEdgePadding ||
-      x > WORLD_W - RULES.placeEdgePadding ||
+      x > hi - RULES.placeEdgePadding - 32 ||
       y > WORLD_H - RULES.placeEdgePadding
     )
       return { ok: false, reason: 'Too close to the edge.' };
@@ -102,6 +111,7 @@ export class Crafting extends System {
       triggeredAt: 0,
     };
     this.game.s.structures.push(st);
+    if (id === 'rift_gate') this.game.realms.socket();
     this.game.sound('place', x, y);
     this.game.s.placing = null;
     this.game.progress.record('place:' + id);

@@ -519,6 +519,170 @@ const SOUNDS: Record<string, Sfx> = {
     tone(k, o, t, { from: 180, to: 60, peak: 0.25 * v, decay: 0.4 });
     hiss(k, o, t, { freq: 600, type: 'lowpass', peak: 0.15 * v, decay: 0.3 });
   },
+  // ── Weapons, magic, and the deep places ──
+  bow: (k, o, t, v) => {
+    tone(k, o, t, { from: 220, to: 140, type: 'triangle', peak: 0.12 * v, decay: 0.12 });
+    hiss(k, o, t + 0.01, { freq: 3200, sweepTo: 1200, q: 1, peak: 0.1 * v, decay: 0.16 });
+  },
+  dart: (k, o, t, v) => {
+    clicks(k, o, t, 1, 0.01, 1800, 0.1 * v);
+    hiss(k, o, t + 0.01, { freq: 4200, sweepTo: 2000, q: 1.2, peak: 0.08 * v, decay: 0.12 });
+  },
+  potion: (k, o, t, v) => {
+    for (let i = 0; i < 4; i++)
+      tone(k, o, t + i * 0.09, {
+        from: 420 + i * 60,
+        to: 300,
+        type: 'sine',
+        peak: 0.08 * v,
+        decay: 0.08,
+      });
+    tone(k, o, t + 0.42, { from: 1320, to: 1760, type: 'triangle', peak: 0.05 * v, decay: 0.3 });
+  },
+  crystal: (k, o, t, v) => {
+    [1318, 1760, 2349, 2637].forEach((f, i) =>
+      tone(k, o, t + i * 0.07, { from: f, type: 'triangle', peak: 0.07 * v, decay: 0.9 }),
+    );
+  },
+  star: (k, o, t, v) => {
+    hiss(k, o, t, { freq: 5200, sweepTo: 1600, q: 1.4, peak: 0.07 * v, decay: 1.1, attack: 0.3 });
+    tone(k, o, t + 1.1, { from: 2093, type: 'triangle', peak: 0.05 * v, decay: 0.8 });
+  },
+  portal: (k, o, t, v) => {
+    hiss(k, o, t, { freq: 300, sweepTo: 2600, q: 2, peak: 0.16 * v, decay: 0.7, attack: 0.25 });
+    tone(k, o, t, {
+      from: 110,
+      to: 440,
+      type: 'triangle',
+      peak: 0.12 * v,
+      decay: 0.9,
+      attack: 0.2,
+    });
+    tone(k, o, t + 0.1, {
+      from: 165,
+      to: 660,
+      type: 'sine',
+      peak: 0.08 * v,
+      decay: 0.9,
+      attack: 0.2,
+    });
+  },
+  slam: (k, o, t, v) => {
+    hiss(k, o, t, { freq: 220, type: 'lowpass', peak: 0.7 * v, decay: 0.6 });
+    tone(k, o, t, { from: 90, to: 38, peak: 0.45 * v, decay: 0.5 });
+  },
+  place_block: (k, o, t, v) => {
+    hiss(k, o, t, { freq: 900, type: 'lowpass', peak: 0.22 * v, decay: 0.07 });
+    clicks(k, o, t, 1, 0.01, 700, 0.08 * v);
+  },
+  // ── Voices of the dungeons and dimensions ──
+  bones_call: (k, o, t, v) => clicks(k, o, t, 7, 0.35, 1900, 0.06 * v),
+  bones_attack: (k, o, t, v) => {
+    clicks(k, o, t, 4, 0.12, 2400, 0.08 * v);
+    hiss(k, o, t + 0.1, { freq: 1800, q: 1, peak: 0.08 * v, decay: 0.15 });
+  },
+  bones_hurt: (k, o, t, v) => clicks(k, o, t, 9, 0.2, 1500, 0.09 * v),
+  ghoul_call: (k, o, t, v) => growl(k, o, t, 80, 66, 0.9, 0.22 * v, 18),
+  ghoul_attack: (k, o, t, v) => {
+    growl(k, o, t, 110, 70, 0.4, 0.3 * v, 24);
+    cry(k, o, t + 0.2, { from: 260, to: 180, formant: 700, peak: 0.15 * v, dur: 0.25 });
+  },
+  ghoul_hurt: (k, o, t, v) =>
+    cry(k, o, t, { from: 420, to: 250, formant: 800, peak: 0.16 * v, dur: 0.3, wobble: 12 }),
+  wraith_call: (k, o, t, v) =>
+    cry(k, o, t, {
+      from: 520,
+      to: 700,
+      formant: 1100,
+      q: 4,
+      peak: 0.08 * v,
+      dur: 1.2,
+      wobble: 3,
+      type: 'sine',
+    }),
+  wraith_attack: (k, o, t, v) =>
+    hiss(k, o, t, { freq: 2600, sweepTo: 800, q: 2, peak: 0.12 * v, decay: 0.4, attack: 0.1 }),
+  wraith_hurt: (k, o, t, v) =>
+    cry(k, o, t, {
+      from: 900,
+      to: 500,
+      formant: 1400,
+      q: 4,
+      peak: 0.1 * v,
+      dur: 0.4,
+      type: 'sine',
+    }),
+  golem_call: (k, o, t, v) => growl(k, o, t, 50, 42, 1, 0.3 * v, 14),
+  golem_attack: (k, o, t, v) => {
+    hiss(k, o, t + 0.25, { freq: 300, type: 'lowpass', peak: 0.4 * v, decay: 0.35 });
+    growl(k, o, t, 60, 45, 0.4, 0.3 * v, 16);
+  },
+  golem_hurt: (k, o, t, v) => {
+    clicks(k, o, t, 3, 0.08, 900, 0.12 * v);
+    hiss(k, o, t, { freq: 1600, q: 1, peak: 0.08 * v, decay: 0.2 });
+  },
+  slime_call: (k, o, t, v) =>
+    tone(k, o, t, { from: 180, to: 320, type: 'sine', peak: 0.1 * v, decay: 0.15 }),
+  slime_attack: (k, o, t, v) => {
+    tone(k, o, t, { from: 260, to: 120, type: 'sine', peak: 0.14 * v, decay: 0.18 });
+    hiss(k, o, t, { freq: 700, type: 'lowpass', peak: 0.1 * v, decay: 0.12 });
+  },
+  slime_hurt: (k, o, t, v) =>
+    tone(k, o, t, { from: 420, to: 160, type: 'sine', peak: 0.12 * v, decay: 0.2 }),
+  serpent_call: (k, o, t, v) =>
+    hiss(k, o, t, { freq: 5200, type: 'highpass', peak: 0.08 * v, decay: 0.8, attack: 0.2 }),
+  serpent_attack: (k, o, t, v) =>
+    hiss(k, o, t, { freq: 4400, type: 'highpass', peak: 0.14 * v, decay: 0.3, attack: 0.02 }),
+  serpent_hurt: (k, o, t, v) => hiss(k, o, t, { freq: 3600, q: 1, peak: 0.12 * v, decay: 0.25 }),
+  imp_call: (k, o, t, v) =>
+    cry(k, o, t, { from: 900, to: 1300, formant: 1800, peak: 0.08 * v, dur: 0.3, wobble: 20 }),
+  imp_attack: (k, o, t, v) => {
+    cry(k, o, t, { from: 1400, to: 800, formant: 2000, peak: 0.1 * v, dur: 0.2 });
+    hiss(k, o, t + 0.1, { freq: 1200, q: 0.8, peak: 0.12 * v, decay: 0.3 });
+  },
+  imp_hurt: (k, o, t, v) =>
+    cry(k, o, t, { from: 1600, to: 900, formant: 2000, peak: 0.12 * v, dur: 0.2, wobble: 25 }),
+  knight_call: (k, o, t, v) => clicks(k, o, t, 3, 0.4, 900, 0.07 * v),
+  knight_attack: (k, o, t, v) => {
+    hiss(k, o, t, { freq: 3000, sweepTo: 1200, q: 1, peak: 0.14 * v, decay: 0.18 });
+    tone(k, o, t + 0.12, { from: 1900, type: 'triangle', peak: 0.06 * v, decay: 0.4 });
+  },
+  knight_hurt: (k, o, t, v) =>
+    tone(k, o, t, { from: 1500, to: 1400, type: 'square', peak: 0.05 * v, decay: 0.25 }),
+  shroom_call: (k, o, t, v) =>
+    hiss(k, o, t, { freq: 1400, q: 1.5, peak: 0.07 * v, decay: 0.3, attack: 0.08 }),
+  shroom_attack: (k, o, t, v) =>
+    hiss(k, o, t, { freq: 900, sweepTo: 2200, q: 1.2, peak: 0.12 * v, decay: 0.3, attack: 0.02 }),
+  shroom_hurt: (k, o, t, v) =>
+    tone(k, o, t, { from: 700, to: 300, type: 'sine', peak: 0.1 * v, decay: 0.2 }),
+  harpy_call: (k, o, t, v) =>
+    cry(k, o, t, {
+      from: 1400,
+      to: 2100,
+      formant: 2400,
+      q: 3,
+      peak: 0.08 * v,
+      dur: 0.5,
+      wobble: 9,
+    }),
+  harpy_attack: (k, o, t, v) =>
+    cry(k, o, t, { from: 2200, to: 1300, formant: 2600, q: 3, peak: 0.12 * v, dur: 0.25 }),
+  harpy_hurt: (k, o, t, v) =>
+    cry(k, o, t, {
+      from: 2600,
+      to: 1600,
+      formant: 2800,
+      q: 3,
+      peak: 0.12 * v,
+      dur: 0.2,
+      wobble: 30,
+    }),
+  wisp_call: (k, o, t, v) =>
+    tone(k, o, t, { from: 1760, to: 2093, type: 'sine', peak: 0.05 * v, decay: 0.8, attack: 0.2 }),
+  wisp_attack: (k, o, t, v) =>
+    tone(k, o, t, { from: 2637, to: 1318, type: 'triangle', peak: 0.08 * v, decay: 0.3 }),
+  wisp_hurt: (k, o, t, v) =>
+    tone(k, o, t, { from: 3136, to: 1568, type: 'sine', peak: 0.08 * v, decay: 0.25 }),
 };
 
 export type SfxName = keyof typeof SOUNDS;

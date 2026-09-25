@@ -7,3 +7,7 @@ export * from './progression.ts';
 export * from './recipes.ts';
 export * from './resources.ts';
 export * from './world.ts';
+export * from './gear.ts';
+export * from './mobs.ts';
+export * from './dungeons.ts';
+export * from './dimensions.ts';

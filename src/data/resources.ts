@@ -27,13 +27,33 @@ export const NODES: Record<string, NodeSpec> = {
   crystal: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 400 },
   hellstone: { yield: [2, 3], tool: 'pick', req: 5, hp: 4, regen: 0 },
   cactus_fruit: { yield: [1, 2], hp: 2, regen: 230 },
+  life_crystal: { yield: [1, 1], tool: 'pick', req: 2, hp: 3, regen: 0 },
+  // The dimensions.
+  glowcap: { yield: [1, 3], hp: 2, regen: 200 },
+  sunbloom: { yield: [1, 2], hp: 2, regen: 240 },
+  void_lily: { yield: [1, 2], hp: 2, regen: 260 },
+  shroom_wood: { yield: [2, 4], tool: 'axe', req: 5, hp: 4, regen: 240 },
+  sky_wood: { yield: [2, 4], tool: 'axe', req: 6, hp: 4, regen: 260 },
+  void_wood: { yield: [2, 4], tool: 'axe', req: 7, hp: 5, regen: 280 },
+  myconite_ore: { yield: [2, 3], tool: 'pick', req: 6, hp: 5, regen: 0 },
+  starmetal_ore: { yield: [2, 3], tool: 'pick', req: 7, hp: 5, regen: 0 },
+  voidsteel_ore: { yield: [2, 3], tool: 'pick', req: 8, hp: 6, regen: 0 },
 };
+/** Every kind that grows as a tree: topples when felled and regrows from the stump. */
+export const TREE_NODES = new Set([
+  'wood',
+  'resin',
+  'honey',
+  'shroom_wood',
+  'sky_wood',
+  'void_wood',
+]);
 
 /** Trees topple and regrow from the stump, minerals crumble away for good, plants are picked. */
 export type NodeForm = 'tree' | 'mineral' | 'plant' | 'water';
 export function nodeForm(kind: string): NodeForm {
   if (kind === 'water') return 'water';
-  if (kind === 'wood' || kind === 'resin' || kind === 'honey') return 'tree';
+  if (TREE_NODES.has(kind)) return 'tree';
   return NODES[kind]?.tool === 'pick' ? 'mineral' : 'plant';
 }
 
@@ -48,6 +68,14 @@ export const TOOL_TIERS: Record<string, ToolTier> = {
   steel_pick: ['pick', 4],
   obsidian_axe: ['axe', 5],
   obsidian_pick: ['pick', 5],
+  hellstone_axe: ['axe', 6],
+  hellstone_pick: ['pick', 6],
+  myconite_axe: ['axe', 7],
+  myconite_pick: ['pick', 7],
+  starmetal_axe: ['axe', 8],
+  starmetal_pick: ['pick', 8],
+  voidsteel_axe: ['axe', 9],
+  voidsteel_pick: ['pick', 9],
 };
 export const WEAPONS: Record<string, WeaponSpec> = {
   fists: [1, 7, 42],
@@ -58,4 +86,22 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   obsidian_blade: [5, 61, 67],
   eclipse_blade: [6, 85, 73],
   hellfire_blade: [6, 76, 70],
+  frostbrand: [6, 84, 72],
+  sunspear: [7, 98, 96],
+  hellrazor: [7, 114, 76],
+  myconite_sword: [8, 128, 74],
+  star_saber: [9, 152, 78],
+  void_reaver: [10, 192, 82],
+  rift_blade: [11, 245, 92],
+  // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
+  wooden_bow: [1, 9, 0],
+  iron_bow: [3, 20, 0],
+  bone_bow: [6, 40, 0],
+  storm_bow: [9, 74, 0],
+  ember_wand: [5, 36, 0],
+  lich_staff: [6, 38, 0],
+  glacier_staff: [6, 62, 0],
+  sun_staff: [7, 84, 0],
+  spore_staff: [8, 76, 0],
+  void_staff: [10, 150, 0],
 };

@@ -1,214 +1,321 @@
+// Pixel skies: dithered bands, stars, sun and moon, clouds, and parallax silhouettes.
+import { D, blendAt, daylight, duskiness, overcastOf, type RegionArt } from './art.ts';
 import {
-  D,
-  T,
-  TAU,
-  H,
+  PX,
+  bayer,
+  cached,
   clamp,
-  lerp,
-  smooth,
-  vnoise,
-  fbm,
-  rgb,
+  hash,
+  makeCanvas,
   mix,
-  rgba,
   shade,
-  INK,
-  polyPath,
-  fillPoly,
-  ellipse,
-  line,
-  curve,
-  smoothPath,
-  blobPath,
-  inked,
-  glow,
-  limb,
-} from './graphics.ts';
-import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
-import type { Canvas2D, RenderGame } from './types.ts';
-import type { Point } from '../core/types.ts';
+  sprite,
+  blit,
+  vnoise,
+} from './px.ts';
+import type { RenderGame } from './types.ts';
 
-export function skylineHeight(style: string, wx: number, layer: number) {
-  const s = layer * 7.3;
-  if (style === 'peaks') {
-    const r = 1 - Math.abs(2 * fbm(wx / 210 + s, 11) - 1);
-    return Math.pow(r, 1.6) * (170 - layer * 28) + fbm(wx / 60, 3) * 12;
+const gradients = new Map<string, HTMLCanvasElement>();
+/** A 4-pixel-wide strip of banded, dithered sky; repeated across the screen. */
+function skyStrip(top: string, bottom: string, height: number) {
+  const key = top + bottom + height;
+  let cv = gradients.get(key);
+  if (!cv) {
+    cv = makeCanvas(4, height);
+    const k = cv.getContext('2d')!,
+      bands = 9;
+    for (let y = 0; y < height; y++) {
+      const t = (y / height) * (bands - 1),
+        band = Math.floor(t),
+        frac = t - band;
+      for (let x = 0; x < 4; x++) {
+        const b = frac > bayer(x, y) ? band + 1 : band;
+        k.fillStyle = mix(top, bottom, b / (bands - 1));
+        k.fillRect(x, y, 1, 1);
+      }
+    }
+    if (gradients.size > 64) gradients.clear();
+    gradients.set(key, cv);
   }
-  if (style === 'dunes')
-    return (0.5 + 0.5 * Math.sin(wx / 170 + fbm(wx / 380 + s, 4) * 4)) * (48 - layer * 6) + 6;
-  if (style === 'mesa') {
-    const v = fbm(wx / 240 + s, 7);
-    return smooth(0.44, 0.5, v) * (120 - layer * 18) + fbm(wx / 40, 9) * 7 + 8;
-  }
-  if (style === 'sea') return layer < 2 ? 2 + layer * 3 : fbm(wx / 260 + s, 5) * 60;
-  return fbm(wx / 280 + s, 2) * (95 - layer * 12) + 10;
+  return cv;
 }
-export function skylineTree(c: Canvas2D, kind: string, x: number, y: number, size: number) {
-  if (kind === 'conifer') {
-    polyPath(c, [
-      [x - size * 0.32, y + 2],
-      [x - size * 0.2, y - size * 0.35],
-      [x - size * 0.26, y - size * 0.35],
-      [x, y - size],
-      [x + size * 0.26, y - size * 0.35],
-      [x + size * 0.2, y - size * 0.35],
-      [x + size * 0.32, y + 2],
-    ]);
-    c.fill();
-  } else if (kind === 'pine') {
-    c.fillRect(x - 1.2, y - size * 0.8, 2.4, size * 0.8 + 2);
-    ellipse(c, x + size * 0.1, y - size * 0.82, size * 0.42, size * 0.16, c.fillStyle);
-  } else if (kind) {
-    c.fillRect(x - 1.5, y - size * 0.5, 3, size * 0.5 + 2);
-    ellipse(c, x, y - size * 0.62, size * 0.4, size * 0.38, c.fillStyle);
+
+/** Silhouette height (art px above the layer base) for a skyline shape at world-art x. */
+function skyline(kind: RegionArt['skyline'], x: number, layer: number) {
+  const n = (s: number, cell: number) => vnoise(x, layer * 97, cell, s);
+  switch (kind) {
+    case 'sea':
+      return layer < 2 ? 4 + Math.sin(x / 23) * 1 : 10 + n(1, 40) * 22;
+    case 'peaks': {
+      const p = Math.abs(((x / (46 + layer * 10)) % 2) - 1);
+      return 18 + (1 - p) * (44 - layer * 6) * (0.6 + n(2, 90) * 0.6) + n(3, 9) * 3;
+    }
+    case 'dunes':
+      return 10 + Math.abs(Math.sin(x / (52 + layer * 8))) * 18 + n(4, 40) * 6;
+    case 'mesa': {
+      const v = n(5, 70);
+      return v > 0.55 ? 34 - layer * 4 : v > 0.35 ? 18 : 8 + n(6, 12) * 3;
+    }
+    case 'spires': {
+      const s = hash(Math.floor(x / 14), layer, 7);
+      return 10 + n(8, 60) * 18 + (s > 0.75 ? (1 - Math.abs(((x % 14) - 7) / 7)) * 60 * s : 0);
+    }
+    case 'islands':
+      return 4 + n(9, 30) * 8;
+    case 'shards':
+      return 6 + n(10, 20) * 12;
+    default:
+      return 12 + n(11, 70) * 24 + n(12, 20) * 6;
   }
 }
+
+function cloudSprite(v: number, dark: boolean) {
+  return cached('cloud' + v + dark, () => {
+    const w = 34 + Math.floor(hash(v, 1) * 30),
+      h = 14;
+    return sprite(
+      w,
+      h,
+      0,
+      0,
+      (p) => {
+        const lit = dark ? '#aeb4bc' : '#fbf8ef',
+          mid = dark ? '#8d949c' : '#e3e2dc',
+          low = dark ? '#6f767f' : '#c9ccd0';
+        for (let i = 0; i < 5; i++) {
+          const cx = 6 + (i / 4) * (w - 12),
+            r = 4 + hash(v, i + 2) * 4;
+          p.ellipse(cx, h - 4 - r * 0.6, r + 1, r, mid);
+        }
+        p.rect(3, h - 5, w - 6, 3, mid);
+        // Light from above, shadow along the flat base.
+        for (let y = 0; y < h; y++)
+          for (let x = 0; x < w; x++)
+            if (p.alpha(x, y)) {
+              if (!p.alpha(x, y - 2)) p.set(x, y, lit);
+              else if (y > h - 5) p.set(x, y, low);
+            }
+      },
+      false,
+    );
+  });
+}
+
+function sunSprite() {
+  return cached('sun', () =>
+    sprite(
+      15,
+      15,
+      7,
+      7,
+      (p) => {
+        p.ellipse(7.5, 7.5, 7, 7, '#f6d77a');
+        p.ellipse(7.5, 7.5, 5.5, 5.5, '#fbe7a4');
+        p.ellipse(6, 6, 2.5, 2.5, '#fff6d8');
+      },
+      false,
+    ),
+  );
+}
+function moonSprite() {
+  return cached('moon', () =>
+    sprite(
+      12,
+      12,
+      6,
+      6,
+      (p) => {
+        p.ellipse(6, 6, 5.5, 5.5, '#e6e2cf');
+        p.ellipse(8, 5, 4.5, 5, '');
+        for (let y = 0; y < 12; y++)
+          for (let x = 0; x < 12; x++)
+            if (Math.hypot(x + 0.5 - 8.4, y + 0.5 - 5) < 4.6) p.clear(x, y);
+        p.set(3, 5, '#bdb8a4');
+        p.set(4, 8, '#bdb8a4');
+      },
+      false,
+    ),
+  );
+}
+
+function silhouetteTree(kind: string, size: number, color: string) {
+  return cached('bgtree' + kind + size + color, () => {
+    const w = size + 2,
+      h = Math.round(size * 1.6);
+    return sprite(
+      w,
+      h,
+      Math.floor(w / 2),
+      h - 1,
+      (p) => {
+        const cx = w / 2;
+        if (kind === 'pine' || kind === 'snowpine')
+          p.poly(
+            [
+              [cx, 0],
+              [w - 1, h - 3],
+              [1, h - 3],
+            ],
+            color,
+          );
+        else if (kind === 'palm') {
+          p.rect(Math.floor(cx), 3, 1, h - 3, color);
+          p.ellipse(cx, 3, size / 2, 2, color);
+        } else if (kind === 'cactus') {
+          p.rect(Math.floor(cx) - 1, 2, 3, h - 2, color);
+          p.rect(Math.floor(cx) - 4, h / 2, 2, 5, color);
+        } else if (kind === 'shroom') {
+          p.rect(Math.floor(cx) - 1, h / 3, 2, h, color);
+          p.ellipse(cx, h / 3, size / 2 + 1, size / 4 + 1, color);
+        } else {
+          p.rect(Math.floor(cx), h / 2, 1, h / 2, color);
+          p.ellipse(cx, h / 2.4, size / 2, size / 2.4, color);
+        }
+        p.rect(Math.floor(cx), h - 3, 1, 3, color);
+      },
+      false,
+    );
+  });
+}
+
+/**
+ * Draws the sky and parallax layers for the view. `fx` is the world x the regional palette
+ * follows (the player, or the menu's focal point).
+ */
 export function drawSky(
-  c: Canvas2D,
+  c: CanvasRenderingContext2D,
   g: RenderGame,
-  cam: Point,
+  ax: number,
+  ay: number,
   w: number,
   h: number,
   fx: number,
-  tod: number,
 ) {
-  const [A, B, k] = blendAt(fx),
+  const tod = g.timeOfDay(),
     day = daylight(tod),
-    dusk = duskiness(tod),
-    time = g.s.elapsed;
-  const gloom = overcastOf(g) * day;
-  const top = mix(
-    mix(mix('#0f1a26', mix(A.sky[0], B.sky[0], k), day), '#8f7f98', dusk * 0.3),
-    '#737d80',
-    gloom * 0.55,
-  );
-  const bottom = mix(
-    mix(mix('#2d3d47', mix(A.sky[1], B.sky[1], k), day), '#f2b184', dusk * 0.55),
-    '#a4aba6',
-    gloom * 0.5,
-  );
-  const grad = c.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, top);
-  grad.addColorStop(0.72, bottom);
-  grad.addColorStop(1, bottom);
-  c.fillStyle = grad;
-  c.fillRect(0, 0, w, h);
-  const night = 1 - day;
-  if (night > 0.02)
-    for (let i = 0; i < 110; i++) {
-      const sx = H(i, 1) * w,
-        sy = H(i, 9) * h * 0.62,
-        tw = 0.55 + 0.45 * Math.sin(time * (1 + H(i, 2) * 2) + i);
-      const r = 0.5 + H(i, 4) * 1.3;
-      c.fillStyle = rgba('#f4eed8', night * tw * (0.35 + H(i, 5) * 0.65));
-      c.fillRect(sx - r / 2, sy - r / 2, r, r);
-    }
-  const solar = (tod - 360) / 780;
-  if (solar > -0.08 && solar < 1.08) {
-    const sx = w * (0.1 + solar * 0.8),
-      sy = h * (0.62 - Math.sin(clamp(solar) * Math.PI) * 0.46);
-    glow(c, sx, sy, 190, dusk > 0.2 ? '#f5b877' : '#fbf0cf', 0.35 + dusk * 0.25);
-    ellipse(c, sx, sy, 30, 30, dusk > 0.2 ? mix('#f7e3b0', '#f19a64', dusk) : '#f8ecc8');
+    dusk = clamp(duskiness(tod)),
+    over = overcastOf(g),
+    night = 1 - day,
+    [A, B, k] = blendAt(fx),
+    dim = D.biomeAt(fx, 0).id,
+    alien = dim === 'mycelia' || dim === 'void';
+  const q = (v: number) => Math.round(v * 24) / 24;
+  let top = mix(A.sky[0], B.sky[0], q(k)),
+    bottom = mix(A.sky[1], B.sky[1], q(k));
+  if (!alien) {
+    top = mix(mix(top, '#8b6d8e', q(dusk) * 0.35), '#0c1228', q(night) * 0.95);
+    bottom = mix(mix(bottom, '#f0a070', q(dusk) * 0.55), '#233354', q(night) * 0.9);
+    top = mix(top, '#7c848a', q(over) * 0.55);
+    bottom = mix(bottom, '#a8aca8', q(over) * 0.5);
   }
-  const lunar = ((tod + 1440 - 1110) % 1440) / 690;
-  if (lunar > -0.05 && lunar < 1.05 && night > 0.05) {
-    const mx = w * (0.12 + lunar * 0.76),
-      my = h * (0.5 - Math.sin(clamp(lunar) * Math.PI) * 0.36);
-    glow(c, mx, my, 110, '#dfe6e8', 0.16 * night);
-    c.save();
-    c.globalAlpha = clamp(night * 1.3);
-    ellipse(c, mx, my, 22, 22, '#ece6cf');
-    c.beginPath();
-    c.arc(mx, my, 22, 0, TAU);
-    c.clip();
-    ellipse(c, mx + 9, my - 5, 21, 21, 'rgba(24,36,48,0.82)');
-    ellipse(c, mx - 7, my + 4, 3.5, 3, 'rgba(160,150,125,0.35)');
-    ellipse(c, mx - 12, my - 7, 2.5, 2, 'rgba(160,150,125,0.3)');
-    c.restore();
-  }
-  drawClouds(c, g, cam, w, h, day, dusk, 0);
-  const surfY = D.surfaceAt(fx) - cam.y;
-  const depthOf = [0.04, 0.1, 0.18, 0.28],
-    rise = [215, 160, 105, 62],
-    haze = [0.58, 0.4, 0.24, 0.1];
-  for (let layer = 0; layer < 4; layer++) {
-    const d = depthOf[layer],
-      base = surfY - rise[layer] + (cam.y - (D.surfaceAt(fx) - h * 0.6)) * d * 0.4;
-    if (base > h + 40) continue;
-    let col = mix(mix(A.hills[layer], B.hills[layer], k), bottom, haze[layer]);
-    col = mix(col, '#172431', night * (0.72 - layer * 0.06));
-    c.fillStyle = col;
-    c.beginPath();
-    c.moveTo(-10, h + 5);
-    const shift = cam.x * d + layer * 1000,
-      ridge = (wx: number) =>
-        base - lerp(skylineHeight(A.skyline, wx, layer), skylineHeight(B.skyline, wx, layer), k);
-    for (let sx = -16; sx <= w + 16; sx += 8) c.lineTo(sx, ridge(sx + shift));
-    c.lineTo(w + 10, h + 5);
-    c.closePath();
-    c.fill();
-    // Trees belong to fixed slots along the ridge, so they scroll with it instead of being
-    // re-picked for each screen column as the camera moves (which made them flicker).
-    if (layer >= 1 && base < h)
-      for (let slot = Math.floor((shift - 16) / 24); slot * 24 - shift <= w + 16; slot++) {
-        const wx = slot * 24,
-          kind = H(slot, layer, 8) < k ? B.trees : A.trees;
-        if (!kind || vnoise(wx / 150, layer + 20) < 0.42) continue;
-        const size = (14 + H(slot, layer, 9) * 16) * (0.7 + layer * 0.25),
-          tx = wx + (H(slot, 3) - 0.5) * 10;
-        skylineTree(c, kind, tx - shift, ridge(tx) + 2, size);
+  const surfY = Math.round(D.surfaceAt(fx) / PX) - ay,
+    horizon = Math.max(40, Math.min(h + 40, surfY + 20));
+  c.fillStyle = c.createPattern(skyStrip(top, bottom, horizon), 'repeat-x')!;
+  c.fillRect(0, 0, w, horizon);
+  c.fillStyle = bottom;
+  c.fillRect(0, horizon, w, h - horizon);
+
+  // Stars come out at night (and always in the alien skies).
+  const starLevel = alien ? 1 : night * (1 - over);
+  if (starLevel > 0.05) {
+    const now = performance.now() / 1000;
+    for (let i = 0; i < 140; i++) {
+      const sx = Math.floor((((hash(i, 1) * 4000 - ax * 0.03) % w) + w) % w),
+        sy = Math.floor(hash(i, 2) * horizon * 0.8);
+      const tw = Math.sin(now * (1 + hash(i, 3) * 3) + i) > 0.3 ? 1 : 0.55;
+      c.fillStyle = `rgba(250,245,225,${(starLevel * tw * (0.5 + hash(i, 4) * 0.5)).toFixed(2)})`;
+      c.fillRect(sx, sy, 1, 1);
+      if (hash(i, 5) > 0.93) {
+        c.fillRect(sx - 1, sy, 3, 1);
+        c.fillRect(sx, sy - 1, 1, 3);
       }
-    c.fillRect(-10, base + 40, w + 20, h);
-  }
-}
-export function drawClouds(
-  c: Canvas2D,
-  g: RenderGame,
-  cam: Point,
-  w: number,
-  h: number,
-  day: number,
-  dusk: number,
-  pass: number,
-) {
-  const weather = g.s.weather,
-    overcast = weather === 'rain' || weather === 'storm' ? 1 : weather === 'cloudy' ? 0.6 : 0;
-  const count = 4 + Math.round(overcast * 8);
-  const light = mix(
-    mix('#3d4b56', '#fbf7ec', day),
-    '#8d9597',
-    overcast * (weather === 'storm' ? 0.7 : 0.45),
-  );
-  const under = mix(mix('#2a3640', '#d8d7cf', day), '#6b7477', overcast * 0.6);
-  const tint = mix(light, '#f3c4a0', dusk * 0.5);
-  for (let i = pass; i < count; i += 1) {
-    const span = w + 520,
-      speed = 3 + H(i, 3) * 5,
-      sx =
-        ((((H(i, 11) * 3000 - cam.x * (0.03 + H(i, 7) * 0.03) + g.s.elapsed * speed) % span) +
-          span) %
-          span) -
-        260,
-      sy = 50 + H(i, 12) * h * 0.26,
-      size = 36 + H(i, 13) * 46 + overcast * 22;
-    const grad = c.createLinearGradient(0, sy - size * 0.8, 0, sy + size * 0.3);
-    grad.addColorStop(0, rgba(tint, 0.92));
-    grad.addColorStop(1, rgba(under, 0.9));
-    c.save();
-    c.beginPath();
-    c.rect(sx - size * 2.2, sy - size * 1.2, size * 4.4, size * 1.45);
-    c.clip();
-    c.fillStyle = grad;
-    c.beginPath();
-    const puffs = 5;
-    for (let p = 0; p < puffs; p++) {
-      const px = sx + (p - (puffs - 1) / 2) * size * 0.62,
-        r = size * (0.42 + H(i, p, 14) * 0.3) * (1 - Math.abs(p - 2) * 0.14);
-      c.moveTo(px + r, sy - r * 0.35);
-      c.arc(px, sy - r * 0.35, r, 0, TAU);
     }
-    c.fill();
-    c.restore();
+  }
+  if (!alien) {
+    // The sun and moon ride an arc across the day.
+    const arc = (phase: number) => [
+      Math.round(w * (0.1 + phase * 0.8)),
+      Math.round(horizon * 0.85 - Math.sin(phase * Math.PI) * horizon * 0.62),
+    ];
+    if (day > 0.02 && tod > 330 && tod < 1170) {
+      const [sx, sy] = arc((tod - 330) / 840);
+      c.globalAlpha = 1 - over * 0.7;
+      blit(c, sunSprite(), sx, sy);
+      c.globalAlpha = 1;
+    } else {
+      const phase = ((tod + 1440 - 1170) % 1440) / 600;
+      if (phase < 1) {
+        const [mx, my] = arc(phase);
+        blit(c, moonSprite(), mx, my);
+      }
+    }
+  }
+  // Clouds drift with the wind and thicken with bad weather.
+  const clouds = alien ? 0 : 5 + Math.round(over * 9),
+    t = g.s.elapsed;
+  for (let i = 0; i < clouds; i++) {
+    const span = w + 140,
+      speed = 1.2 + hash(i, 6) * 2.4,
+      sx =
+        ((((hash(i, 7) * 3000 - ax * (0.04 + hash(i, 8) * 0.04) + t * speed) % span) + span) %
+          span) -
+        70,
+      sy = 6 + Math.floor(hash(i, 9) * horizon * 0.35);
+    const cs = cloudSprite(i % 8, over > 0.6);
+    c.globalAlpha = night > 0.5 ? 0.55 : 1;
+    blit(c, cs, sx, sy);
+    c.globalAlpha = 1;
+  }
+
+  // Four parallax layers, far to near, each a crisp silhouette with its own trees.
+  const depth = [0.08, 0.16, 0.26, 0.38],
+    rise = [72, 54, 36, 20],
+    haze = [0.6, 0.42, 0.26, 0.12];
+  for (let layer = 0; layer < 4; layer++) {
+    const base =
+      surfY -
+      rise[layer] +
+      Math.round((ay - (D.surfaceAt(fx) / PX - h * 0.6)) * depth[layer] * 0.35);
+    if (base - 90 > h || base < -140) continue;
+    let col = mix(mix(A.hills[layer], B.hills[layer], q(k)), bottom, haze[layer]);
+    if (!alien) col = mix(col, '#141c30', q(night) * (0.75 - layer * 0.07));
+    const shift = Math.round(ax * depth[layer]) + layer * 1000;
+    c.fillStyle = col;
+    const kindA = A.skyline,
+      kindB = B.skyline;
+    const floating = kindA === 'islands' || kindA === 'shards';
+    for (let sx = 0; sx < w; sx++) {
+      const wx = sx + shift,
+        hgt = skyline(kindA, wx, layer) * (1 - k) + skyline(kindB, wx, layer) * k,
+        y = Math.round(base - hgt);
+      if (floating) {
+        // Islands and shards hang in the air instead of rising from the ground.
+        const band = vnoise(wx, layer, 26, 40);
+        if (band > 0.55) {
+          const thick = Math.round((band - 0.55) * 60);
+          c.fillRect(sx, y - 30, 1, 3 + Math.round(thick * 0.3));
+          c.fillRect(
+            sx,
+            y - 27 + Math.round(thick * 0.3),
+            1,
+            Math.max(0, thick - (Math.abs((wx % 26) - 13) > 9 ? 4 : 0)),
+          );
+        }
+      } else c.fillRect(sx, y, 1, h - y);
+    }
+    // Background trees stand in fixed world slots, so they scroll with their hill.
+    if (layer >= 1 && !floating) {
+      const tree = k < 0.5 ? A.tree : B.tree,
+        treeCol = shade(col, -0.12);
+      for (let slot = Math.floor((shift - 20) / 14); slot * 14 - shift < w + 20; slot++) {
+        if (vnoise(slot * 14, layer, 90, 44) < 0.4 || hash(slot, layer, 45) < 0.3) continue;
+        const wx = slot * 14 + Math.floor(hash(slot, layer, 46) * 8),
+          y = Math.round(
+            base - (skyline(kindA, wx, layer) * (1 - k) + skyline(kindB, wx, layer) * k),
+          ),
+          size = 5 + layer * 2 + Math.floor(hash(slot, layer, 47) * 4);
+        blit(c, silhouetteTree(tree, size, treeCol), wx - shift, y + 1);
+      }
+    }
   }
 }
-// ─── Terrain: cached chunks ───────────────────────────────────────────────

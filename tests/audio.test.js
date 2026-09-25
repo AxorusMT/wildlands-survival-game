@@ -40,7 +40,7 @@ test('every track loops about a minute of well-formed, playable music', () => {
   }
 });
 
-test('the music follows menu, death, boss, caves, weather, biome, and night', () => {
+test('the music follows menu, death, bosses, dungeons, dimensions, caves, weather, biome, and night', () => {
   const base = {
     playing: true,
     dead: false,
@@ -66,6 +66,14 @@ test('the music follows menu, death, boss, caves, weather, biome, and night', ()
     [{ biome: 'forest' }, 'forest'],
     [{ biome: 'coast' }, 'coast'],
     [{}, 'meadow'],
+    [{ dungeon: 'crypt' }, 'dungeon'],
+    [{ dungeon: 'tomb', biome: 'desert' }, 'tomb'],
+    [{ dungeon: 'citadel', layer: 'lower_hell' }, 'pandemonium'],
+    [{ layer: 'mycelia' }, 'mycelia'],
+    [{ layer: 'skyreach', night: true }, 'skyreach'],
+    [{ layer: 'void' }, 'void'],
+    [{ boss: true, bossType: 'hollow_king', dungeon: 'crypt' }, 'boss'],
+    [{ boss: true, bossType: 'unmaker', layer: 'void' }, 'final_boss'],
   ];
   for (const [over, want] of cases) assert.equal(musicScene({ ...base, ...over }), want);
   for (const [, id] of cases) assert.ok(TRACKS[id], `track for ${id}`);

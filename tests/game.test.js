@@ -8,8 +8,8 @@ const allMaterials = (game) => {
   for (const id of Object.keys(D.ITEMS))
     if (!['weapon', 'tool', 'clothing', 'structure'].includes(D.ITEMS[id][1])) game.add(id, 80);
 };
-const station = (game, type) =>
-  game.s.structures.push({
+const station = (game, type) => {
+  const st = {
     id: Math.random(),
     type,
     x: game.s.player.x + 35,
@@ -17,11 +17,16 @@ const station = (game, type) =>
     fuel: 900,
     crop: null,
     plantedAt: 0,
-  });
+  };
+  game.s.structures.push(st);
+  return st;
+};
+/** The first structure the player built (dungeons and dimensions furnish the rest). */
+const built = (game) => game.s.structures.find((st) => !st.fixed);
 
 test('long side-view world has shaped terrain, connected caves, and nearby starter resources', () => {
   const g = fresh();
-  assert.equal(D.WORLD_W, 30000);
+  assert.equal(D.OVERWORLD_W, 30000);
   assert.equal(D.WORLD_H, 4480);
   assert.equal(g.biome().id, 'meadow');
   assert.ok(
@@ -128,10 +133,10 @@ test('individual food ages, icebox slows it, and loading applies offline time', 
 test('icebox cooling stops exactly when its ice runs out', () => {
   const g = fresh();
   g.add('raw_meat');
-  station(g, 'icebox');
-  g.s.structures[0].fuel = 10;
+  const ice = station(g, 'icebox');
+  ice.fuel = 10;
   g.survival.advanceDecay(30);
-  assert.equal(g.s.structures[0].fuel, 0);
+  assert.equal(ice.fuel, 0);
   assert.equal(g.s.inventory.find((e) => e.id === 'raw_meat').fresh, 500 - 10 * 0.18 - 20);
 });
 
@@ -151,7 +156,7 @@ test('farm plots grow seeds into harvest and structures persist', () => {
   g.save(storage);
   const copy = fresh();
   copy.load(storage);
-  assert.equal(copy.s.structures[0].type, 'farm_plot');
+  assert.equal(built(copy).type, 'farm_plot');
 });
 
 test('older field records migrate into the side-view world with inventory and structures', () => {
@@ -165,6 +170,7 @@ test('older field records migrate into the side-view world with inventory and st
   old.version = 1;
   old.player.x = 1416;
   old.player.y = 1062;
+  old.structures = old.structures.filter((st) => !st.fixed);
   for (const st of old.structures) {
     st.x = 1437;
     st.y = 1062;
@@ -178,7 +184,7 @@ test('older field records migrate into the side-view world with inventory and st
   assert.equal(loaded.load(storage), true);
   assert.equal(loaded.s.version, 3);
   assert.equal(loaded.count('wood'), 7);
-  assert.equal(loaded.s.structures[0].type, 'campfire');
+  assert.equal(built(loaded).type, 'campfire');
   assert.ok(loaded.s.tiles.length > 20000);
   assert.ok(loaded.s.player.x > 0 && loaded.s.player.x < D.WORLD_W);
 });
@@ -295,6 +301,8 @@ test('wolf hunts summon each boss; obsidian gate, rewards, and upgrades work', (
     const boss = g.s.animals.find((a) => a.id === g.s.altar.activeBoss);
     assert.ok(boss);
     assert.equal(boss.hp, cfg.hp);
+    // The Direwolf's escort would take the swing too; this checks the Direwolf alone.
+    g.s.animals = g.s.animals.filter((a) => !a.companion);
     g.s.player.x = boss.x;
     g.s.player.y = boss.y;
     g.s.player.weapon = 'flint_spear';

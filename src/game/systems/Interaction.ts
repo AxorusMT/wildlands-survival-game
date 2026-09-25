@@ -13,11 +13,18 @@ export class Interaction extends System {
       ...this.game.s.nodes
         .filter((n) => n.hp > 0)
         .map((n) => ({ object: n, type: 'node' as const, d: dist(n, p) })),
-      ...this.game.s.structures.map((st) => ({
-        object: st,
-        type: 'structure' as const,
-        d: dist(st, p),
-      })),
+      ...this.game.s.structures
+        .filter(
+          (st) =>
+            st.type !== 'torch' &&
+            !st.type.startsWith('trap_') &&
+            !(st.type === 'dungeon_chest' && st.crop === 'open'),
+        )
+        .map((st) => ({
+          object: st,
+          type: 'structure' as const,
+          d: dist(st, p),
+        })),
       ...this.game.s.caches
         .filter((c) => !c.opened)
         .map((c) => ({ object: c, type: 'cache' as const, d: dist(c, p) })),
@@ -66,6 +73,15 @@ export class Interaction extends System {
       return { ok: true, action: 'cache' };
     }
     const st = near.object;
+    if (st.type === 'dungeon_chest') return this.game.realms.openChest(st);
+    if (st.type === 'boss_altar') return this.game.bosses.summon(st);
+    if (st.type === 'rift_gate') {
+      this.game.realms.socket();
+      return { ok: true, action: 'rift', structure: st };
+    }
+    if (st.type === 'portal') return this.game.realms.goHome();
+    if (st.type === 'torch' || st.type.startsWith('trap_'))
+      return { ok: false, reason: 'Nothing to do here.' };
     if (st.type === 'bedroll') {
       this.game.s.vitals.fatigue = clamp(this.game.s.vitals.fatigue - 32, 0, RULES.maxVital);
       this.game.s.vitals.stamina = 100;

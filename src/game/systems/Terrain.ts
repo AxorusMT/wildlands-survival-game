@@ -1,6 +1,15 @@
 import { clamp } from '../../core/math.ts';
 import { itemName } from '../../data/items.ts';
-import { MINE_TIER, TILE, TILE_COLS, TILE_ROWS, TILE_YIELD, WORLD_H } from '../../data/world.ts';
+import { MYC } from '../../data/dimensions.ts';
+import {
+  MINE_TIER,
+  TILE,
+  TILE_COLS,
+  TILE_ROWS,
+  TILE_YIELD,
+  WORLD_H,
+  dimensionAt,
+} from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -19,8 +28,12 @@ export class Terrain extends System {
     this.game.s.tileEdits[index] = kind;
   }
   groundTopAt(x: number) {
-    const tx = clamp(Math.floor(x / TILE), 0, TILE_COLS - 1);
-    for (let ty = 0; ty < TILE_ROWS; ty++) if (this.tileAt(tx, ty)) return ty * TILE;
+    const tx = clamp(Math.floor(x / TILE), 0, TILE_COLS - 1),
+      dim = dimensionAt(x);
+    // Under the Mycelial Deep's rock sky, the ground is the cavern floor, not the ceiling.
+    const from =
+      dim?.id === 'mycelia' ? Math.max(0, Math.floor((MYC.floor(x - dim.start) - 96) / TILE)) : 0;
+    for (let ty = from; ty < TILE_ROWS; ty++) if (this.tileAt(tx, ty)) return ty * TILE;
     return WORLD_H - TILE;
   }
   // The first standing surface at or below y, so cave objects rest on the passage floor.

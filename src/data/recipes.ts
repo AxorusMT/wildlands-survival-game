@@ -1,4 +1,5 @@
 import type { Recipe } from '../core/types.ts';
+import { ARMOR_RECIPES } from './gear.ts';
 
 // Recipe station means the player must stand near an existing structure of that type.
 export const RECIPES: Recipe[] = (
@@ -64,5 +65,72 @@ export const RECIPES: Recipe[] = (
     ['poultice', { herb: 2, honey: 1, clay: 1 }, 'apothecary', 3],
     ['fever_remedy', { willow: 2, boiled_water: 1, honey: 1 }, 'apothecary', 3],
     ['antibiotic', { mushroom: 5, honey: 3, herb: 4, boiled_water: 2, coal: 2 }, 'apothecary', 4],
-  ] as [string, Record<string, number>, string | null, number][]
-).map(([id, cost, station, tier]) => ({ id, cost, station, tier }));
+    // ── Light, blocks, and building ──
+    ['torch', { wood: 1, coal: 1 }, null, 1, 4],
+    ['planks', { wood: 1 }, 'workbench', 1, 2],
+    ['sandstone_brick', { sand: 2 }, 'workbench', 1, 2],
+    ['stone_brick', { stone: 2 }, 'furnace', 2],
+    ['clay_brick', { clay: 2 }, 'furnace', 2],
+    ['glass', { sand: 2 }, 'furnace', 2],
+    ['obsidian_brick', { obsidian: 1 }, 'forge', 5],
+    // ── Bows, arrows, and wands ──
+    ['wooden_bow', { wood: 8, fiber: 6 }, 'workbench', 1],
+    ['arrow', { wood: 1, flint: 1 }, 'workbench', 1, 10],
+    ['iron_bow', { iron_ingot: 6, fiber: 4, wood: 2 }, 'workbench', 3],
+    ['fire_arrow', { arrow: 10, sulfur: 1 }, 'workbench', 3, 10],
+    ['crystal_arrow', { arrow: 10, crystal: 1 }, 'forge', 4, 10],
+    ['ember_wand', { hellstone_ingot: 6, crystal: 4, wood: 2 }, 'forge', 6],
+    ['miners_lamp', { copper_ingot: 4, crystal: 2, resin: 2 }, 'workbench', 3],
+    // ── Past hell ──
+    ['hellstone_axe', { hellstone_ingot: 8, obsidian: 4 }, 'forge', 6],
+    ['hellstone_pick', { hellstone_ingot: 8, obsidian: 4 }, 'forge', 6],
+    ['rift_gate', { obsidian: 20, crystal: 12, hellstone_ingot: 6, grave_dust: 10 }, 'forge', 6],
+    ['mana_crystal', { fallen_star: 5 }, null, 1],
+    ['crypt_key', { grave_dust: 6, bone: 10, iron_ingot: 2 }, 'workbench', 6],
+    ['frost_key', { frost_shard: 6, ice: 10, steel_ingot: 2 }, 'workbench', 6],
+    ['tomb_key', { sun_gold: 6, linen: 4, steel_ingot: 2 }, 'workbench', 6],
+    ['cinder_key', { cinder_core: 6, hellstone_ingot: 4 }, 'forge', 7],
+    // ── The dimensions: myconite, starmetal, voidsteel ──
+    ['myconite_ingot', { myconite_ore: 3, coal: 1 }, 'forge', 7],
+    ['starforge', { myconite_ingot: 12, obsidian: 10, crystal: 8, hellstone_ingot: 6 }, 'forge', 7],
+    ['myconite_axe', { myconite_ingot: 10, shroom_wood: 4 }, 'starforge', 8],
+    ['myconite_pick', { myconite_ingot: 10, shroom_wood: 4 }, 'starforge', 8],
+    ['myconite_sword', { myconite_ingot: 12, spores: 6 }, 'starforge', 8],
+    ['spore_lure', { spores: 12, glowcap: 6, myconite_ingot: 4 }, 'starforge', 8],
+    ['starmetal_ingot', { starmetal_ore: 3, fallen_star: 1 }, 'starforge', 9],
+    ['starmetal_axe', { starmetal_ingot: 10, sky_wood: 4 }, 'starforge', 9],
+    ['starmetal_pick', { starmetal_ingot: 10, sky_wood: 4 }, 'starforge', 9],
+    ['star_saber', { starmetal_ingot: 12, sky_silk: 6 }, 'starforge', 9],
+    ['storm_totem', { sky_silk: 10, starmetal_ingot: 6, feathers: 10 }, 'starforge', 9],
+    ['voidsteel_ingot', { voidsteel_ore: 3, void_essence: 1 }, 'starforge', 10],
+    ['voidsteel_axe', { voidsteel_ingot: 10, void_wood: 4 }, 'starforge', 10],
+    ['voidsteel_pick', { voidsteel_ingot: 10, void_wood: 4 }, 'starforge', 10],
+    ['void_reaver', { voidsteel_ingot: 14, void_essence: 8 }, 'starforge', 10],
+    [
+      'void_seal',
+      { void_essence: 20, voidsteel_ingot: 8, spore_heart: 1, roc_plume: 1 },
+      'starforge',
+      10,
+    ],
+    // ── Draughts and potions ──
+    ['healing_draught', { herb: 2, honey: 1, boiled_water: 1 }, 'apothecary', 2, 2],
+    ['mana_draught', { crystal: 1, mushroom: 1, boiled_water: 1 }, 'apothecary', 3, 2],
+    ['swiftness_potion', { cactus_fruit: 1, feathers: 1, boiled_water: 1 }, 'apothecary', 3],
+    ['ironskin_potion', { iron_ore: 2, herb: 1, boiled_water: 1 }, 'apothecary', 3],
+    ['regeneration_potion', { berry: 3, herb: 1, boiled_water: 1 }, 'apothecary', 3],
+    ['shine_potion', { mushroom: 1, crystal: 1, boiled_water: 1 }, 'apothecary', 3],
+    ['delving_potion', { coal: 1, copper_ore: 1, boiled_water: 1 }, 'apothecary', 3],
+    ['featherfall_potion', { feathers: 3, boiled_water: 1 }, 'apothecary', 3],
+    ['fireward_potion', { sulfur: 2, obsidian: 1, boiled_water: 1 }, 'apothecary', 5],
+    ['wrath_potion', { venom: 1, hellstone: 1, boiled_water: 1 }, 'apothecary', 6],
+    ['greater_healing', { healing_draught: 2, glowcap: 2, crystal: 1 }, 'apothecary', 7, 2],
+    // ── Armour ──
+    ...ARMOR_RECIPES,
+  ] as [string, Record<string, number>, string | null, number, number?][]
+).map(([id, cost, station, tier, yieldQty]) => ({
+  id,
+  cost,
+  station,
+  tier,
+  ...(yieldQty ? { yield: yieldQty } : {}),
+}));

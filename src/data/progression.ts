@@ -29,4 +29,17 @@ export const CHAPTERS: Objective[] = [
   ['Defeat an Eclipse Direwolf', 'kill:boss', 1],
   ['Defeat an Ember Direwolf', 'kill:boss', 2],
   ['Defeat the Void Direwolf', 'kill:boss', 3],
+  // Beyond the Effergy: the dungeons, the Rift, and the worlds behind it.
+  ['Find the Mossy Crypt beneath the forest', 'visit:crypt', 1],
+  ['Slay the Hollow King', 'boss:hollow_king', 1],
+  ['Build the Rift Gate and set the Sigil of Bone', 'place:rift_gate', 1],
+  ['Step into the Mycelial Deep', 'visit:mycelia', 1],
+  ['Slay the Rime Colossus in the Frost Keep', 'boss:rime_colossus', 1],
+  ['Slay Pharaoh Ankhet in the Sunken Tomb', 'boss:pharaoh', 1],
+  ['Walk the islands of Skyreach', 'visit:skyreach', 1],
+  ['Slay Archdemon Vahl in the Cinder Citadel', 'boss:archdemon', 1],
+  ['Slay the Sporemother', 'boss:sporemother', 1],
+  ['Slay the Tempest Roc', 'boss:tempest_roc', 1],
+  ['Cross into the Hollow Void', 'visit:void', 1],
+  ['Unmake the Unmaker', 'boss:unmaker', 1],
 ];

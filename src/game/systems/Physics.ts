@@ -1,5 +1,5 @@
 import { clamp } from '../../core/math.ts';
-import { TILE, WORLD_H, WORLD_W, inShaft } from '../../data/world.ts';
+import { TILE, WORLD_H, inShaft, regionBounds } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -43,11 +43,24 @@ export class Physics extends System {
         if (this.game.tileAt(tx, ty)) return true;
     return false;
   }
+  /** Mid-air jumps left (from wings or a cloud in a jar). */
+  private airJumps = 0;
   jump() {
-    const p = this.game.s.player;
-    if (!p.grounded || this.game.s.vitals.stamina < RULES.jumpStamina) return false;
-    p.vy = -RULES.jumpVelocity;
+    const p = this.game.s.player,
+      fx = this.game.equipment.effects();
+    if (this.game.s.vitals.stamina < RULES.jumpStamina) return false;
+    if (!p.grounded) {
+      if (this.airJumps <= 0 || !fx.has('double_jump')) return false;
+      this.airJumps--;
+      p.vy = -RULES.jumpVelocity * 0.95;
+      this.game.event('burst', p.x, p.y, '#e8f0ff');
+      this.game.sound('jump', p.x, p.y, 0.8);
+      return true;
+    }
+    const boost = fx.has('jump') || fx.has('speed') ? 1.18 : 1;
+    p.vy = -RULES.jumpVelocity * boost;
     p.grounded = false;
+    this.airJumps = 1;
     this.game.s.vitals.stamina -= RULES.jumpStamina;
     this.game.sound('jump');
     return true;
@@ -61,7 +74,8 @@ export class Physics extends System {
       const fly = 520 * this.game.dev.speed;
       p.moving = Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
-      p.x = clamp(p.x + dx * fly * dt, 15, WORLD_W - 15);
+      const [lo, hi] = regionBounds(p.x);
+      p.x = clamp(p.x + dx * fly * dt, lo + 15, hi - 15);
       p.y = clamp(p.y + dy * fly * dt, 40, WORLD_H - 15);
       p.vx = 0;
       p.vy = 0;
@@ -85,6 +99,7 @@ export class Physics extends System {
       (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) *
       (v.illness > 60 ? 0.82 : 1) *
       (p.boots ? 1.12 : 1) *
+      this.game.equipment.speedBonus() *
       this.game.dev.speed;
     if (dx) p.face = dx > 0 ? 0 : Math.PI;
     p.vx = dx * speed;
@@ -98,8 +113,14 @@ export class Physics extends System {
         v.stamina = clamp(v.stamina - dt * 5, 0, RULES.maxVital);
       }
     } else if (shaft && dy > 0) p.vy = Math.min(p.vy + 160 * dt, 170);
-    else p.vy = Math.min(p.vy + RULES.gravity * dt, RULES.terminalVelocity);
-    const nx = clamp(p.x + p.vx * dt, 15, WORLD_W - 15);
+    else {
+      // Featherfall and wings let you drift down slowly while holding jump.
+      const fx = this.game.equipment.effects(),
+        floaty = fx.has('buff:featherfall') || (fx.has('glide') && dy < 0 && p.vy > 0);
+      p.vy = Math.min(p.vy + RULES.gravity * dt, floaty ? 120 : RULES.terminalVelocity);
+    }
+    const [lo, hi] = regionBounds(p.x);
+    const nx = clamp(p.x + p.vx * dt, lo + 40, hi - 40);
     if (!this.collides(nx, p.y)) p.x = nx;
     else if (p.grounded && !this.collides(nx, p.y - TILE) && this.collides(nx, p.y + 2)) {
       p.x = nx;
@@ -135,8 +156,9 @@ export class Physics extends System {
             v.health = clamp(
               v.health - (p.vy - RULES.fallDamageVelocity) * 0.07,
               0,
-              RULES.maxVital,
+              this.game.maxHealth(),
             );
+          this.airJumps = 1;
         }
         p.vy = 0;
         break;

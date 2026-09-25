@@ -1,4 +1,5 @@
 import { CHAPTERS, TUTORIAL } from '../../data/progression.ts';
+import { dungeonAt } from '../../data/world.ts';
 
 import { System } from './System.ts';
 
@@ -33,6 +34,13 @@ export class Progress extends System {
   }
   // The first visit to each region is recorded as a discovery.
   discover() {
+    const p = this.game.s.player,
+      dungeon = dungeonAt(p.x, p.y - 20);
+    if (dungeon && !this.game.s.discoveries.includes(dungeon.def.id)) {
+      this.game.s.discoveries.push(dungeon.def.id);
+      this.record('visit:' + dungeon.def.id);
+      this.game.say('New field entry: ' + dungeon.def.name + '.', 'good');
+    }
     const region = this.game.biome();
     if (this.game.s.discoveries.includes(region.id)) return;
     this.game.s.discoveries.push(region.id);
