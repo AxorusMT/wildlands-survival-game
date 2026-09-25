@@ -11,32 +11,45 @@
   __export(data_exports, {
     BIOMES: () => BIOMES,
     BIOME_CENTERS: () => BIOME_CENTERS,
-    BIOME_WIDTH: () => BIOME_WIDTH,
+    BIOME_SPANS: () => BIOME_SPANS,
     BOSSES: () => BOSSES,
     CAVE_LEVELS: () => CAVE_LEVELS,
     CHAPTERS: () => CHAPTERS,
     DISEASES: () => DISEASES,
     ENTRANCES: () => ENTRANCES,
-    FIRST_BIOME_CENTER: () => FIRST_BIOME_CENTER,
     Ground: () => Ground,
     ITEMS: () => ITEMS,
+    LAVA_Y: () => LAVA_Y,
+    LAYERS: () => LAYERS,
+    MINE_TIER: () => MINE_TIER,
     NODES: () => NODES,
     RECIPES: () => RECIPES,
+    SHAFTS: () => SHAFTS,
     SIDE_ORDER: () => SIDE_ORDER,
+    SURFACE_BAND: () => SURFACE_BAND,
     TILE: () => TILE,
     TILE_COLS: () => TILE_COLS,
     TILE_ROWS: () => TILE_ROWS,
+    TILE_YIELD: () => TILE_YIELD,
     TOOL_TIERS: () => TOOL_TIERS,
     TUTORIAL: () => TUTORIAL,
     WEAPONS: () => WEAPONS,
     WORLD_H: () => WORLD_H,
     WORLD_W: () => WORLD_W,
     baseTileAt: () => baseTileAt,
+    baselineAt: () => baselineAt,
     biomeAt: () => biomeAt,
+    biomeBlend: () => biomeBlend,
     caveAt: () => caveAt,
     caveY: () => caveY,
+    inShaft: () => inShaft,
     itemName: () => itemName,
-    surfaceAt: () => surfaceAt
+    lavaAt: () => lavaAt,
+    layerAt: () => layerAt,
+    nodeForm: () => nodeForm,
+    surfaceAt: () => surfaceAt,
+    underworldCeiling: () => underworldCeiling,
+    underworldFloor: () => underworldFloor
   });
 
   // src/data/biomes.ts
@@ -234,6 +247,7 @@
     reeds: ["Reeds", "material"],
     salt: ["Sea salt", "material"],
     crystal: ["Cave crystal", "ore"],
+    hellstone: ["Hellstone", "ore"],
     chitin: ["Chitin", "material"],
     venom: ["Venom sac", "material"],
     feathers: ["Feathers", "material"],
@@ -259,6 +273,7 @@
     copper_ingot: ["Copper ingot", "metal"],
     iron_ingot: ["Iron ingot", "metal"],
     steel_ingot: ["Steel ingot", "metal"],
+    hellstone_ingot: ["Hellstone ingot", "metal"],
     herbal_tea: ["Herbal rehydration tea", "medicine", 1200],
     poultice: ["Antiseptic poultice", "medicine", 1400],
     fever_remedy: ["Willow fever remedy", "medicine", 1500],
@@ -281,9 +296,11 @@
     obsidian_pick: ["Obsidian pickaxe", "tool"],
     obsidian_blade: ["Obsidian blade", "weapon"],
     eclipse_blade: ["Eclipse Blade", "weapon"],
+    hellfire_blade: ["Hellfire Blade", "weapon"],
     direwolf_cloak: ["Direwolf Cloak", "clothing"],
     hide_coat: ["Hide coat", "clothing"],
     explorer_boots: ["Explorer boots", "clothing"],
+    cinder_ward: ["Cinder Ward", "clothing"],
     fishing_rod: ["Fishing rod", "tool"],
     eclipse_fang: ["Eclipse Fang", "trophy"],
     direwolf_pelt: ["Direwolf Pelt", "trophy"],
@@ -377,6 +394,9 @@
     ["obsidian_axe", { obsidian: 5, steel_ingot: 3, hide: 1 }, "forge", 5],
     ["obsidian_pick", { obsidian: 5, steel_ingot: 3, hide: 1 }, "forge", 5],
     ["obsidian_blade", { obsidian: 7, steel_ingot: 4, hide: 2 }, "forge", 5],
+    ["cinder_ward", { obsidian: 6, sulfur: 6, hide: 8, ice: 8 }, "forge", 5],
+    ["hellstone_ingot", { hellstone: 3, coal: 2, sulfur: 1 }, "forge", 6],
+    ["hellfire_blade", { hellstone_ingot: 8, obsidian: 6, hide: 2 }, "forge", 6],
     [
       "effergy",
       { obsidian: 24, steel_ingot: 18, sulfur: 12, bone: 16, hide: 12, ice: 6, antibiotic: 2 },
@@ -425,8 +445,14 @@
     reeds: { yield: [2, 4], hp: 3, regen: 170 },
     salt: { yield: [1, 3], tool: "pick", req: 0, hp: 2, regen: 240 },
     crystal: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 400 },
+    hellstone: { yield: [2, 3], tool: "pick", req: 5, hp: 4, regen: 0 },
     cactus_fruit: { yield: [1, 2], hp: 2, regen: 230 }
   };
+  function nodeForm(kind) {
+    if (kind === "water") return "water";
+    if (kind === "wood" || kind === "resin" || kind === "honey") return "tree";
+    return NODES[kind]?.tool === "pick" ? "mineral" : "plant";
+  }
   var TOOL_TIERS = {
     stone_axe: ["axe", 1],
     stone_pick: ["pick", 1],
@@ -446,8 +472,47 @@
     iron_sword: [3, 36, 62],
     steel_sword: [4, 47, 65],
     obsidian_blade: [5, 61, 67],
-    eclipse_blade: [6, 85, 73]
+    eclipse_blade: [6, 85, 73],
+    hellfire_blade: [6, 76, 70]
   };
+
+  // src/core/noise.ts
+  var hash = (i, seed) => {
+    const n = Math.sin(i * 127.1 + seed * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  };
+  var hash2 = (i, j, seed) => {
+    const n = Math.sin(i * 127.1 + j * 269.5 + seed * 113.3) * 43758.5453;
+    return n - Math.floor(n);
+  };
+  var ease = (t) => t * t * (3 - 2 * t);
+  function noise1(x, seed = 0) {
+    const i = Math.floor(x), t = ease(x - i);
+    return (hash(i, seed) * (1 - t) + hash(i + 1, seed) * t) * 2 - 1;
+  }
+  function fbm1(x, seed = 0, octaves = 3) {
+    let sum = 0, amp = 1, norm = 0;
+    for (let o = 0; o < octaves; o++) {
+      sum += noise1(x * 2 ** o, seed + o * 17) * amp;
+      norm += amp;
+      amp *= 0.5;
+    }
+    return sum / norm;
+  }
+  function noise2(x, y, seed = 0) {
+    const i = Math.floor(x), j = Math.floor(y), tx = ease(x - i), ty = ease(y - j);
+    const a = hash2(i, j, seed), b = hash2(i + 1, j, seed), c = hash2(i, j + 1, seed), d = hash2(i + 1, j + 1, seed);
+    return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+  }
+  function fbm2(x, y, seed = 0, octaves = 3) {
+    let sum = 0, amp = 1, norm = 0;
+    for (let o = 0; o < octaves; o++) {
+      sum += noise2(x * 2 ** o, y * 2 ** o, seed + o * 29) * amp;
+      norm += amp;
+      amp *= 0.5;
+    }
+    return sum / norm;
+  }
 
   // src/data/world.ts
   var SIDE_ORDER = [
@@ -461,18 +526,32 @@
     "desert",
     "badlands"
   ];
-  var BIOME_WIDTH = 1200;
-  var FIRST_BIOME_CENTER = BIOME_WIDTH / 2;
+  var BIOME_WIDTHS = {
+    coast: 2800,
+    marsh: 3e3,
+    forest: 3800,
+    meadow: 3200,
+    taiga: 3400,
+    tundra: 3e3,
+    alpine: 3600,
+    desert: 3800,
+    badlands: 3400
+  };
+  var BIOME_SPANS = (() => {
+    let at = 0;
+    return SIDE_ORDER.map((id) => {
+      const start2 = at;
+      at += BIOME_WIDTHS[id];
+      return { id, start: start2, end: at, center: (start2 + at) / 2 };
+    });
+  })();
   var MAP_LABEL_Y = 610;
-  var CAVE_ENTRANCE_OFFSET = 420;
-  var CAVE_DEPTHS = [0, 210, 465, 760];
-  var CAVE_LEVELS = CAVE_DEPTHS.length - 1;
   var BIOME_CENTERS = Object.fromEntries(
-    SIDE_ORDER.map((id, i) => [id, [FIRST_BIOME_CENTER + i * BIOME_WIDTH, MAP_LABEL_Y]])
+    BIOME_SPANS.map((s) => [s.id, [s.center, MAP_LABEL_Y]])
   );
   var TILE = 32;
-  var WORLD_W = SIDE_ORDER.length * BIOME_WIDTH;
-  var WORLD_H = 1920;
+  var WORLD_W = BIOME_SPANS[BIOME_SPANS.length - 1].end;
+  var WORLD_H = 4480;
   var TILE_COLS = Math.ceil(WORLD_W / TILE);
   var TILE_ROWS = Math.ceil(WORLD_H / TILE);
   var Ground = {
@@ -482,63 +561,250 @@
     sand: 3,
     mud: 4,
     frost: 5,
-    redrock: 6
+    redrock: 6,
+    deepstone: 8,
+    ash: 9,
+    hellrock: 10
   };
-  var ELEVATION = {
-    coast: 690,
-    marsh: 665,
-    forest: 625,
-    meadow: 635,
-    taiga: 600,
-    tundra: 575,
-    alpine: 490,
-    desert: 635,
-    badlands: 585
+  var MINE_TIER = {
+    1: 0,
+    2: 1,
+    3: 0,
+    4: 0,
+    5: 2,
+    6: 4,
+    8: 3,
+    9: 4,
+    10: 5
   };
-  function surfaceAt(x) {
-    x = Math.max(0, Math.min(WORLD_W, x));
-    const i = Math.max(
-      0,
-      Math.min(SIDE_ORDER.length - 2, Math.floor((x - FIRST_BIOME_CENTER) / BIOME_WIDTH))
-    );
-    const x0 = FIRST_BIOME_CENTER + i * BIOME_WIDTH, t = Math.max(0, Math.min(1, (x - x0) / BIOME_WIDTH));
-    const smooth6 = t * t * (3 - 2 * t);
-    const base = ELEVATION[SIDE_ORDER[i]] * (1 - smooth6) + ELEVATION[SIDE_ORDER[i + 1]] * smooth6;
-    return base + Math.sin(x / 145) * 20 + Math.sin(x / 53) * 8 + Math.sin(x / 370) * 14;
+  var TILE_YIELD = {
+    1: { item: "dirt" },
+    2: { item: "stone" },
+    3: { item: "dirt" },
+    4: { item: "clay" },
+    5: { item: "ice" },
+    6: { item: "stone", bonus: ["obsidian", 0.22] },
+    8: { item: "stone", bonus: ["coal", 0.12] },
+    9: { item: "stone", bonus: ["sulfur", 0.3] },
+    10: { item: "stone", bonus: ["hellstone", 0.14] }
+  };
+  var SURFACE_BAND = 140;
+  var LAYERS = [
+    { id: "surface", name: "Surface", top: 0, temp: 0 },
+    { id: "upper_mines", name: "Upper Mines", top: 0, temp: 11 },
+    { id: "lower_mines", name: "Lower Mines", top: 1750, temp: 19 },
+    { id: "upper_hell", name: "Upper Hell", top: 2750, temp: 46 },
+    { id: "lower_hell", name: "Lower Hell", top: 3600, temp: 68 }
+  ];
+  function layerAt(x, y) {
+    if (y < surfaceAt(x) + SURFACE_BAND) return LAYERS[0];
+    for (let i = LAYERS.length - 1; i > 1; i--) if (y >= LAYERS[i].top) return LAYERS[i];
+    return LAYERS[1];
   }
-  var ENTRANCES = SIDE_ORDER.map(
-    (_, i) => FIRST_BIOME_CENTER + CAVE_ENTRANCE_OFFSET + i * BIOME_WIDTH
-  );
+  var PROFILES = {
+    // Low dunes that slope down to the sea at the western edge.
+    coast: (x) => 688 + 12 * fbm1(x / 260, 1) + Math.max(0, 700 - x) * 0.09,
+    // Nearly flat wetland.
+    marsh: (x) => 676 + 6 * noise1(x / 330, 2) + 3 * noise1(x / 90, 3),
+    // Rolling wooded hills.
+    forest: (x) => 612 + 62 * fbm1(x / 560, 4) + 10 * noise1(x / 140, 5),
+    // Gentle, open grassland.
+    meadow: (x) => 632 + 26 * noise1(x / 480, 6) + 7 * noise1(x / 140, 7),
+    // Hilly conifer country.
+    taiga: (x) => 580 + 88 * fbm1(x / 640, 8) + 18 * noise1(x / 170, 9),
+    // Wide frozen plains broken by the odd pressure ridge.
+    tundra: (x) => 566 + 8 * noise1(x / 420, 10) - 44 * Math.max(0, noise1(x / 380, 11) - 0.55) * 2.2,
+    // Sharp mountain peaks.
+    alpine: (x) => {
+      const ridge = 1 - Math.abs(fbm1(x / 820, 12, 2));
+      return 560 - 330 * ridge ** 1.6 - 40 * (1 - Math.abs(noise1(x / 260, 13)));
+    },
+    // Long sand dunes.
+    desert: (x) => 642 + 34 * noise1(x / 340, 14) + 12 * Math.abs(noise1(x / 120, 15)),
+    // Terraced mesas; the slope limit turns their steps into cliffs with scree.
+    badlands: (x) => {
+      const t = fbm1(x / 620, 16, 2) * 3.2;
+      const step = Math.round(t), edge = Math.max(-0.5, Math.min(0.5, (t - step) * 3));
+      return 604 - (step + edge) * 62;
+    }
+  };
+  var BORDER_FEATURES = [
+    ["coast", 18, 260],
+    // a shallow lagoon basin into the marsh
+    ["marsh", 62, 170],
+    // a river valley below the forest bluff
+    ["forest", -74, 320],
+    // a wooded ridge down to the meadow
+    ["meadow", -96, 380],
+    // foothills climbing into the taiga
+    ["taiga", 52, 300],
+    // a frozen lake basin
+    ["tundra", -40, 280],
+    // the first rise of the mountains
+    ["alpine", -70, 360],
+    // the escarpment down into the desert
+    ["desert", 150, 150]
+    // a deep canyon cut into the badlands
+  ];
+  var BLEND = 380;
+  var SURFACE_STEP = 16;
+  var MAX_RISE = 15;
+  function roughSurface(x) {
+    let i = BIOME_SPANS.findIndex((s) => x < s.end);
+    if (i < 0) i = BIOME_SPANS.length - 1;
+    const span = BIOME_SPANS[i];
+    let y = PROFILES[span.id](x);
+    const west = i > 0 && x - span.start < BLEND, east = i < BIOME_SPANS.length - 1 && span.end - x < BLEND;
+    if (west || east) {
+      const border = west ? span.start : span.end, other = BIOME_SPANS[west ? i - 1 : i + 1], t = 0.5 + (x - border) / BLEND * 0.5 * (west ? 1 : -1), k = t * t * (3 - 2 * t);
+      y = PROFILES[other.id](x) * (1 - k) + y * k;
+    }
+    for (const [id, depth, half] of BORDER_FEATURES) {
+      const border = BIOME_SPANS.find((s) => s.id === id).end, d = (x - border) / half;
+      if (Math.abs(d) < 3) y += depth * Math.exp(-d * d * 2);
+    }
+    return Math.max(170, Math.min(800, y));
+  }
+  var SURFACE = (() => {
+    const n = Math.ceil(WORLD_W / SURFACE_STEP) + 1, h = new Float32Array(n);
+    for (let i = 0; i < n; i++) h[i] = roughSurface(i * SURFACE_STEP);
+    for (let i = 1; i < n; i++) h[i] = Math.min(h[i], h[i - 1] + MAX_RISE);
+    for (let i = n - 2; i >= 0; i--) h[i] = Math.min(h[i], h[i + 1] + MAX_RISE);
+    return h;
+  })();
+  function surfaceAt(x) {
+    const f = Math.max(0, Math.min(WORLD_W, x)) / SURFACE_STEP, i = Math.min(SURFACE.length - 2, Math.floor(f)), t = f - i;
+    return SURFACE[i] * (1 - t) + SURFACE[i + 1] * t;
+  }
+  var BASELINE = (() => {
+    const r = Math.round(520 / SURFACE_STEP), out = new Float32Array(SURFACE.length);
+    for (let i = 0; i < SURFACE.length; i++) {
+      let sum = 0, n = 0;
+      for (let j = Math.max(0, i - r); j <= Math.min(SURFACE.length - 1, i + r); j++) {
+        sum += SURFACE[j];
+        n++;
+      }
+      out[i] = sum / n;
+    }
+    return out;
+  })();
+  function baselineAt(x) {
+    const i = Math.max(0, Math.min(BASELINE.length - 1, Math.round(x / SURFACE_STEP)));
+    return BASELINE[i];
+  }
+  var CAVE_LEVELS = 7;
   function caveY(x, level) {
-    return surfaceAt(x) + CAVE_DEPTHS[level] + Math.sin(x / (125 + level * 45)) * (22 + level * 11);
+    if (level <= 3) {
+      const depth = [0, 210, 465, 760][level];
+      const base2 = Math.max(baselineAt(x), surfaceAt(x) - 40);
+      return base2 + depth + Math.sin(x / (125 + level * 45)) * (22 + level * 11);
+    }
+    const base = [0, 0, 0, 0, 2020, 2440, 2980, 3360][level];
+    return base + 80 * fbm1(x / (900 + level * 40), 40 + level) + 18 * Math.sin(x / 190 + level);
+  }
+  function tunnelHalfWidth(x, level) {
+    return 42 + Math.min(level, 5) * 8 + Math.sin(x / 79 + level) * 10;
+  }
+  var underworldCeiling = (x) => 3790 + 70 * fbm1(x / 700, 61);
+  var underworldFloor = (x) => Math.min(4410, 4240 + 150 * fbm1(x / 1100, 67) + 36 * noise1(x / 230, 71));
+  var LAVA_Y = 4262;
+  var shaftAt = (x, top, bottom) => ({ x, top, bottom });
+  var ENTRANCES = BIOME_SPANS.flatMap((s) => [
+    s.start + (s.end - s.start) * 0.28,
+    s.start + (s.end - s.start) * 0.74
+  ]);
+  function dryLanding(x) {
+    for (let d = 0; d < 900; d += 32)
+      for (const cx of [x + d, x - d]) if (underworldFloor(cx) < LAVA_Y - 45) return cx;
+    return x;
+  }
+  var SHAFTS = [
+    ...ENTRANCES.map((x) => shaftAt(x, surfaceAt(x) - 4, caveY(x, 3) + 40)),
+    ...BIOME_SPANS.flatMap((s, i) => {
+      const at = (f) => s.start + (s.end - s.start) * f;
+      const list = [
+        shaftAt(at(0.5), caveY(at(0.5), 3), caveY(at(0.5), 4) + 40),
+        shaftAt(at(0.16), caveY(at(0.16), 4), caveY(at(0.16), 5) + 40),
+        i % 2 ? shaftAt(at(0.84), caveY(at(0.84), 5), caveY(at(0.84), 6) + 40) : shaftAt(at(0.62), caveY(at(0.62), 5), caveY(at(0.62), 6) + 40),
+        shaftAt(at(0.36), caveY(at(0.36), 6), caveY(at(0.36), 7) + 40)
+      ];
+      if (i % 3 === 2) {
+        const x = dryLanding(at(0.66));
+        list.push(shaftAt(x, caveY(x, 7), underworldFloor(x) - 6));
+      }
+      return list;
+    })
+  ];
+  var SHAFT_HALF = 47;
+  function inShaft(x, y, slack = 0) {
+    return SHAFTS.some(
+      (s) => Math.abs(x - s.x) < SHAFT_HALF - 4 + slack && y > s.top - 12 && y < s.bottom + 58
+    );
+  }
+  function inUnderworld(x, y) {
+    const ceil = underworldCeiling(x), floor = underworldFloor(x);
+    if (y < ceil || y > floor) return false;
+    const spire = noise1(x / 150, 73);
+    if (spire > 0.55 && y < ceil + (floor - ceil) * (spire - 0.55) * 1.3) return false;
+    return true;
+  }
+  function inCavern(x, y, surface) {
+    if (y > LAYERS[3].top && y < LAYERS[4].top - 60) return fbm2(x / 300, y / 200, 83) > 0.64;
+    if (y > LAYERS[2].top && y < LAYERS[3].top) return fbm2(x / 260, y / 170, 79) > 0.68;
+    if (y > surface + 170) return fbm2(x / 200, y / 140, 89) > 0.74;
+    return false;
   }
   function caveAt(x, y) {
     const surface = surfaceAt(x);
-    if (ENTRANCES.some((entrance) => Math.abs(x - entrance) < 47) && y >= surface && y < caveY(x, CAVE_LEVELS) + 50)
+    if (y >= surface - 4 && SHAFTS.some((s) => Math.abs(x - s.x) < SHAFT_HALF && y >= s.top && y < s.bottom + 50))
       return true;
     if (y < surface + 70) return false;
-    for (let level = 1; level <= CAVE_LEVELS; level++) {
-      const width = 42 + level * 8 + Math.sin(x / 79 + level) * 10;
-      if (Math.abs(y - caveY(x, level)) < width) return true;
+    for (let level = 1; level <= CAVE_LEVELS; level++)
+      if (Math.abs(y - caveY(x, level)) < tunnelHalfWidth(x, level)) return true;
+    return inUnderworld(x, y) || inCavern(x, y, surface);
+  }
+  function lavaAt(x, y) {
+    if (y > LAVA_Y && y < WORLD_H) return inUnderworld(x, y);
+    if (y > 3470 && y < LAYERS[4].top - 60 && inCavern(x, y, 0)) {
+      for (const level of [6, 7])
+        if (Math.abs(y - caveY(x, level)) < tunnelHalfWidth(x, level)) return false;
+      return !inShaft(x, y, 10);
     }
     return false;
   }
+  function spanIndex(x) {
+    for (let i = 0; i < BIOME_SPANS.length; i++) if (x < BIOME_SPANS[i].end) return i;
+    return BIOME_SPANS.length - 1;
+  }
   function biomeAt(x, y) {
     const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
-    const index = Math.max(
-      0,
-      Math.min(SIDE_ORDER.length - 1, Math.round((warped - FIRST_BIOME_CENTER) / BIOME_WIDTH))
-    );
-    return BIOMES.find((b) => b.id === SIDE_ORDER[index]);
+    const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;
+    return BIOMES.find((b) => b.id === id);
+  }
+  function biomeBlend(x, band = 520) {
+    const i = spanIndex(x), s = BIOME_SPANS[i];
+    if (i > 0 && x - s.start < band) {
+      const t = 0.5 + (x - s.start) / band / 2;
+      return [BIOME_SPANS[i - 1].id, s.id, t * t * (3 - 2 * t)];
+    }
+    if (i < BIOME_SPANS.length - 1 && s.end - x < band) {
+      const t = 0.5 - (s.end - x) / band / 2;
+      return [s.id, BIOME_SPANS[i + 1].id, t * t * (3 - 2 * t)];
+    }
+    return [s.id, s.id, 0];
   }
   function baseTileAt(tx, ty) {
     const x = tx * TILE + TILE / 2, y = ty * TILE + TILE / 2, surface = surfaceAt(x);
     if (y < surface || caveAt(x, y)) return Ground.air;
-    const biome = biomeAt(x, y).id;
-    if (y < surface + 76)
+    const biome = biomeAt(x, y).id, depth = y - surface;
+    if (depth < 76)
       return biome === "desert" ? Ground.sand : biome === "marsh" || biome === "coast" ? Ground.mud : biome === "tundra" ? Ground.frost : biome === "badlands" ? Ground.redrock : Ground.soil;
-    if (biome === "tundra" && y < surface + 270) return Ground.frost;
-    if (biome === "badlands" && y > surface + 350) return Ground.redrock;
+    const yy = y + 46 * noise1(x / 310, 97);
+    if (yy >= LAYERS[4].top) return Ground.hellrock;
+    if (yy >= LAYERS[3].top) return Ground.ash;
+    if (yy >= LAYERS[2].top) return Ground.deepstone;
+    if (biome === "tundra" && depth < 270) return Ground.frost;
+    if (biome === "badlands" && depth > 350) return Ground.redrock;
     return Ground.stone;
   }
 
@@ -612,14 +878,18 @@
     rainCatchRate: 0.035,
     rainCatchCapacity: 8,
     worldGenerationAttemptsPerNode: 35,
-    resourceSpread: 1120,
-    animalSpread: 870,
+    treeFallSeconds: 1.1,
+    treeRegrowthFactor: 3,
     resourceWorldPadding: 65,
     animalWorldPadding: 70,
     entranceResourceClearance: 80,
     maxTickSeconds: 0.1,
     maxOfflineSeconds: 24 * 60 * 60,
     cooledSpoilageRate: 0.18,
+    /** Health lost per second to hell's heat, without and with a Cinder Ward. */
+    upperHellHeat: [0.35, 0],
+    lowerHellHeat: [2.2, 0.25],
+    lavaDamage: [32, 20],
     saveKey: "wildlands-save-v1"
   };
 
@@ -642,8 +912,14 @@
         this.game.say(itemName(id) + " equipped.");
         return { ok: true };
       }
-      if (id === "direwolf_cloak" || id === "hide_coat" || id === "explorer_boots") {
-        const key = { direwolf_cloak: "cloak", hide_coat: "coat", explorer_boots: "boots" }[id];
+      const wear = {
+        direwolf_cloak: "cloak",
+        hide_coat: "coat",
+        explorer_boots: "boots",
+        cinder_ward: "ward"
+      }[id];
+      if (wear) {
+        const key = wear;
         this.game.s.player[key] = !this.game.s.player[key];
         this.game.say(itemName(id) + (this.game.s.player[key] ? " worn." : " stowed."));
         return { ok: true };
@@ -802,6 +1078,97 @@
     }
   };
 
+  // src/game/systems/Drops.ts
+  var DROP_RULES = {
+    gravity: 900,
+    magnetRadius: 150,
+    collectRadius: 26,
+    pickupDelay: 0.3,
+    mergeRadius: 26,
+    maxDrops: 240
+  };
+  var Drops = class extends System {
+    /** Spawns a stack that pops upward; `delay` holds it back (a felled tree lands first). */
+    spawn(item, qty, x, y, delay = 0) {
+      if (qty <= 0) return;
+      const drops = this.game.s.drops;
+      drops.push({
+        id: uniqueId(),
+        item,
+        qty,
+        x: clamp(x, 10, WORLD_W - 10),
+        y: y - 6,
+        vx: (this.game.rng() - 0.5) * 130,
+        vy: -170 - this.game.rng() * 90,
+        born: this.game.s.elapsed + delay,
+        resting: false
+      });
+      if (drops.length > DROP_RULES.maxDrops) drops.splice(0, drops.length - DROP_RULES.maxDrops);
+    }
+    solid(x, y) {
+      return !!this.game.tileAt(Math.floor(x / TILE), Math.floor(y / TILE));
+    }
+    step(dt) {
+      const s = this.game.s, p = s.player, centre = { x: p.x, y: p.y - 20 };
+      for (let i = s.drops.length - 1; i >= 0; i--) {
+        const d = s.drops[i];
+        if (s.elapsed < d.born) continue;
+        const near = dist(d, centre);
+        if (!s.dead && s.elapsed - d.born > DROP_RULES.pickupDelay && near < DROP_RULES.magnetRadius) {
+          if (near < DROP_RULES.collectRadius) {
+            s.drops.splice(i, 1);
+            this.game.add(d.item, d.qty);
+            this.game.event("pickup", d.x, d.y, d.item);
+            this.game.say("+" + d.qty + " " + itemName(d.item), "good");
+            continue;
+          }
+          const pull = 420 + (DROP_RULES.magnetRadius - near) * 9;
+          d.vx = (centre.x - d.x) / near * pull;
+          d.vy = (centre.y - d.y) / near * pull;
+          d.x += d.vx * dt;
+          d.y += d.vy * dt;
+          d.resting = false;
+          continue;
+        }
+        if (d.resting) {
+          if (!this.solid(d.x, d.y + 2)) d.resting = false;
+          else continue;
+        }
+        d.vy = Math.min(d.vy + DROP_RULES.gravity * dt, 600);
+        const nx = d.x + d.vx * dt;
+        if (this.solid(nx, d.y - 4)) d.vx *= -0.35;
+        else d.x = clamp(nx, 10, WORLD_W - 10);
+        const ny = d.y + d.vy * dt;
+        if (d.vy > 0 && this.solid(d.x, ny)) {
+          d.y = Math.floor(ny / TILE) * TILE - 1;
+          if (d.vy > 160) {
+            d.vy *= -0.3;
+            d.vx *= 0.6;
+          } else {
+            d.vy = 0;
+            d.vx = 0;
+            d.resting = true;
+          }
+        } else if (d.vy < 0 && this.solid(d.x, ny - 8)) d.vy = 0;
+        else d.y = Math.min(ny, WORLD_H - 20);
+        if (lavaAt(d.x, d.y)) {
+          s.drops.splice(i, 1);
+          this.game.event("sizzle", d.x, d.y, d.item);
+          continue;
+        }
+        if (d.resting) {
+          const twin = s.drops.find(
+            (o) => o !== d && o.resting && o.item === d.item && dist(o, d) < DROP_RULES.mergeRadius
+          );
+          if (twin) {
+            twin.qty += d.qty;
+            s.drops.splice(i, 1);
+          }
+        }
+      }
+    }
+  };
+
   // src/game/systems/Effergy.ts
   var Effergy = class extends System {
     summonBoss() {
@@ -887,7 +1254,9 @@
       return t < RULES.nightEndsAt || t > RULES.nightStartsAt;
     }
     temperature() {
-      const b = this.game.biome();
+      const b = this.game.biome(), layer = this.game.layer();
+      if (layer.id === "upper_mines") return layer.temp + b.temp * 0.25;
+      if (layer.id !== "surface") return layer.temp;
       return b.temp + (this.isNight() ? -8 : 0) + (this.game.s.weather === "rain" ? -4 : this.game.s.weather === "storm" ? -7 : 0);
     }
     // Moves the clock forward and occasionally turns the weather.
@@ -932,7 +1301,11 @@
       if (near.type === "cache") {
         const c = near.object;
         c.opened = true;
-        const loot = {
+        const deep = {
+          lower_mines: ["iron_ingot", "crystal"],
+          upper_hell: ["steel_ingot", "obsidian"]
+        };
+        const loot = c.layer ? deep[c.layer] : {
           coast: ["salt", "reeds"],
           marsh: ["herb", "clay"],
           forest: ["resin", "copper_ore"],
@@ -1045,28 +1418,58 @@
       return { ok: true };
     }
     gather(node) {
-      if (dist(node, this.game.s.player) > RULES.gatherReach || node.hp <= 0)
+      const p = this.game.s.player;
+      if (dist(node, p) > RULES.gatherReach || node.hp <= 0)
         return { ok: false, reason: "Move closer to the resource." };
       const spec = NODES[node.kind], v = this.game.s.vitals;
       const tier = spec.tool ? this.game.toolTier(spec.tool) : 0;
       if (tier < (spec.req || 0))
         return {
           ok: false,
-          reason: itemName(node.kind) + " requires a tier " + spec.req + " pickaxe."
+          reason: itemName(node.kind) + " requires a tier " + spec.req + (spec.tool === "axe" ? " axe." : " pickaxe.")
         };
       if (v.stamina < 7) return { ok: false, reason: "Too exhausted to gather. Rest or wait." };
       v.stamina -= 7;
       v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
       v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
-      const qty = Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0);
-      const id = node.kind === "water" ? "wild_water" : node.kind;
-      this.game.add(id, qty);
-      if (node.kind !== "water") {
-        node.hp--;
-        if (node.hp <= 0) node.depletedUntil = this.game.s.elapsed + spec.regen;
+      const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0);
+      const form = nodeForm(node.kind), s = this.game.s;
+      node.hitAt = s.elapsed;
+      if (form === "water") {
+        const qty2 = roll();
+        this.game.add("wild_water", qty2);
+        this.game.event("chip", node.x, node.y, "water");
+        this.game.say("Gathered " + qty2 + " wild water.", "good");
+        return { ok: true, id: "wild_water", qty: qty2 };
       }
-      this.game.say("Gathered " + qty + " " + itemName(id).toLowerCase() + ".", "good");
-      return { ok: true, id, qty };
+      this.game.event("chip", node.x, node.y - (form === "tree" ? 26 : 10), node.kind);
+      if (form === "plant") {
+        const qty2 = roll();
+        node.hp--;
+        if (node.hp <= 0) node.depletedUntil = s.elapsed + spec.regen;
+        this.game.drops.spawn(node.kind, qty2, node.x, node.y - 14);
+        return { ok: true, id: node.kind, qty: qty2 };
+      }
+      node.hp--;
+      if (node.hp > 0) return { ok: true, id: node.kind, qty: 0, hit: true };
+      let qty = 0;
+      for (let i = 0; i < spec.hp; i++) qty += roll();
+      if (form === "tree") {
+        const dir = node.x >= p.x ? 1 : -1;
+        node.felledAt = s.elapsed;
+        node.fallDir = dir;
+        node.depletedUntil = s.elapsed + spec.regen * RULES.treeRegrowthFactor;
+        this.game.event("fell", node.x, node.y, node.kind, dir);
+        this.game.drops.spawn(node.kind, qty, node.x + dir * 70, node.y - 24, RULES.treeFallSeconds);
+        this.game.say("Timber! The tree comes down.", "good");
+      } else {
+        const index = s.nodes.indexOf(node);
+        if (index >= 0) s.nodes.splice(index, 1);
+        this.game.event("crumble", node.x, node.y, node.kind);
+        this.game.drops.spawn(node.kind, qty, node.x, node.y - 12);
+        this.game.say("The " + itemName(node.kind).toLowerCase() + " breaks apart.", "good");
+      }
+      return { ok: true, id: node.kind, qty };
     }
   };
 
@@ -1134,11 +1537,13 @@
       const p = this.game.s.player, v = this.game.s.vitals;
       p.moving = Math.abs(dx) > 0.1;
       const tired = v.stamina < 12 || v.fatigue > 80;
-      const speed = (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * (p.boots ? 1.12 : 1);
+      const lava = this.game.inLava();
+      const speed = (lava ? 0.45 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * (p.boots ? 1.12 : 1);
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
       p.vx = dx * speed;
-      const shaft = ENTRANCES.some((x) => Math.abs(x - p.x) < 43) && p.y > surfaceAt(p.x) - 12;
-      if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
+      const shaft = inShaft(p.x, p.y);
+      if (lava) p.vy = dy < 0 ? -150 : Math.min(p.vy + 240 * dt, 60);
+      else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
         if (p.grounded) this.jump();
         else {
           p.vy = -RULES.climbVelocity;
@@ -1269,7 +1674,10 @@
         if (st.fuel > 0 && ["campfire", "icebox", "lantern"].includes(st.type))
           st.fuel = Math.max(0, st.fuel - dt);
       for (const n of this.game.s.nodes)
-        if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) n.hp = NODES[n.kind].hp;
+        if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) {
+          n.hp = NODES[n.kind].hp;
+          delete n.felledAt;
+        }
     }
     vitalReasons() {
       const v = this.game.s.vitals, causes = [];
@@ -1280,6 +1688,11 @@
       if (v.bodyTemp > 39) causes.push("Heat exposure is draining health");
       if (v.wetness > 40) causes.push("Wet clothing magnifies cold");
       if (v.fatigue > 75) causes.push("Fatigue slows movement and fighting");
+      if (this.game.inLava()) causes.push("Molten rock is burning you; climb out");
+      else if (this.heat() > 0)
+        causes.push(
+          this.game.s.player.ward ? "The Cinder Ward holds back most of the heat" : "Scorching heat; a Cinder Ward is needed below"
+        );
       if (v.illness > 30) causes.push("Illness is worsening");
       if (v.infection > 25) causes.push("Infection is worsening; wash and treat it");
       if (v.hygiene < 25) causes.push("Poor hygiene increases infection");
@@ -1316,6 +1729,13 @@
           e.qty = Math.ceil(e.qty * 0.75);
       this.game.say("You woke in the meadow. Some loose supplies were lost.", "good");
     }
+    /** Health lost per second to the heat of the hell layers. */
+    heat() {
+      const layer = this.game.layer().id, ward = this.game.s.player.ward ? 1 : 0;
+      if (layer === "upper_hell") return RULES.upperHellHeat[ward];
+      if (layer === "lower_hell") return RULES.lowerHellHeat[ward];
+      return 0;
+    }
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
@@ -1333,7 +1753,7 @@
       target = clamp(target, 30, 41);
       v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
       v.hydration = clamp(
-        v.hydration - dt * (0.045 + (cold2 > 26 ? 0.045 : 0) + (this.game.s.disease === "dysentery" ? 0.055 : 0)),
+        v.hydration - dt * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0) + (this.game.s.disease === "dysentery" ? 0.055 : 0)),
         0,
         100
       );
@@ -1363,20 +1783,24 @@
       if (v.hygiene < 20 && v.infection > 0)
         v.infection = clamp(v.infection + dt * 0.024, 0, RULES.maxVital);
       const threats = this.game.s.animals.some(
-        (a) => !a.deadUntil && ["wolf", "boar", "scorpion", "bat", "boss"].includes(a.type) && dist(a, p) < 150
+        (a) => !a.deadUntil && ["wolf", "boar", "scorpion", "bat", "boss", "ember_bat", "hellhound"].includes(a.type) && dist(a, p) < 150
       );
       v.morale = clamp(
         v.morale + dt * (threats || v.illness > 45 ? -0.045 : fire && v.calories > 40 ? 0.025 : 4e-3),
         0,
         100
       );
-      const harm = (v.hydration <= 0 ? 0.15 : 0) + (v.calories <= 0 ? 0.11 : 0) + (v.protein <= 0 ? 0.04 : 0) + (v.bodyTemp < 35 || v.bodyTemp > 39 ? 0.09 : 0) + (v.illness > 70 ? 0.08 : 0) + (v.infection > 65 ? 0.1 : 0);
+      const burning = this.game.inLava() ? RULES.lavaDamage[p.ward ? 1 : 0] : 0;
+      const harm = burning + this.heat() + (v.hydration <= 0 ? 0.15 : 0) + (v.calories <= 0 ? 0.11 : 0) + (v.protein <= 0 ? 0.04 : 0) + (v.bodyTemp < 35 || v.bodyTemp > 39 ? 0.09 : 0) + (v.illness > 70 ? 0.08 : 0) + (v.infection > 65 ? 0.1 : 0);
       if (harm) v.health = clamp(v.health - harm * dt, 0, RULES.maxVital);
       else if (v.hydration > 50 && v.calories > 50 && v.protein > 25 && v.bodyTemp > 36 && v.bodyTemp < 38 && v.illness < 20 && v.infection < 20 && !threats)
         v.health = clamp(v.health + dt * 0.018, 0, RULES.maxVital);
       if (v.health <= 0) {
         this.game.s.dead = true;
-        this.game.say("You collapsed. Your field record survives.", "danger");
+        this.game.say(
+          burning ? "The lava took you. Your field record survives." : "You collapsed. Your field record survives.",
+          "danger"
+        );
       }
     }
   };
@@ -1385,6 +1809,13 @@
   var Terrain = class extends System {
     tileAt(tx, ty) {
       return tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS ? 0 : this.game.s.tiles[ty * TILE_COLS + tx] || 0;
+    }
+    /** Changes one tile and remembers the change for the field record. */
+    setTile(tx, ty, kind) {
+      if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return;
+      const index = ty * TILE_COLS + tx;
+      this.game.s.tiles[index] = kind;
+      this.game.s.tileEdits[index] = kind;
     }
     groundTopAt(x) {
       const tx = clamp(Math.floor(x / TILE), 0, TILE_COLS - 1);
@@ -1405,23 +1836,42 @@
       if (!kind) return { ok: false, reason: "There is no solid ground there." };
       if (Math.hypot(x - this.game.s.player.x, y - (this.game.s.player.y - 24)) > RULES.mineReach)
         return { ok: false, reason: "Move closer to mine this tile." };
-      const need = kind === 6 ? 4 : kind === 5 ? 2 : kind === 2 ? 1 : 0;
+      const need = MINE_TIER[kind] ?? 1;
       if (this.game.toolTier("pick") < need)
         return { ok: false, reason: "This ground needs a tier " + need + " pickaxe." };
       if (this.game.s.vitals.stamina < RULES.mineStamina)
         return { ok: false, reason: "Too exhausted to mine." };
       this.game.s.vitals.stamina -= RULES.mineStamina;
-      this.game.s.tiles[ty * TILE_COLS + tx] = 0;
-      const yieldItem = { 1: "dirt", 2: "stone", 3: "dirt", 4: "clay", 5: "ice", 6: "stone" }[kind];
-      this.game.add(yieldItem, 1);
-      if (kind === 6 && this.game.rng() < 0.22) this.game.add("obsidian", 1);
-      this.game.say("Mined " + itemName(yieldItem).toLowerCase() + ".", "good");
-      return { ok: true, item: yieldItem };
+      this.setTile(tx, ty, 0);
+      const cx = tx * TILE + TILE / 2, cy = ty * TILE + TILE / 2, spec = TILE_YIELD[kind] ?? { item: "stone" };
+      this.game.event("dig", cx, cy, String(kind));
+      this.game.drops.spawn(spec.item, 1, cx, cy);
+      if (spec.bonus && this.game.rng() < spec.bonus[1]) {
+        this.game.drops.spawn(spec.bonus[0], 1, cx, cy);
+        this.game.say("Found " + itemName(spec.bonus[0]).toLowerCase() + " in the rock!", "good");
+      }
+      return { ok: true, item: spec.item };
     }
   };
 
   // src/game/systems/Wildlife.ts
+  var ANIMAL_NAMES = {
+    deer: "Deer",
+    wolf: "Wolf",
+    boar: "Boar",
+    bat: "Bat",
+    scorpion: "Scorpion",
+    ember_bat: "Ember bat",
+    hellhound: "Hellhound"
+  };
   var Wildlife = class extends System {
+    /** Where an animal stands (or hovers) at x: its tunnel, the underworld floor, or the ground. */
+    restY(a, x) {
+      if (a.tunnel) return caveY(x, a.tunnel) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
+      if (a.type === "bat") return caveY(x, 1) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
+      if (a.underground) return this.game.floorNear(x, underworldFloor(x) - 20);
+      return this.game.groundTopAt(x) - 1;
+    }
     attack() {
       if (this.game.s.dead) return { ok: false, reason: "You must recover first." };
       const p = this.game.s.player, v = this.game.s.vitals, weapon = WEAPONS[p.weapon] || WEAPONS.fists;
@@ -1447,7 +1897,7 @@
       target.hp -= damage;
       target.warning = 0;
       this.game.say(
-        itemName(p.weapon) + " struck " + (target.type === "boss" ? BOSSES[this.game.s.altar.level - 1].name : "a " + target.type) + " for " + Math.round(damage) + ".",
+        itemName(p.weapon) + " struck " + (target.type === "boss" ? BOSSES[this.game.s.altar.level - 1].name : "a " + (ANIMAL_NAMES[target.type] || target.type).toLowerCase()) + " for " + Math.round(damage) + ".",
         "combat"
       );
       if (target.hp <= 0) this.kill(target);
@@ -1468,16 +1918,24 @@
           "victory"
         );
       } else {
-        if (animal.type === "bat") {
-          this.game.add("chitin", 2);
-          this.game.add("feathers", 1);
+        const at = animal.x === void 0 ? this.game.s.player : animal, loot = (id, qty) => this.game.drops.spawn(id, qty, at.x, at.y - 20);
+        if (animal.type === "ember_bat") {
+          loot("sulfur", 2);
+          loot("chitin", 2);
+        } else if (animal.type === "hellhound") {
+          loot("hide", 3);
+          loot("bone", 3);
+          loot("hellstone", 1 + Math.floor(this.game.rng() * 2));
+        } else if (animal.type === "bat") {
+          loot("chitin", 2);
+          loot("feathers", 1);
         } else if (animal.type === "scorpion") {
-          this.game.add("chitin", 3);
-          this.game.add("venom", 1);
+          loot("chitin", 3);
+          loot("venom", 1);
         } else {
-          this.game.add("raw_meat", animal.type === "boar" ? 5 : 3);
-          this.game.add("hide", 2);
-          this.game.add("bone", animal.type === "wolf" ? 2 : 1);
+          loot("raw_meat", animal.type === "boar" ? 5 : 3);
+          loot("hide", 2);
+          loot("bone", animal.type === "wolf" ? 2 : 1);
         }
         if (animal.type === "wolf" && this.game.s.altar.attuned === "wolf" && !this.game.s.altar.activeBoss) {
           this.game.s.altar.kills++;
@@ -1493,15 +1951,24 @@
           a.deadUntil = 0;
           a.hp = a.maxHp;
           a.x = a.homeX + (this.game.rng() - 0.5) * 180;
-          a.y = a.type === "bat" ? caveY(a.x, 1) : this.game.groundTopAt(a.x) - 1;
+          a.y = this.restY(a, a.x);
         }
         return;
       }
       const p = this.game.s.player, d = dist(a, p), boss2 = a.type === "boss";
-      const aggressive = ["wolf", "boar", "scorpion", "bat", "boss"].includes(a.type);
+      const aggressive = [
+        "wolf",
+        "boar",
+        "scorpion",
+        "bat",
+        "boss",
+        "ember_bat",
+        "hellhound"
+      ].includes(a.type);
+      const range = boss2 ? 350 : a.type === "bat" ? 145 : a.type === "hellhound" ? 300 : 210;
       let vx = 0;
       if (a.type === "deer" && d < 175) vx = Math.sign(a.x - p.x);
-      else if (aggressive && d < (boss2 ? 350 : a.type === "bat" ? 145 : 210) && !this.game.s.dead) {
+      else if (aggressive && d < range && !this.game.s.dead) {
         vx = Math.sign(p.x - a.x);
         if (Math.abs(a.x - p.x) < (boss2 ? 75 : 30)) vx = 0;
         if (d < (boss2 ? 94 : 45) && this.game.s.elapsed >= a.attackAt) {
@@ -1525,7 +1992,7 @@
       if (a.hitAt && this.game.s.elapsed >= a.hitAt) {
         a.hitAt = 0;
         if (dist(a, p) < (boss2 ? 108 : 55) && p.invuln <= 0 && !this.game.s.dead) {
-          const damage = boss2 ? BOSSES[this.game.s.altar.level - 1].bite : a.type === "boar" ? 14 : a.type === "scorpion" ? 8 : 9;
+          const damage = boss2 ? BOSSES[this.game.s.altar.level - 1].bite : a.type === "hellhound" ? 26 : a.type === "ember_bat" ? 15 : a.type === "boar" ? 14 : a.type === "scorpion" ? 8 : 9;
           this.game.s.vitals.health -= damage * (p.cloak ? 0.68 : p.coat ? 0.82 : 1);
           this.game.s.vitals.morale = clamp(
             this.game.s.vitals.morale - (boss2 ? 9 : 4),
@@ -1537,7 +2004,7 @@
           else if (this.game.rng() < (boss2 ? 0.4 : 0.16) + (this.game.s.vitals.hygiene < 30 ? 0.13 : 0))
             this.game.contract("wound");
           this.game.say(
-            (boss2 ? "Direwolf" : a.type[0].toUpperCase() + a.type.slice(1)) + " attack! " + Math.round(damage * (p.cloak ? 0.68 : p.coat ? 0.82 : 1)) + " damage.",
+            (boss2 ? "Direwolf" : ANIMAL_NAMES[a.type] || a.type) + " attack! " + Math.round(damage * (p.cloak ? 0.68 : p.coat ? 0.82 : 1)) + " damage.",
             "danger"
           );
         }
@@ -1551,10 +2018,12 @@
         }
       }
       a.warning = Math.max(0, a.warning - dt);
-      const speed = a.type === "deer" ? d < 175 ? 160 : 32 : boss2 ? 85 : a.type === "scorpion" ? 67 : d < 210 ? 105 : 30;
+      const speed = a.type === "deer" ? d < 175 ? 160 : 32 : boss2 ? 85 : a.type === "hellhound" ? d < range ? 150 : 45 : a.type === "ember_bat" ? d < range ? 135 : 40 : a.type === "scorpion" ? 67 : d < 210 ? 105 : 30;
       if (Math.abs(vx) > 0.5) a.angle = vx > 0 ? 0 : Math.PI;
-      a.x = clamp(a.x + vx * speed * dt, 20, WORLD_W - 20);
-      a.y = a.type === "bat" ? caveY(a.x, 1) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13 : this.game.groundTopAt(a.x) - 1;
+      const nx = clamp(a.x + vx * speed * dt, 20, WORLD_W - 20);
+      if (a.underground && underworldFloor(nx) > LAVA_Y - 6) a.angle = a.angle ? 0 : Math.PI;
+      else a.x = nx;
+      a.y = this.restY(a, a.x);
       for (const st of this.game.s.structures)
         if (st.type === "spike_trap" && Math.abs(st.x - a.x) < 23 && Math.abs(st.y - a.y) < 38 && this.game.s.elapsed - st.triggeredAt > 2) {
           a.hp -= 22;
@@ -1565,10 +2034,13 @@
   };
 
   // src/game/SaveSystem.ts
+  var LAYOUT = 3;
+  var OLD_REGION_WIDTH = 1200;
   var SaveSystem = class extends System {
     save(storage = globalThis.localStorage, silent = false) {
       this.game.s.lastSave = Date.now();
-      storage.setItem(RULES.saveKey, JSON.stringify(this.game.s));
+      const { tiles: _tiles, ...record } = this.game.s;
+      storage.setItem(RULES.saveKey, JSON.stringify(record));
       if (!silent) this.game.say("Field record saved.", "good");
       return true;
     }
@@ -1594,8 +2066,9 @@
         ];
         const remap = (x, y) => {
           const ox = clamp(x * scale, 0, 4799), oy = clamp(y * scale, 0, 3599), col = Math.floor(ox / 1600), row = Math.floor(oy / 1200);
+          const span = BIOME_SPANS.find((b) => b.id === oldGrid[row][col]);
           return clamp(
-            BIOME_CENTERS[oldGrid[row][col]][0] + (ox % 1600 - 800) * 0.6,
+            BIOME_CENTERS[span.id][0] + (ox % 1600 - 800) / 1600 * (span.end - span.start) * 0.8,
             30,
             WORLD_W - 30
           );
@@ -1616,6 +2089,7 @@
         parsed.tiles = [];
         if (parsed.altar) parsed.altar.activeBoss = null;
         parsed.version = 3;
+        parsed.layout = LAYOUT;
         this.game.s = parsed;
         this.game.rng = seededRandom(parsed.seed);
         this.game.messages = [];
@@ -1624,165 +2098,284 @@
         this.game.s = parsed;
         this.game.rng = seededRandom(parsed.seed + Math.floor(parsed.elapsed));
         this.game.messages = [];
-      }
-      if (!this.game.s.layout) {
-        if (!legacy) {
-          this.game.s.nodes = [];
-          this.game.world.generateNodes();
+        if ((parsed.layout ?? 1) < LAYOUT) this.migrateLayout();
+        else {
+          this.game.s.tiles = this.game.world.generateTiles();
+          for (const [index, kind] of Object.entries(this.game.s.tileEdits ?? {}))
+            if (+index < this.game.s.tiles.length) this.game.s.tiles[+index] = kind;
         }
-        this.game.s.layout = 2;
       }
+      this.game.s.tileEdits ??= {};
+      this.game.s.drops ??= [];
+      this.game.events = [];
       this.game.s.chapter ??= 0;
       this.game.s.discoveries ??= ["meadow"];
       this.game.progress.advanceChapter();
       const away = clamp((Date.now() - parsed.lastSave) / 1e3, 0, RULES.maxOfflineSeconds);
       this.game.survival.advanceDecay(away);
       this.game.s.elapsed += away;
-      for (const n of this.game.s.nodes) {
-        if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) n.hp = NODES[n.kind].hp;
-        if (n.underground) n.y = this.game.floorNear(n.x, n.y);
-      }
+      for (const n of this.game.s.nodes)
+        if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) {
+          n.hp = NODES[n.kind].hp;
+          delete n.felledAt;
+        }
       this.game.say("Field record reopened. " + Math.round(away) + " seconds passed.", "good");
       return true;
+    }
+    /**
+     * Records from the narrow three-layer world keep the expedition (pack, vitals, camp, progress)
+     * and move the player and camp to the same place in each wider region; the land is regrown.
+     */
+    migrateLayout() {
+      const s = this.game.s, remap = (x) => {
+        const i = clamp(Math.floor(x / OLD_REGION_WIDTH), 0, BIOME_SPANS.length - 1), span = BIOME_SPANS[i], f = clamp(x / OLD_REGION_WIDTH - i, 0, 1);
+        return clamp(span.start + f * (span.end - span.start), 30, WORLD_W - 30);
+      };
+      s.nodes = [];
+      s.animals = [];
+      s.caches = [];
+      if (s.altar) s.altar.activeBoss = null;
+      this.game.world.generate();
+      s.player.x = remap(s.player.x);
+      s.player.y = this.game.groundTopAt(s.player.x) + 1;
+      Object.assign(s.player, { vx: 0, vy: 0, grounded: true });
+      for (const st of s.structures) {
+        st.x = remap(st.x);
+        st.y = this.game.groundTopAt(st.x) - 1;
+      }
+      s.layout = LAYOUT;
+      this.game.say("The wilds have grown vast and deep since this record was written.", "good");
     }
   };
 
   // src/game/WorldGenerator.ts
+  var UNDERGROUND = [
+    {
+      layer: "upper_mines",
+      levels: [1, 2, 3],
+      perKm: 9,
+      kinds: (ores) => [...ores, ...ores, "stone", "coal", "copper_ore", "clay", "mushroom"]
+    },
+    {
+      layer: "lower_mines",
+      levels: [4, 5],
+      perKm: 7,
+      kinds: () => ["iron_ore", "iron_ore", "coal", "coal", "crystal", "sulfur", "mushroom"]
+    },
+    {
+      layer: "upper_hell",
+      levels: [6, 7],
+      perKm: 5,
+      kinds: () => ["sulfur", "sulfur", "obsidian", "obsidian", "crystal"]
+    },
+    {
+      layer: "lower_hell",
+      levels: [0],
+      perKm: 4,
+      kinds: () => ["hellstone", "hellstone", "obsidian"]
+    }
+  ];
+  var ORES = ["copper_ore", "iron_ore", "coal", "ice", "obsidian", "sulfur", "crystal"];
+  var DEEP_LIFE = [
+    ["bat", [1, 2, 3], 0.7],
+    ["bat", [4, 5], 0.6],
+    ["ember_bat", [6, 7], 0.8],
+    ["hellhound", [0], 0.8]
+  ];
+  var ANIMAL_HP = {
+    deer: 42,
+    wolf: 66,
+    boar: 88,
+    bat: 33,
+    scorpion: 54,
+    ember_bat: 70,
+    hellhound: 190
+  };
   var WorldGenerator = class extends System {
+    /** Tile grid rebuilt from the world's pure geometry. */
+    generateTiles() {
+      const tiles = new Array(TILE_COLS * TILE_ROWS);
+      for (let i = 0; i < tiles.length; i++)
+        tiles[i] = baseTileAt(i % TILE_COLS, Math.floor(i / TILE_COLS));
+      return tiles;
+    }
     generate() {
-      this.game.s.tiles = Array.from(
-        { length: TILE_COLS * TILE_ROWS },
-        (_, index) => baseTileAt(index % TILE_COLS, Math.floor(index / TILE_COLS))
-      );
-      for (const b of BIOMES) {
-        const cx = BIOME_CENTERS[b.id][0];
-        for (let i = 0; i < 3; i++) {
-          const x = clamp(cx - 430 + i * 410 + this.game.rng() * 110, 70, WORLD_W - 70);
-          if (Math.abs(x - RULES.spawnX) > 250 && !ENTRANCES.some((e) => Math.abs(e - x) < 85) && this.nodeFits("cache", x, this.game.groundTopAt(x) - 1))
-            this.game.s.caches.push({
-              id: uniqueId(),
-              x,
-              y: this.game.groundTopAt(x) - 1,
-              opened: false,
-              biome: b.id
-            });
+      const s = this.game.s;
+      this.buckets.clear();
+      s.tiles = this.generateTiles();
+      s.tileEdits = {};
+      s.drops = [];
+      for (const span of BIOME_SPANS) {
+        const width = span.end - span.start, count = Math.round(width / 450);
+        for (let i = 0; i < count; i++) {
+          const x = clamp(
+            span.start + (i + 0.5) / count * width + (this.game.rng() - 0.5) * 220,
+            70,
+            WORLD_W - 70
+          );
+          const y = this.game.groundTopAt(x) - 1;
+          if (Math.abs(x - RULES.spawnX) > 250 && !ENTRANCES.some((e) => Math.abs(e - x) < 85) && this.nodeFits("cache", x, y))
+            s.caches.push({ id: uniqueId(), x, y, opened: false, biome: span.id });
+        }
+        for (const [level, layer] of [
+          [4, "lower_mines"],
+          [7, "upper_hell"]
+        ]) {
+          const x = span.start + width * (0.3 + this.game.rng() * 0.4), y = this.game.floorNear(x, caveY(x, level));
+          if (this.nodeFits("cache", x, y))
+            s.caches.push({ id: uniqueId(), x, y, opened: false, biome: span.id, layer });
         }
       }
       this.generateNodes();
-      for (const b of BIOMES) {
-        const cx = BIOME_CENTERS[b.id][0];
-        const populations = {
-          coast: ["deer", "deer"],
-          marsh: ["deer", "boar", "bat"],
-          forest: ["deer", "deer", "wolf", "boar", "bat"],
-          meadow: ["deer", "deer"],
-          taiga: ["deer", "wolf", "wolf", "bat"],
-          tundra: ["wolf", "wolf"],
-          alpine: ["wolf", "bat"],
-          desert: ["scorpion", "scorpion"],
-          badlands: ["wolf", "wolf", "scorpion", "bat"]
-        };
-        for (const type of populations[b.id]) {
-          let x = -1;
-          for (let attempt = 0; attempt < 12 && x < 0; attempt++) {
-            const tryX = clamp(
-              cx + (this.game.rng() - 0.5) * RULES.animalSpread,
-              RULES.animalWorldPadding,
-              WORLD_W - RULES.animalWorldPadding
-            );
-            if (!(b.id === "meadow" && Math.abs(tryX - RULES.spawnX) < 260) && !ENTRANCES.some((e) => Math.abs(e - tryX) < 70) && !this.game.s.animals.some(
-              (a) => a.type === "bat" === (type === "bat") && Math.abs(a.x - tryX) < 80
-            ))
-              x = tryX;
-          }
-          if (x < 0) continue;
-          const flying = type === "bat", y = flying ? caveY(x, 1) : this.game.groundTopAt(x) - 1;
-          const hp = { deer: 42, wolf: 66, boar: 88, bat: 33, scorpion: 54 }[type];
-          this.game.s.animals.push({
-            id: uniqueId(),
-            type,
-            x,
-            y,
-            homeX: x,
-            homeY: y,
-            hp,
-            maxHp: hp,
-            angle: this.game.rng() > 0.5 ? 0 : Math.PI,
-            wanderAt: 0,
-            attackAt: 0,
-            deadUntil: 0,
-            warning: 0,
-            phase: this.game.rng() * Math.PI * 2
-          });
+      for (const span of BIOME_SPANS) this.populate(span);
+    }
+    addAnimal(type, x, y, extra = {}) {
+      const hp = ANIMAL_HP[type];
+      this.game.s.animals.push({
+        id: uniqueId(),
+        type,
+        x,
+        y,
+        homeX: x,
+        homeY: y,
+        hp,
+        maxHp: hp,
+        angle: this.game.rng() > 0.5 ? 0 : Math.PI,
+        wanderAt: 0,
+        attackAt: 0,
+        deadUntil: 0,
+        warning: 0,
+        phase: this.game.rng() * Math.PI * 2,
+        ...extra
+      });
+    }
+    populate(span) {
+      const width = span.end - span.start, scale = width / 1200;
+      const surface = {
+        coast: ["deer", "deer"],
+        marsh: ["deer", "boar"],
+        forest: ["deer", "deer", "wolf", "boar"],
+        meadow: ["deer", "deer"],
+        taiga: ["deer", "wolf", "wolf"],
+        tundra: ["wolf", "wolf"],
+        alpine: ["wolf"],
+        desert: ["scorpion", "scorpion"],
+        badlands: ["wolf", "wolf", "scorpion"]
+      };
+      const kinds = surface[span.id];
+      const total = Math.round(kinds.length * scale * 0.85);
+      for (let i = 0; i < total; i++) {
+        const type = kinds[i % kinds.length];
+        for (let attempt = 0; attempt < 12; attempt++) {
+          const x = clamp(
+            span.start + this.game.rng() * width,
+            RULES.animalWorldPadding,
+            WORLD_W - RULES.animalWorldPadding
+          );
+          if (span.id === "meadow" && Math.abs(x - RULES.spawnX) < 320 || ENTRANCES.some((e) => Math.abs(e - x) < 70) || this.game.s.animals.some((a) => !a.tunnel && Math.abs(a.x - x) < 90))
+            continue;
+          this.addAnimal(type, x, this.game.groundTopAt(x) - 1);
+          break;
+        }
+      }
+      for (const [type, levels, perKm] of DEEP_LIFE) {
+        const n = Math.round(width / 1e3 * perKm);
+        for (let i = 0; i < n; i++) {
+          const x = span.start + (i + 0.3 + this.game.rng() * 0.4) / n * width, level = levels[i % levels.length];
+          if (level === 0) {
+            const floor = underworldFloor(x);
+            if (floor > LAVA_Y - 20) continue;
+            this.addAnimal(type, x, floor - 1, { underground: true });
+          } else this.addAnimal(type, x, caveY(x, level), { tunnel: level });
         }
       }
     }
-    // Resource layout; also rebuilt once for records saved before resources kept their spacing.
+    // Resource layout; also rebuilt for records saved before the current world layout.
     generateNodes() {
-      RULES.starterNodeOffsets.forEach(([kind, offset]) => {
-        const x = RULES.spawnX + offset;
-        this.game.s.nodes.push({
-          id: uniqueId(),
-          kind,
-          x,
-          y: this.game.groundTopAt(x) - 1,
-          hp: NODES[kind].hp,
-          depletedUntil: 0,
-          phase: 0
-        });
+      const s = this.game.s;
+      const push = (kind, x, y, underground = false) => s.nodes.push({
+        id: uniqueId(),
+        kind,
+        x,
+        y,
+        hp: NODES[kind].hp,
+        depletedUntil: 0,
+        phase: this.game.rng() * Math.PI * 2,
+        ...underground ? { underground } : {}
       });
-      for (const b of BIOMES) {
-        const cx = BIOME_CENTERS[b.id][0];
+      for (const [kind, offset] of RULES.starterNodeOffsets) {
+        const x = RULES.spawnX + offset;
+        push(kind, x, this.game.groundTopAt(x) - 1);
+      }
+      this.buckets.clear();
+      for (const n of s.nodes) this.remember(n.kind, n.x, n.y);
+      for (const c of s.caches) this.remember("cache", c.x, c.y);
+      for (const span of BIOME_SPANS) {
+        const b = BIOMES.find((bb) => bb.id === span.id), width = span.end - span.start, scale = width / 1200;
         const kinds = [...new Set(b.resources)], queue = [];
-        for (let round = 0; round < 12; round++)
+        for (let round = 0; round < 40; round++)
           for (const kind of kinds) {
-            const quantity = kind === "wood" || kind === "stone" ? 12 : kind === "water" ? 5 : 8;
-            if (round < quantity) queue.push(kind);
+            const base = kind === "wood" || kind === "stone" ? 12 : kind === "water" ? 5 : 8;
+            if (round < Math.round(base * scale * (ORES.includes(kind) ? 0.35 : 0.85)))
+              queue.push(kind);
           }
         for (const kind of queue)
-          for (let attempts = 0; attempts < RULES.worldGenerationAttemptsPerNode; attempts++) {
+          for (let attempt = 0; attempt < RULES.worldGenerationAttemptsPerNode; attempt++) {
             const x = clamp(
-              cx + (this.game.rng() - 0.5) * RULES.resourceSpread,
+              span.start + this.game.rng() * width,
               RULES.resourceWorldPadding,
               WORLD_W - RULES.resourceWorldPadding
             );
             if (ENTRANCES.some((e) => Math.abs(e - x) < RULES.entranceResourceClearance)) continue;
-            const ore = [
-              "copper_ore",
-              "iron_ore",
-              "coal",
-              "ice",
-              "obsidian",
-              "sulfur",
-              "crystal"
-            ].includes(kind);
-            const underground = ore && this.game.rng() < (kind === "obsidian" ? 0.9 : 0.7);
-            const level = ["obsidian", "crystal"].includes(kind) ? 3 : ["iron_ore", "ice", "sulfur"].includes(kind) ? 2 : 1;
-            const y = underground ? this.game.floorNear(x, caveY(x, level)) : this.game.groundTopAt(x) - 1;
-            if (biomeAt(x, y).id !== b.id || b.id === "meadow" && Math.abs(x - RULES.spawnX) < 110 || !this.nodeFits(kind, x, y))
+            const y = this.game.groundTopAt(x) - 1;
+            if (biomeAt(x, y).id !== span.id || span.id === "meadow" && Math.abs(x - RULES.spawnX) < 110 || !this.nodeFits(kind, x, y))
               continue;
-            this.game.s.nodes.push({
-              id: uniqueId(),
-              kind,
-              x,
-              y,
-              hp: NODES[kind].hp,
-              depletedUntil: 0,
-              phase: this.game.rng() * Math.PI * 2,
-              underground
-            });
+            push(kind, x, y);
+            this.remember(kind, x, y);
             break;
           }
+        const biomeOres = kinds.filter((k) => ORES.includes(k));
+        for (const deep of UNDERGROUND) {
+          const pool = deep.kinds(biomeOres.length ? biomeOres : ["coal"]), n = Math.round(width / 1e3 * deep.perKm);
+          for (let i = 0; i < n; i++) {
+            const kind = pool[i % pool.length];
+            for (let attempt = 0; attempt < 20; attempt++) {
+              const x = span.start + this.game.rng() * width, level = deep.levels[Math.floor(this.game.rng() * deep.levels.length)];
+              if (SHAFTS.some((sh) => Math.abs(sh.x - x) < 70)) continue;
+              let y;
+              if (level === 0) {
+                const floor = underworldFloor(x);
+                if (floor > LAVA_Y - 20) continue;
+                y = this.game.floorNear(x, floor - 20);
+              } else y = this.game.floorNear(x, caveY(x, level));
+              if (!this.nodeFits(kind, x, y)) continue;
+              push(kind, x, y, true);
+              this.remember(kind, x, y);
+              break;
+            }
+          }
+        }
       }
+    }
+    // Spatial buckets keep placement checks local now that regions are wide.
+    buckets = /* @__PURE__ */ new Map();
+    remember(kind, x, y) {
+      const key = Math.floor(x / 200);
+      let list = this.buckets.get(key);
+      if (!list) this.buckets.set(key, list = []);
+      list.push({ kind, x, y });
     }
     // Resources keep a readable footprint: trees space from trees, small finds from each other.
     nodeFits(kind, x, y) {
       const tree = (k) => k === "wood" || k === "resin" || k === "honey";
       const width = (k) => tree(k) ? 92 : k === "water" ? 74 : k === "cache" ? 44 : NODES[k]?.tool ? 38 : 30;
-      const others = [
-        ...this.game.s.nodes,
-        ...this.game.s.caches.map((c) => ({ kind: "cache", x: c.x, y: c.y }))
-      ];
+      const key = Math.floor(x / 200);
+      const others = [key - 1, key, key + 1].flatMap((k) => this.buckets.get(k) ?? []);
+      if (!this.buckets.size)
+        others.push(
+          ...this.game.s.nodes,
+          ...this.game.s.caches.map((c) => ({ kind: "cache", x: c.x, y: c.y }))
+        );
       return others.every((n) => {
         if (Math.abs(n.y - y) > 60) return true;
         const gap = Math.abs(n.x - x);
@@ -1798,6 +2391,8 @@
     s;
     rng;
     messages;
+    /** Passing events for effects and sound; not saved. */
+    events = [];
     terrain = new Terrain(this);
     environment = new Environment(this);
     inventory = new Inventory(this);
@@ -1809,6 +2404,7 @@
     physics = new Physics(this);
     wildlife = new Wildlife(this);
     effergy = new Effergy(this);
+    drops = new Drops(this);
     world = new WorldGenerator(this);
     saves = new SaveSystem(this);
     constructor(seed = RULES.defaultSeed) {
@@ -1819,7 +2415,7 @@
       this.rng = seededRandom(seed);
       this.s = {
         version: 3,
-        layout: 2,
+        layout: 3,
         seed,
         elapsed: 0,
         day: 1,
@@ -1861,6 +2457,8 @@
         structures: [],
         caches: [],
         tiles: [],
+        tileEdits: {},
+        drops: [],
         effects: [],
         tutorial: { step: 0, tally: {} },
         chapter: 0,
@@ -1871,6 +2469,7 @@
         lastSave: Date.now()
       };
       this.messages = [];
+      this.events = [];
       this.world.generate();
       this.s.player.y = this.groundTopAt(RULES.spawnX) + 1;
       this.say("Field record I \xB7 Stranded in the meadow. Find wood, stone, and fiber.");
@@ -1886,7 +2485,18 @@
       this.environment.collectRain(dt);
       this.s.player.invuln = Math.max(0, this.s.player.invuln - dt);
       for (const a of this.s.animals) this.wildlife.step(a, dt);
+      this.drops.step(dt);
       this.survival.update(dt);
+    }
+    event(type, x, y, kind, dir) {
+      this.events.push({ type, x, y, kind, dir });
+      if (this.events.length > 64) this.events.shift();
+    }
+    /** Hands over and clears the events since the last call. */
+    takeEvents() {
+      const out = this.events;
+      this.events = [];
+      return out;
     }
     say(message2, tone2 = "ink") {
       this.messages.unshift({ message: message2, tone: tone2, at: this.s.elapsed });
@@ -1895,6 +2505,13 @@
     // ─── Place and surroundings ───────────────────────────────────────────────
     biome(x = this.s.player.x, y = this.s.player.y) {
       return biomeAt(x, y);
+    }
+    layer(x = this.s.player.x, y = this.s.player.y) {
+      return layerAt(x, y);
+    }
+    inLava() {
+      const p = this.s.player;
+      return lavaAt(p.x, p.y - 8);
     }
     near(type, radius = 110) {
       return this.s.structures.find((st) => st.type === type && dist(st, this.s.player) <= radius);
@@ -1928,6 +2545,9 @@
     }
     floorNear(x, y) {
       return this.terrain.floorNear(x, y);
+    }
+    setTile(tx, ty, kind) {
+      this.terrain.setTile(tx, ty, kind);
     }
     mineTileAt(x, y) {
       return this.terrain.mineTileAt(x, y);
@@ -2277,11 +2897,9 @@
       flowers: []
     }
   };
-  var BIOME_STEP = data_exports.BIOME_CENTERS[data_exports.SIDE_ORDER[1]][0] - data_exports.BIOME_CENTERS[data_exports.SIDE_ORDER[0]][0];
-  var FIRST_CENTER = data_exports.BIOME_CENTERS[data_exports.SIDE_ORDER[0]][0];
   function blendAt(x) {
-    const f = clamp2((x - FIRST_CENTER) / BIOME_STEP, 0, data_exports.SIDE_ORDER.length - 1), i = Math.min(Math.floor(f), data_exports.SIDE_ORDER.length - 2);
-    return [ART[data_exports.SIDE_ORDER[i]], ART[data_exports.SIDE_ORDER[i + 1]], smooth(0.3, 0.7, f - i)];
+    const [a, b, t] = data_exports.biomeBlend(x);
+    return [ART[a], ART[b], t];
   }
   var artAt = (x, y) => ART[data_exports.biomeAt(x, y).id];
   function daylight(t) {
@@ -2456,7 +3074,10 @@
     4: "#5c6656",
     5: "#b7ccd2",
     6: "#9a5f4a",
-    7: "#2f2a35"
+    7: "#2f2a35",
+    8: "#4b566a",
+    9: "#6e4038",
+    10: "#5c2230"
   };
   function chunkSig(g, cx, cy) {
     let s = 17;
@@ -2494,7 +3115,12 @@
         const x = tx * T, y = ty * T, depth = y - data_exports.surfaceAt(x + T / 2), biome = data_exports.biomeAt(x, y).id;
         const rock = biome === "badlands" ? "#2a222a" : biome === "tundra" || biome === "alpine" ? "#27313a" : "#242a30";
         const earth = biome === "desert" ? "#4a3b2b" : biome === "badlands" ? "#4a3029" : "#3b3028";
-        const col = mix(earth, rock, smooth(30, 170, depth));
+        const deep = mix(
+          mix(rock, "#1b2130", smooth(data_exports.LAYERS[2].top - 150, data_exports.LAYERS[2].top + 150, y)),
+          mix("#1f0f0d", "#140507", smooth(data_exports.LAYERS[4].top - 150, data_exports.LAYERS[4].top + 150, y)),
+          smooth(data_exports.LAYERS[3].top - 150, data_exports.LAYERS[3].top + 150, y)
+        );
+        const col = mix(earth, deep, smooth(30, 170, depth));
         k.fillStyle = col;
         k.fillRect(x, y, T + 0.6, T + 0.6);
         blobPath(k, x + 8 + H(tx, ty, 1) * 16, y + 8 + H(tx, ty, 2) * 16, 9, 6, tx * 7 + ty, 0.3);
@@ -2636,8 +3262,8 @@
   }
   function textureMaterial(k, g, look, base, x0, y0) {
     const left = x0 * T, top = y0 * T;
-    if (look === 2 || look === 6 || look === 5 || look === 7) {
-      const gap = look === 6 ? 11 : look === 5 ? 15 : 23;
+    if (look === 2 || look === 6 || look === 5 || look === 7 || look >= 8) {
+      const gap = look === 6 ? 11 : look === 5 ? 15 : look === 10 ? 17 : look === 9 ? 13 : 23;
       for (let yy = top - gap; yy < top + CPX + gap; yy += gap) {
         k.beginPath();
         for (let xx = left - 8; xx <= left + CPX + 8; xx += 16) {
@@ -2736,6 +3362,53 @@
               "#6e5a8c"
             );
           }
+        } else if (look === 8) {
+          blobPath(
+            k,
+            x + 8 + r(1) * 16,
+            y + 8 + r(2) * 16,
+            8 + r(3) * 5,
+            5 + r(4) * 3,
+            tx * 17 + ty,
+            0.2
+          );
+          k.fillStyle = shade(base, 0.06);
+          k.fill();
+          k.strokeStyle = rgba(shade(base, -0.35), 0.5);
+          k.lineWidth = 1;
+          k.stroke();
+          if (r(5) < 0.45) ellipse(k, x + r(6) * T, y + r(7) * T, 1.3, 1.3, "#b9d2e6");
+          if (r(8) < 0.2) ellipse(k, x + r(9) * T, y + r(10) * T, 1.6, 1.1, "#e8f1f8");
+        } else if (look === 9) {
+          k.strokeStyle = rgba("#2a1512", 0.7);
+          k.lineWidth = 1.1;
+          k.beginPath();
+          k.moveTo(x + r(1) * T, y);
+          k.lineTo(x + r(2) * T, y + 14 + r(3) * 6);
+          k.lineTo(x + r(4) * T, y + T);
+          k.stroke();
+          for (let i = 0; i < 3; i++)
+            ellipse(k, x + r(i + 5) * T, y + r(i + 8) * T, 2.5, 1.6, shade(base, 0.12));
+          if (r(11) < 0.35) {
+            ellipse(k, x + r(12) * T, y + r(13) * T, 1.6, 1.6, "#ff8a3a");
+            ellipse(k, x + r(12) * T, y + r(13) * T, 3.4, 3.4, rgba("#ff6a1a", 0.25));
+          }
+        } else if (look === 10) {
+          if (r(1) < 0.5) {
+            const vx = x + r(2) * T;
+            k.strokeStyle = rgba("#ff5a1f", 0.75);
+            k.lineWidth = 1.4;
+            k.beginPath();
+            k.moveTo(vx, y);
+            k.quadraticCurveTo(vx + (r(3) - 0.5) * 20, y + 16, vx + (r(4) - 0.5) * 14, y + T);
+            k.stroke();
+            k.strokeStyle = rgba("#ffc46a", 0.5);
+            k.lineWidth = 0.6;
+            k.stroke();
+          }
+          blobPath(k, x + 16, y + 16, 9 + r(5) * 5, 6 + r(6) * 4, tx * 7 + ty * 3, 0.3);
+          k.fillStyle = shade(base, -0.08);
+          k.fill();
         } else if (look === 3) {
           for (let i = 0; i < 3; i++) {
             const yy = y + 5 + i * 10 + r(i) * 4;
@@ -2925,6 +3598,7 @@
     for (const [ch, cx, cy] of visible)
       if (ch.back)
         c.drawImage(ch.back, snap(cx * CPX - cam.x), snap(cy * CPX - cam.y), CPX + 0.5, CPX + 0.5);
+    drawLava(c, g, cam, w, h);
     for (const [ch, cx, cy] of visible)
       if (ch.front)
         c.drawImage(
@@ -2935,21 +3609,53 @@
           CPX + PAD * 2
         );
   }
-  function drawLadders(c, cam, w) {
-    for (const ex of data_exports.ENTRANCES) {
-      const sx = ex - cam.x;
+  function drawLava(c, g, cam, w, h) {
+    if (cam.y + h < 3400) return;
+    const now = performance.now() / 1e3, tx0 = Math.floor(cam.x / T), tx1 = Math.ceil((cam.x + w) / T), ty0 = Math.max(0, Math.floor(cam.y / T)), ty1 = Math.min(data_exports.TILE_ROWS - 1, Math.ceil((cam.y + h) / T));
+    const lava = (tx, ty) => !g.tileAt(tx, ty) && data_exports.lavaAt(tx * T + T / 2, ty * T + T / 2);
+    for (let tx = tx0; tx <= tx1; tx++)
+      for (let ty = ty0; ty <= ty1; ty++) {
+        if (!lava(tx, ty)) continue;
+        const x = tx * T - cam.x, y = ty * T - cam.y, top = !lava(tx, ty - 1);
+        const gr = c.createLinearGradient(0, y, 0, y + T);
+        gr.addColorStop(0, top ? "#ffb347" : "#f0661e");
+        gr.addColorStop(1, "#c2330f");
+        c.fillStyle = gr;
+        c.fillRect(x, y, T + 0.5, T + 0.5);
+        const drift = Math.sin(now * 0.6 + tx * 0.9 + ty * 1.7);
+        ellipse(c, x + 16 + drift * 6, y + 18, 7, 3, rgba("#7a1d0c", 0.45));
+        if (top) {
+          c.beginPath();
+          c.moveTo(x, y + 4);
+          for (let i = 0; i <= 4; i++)
+            c.lineTo(x + i * T / 4, y + 3 + Math.sin(now * 2.4 + (tx * 4 + i) * 0.8) * 2.5);
+          c.lineTo(x + T, y + 8);
+          c.lineTo(x, y + 8);
+          c.closePath();
+          c.fillStyle = "#ffe08a";
+          c.fill();
+          glow(c, x + 16, y + 2, 34, "#ff7a2a", 0.22);
+        }
+      }
+  }
+  function drawLadders(c, cam, w, h) {
+    for (const shaft of data_exports.SHAFTS) {
+      const sx = shaft.x - cam.x;
       if (sx < -90 || sx > w + 90) continue;
-      const y1 = data_exports.surfaceAt(ex) - cam.y - 24, y2 = data_exports.caveY(ex, 3) + 40 - cam.y;
+      const surface = shaft.top < data_exports.surfaceAt(shaft.x) + 20, y1 = (surface ? data_exports.surfaceAt(shaft.x) - 24 : shaft.top) - cam.y, y2 = shaft.bottom + 40 - cam.y;
+      if (y2 < -40 || y1 > h + 40) continue;
+      const deep = shaft.top > data_exports.LAYERS[3].top, wood = deep ? "#4a3a3a" : "#7a5d42", rung = deep ? "#6d5250" : "#a58560";
       for (const rx of [-22, 22]) {
         line(c, sx + rx, y1, sx + rx, y2, INK, 7);
-        line(c, sx + rx, y1, sx + rx, y2, "#7a5d42", 4.5);
-        line(c, sx + rx - 1, y1, sx + rx - 1, y2, "#9a7a56", 1.3);
+        line(c, sx + rx, y1, sx + rx, y2, wood, 4.5);
+        line(c, sx + rx - 1, y1, sx + rx - 1, y2, shade(wood, 0.2), 1.3);
       }
-      for (let y = y1 + 14; y < y2; y += 20) {
+      for (let y = Math.max(y1 + 14, y1 + 14 + Math.floor((-40 - y1) / 20) * 20); y < Math.min(y2, h + 40); y += 20) {
         line(c, sx - 22, y + 2, sx + 22, y + 2, "rgba(0,0,0,0.3)", 3);
         line(c, sx - 22, y, sx + 22, y, INK, 5);
-        line(c, sx - 22, y, sx + 22, y, "#a58560", 3);
+        line(c, sx - 22, y, sx + 22, y, rung, 3);
       }
+      if (!surface) continue;
       line(c, sx - 30, y1 + 26, sx - 26, y1 - 30, INK, 6);
       line(c, sx + 30, y1 + 26, sx + 26, y1 - 30, INK, 6);
       line(c, sx - 30, y1 + 26, sx - 26, y1 - 30, "#6b4f37", 4);
@@ -3155,12 +3861,33 @@
       ellipse(c, x - rx * 0.3, y - ry * 0.45, rx * 0.35, ry * 0.25, lt);
     }
   }
+  var FALL_SECONDS = 1.1;
+  var FADE_SECONDS = 0.45;
+  var hitShake = (n, t) => {
+    const since = t - (n.hitAt ?? -9);
+    return since >= 0 && since < 0.3 ? Math.sin(since * 70) * 3.2 * (1 - since / 0.3) : 0;
+  };
   function drawTree(c, n, x, y, t) {
+    const since = n.felledAt === void 0 ? Infinity : t - n.felledAt;
+    if (n.hp > 0 || since >= FALL_SECONDS + FADE_SECONDS) {
+      drawStandingTree(c, n, x + hitShake(n, t), y, t, since);
+      return;
+    }
+    drawStandingTree(c, n, x, y, t, Infinity, true);
+    const dir = n.fallDir ?? 1, lie = Math.PI / 2 - 0.08, p = Math.min(1, since / FALL_SECONDS), after = Math.max(0, since - FALL_SECONDS), angle = since < FALL_SECONDS ? lie * p ** 2.4 : lie - 0.07 * Math.sin(after * 18) * Math.exp(-after * 7);
+    c.save();
+    c.translate(x, y - 12);
+    c.rotate(dir * angle);
+    c.globalAlpha = after > 0 ? Math.max(0, 1 - after / FADE_SECONDS) : 1;
+    drawStandingTree(c, { ...n, hp: 1 }, 0, 12, t, Infinity);
+    c.restore();
+  }
+  function drawStandingTree(c, n, x, y, t, since, stumpOnly = false) {
     const art0 = artAt(n.x, n.y), art = art0.trees ? art0 : ART.meadow, s = 0.9 + H(n.id, 3) * 0.24, sway = Math.sin(t * 0.9 + n.phase + n.x * 0.01) * 2.2, seed = n.id * 13;
     c.save();
     c.translate(x, y);
-    ellipse(c, 0, 1, 30 * s, 5, "rgba(20,24,18,0.22)");
-    if (n.hp <= 0) {
+    if (!stumpOnly) ellipse(c, 0, 1, 30 * s, 5, "rgba(20,24,18,0.22)");
+    if (n.hp <= 0 || stumpOnly) {
       fillPoly(
         c,
         [
@@ -3175,6 +3902,17 @@
       );
       ellipse(c, 0, -12.5, 8, 3, "#c9a878", INK, 1.2);
       ellipse(c, 0, -12.5, 4, 1.5, "", "#a8845a", 1);
+      const window2 = n.depletedUntil - (n.felledAt ?? n.depletedUntil), growth = window2 > 0 && since < Infinity ? since / window2 : 0;
+      if (!stumpOnly && growth > 0.45) {
+        const k = 0.2 + (growth - 0.45) * 1.25;
+        c.translate(10, 0);
+        c.scale(k, k);
+        const kind2 = n.kind === "resin" ? "conifer" : art.trees || "broadleaf";
+        if (kind2 === "conifer") drawConifer(c, s, seed, art, sway, !!art.snowy);
+        else if (kind2 === "willow") drawWillow(c, s, seed, art, sway, t);
+        else if (kind2 === "pine") drawPine(c, s, seed, art, sway);
+        else drawBroadleaf(c, s, seed, art, sway);
+      }
       c.restore();
       return;
     }
@@ -3783,6 +4521,18 @@
         c.strokeRect(-r, -r, r * 2, r * 2);
         c.restore();
       }
+    } else if (k === "hellstone") {
+      glow(c, 0, -10, 34, "#ff5a1f", 0.35 + Math.sin(t * 2.4 + n.phase) * 0.1);
+      drawRock(c, -4, 30, 22, seed, "#4a1c22");
+      drawRock(c, 11, 16, 13, seed + 3, "#5a2029");
+      for (const [x1, y1, x2, y2] of [
+        [-14, -6, -2, -15],
+        [-6, -2, 6, -12],
+        [6, -4, 14, -9]
+      ]) {
+        line(c, x1, y1, x2, y2, "#ff6a2a", 2.4);
+        line(c, x1, y1, x2, y2, "#ffd27a", 0.9);
+      }
     } else {
       drawRock(c, 0, 30, 20, seed, "#9a8d78");
     }
@@ -3790,6 +4540,7 @@
   }
   function drawNode(c, n, x, y, t) {
     const k = n.kind;
+    x += hitShake(n, t);
     if (k === "water") drawPond(c, n, x, y, t);
     else if ([
       "berry",
@@ -5052,7 +5803,15 @@
     const m = track(a.id, a.x, a.y, a.hp, t), facing = Math.cos(a.angle) >= 0 ? 1 : -1, boss2 = a.type === "boss", hurt = t - m.hurt < 0.16;
     c.save();
     c.translate(x + (hurt ? Math.sin(t * 90) * 2 : 0), y + 1);
-    if (a.type !== "bat") ellipse(c, 0, 0, boss2 ? 44 : 24, boss2 ? 6 : 4, "rgba(15,15,12,0.25)");
+    if (a.type !== "bat" && a.type !== "ember_bat")
+      ellipse(
+        c,
+        0,
+        0,
+        boss2 ? 44 : a.type === "hellhound" ? 32 : 24,
+        boss2 ? 6 : 4,
+        "rgba(15,15,12,0.25)"
+      );
     c.scale(facing, 1);
     if (hurt) c.filter = "brightness(1.9) saturate(0.4)";
     if (boss2) {
@@ -5078,10 +5837,32 @@
       drawWolf(c, m, t, a, "#7b8284", a.warning > 0 ? "#e0624a" : "#e8c46a");
     else if (a.type === "boar") drawBoar(c, m, t, a);
     else if (a.type === "bat") drawBat(c, t, a);
-    else if (a.type === "scorpion") drawScorpion(c, m, t, a);
+    else if (a.type === "ember_bat") {
+      glow(c, 0, -24, 34, "#ff7a2a", 0.35 + Math.sin(t * 9 + a.phase) * 0.1);
+      c.filter = hurt ? "brightness(1.9)" : "sepia(1) saturate(3.2) hue-rotate(-28deg) brightness(0.85)";
+      drawBat(c, t, a);
+      c.filter = "none";
+      glow(c, 5, -2, 5, "#ffd27a", 0.9);
+    } else if (a.type === "hellhound") {
+      glow(c, 0, -30, 70, "#ff4a1a", 0.18 + Math.sin(t * 4 + a.phase) * 0.05);
+      c.scale(1.3, 1.3);
+      drawWolf(c, m, t, a, "#5e2428", a.warning > 0 ? "#fff0a0" : "#ff7a2a");
+      for (let i = 0; i < 4; i++) {
+        const k = (t * 0.9 + i * 0.25 + a.phase) % 1;
+        ellipse(c, -10 + i * 7, -40 - k * 26, 3 + k * 5, 2 + k * 4, rgba("#5a4442", 0.35 * (1 - k)));
+      }
+    } else if (a.type === "scorpion") drawScorpion(c, m, t, a);
     c.filter = "none";
     c.restore();
-    const top = { deer: 100, wolf: 56, boar: 50, bat: 50, scorpion: 60 };
+    const top = {
+      deer: 100,
+      wolf: 56,
+      boar: 50,
+      bat: 50,
+      scorpion: 60,
+      ember_bat: 50,
+      hellhound: 76
+    };
     if (!boss2 && a.hp < a.maxHp && a.hp > 0) {
       const by = y - (top[a.type] || 60) - 6;
       c.fillStyle = "rgba(30,25,20,0.65)";
@@ -5140,7 +5921,7 @@
     if (weapon === "eclipse_blade") glow(c, 22, 0, 18, "#9fe8f0", 0.35 + Math.sin(t * 5) * 0.1);
   }
   function drawPlayer(c, p, x, y, t) {
-    const m = track(-1, p.x, p.y, 0, t), facing = Math.cos(p.face) >= 0 ? 1 : -1, shaft = data_exports.ENTRANCES.some((e) => Math.abs(p.x - e) < 47) && p.y > data_exports.surfaceAt(p.x) + 8, climbing = shaft && !p.grounded, air = !p.grounded && !climbing, walking = p.grounded ? m.move : 0, ph = m.walk * 0.12, sw = Math.sin(ph) * walking, bob = Math.abs(Math.cos(ph)) * walking * 1.6, breath = Math.sin(t * 2.2) * 0.5 * (1 - walking);
+    const m = track(-1, p.x, p.y, 0, t), facing = Math.cos(p.face) >= 0 ? 1 : -1, shaft = data_exports.inShaft(p.x, p.y) && p.y > data_exports.surfaceAt(p.x) + 8, climbing = shaft && !p.grounded, air = !p.grounded && !climbing, walking = p.grounded ? m.move : 0, ph = m.walk * 0.12, sw = Math.sin(ph) * walking, bob = Math.abs(Math.cos(ph)) * walking * 1.6, breath = Math.sin(t * 2.2) * 0.5 * (1 - walking);
     const coat = p.coat ? "#8a6e4e" : "#5d7560", coatDark = shade(coat, -0.25), pants = "#4a4e4f", boot = p.boots ? "#6b5139" : "#3e342c", skin = "#d0a17c";
     const attackStart = p.attackAt - 0.52, prog = clamp2((t - attackStart) / 0.3), attacking = t >= attackStart && t < attackStart + 0.3, spear = p.weapon.includes("spear");
     c.save();
@@ -5352,6 +6133,17 @@
     for (const n of g.s.nodes)
       if (n.hp > 0 && n.kind === "crystal")
         lights.push({ x: n.x, y: n.y - 16, r: 95, color: "#8fe3df", warm: 0.18 });
+      else if (n.hp > 0 && n.kind === "hellstone")
+        lights.push({ x: n.x, y: n.y - 12, r: 120, color: "#ff6a2a", warm: 0.3 });
+    for (const a of g.s.animals)
+      if (!a.deadUntil && (a.type === "hellhound" || a.type === "ember_bat"))
+        lights.push({
+          x: a.x,
+          y: a.y - (a.type === "hellhound" ? 34 : 24),
+          r: a.type === "hellhound" ? 150 : 110,
+          color: "#ff5a1f",
+          warm: 0.32
+        });
     return lights;
   }
   function drawLighting(c, g, cam, w, h, menu2, tod) {
@@ -5393,7 +6185,19 @@
       m.fillStyle = gr;
       m.fill();
     }
-    const lights = collectLights(g, menu2, t).filter(
+    const lavaLights = [];
+    if (cam.y + h > 3400) {
+      for (let tx = Math.floor(cam.x / T) - 4; tx <= Math.ceil((cam.x + w) / T) + 4; tx += 3)
+        for (let ty = Math.max(0, Math.floor(cam.y / T) - 4); ty <= Math.ceil((cam.y + h) / T) + 4; ty++) {
+          const x = tx * T + T / 2, y = ty * T + T / 2;
+          if (!g.tileAt(tx, ty) && data_exports.lavaAt(x, y)) {
+            const flicker = Math.sin(t * 3 + tx) * 10;
+            lavaLights.push({ x, y: y - 20, r: 230 + flicker, color: "#ff7a2a", warm: 0.5 });
+            break;
+          }
+        }
+    }
+    const lights = [...collectLights(g, menu2, t), ...lavaLights].filter(
       (l) => l.x - cam.x > -l.r && l.x - cam.x < w + l.r && l.y - cam.y > -l.r && l.y - cam.y < h + l.r
     );
     m.globalCompositeOperation = "destination-out";
@@ -5406,6 +6210,11 @@
       m.fillRect(sx - l.r, sy - l.r, l.r * 2, l.r * 2);
     }
     c.drawImage(mask, 0, 0, w, h);
+    const hell = smooth(data_exports.LAYERS[3].top - 350, data_exports.LAYERS[4].top + 300, cam.y + h / 2);
+    if (hell > 0) {
+      c.fillStyle = rgba("#8a1a0c", 0.05 + hell * 0.08);
+      c.fillRect(0, 0, w, h);
+    }
     const dark = Math.max(night2, caveVisible ? 0.5 : 0);
     c.save();
     c.globalCompositeOperation = "lighter";
@@ -5468,13 +6277,381 @@
       }
   }
 
+  // src/renderer/effects.ts
+  var particles = [];
+  var MAX_PARTICLES = 500;
+  var rand = 1;
+  var rnd = () => (rand = rand * 16807 % 2147483647) / 2147483647;
+  var ITEM_COLOR = {
+    wood: "#8a6440",
+    resin: "#d99a3c",
+    honey: "#dcaa4e",
+    stone: "#8b8f8a",
+    flint: "#3d4246",
+    clay: "#b06f55",
+    dirt: "#76604a",
+    salt: "#e8e4da",
+    copper_ore: "#c07a4a",
+    iron_ore: "#9a7866",
+    coal: "#2c2c30",
+    ice: "#bfe3ee",
+    obsidian: "#2a2433",
+    sulfur: "#e0c94a",
+    crystal: "#8fe3df",
+    hellstone: "#d2402a",
+    fiber: "#8fa35a",
+    reeds: "#a4a86a",
+    herb: "#5f9a55",
+    willow: "#8a7a5a",
+    berry: "#b8324a",
+    wheat: "#d9b75a",
+    potato: "#b99468",
+    mushroom: "#c9a07a",
+    cactus_fruit: "#d8577a",
+    raw_meat: "#c65a5a",
+    hide: "#a47c55",
+    bone: "#e6dcc6",
+    chitin: "#5a4032",
+    venom: "#7bc05a",
+    feathers: "#eef0ea"
+  };
+  var colorOf = (item) => ITEM_COLOR[item] ?? "#a89878";
+  function emit(p, now, delay = 0) {
+    particles.push({
+      vx: 0,
+      vy: 0,
+      spin: 0,
+      angle: rnd() * TAU,
+      size: 3,
+      color: "#8a6440",
+      kind: "chip",
+      life: 0.9,
+      gravity: 700,
+      ...p,
+      born: now + delay
+    });
+    if (particles.length > MAX_PARTICLES) particles.splice(0, particles.length - MAX_PARTICLES);
+  }
+  var burst = (e, now, n, make, delay = 0) => {
+    for (let i = 0; i < n; i++) emit({ x: e.x, y: e.y, ...make(i) }, now, delay);
+  };
+  function spawnEffects(g, events, now = performance.now() / 1e3) {
+    for (const e of events) {
+      const art = artAt(e.x, e.y), leaves = art.leaves?.length ? art.leaves : ["#5e7a45", "#7c9656"];
+      if (e.type === "chip") {
+        if (e.kind === "water")
+          burst(e, now, 7, () => ({
+            kind: "drop",
+            vx: (rnd() - 0.5) * 140,
+            vy: -120 - rnd() * 120,
+            size: 2 + rnd() * 1.5,
+            color: "#9fd0e4",
+            life: 0.6
+          }));
+        else if (e.kind === "wood" || e.kind === "resin" || e.kind === "honey") {
+          burst(e, now, 6, () => ({
+            vx: (rnd() - 0.5) * 220,
+            vy: -140 - rnd() * 160,
+            spin: (rnd() - 0.5) * 20,
+            size: 2.5 + rnd() * 2,
+            color: rnd() < 0.5 ? "#c9a878" : "#8a6440"
+          }));
+          burst({ x: e.x, y: e.y - 40 }, now, 3, () => ({
+            kind: "leaf",
+            vx: (rnd() - 0.5) * 60,
+            vy: -20 - rnd() * 30,
+            size: 3 + rnd() * 2,
+            color: leaves[Math.floor(rnd() * leaves.length)],
+            life: 2.2,
+            gravity: 60
+          }));
+        } else if (data_exports.NODES[e.kind]?.tool === "pick")
+          burst(e, now, 7, () => ({
+            vx: (rnd() - 0.5) * 240,
+            vy: -120 - rnd() * 170,
+            spin: (rnd() - 0.5) * 16,
+            size: 2 + rnd() * 2.5,
+            color: rnd() < 0.6 ? colorOf(e.kind) : "#9a9d97",
+            life: 0.8
+          }));
+        else
+          burst(e, now, 4, () => ({
+            kind: "leaf",
+            vx: (rnd() - 0.5) * 80,
+            vy: -60 - rnd() * 60,
+            size: 2.5 + rnd() * 1.5,
+            color: rnd() < 0.5 ? colorOf(e.kind) : leaves[0],
+            life: 1.4,
+            gravity: 120
+          }));
+      } else if (e.type === "fell") {
+        const dir = e.dir ?? 1;
+        for (let i = 0; i < 26; i++) {
+          const along = 30 + rnd() * 110;
+          emit(
+            {
+              x: e.x + dir * along,
+              y: e.y - 10 - rnd() * 40,
+              kind: "leaf",
+              vx: (rnd() - 0.5) * 120 + dir * 30,
+              vy: -60 - rnd() * 90,
+              size: 3 + rnd() * 2.5,
+              color: leaves[Math.floor(rnd() * leaves.length)],
+              life: 2.4,
+              gravity: 70
+            },
+            now,
+            0.95
+          );
+        }
+        for (let i = 0; i < 6; i++)
+          emit(
+            {
+              x: e.x + dir * (20 + i * 22),
+              y: e.y - 4,
+              kind: "dust",
+              vx: dir * 20 + (rnd() - 0.5) * 30,
+              vy: -18,
+              size: 10 + rnd() * 8,
+              color: "#b9a88a",
+              life: 1.1,
+              gravity: 0
+            },
+            now,
+            1
+          );
+      } else if (e.type === "crumble" || e.type === "dig") {
+        const color = e.type === "dig" ? DIG_COLOR[+e.kind] ?? "#6a6660" : colorOf(e.kind);
+        burst(e, now, e.type === "dig" ? 9 : 16, () => ({
+          vx: (rnd() - 0.5) * 300,
+          vy: -150 - rnd() * 220,
+          spin: (rnd() - 0.5) * 14,
+          size: 2.5 + rnd() * (e.type === "dig" ? 3 : 5),
+          color: rnd() < 0.7 ? color : shade(color, -0.25),
+          life: 1.1
+        }));
+        burst(e, now, 3, () => ({
+          kind: "dust",
+          vx: (rnd() - 0.5) * 60,
+          vy: -30,
+          size: 12 + rnd() * 10,
+          color: e.type === "dig" && +e.kind >= 9 ? "#4a2a22" : "#a8a092",
+          life: 0.9,
+          gravity: 0
+        }));
+        if (e.kind === "hellstone" || e.kind === "9" || e.kind === "10")
+          burst(e, now, 8, () => ({
+            kind: "spark",
+            vx: (rnd() - 0.5) * 200,
+            vy: -120 - rnd() * 160,
+            size: 1.6,
+            color: "#ffb347",
+            life: 0.8,
+            gravity: 300
+          }));
+      } else if (e.type === "pickup") {
+        const p = g.s.player;
+        emit(
+          {
+            x: p.x,
+            y: p.y - 26,
+            kind: "ring",
+            size: 8,
+            color: colorOf(e.kind),
+            life: 0.35,
+            gravity: 0
+          },
+          now
+        );
+      } else if (e.type === "sizzle")
+        burst(e, now, 10, () => ({
+          kind: rnd() < 0.5 ? "spark" : "dust",
+          vx: (rnd() - 0.5) * 80,
+          vy: -80 - rnd() * 120,
+          size: rnd() < 0.5 ? 1.8 : 9,
+          color: rnd() < 0.5 ? "#ffc46a" : "#5a4a44",
+          life: 0.9,
+          gravity: -40
+        }));
+    }
+  }
+  var DIG_COLOR = {
+    1: "#76604a",
+    2: "#6d7277",
+    3: "#c9ad7f",
+    4: "#5c6656",
+    5: "#b7ccd2",
+    6: "#9a5f4a",
+    8: "#434d5f",
+    9: "#5e3b35",
+    10: "#6a2530"
+  };
+  function drawParticles(c, cam, now = performance.now() / 1e3) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i], age = now - p.born;
+      if (age < 0) continue;
+      if (age > p.life) {
+        particles.splice(i, 1);
+        continue;
+      }
+      const x = p.x + p.vx * age - cam.x + (p.kind === "leaf" ? Math.sin(age * 5 + p.angle) * 10 : 0), y = p.y + p.vy * age + 0.5 * p.gravity * age * age - cam.y, fade = 1 - age / p.life;
+      if (p.kind === "dust") {
+        ellipse(
+          c,
+          x,
+          y,
+          p.size * (1 + age * 1.6),
+          p.size * 0.6 * (1 + age),
+          rgba(p.color, 0.3 * fade)
+        );
+      } else if (p.kind === "ring") {
+        c.beginPath();
+        c.arc(x, y, p.size + age * 70, 0, TAU);
+        c.strokeStyle = rgba(p.color, 0.8 * fade);
+        c.lineWidth = 2;
+        c.stroke();
+      } else if (p.kind === "spark") {
+        glow(c, x, y, 7, p.color, 0.6 * fade);
+        ellipse(c, x, y, p.size, p.size, rgba("#fff2c0", fade));
+      } else if (p.kind === "drop") {
+        ellipse(c, x, y, p.size * 0.8, p.size * 1.2, rgba(p.color, 0.85 * fade));
+      } else {
+        c.save();
+        c.translate(x, y);
+        c.rotate(p.angle + p.spin * age);
+        c.globalAlpha = Math.min(1, fade * 1.6);
+        if (p.kind === "leaf") ellipse(c, 0, 0, p.size, p.size * 0.5, p.color, INK, 0.6);
+        else
+          fillPoly(
+            c,
+            [
+              [-p.size, -p.size * 0.6],
+              [p.size * 0.8, -p.size * 0.8],
+              [p.size, p.size * 0.7],
+              [-p.size * 0.6, p.size]
+            ],
+            p.color,
+            INK,
+            0.7
+          );
+        c.restore();
+      }
+    }
+  }
+  function drawItemIcon(c, item, seed) {
+    const col = colorOf(item);
+    if (item === "wood") {
+      for (const [dx, dy] of [
+        [-4, 2],
+        [4, 2],
+        [0, -4]
+      ]) {
+        c.save();
+        c.translate(dx, dy);
+        c.fillStyle = col;
+        c.strokeStyle = INK;
+        c.lineWidth = 1.2;
+        c.beginPath();
+        c.roundRect(-8, -3.2, 16, 6.4, 3);
+        c.fill();
+        c.stroke();
+        ellipse(c, 7, 0, 2.4, 3, "#d8b888", INK, 0.9);
+        line(c, -5, -1, 3, -1, shade(col, -0.25), 0.8);
+        c.restore();
+      }
+    } else if (["berry", "cactus_fruit"].includes(item)) {
+      for (const [dx, dy] of [
+        [-3, 1],
+        [3, 1],
+        [0, -3],
+        [0, 3]
+      ])
+        ellipse(c, dx, dy, 3.4, 3.4, col, INK, 0.9);
+      ellipse(c, -1, -4, 1, 1, "#ffe6ec");
+    } else if (["fiber", "reeds", "herb", "wheat", "willow", "feathers"].includes(item)) {
+      for (let i = -2; i <= 2; i++) line(c, i * 1.6, 7, i * 3.2, -8, INK, 2.6);
+      for (let i = -2; i <= 2; i++) line(c, i * 1.6, 7, i * 3.2, -8, col, 1.6);
+      line(c, -5, 1, 5, 1, "#6b4f37", 2);
+    } else if (item === "crystal") {
+      fillPoly(
+        c,
+        [
+          [-5, 6],
+          [-3, -6],
+          [0, -9],
+          [3, -6],
+          [5, 6]
+        ],
+        col,
+        INK,
+        1
+      );
+      glow(c, 0, 0, 14, col, 0.35);
+    } else if (item === "bone") {
+      line(c, -7, 3, 7, -3, INK, 5);
+      line(c, -7, 3, 7, -3, col, 3);
+      for (const [x, y] of [
+        [-7, 3],
+        [7, -3]
+      ])
+        ellipse(c, x, y, 2.6, 2.6, col, INK, 0.8);
+    } else if (["raw_meat", "hide", "potato", "mushroom", "honey", "resin", "venom"].includes(item)) {
+      c.beginPath();
+      c.ellipse(0, 0, 8, 5.5, -0.3, 0, TAU);
+      c.fillStyle = col;
+      c.fill();
+      c.strokeStyle = INK;
+      c.lineWidth = 1.1;
+      c.stroke();
+      ellipse(c, -2.5, -2, 2.6, 1.4, rgba("#ffffff", 0.25));
+    } else {
+      const pts = [];
+      for (let i = 0; i < 7; i++) {
+        const a = i / 7 * TAU, r = 7 + H(seed, i) * 3;
+        pts.push([Math.cos(a) * r, Math.sin(a) * r * 0.75]);
+      }
+      const ore = item.endsWith("_ore") || item === "hellstone";
+      fillPoly(c, pts, ore ? "#7c7a74" : col, INK, 1.1);
+      if (ore)
+        for (let i = 0; i < 4; i++)
+          ellipse(c, (H(seed, i + 9) - 0.5) * 9, (H(seed, i + 19) - 0.5) * 6, 1.9, 1.5, col);
+      ellipse(c, -2, -3, 2.6, 1.2, rgba("#ffffff", 0.22));
+      if (item === "hellstone") glow(c, 0, 0, 16, "#ff5a1f", 0.45);
+      if (item === "ice") glow(c, 0, 0, 12, "#dff6ff", 0.2);
+    }
+  }
+  function drawDrops(c, g, cam, w, h, t) {
+    for (const d of g.s.drops) {
+      if (t < d.born) continue;
+      const x = d.x - cam.x, y = d.y - cam.y;
+      if (x < -40 || x > w + 40 || y < -40 || y > h + 40) continue;
+      const bob = d.resting ? Math.sin(t * 2.6 + d.id) * 1.5 : 0;
+      c.save();
+      c.translate(x, y - 10 + bob);
+      if (d.resting) ellipse(c, 0, 10 - bob, 11, 2.6, "rgba(15,15,12,0.25)");
+      c.scale(1.3, 1.3);
+      glow(c, 0, 0, 16, "#fff1c8", 0.12 + Math.sin(t * 3 + d.id) * 0.05);
+      drawItemIcon(c, d.item, d.id);
+      if (d.qty > 1) {
+        c.font = "bold 11px sans-serif";
+        c.textAlign = "left";
+        c.lineWidth = 3;
+        c.strokeStyle = "rgba(25,20,15,0.85)";
+        c.strokeText("\xD7" + d.qty, 7, 11);
+        c.fillStyle = "#f4ecd8";
+        c.fillText("\xD7" + d.qty, 7, 11);
+      }
+      c.restore();
+    }
+  }
+
   // src/renderer/Renderer.ts
   function draw(c, g, cam, w, h, menu2 = false) {
     const t = g.s.elapsed, tod = g.timeOfDay(), fx = menu2 ? cam.x + w / 2 : g.s.player.x;
     c.clearRect(0, 0, w, h);
     drawSky(c, g, cam, w, h, fx, tod);
     drawTerrain(c, g, cam, w, h);
-    drawLadders(c, cam, w);
+    drawLadders(c, cam, w, h);
     const visible = (o, pad2 = 140) => o.x > cam.x - pad2 && o.x < cam.x + w + pad2 && o.y > cam.y - 40 && o.y < cam.y + h + 220;
     for (const n of g.s.nodes)
       if (treeNode(n.kind) && visible(n, 160)) drawTree(c, n, n.x - cam.x, n.y - cam.y, t);
@@ -5487,7 +6664,9 @@
       if (visible(s)) drawStructure(c, g, s, s.x - cam.x, s.y - cam.y, t);
     for (const a of g.s.animals)
       if (!a.deadUntil && visible(a)) drawAnimal(c, g, a, a.x - cam.x, a.y - cam.y, t);
+    drawDrops(c, g, cam, w, h, t);
     if (!menu2) drawPlayer(c, g.s.player, g.s.player.x - cam.x, g.s.player.y - cam.y, t);
+    drawParticles(c, cam);
     drawLighting(c, g, cam, w, h, menu2, tod);
     drawWeather(c, g, cam, w, h, menu2, fx, tod);
     const vignette = c.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, w * 0.75);
@@ -5613,6 +6792,19 @@
     for (let i = 1; i < n; i++) real[i] = 2 * Math.sin(Math.PI * i * duty) / (Math.PI * i);
     return ctx2.createPeriodicWave(real, imag);
   }
+  function organWave(ctx2) {
+    const ranks = {
+      1: 1,
+      2: 0.75,
+      3: 0.45,
+      4: 0.55,
+      5: 0.2,
+      6: 0.3,
+      8: 0.35
+    }, n = 12, real = new Float32Array(n), imag = new Float32Array(n);
+    for (const [h, a] of Object.entries(ranks)) imag[+h] = a;
+    return ctx2.createPeriodicWave(real, imag);
+  }
   function shaper(amount) {
     const curve5 = new Float32Array(1024);
     for (let i = 0; i < curve5.length; i++) {
@@ -5624,8 +6816,8 @@
   function kit(ctx2) {
     let k = kits.get(ctx2);
     if (!k) {
-      const noise2 = ctx2.createBuffer(1, ctx2.sampleRate * 2, ctx2.sampleRate);
-      const data = noise2.getChannelData(0);
+      const noise3 = ctx2.createBuffer(1, ctx2.sampleRate * 2, ctx2.sampleRate);
+      const data = noise3.getChannelData(0);
       let seed = 1;
       for (let i = 0; i < data.length; i++) {
         seed = seed * 16807 % 2147483647;
@@ -5633,9 +6825,10 @@
       }
       k = {
         ctx: ctx2,
-        noise: noise2,
+        noise: noise3,
         pulse25: pulseWave(ctx2, 0.25),
         pulse12: pulseWave(ctx2, 0.125),
+        organ: organWave(ctx2),
         drive: shaper(2.2),
         fuzz: shaper(14)
       };
@@ -5982,6 +7175,69 @@
       osc(k, "sine", f * 7, t, tine.end).connect(tine.g).connect(out.node);
     }
   };
+  var organ = {
+    cutoff: 7e3,
+    vibrato: 6.4,
+    voice: (k, out, t, m, dur, v) => {
+      const f = hz(m);
+      const { g, end } = adsr(k, t, dur, 0.035, 0.2, 0.92, 0.18, 0.075 * v);
+      const a = osc(k, k.organ, f, t, end), b = osc(k, k.organ, f, t, end, 5);
+      vibrato(out, [a, b], f, t, 5, 0.05);
+      a.connect(g);
+      b.connect(g);
+      g.connect(out.node);
+      const chiff = perc(k, t, 0.05 * v, 0.06), bp = filter(k, "bandpass", Math.min(f * 4, 9e3), 2);
+      noise(k, t, t + 0.12).connect(bp).connect(chiff.g).connect(out.node);
+    }
+  };
+  function formants(k, vowel) {
+    const input = gain(k, 1), output = gain(k, 1);
+    for (const [freq, q, level] of vowel) {
+      const bp = filter(k, "bandpass", freq, q);
+      input.connect(bp).connect(gain(k, level)).connect(output);
+    }
+    return { input, output };
+  }
+  var chant = {
+    vibrato: 4.6,
+    insert: (k) => formants(k, [
+      [430, 7, 1],
+      [820, 8, 0.6],
+      [2700, 10, 0.12]
+    ]),
+    voice: (k, out, t, m, dur, v) => {
+      const f = hz(m);
+      const {
+        gs: [l, r],
+        end
+      } = adsrN(2, k, t, dur, 0.09, 0.4, 0.85, 0.3, 0.2 * v);
+      const oscs = [-10, 0, 10].map((c) => osc(k, "sawtooth", f, t, end, c));
+      if (dur > 0.4) vibrato(out, oscs, f, t, 9, 0.3);
+      oscs[0].connect(l);
+      oscs[1].connect(l);
+      oscs[1].connect(r);
+      oscs[2].connect(r);
+      l.connect(out.left);
+      r.connect(out.right);
+    }
+  };
+  var toll = {
+    voice: (k, out, t, m, _dur, v) => {
+      const f = hz(m);
+      for (const [ratio, level, decay] of [
+        [0.5, 0.5, 5],
+        [1, 0.8, 4],
+        [1.2, 0.45, 2.6],
+        [1.5, 0.3, 2.2],
+        [2, 0.5, 1.8],
+        [2.66, 0.2, 1]
+      ]) {
+        const e = perc(k, t, 0.06 * v * level, decay, 4e-3);
+        osc(k, "sine", f * ratio, t, e.end).connect(e.g).connect(out.node);
+      }
+      click(k, out.node, t, 2400, 0.08 * v, 0.05, 1.5);
+    }
+  };
   var choir = {
     vibrato: 5,
     insert: (k) => {
@@ -6056,7 +7312,7 @@
   var guitar = {
     cutoff: 3400,
     insert: (k) => {
-      const pre = gain(k, 3), ws = k.ctx.createWaveShaper(), mid = filter(k, "peaking", 700, 1), post = gain(k, 0.35);
+      const pre = gain(k, 3), ws = k.ctx.createWaveShaper(), mid = filter(k, "peaking", 700, 1), post = gain(k, 0.2);
       ws.curve = k.fuzz;
       mid.gain.value = -5;
       return insertChain(pre, ws, mid, post);
@@ -6290,6 +7546,9 @@
     marimba,
     epiano,
     choir,
+    chant,
+    organ,
+    toll,
     howl,
     orchhit,
     guitar,
@@ -6328,12 +7587,12 @@
     let seed = 99;
     for (let c = 0; c < 2; c++) {
       const data = ir.getChannelData(c);
-      let smooth6 = 0;
+      let smooth5 = 0;
       for (let i = 0; i < len; i++) {
         seed = seed * 16807 % 2147483647;
         const x = i / len, white = seed / 2147483647 * 2 - 1, k = 0.85 - 0.75 * x;
-        smooth6 = smooth6 + k * (white - smooth6);
-        data[i] = smooth6 * Math.exp(-x * 5.5) * (i < rate * 0.012 ? i / (rate * 0.012) : 1);
+        smooth5 = smooth5 + k * (white - smooth5);
+        data[i] = smooth5 * Math.exp(-x * 5.5) * (i < rate * 0.012 ? i / (rate * 0.012) : 1);
       }
     }
     return ir;
@@ -6939,6 +8198,75 @@
       s.grid("tom", 39, "x.x.x.x.xxxxxxxx", 1, { midi: 48 });
       s.grid("hat", 36, "x.x.x.x.x.x.x.x.", 4);
       s.note("riser", 148, 60, 8);
+    }
+  );
+
+  // src/audio/tracks/brimstone.ts
+  var brimstone = compose(
+    {
+      id: "brimstone",
+      title: "Brimstone Forges",
+      mood: "Upper hell",
+      bpm: 112,
+      bars: 28,
+      sidechain: { part: "kick", depth: 0.4, release: 0.2 },
+      parts: {
+        kick: { inst: "bigkick", vol: 0.8 },
+        snare: { inst: "snare", vol: 0.6, rev: 0.3 },
+        taiko: { inst: "taiko", vol: 0.85, rev: 0.4 },
+        tom: { inst: "tom", vol: 0.6, rev: 0.3 },
+        anvil: { inst: "ride", vol: 2, rev: 0.35, pan: 0.3 },
+        crash: { inst: "crash", vol: 0.55, rev: 0.3 },
+        riser: { inst: "riser", vol: 0.4, rev: 0.3 },
+        impact: { inst: "impact", vol: 0.7, rev: 0.5 },
+        bass: { inst: "synthbass", vol: 0.75, duck: true },
+        pad: { inst: "pad", vol: 0.6, duck: true, rev: 0.45, cutoff: 1600 },
+        trem: { inst: "tremolo", vol: 1.1, rev: 0.45 },
+        brass: { inst: "brass", vol: 1, rev: 0.4 },
+        lead: { inst: "pulse", vol: 0.75, rev: 0.3, echo: 0.3 },
+        choir: { inst: "choir", vol: 0.8, rev: 0.6 },
+        hit: { inst: "orchhit", vol: 0.7, rev: 0.45 }
+      }
+    },
+    (s) => {
+      const prog = "Fm Gb Fm Eb Fm Gb Db C";
+      const ostinato = "R:2 R:1 R:1 8:2 R:2 5:2 R:2 8:2 7:2";
+      const theme = "f4:6 gb4:2 ab4:4 c5:4 | db5:6 c5:2 bb4:8 | ab4:6 bb4:2 c5:4 f5:4 | eb5:8 db5:4 c5:4 | f5:6 gb5:2 ab5:4 f5:4 | gb5:6 f5:2 db5:8 | db5:4 eb5:4 f5:4 ab5:4 | g5:8 e5:4 c5:4";
+      const forge = (bar, bars, full) => {
+        s.grid("kick", bar, full ? "x..x..x.x..x..x." : "x.......x.......", bars);
+        s.grid("snare", bar, "....x.......x...", bars);
+        s.grid("taiko", bar, full ? "x.....x...x....." : "x...........x...", bars);
+        s.grid("anvil", bar, "..x...x...x...xx", bars, { vel: 0.8 });
+      };
+      s.bass("bass", 0, prog, ostinato, 29);
+      s.pad("trem", 0, prog, 53, { vel: 0.8 });
+      s.grid("taiko", 0, "x.......x.......", 8);
+      s.grid("anvil", 0, "........x.......", 8, { vel: 0.7 });
+      s.grid("tom", 7, "x.x.x.x.xxxxxxxx", 1, { midi: 45 });
+      s.play("hit", 0, ">f3:16 | r:16 | r:16 | r:16 | f3:16 | r:16 | r:16 | >c4:4 c4:4 c4:8");
+      s.note("impact", 32, 60, 1);
+      s.grid("crash", 8, "x...............");
+      s.play("brass", 8, theme);
+      s.bass("bass", 8, prog, ostinato, 29);
+      s.pad("pad", 8, prog, 60);
+      forge(8, 8, false);
+      s.grid("crash", 16, "x...............");
+      s.grid("crash", 20, "x...............");
+      s.play("lead", 16, theme, { transpose: 12 });
+      s.play("brass", 16, theme, { vel: 0.8 });
+      s.pad("choir", 16, prog, 64);
+      s.pad("pad", 16, prog, 57);
+      s.bass("bass", 16, prog, "R:1 R:1 8:1 R:1", 29);
+      forge(16, 8, true);
+      s.play("hit", 16, ">f3:16 | r:16 | r:16 | r:16 | f3:16 | r:16 | db4:16 | >c4:3 c4:3 c4:10");
+      s.pad("choir", 24, "Fm:2 Gb C", 58, { vel: 0.8 });
+      s.bass("bass", 24, "Fm:2 Gb C", "R:4 r:4 R:2 R:2 r:4", 29);
+      s.grid("taiko", 24, "x..x..x.x..x..x.", 3);
+      s.grid("tom", 26, "....x.x.x.xxxxxx", 1, { midi: 50 });
+      s.grid("tom", 27, "xxxxxxxxxxxxxxxx", 1, { midi: 43 });
+      s.grid("snare", 27, "........xxxxxxxx");
+      s.automate("snare", "vol", 27, 1, 0.4, 1.2);
+      s.note("riser", 104, 60, 8);
     }
   );
 
@@ -7689,6 +9017,93 @@
     }
   );
 
+  // src/audio/tracks/pandemonium.ts
+  var pandemonium = compose(
+    {
+      id: "pandemonium",
+      title: "Throne of Cinders",
+      mood: "Lower hell",
+      bpm: 100,
+      bars: 28,
+      loopBar: 4,
+      sidechain: { part: "kick", depth: 0.35, release: 0.16 },
+      parts: {
+        kick: { inst: "bigkick", vol: 0.8 },
+        snare: { inst: "snare", vol: 0.7, rev: 0.35 },
+        taiko: { inst: "taiko", vol: 0.9, rev: 0.5 },
+        timp: { inst: "timpani", vol: 0.9, rev: 0.5 },
+        crash: { inst: "crash", vol: 0.55, rev: 0.35 },
+        impact: { inst: "impact", vol: 0.8, rev: 0.6 },
+        riser: { inst: "riser", vol: 0.4, rev: 0.4 },
+        swell: { inst: "swell", vol: 0.45, rev: 0.4 },
+        toll: { inst: "toll", vol: 1.7, rev: 0.75 },
+        pedal: { inst: "organ", vol: 0.8, rev: 0.4, cutoff: 1400 },
+        organ: { inst: "organ", vol: 0.75, rev: 0.55, pan: -0.15 },
+        lead: { inst: "organ", vol: 2.3, rev: 0.5, echo: 0.15 },
+        chant: { inst: "chant", vol: 1, rev: 0.6 },
+        choir: { inst: "choir", vol: 0.75, rev: 0.7 },
+        guitar: { inst: "guitar", vol: 0.55, pan: -0.35, duck: true },
+        guitar2: { inst: "guitar", vol: 0.4, pan: 0.35, transpose: 12, duck: true },
+        bass: { inst: "synthbass", vol: 0.85, duck: true },
+        hit: { inst: "orchhit", vol: 0.75, rev: 0.5 }
+      }
+    },
+    (s) => {
+      const intro = "Dm Dm Eb A", progA = "Dm Eb Dm Ab Dm Eb Bbm A", progB = "Dm Eb Dm Ab Bbm Gm A A", powerB = "D5 Eb5 D5 Ab5 Bb5 G5 A5 A5", progC = "Dm:2 Ab:2 Dm:2 A:2";
+      const tolls = (bar, bars, every = 1) => {
+        for (let b = 0; b < bars; b += every) s.at("toll", bar + b, "d3", 4);
+      };
+      tolls(0, 4);
+      s.pad("organ", 0, intro, 57, { vel: 0.8 });
+      s.automate("organ", "vol", 0, 3, 0.15, 1);
+      s.play("chant", 0, "d3:4 d3:4 d3:4 f3:2 e3:2 | d3:16 | eb3:4 eb3:4 d3:4 c3:4 | c#3:16");
+      s.bass("pedal", 0, intro, "R:16", 26);
+      s.note("riser", 8, 60, 8);
+      s.grid("timp", 3, "oooooooxxxxxXXXX", 1, { midi: 38 });
+      s.note("swell", 12, 60, 4);
+      s.note("impact", 16, 60, 1);
+      s.grid("crash", 4, "x...............");
+      s.arp("organ", 4, progA, "2 1 0 1 3 1 0 1", 57, 1, { vel: 0.85 });
+      s.bass("pedal", 4, progA, "R:8 R:8", 26);
+      s.hits("chant", 4, progA, "x...x...x.x.x...", 50);
+      s.grid("taiko", 4, "x.......x.......", 8);
+      s.grid("kick", 4, "x..x....x..x....", 7);
+      s.grid("kick", 11, "x..x....x.xxxxxx");
+      s.grid("snare", 11, "........x.x.xxxx");
+      s.play("hit", 4, ">d4:16 | r:16 | r:16 | >ab3:16 | d4:16 | r:16 | r:16 | >a3:3 a3:3 a3:10");
+      tolls(4, 8, 2);
+      s.note("impact", 48, 60, 1);
+      s.grid("crash", 12, "x...............");
+      s.grid("crash", 16, "x...............");
+      const theme = "d5:3 f5:3 a5:2 ab5:4 f5:4 | g5:3 eb5:3 bb4:2 eb5:8 | d5:3 f5:3 a5:2 d6:4 c#6:4 | c6:3 ab5:3 eb5:2 ab5:8 | bb5:3 db6:3 f6:2 db6:4 bb5:4 | g5:3 bb5:3 d6:2 bb5:4 g5:4 | a5:3 c#6:3 e6:2 g6:4 e6:4 | c#6:8 a5:4 e5:4";
+      s.play("lead", 12, theme);
+      s.pad("choir", 12, progB, 62);
+      s.hits("guitar", 12, powerB, "x-.xx-.xx-.xx.xx", 50);
+      s.hits("guitar2", 12, powerB, "x-.xx-.xx-.xx.xx", 50);
+      s.bass("bass", 12, progB, "R:2", 26);
+      s.bass("pedal", 12, progB, "R:16", 26);
+      s.grid("kick", 12, "x.xxx.xxx.xxx.xx", 8);
+      s.grid("snare", 12, "....x.......x...", 7);
+      s.grid("snare", 19, "....x...x.x.xxxx");
+      s.grid("taiko", 12, "x.......x.......", 8);
+      s.play("hit", 12, ">d4:16 | r:16 | r:16 | >ab3:16 | r:16 | r:16 | >a3:16 | r:16");
+      s.play(
+        "chant",
+        20,
+        "d3:8 f3:8 | e3:8 d3:8 | eb3:8 c3:8 | eb3:16 | d3:8 a3:8 | f3:8 d3:8 | c#3:8 e3:8 | a2:16"
+      );
+      s.pad("organ", 20, progC, 60, { vel: 0.9 });
+      s.bass("pedal", 20, progC, "R:16", 26);
+      s.pad("choir", 24, "Dm:2 A:2", 66, { vel: 0.8 });
+      tolls(20, 8);
+      s.grid("kick", 20, "x..x............", 6, { vel: 0.9 });
+      s.grid("timp", 26, "x.......x.......|oooooooxxxxxXXXX", 1, { midi: 38 });
+      s.automate("timp", "vol", 26, 2, 0.5, 1.2);
+      s.note("riser", 96, 60, 16);
+      s.note("swell", 108, 60, 4);
+    }
+  );
+
   // src/audio/tracks/storm.ts
   var storm = compose(
     {
@@ -7785,6 +9200,8 @@
     storm,
     cave,
     depths,
+    brimstone,
+    pandemonium,
     boss,
     fallen
   ];
@@ -7894,16 +9311,20 @@
       victory: [330, 440, 550, 770],
       mine: [170, 120],
       jump: [260, 370],
-      fish: [315, 420]
+      fish: [315, 420],
+      fell: [130, 92, 70, 58],
+      crumble: [210, 150, 110],
+      pickup: [660, 880],
+      sizzle: [900, 700]
     };
     const seq = pitches[kind] || pitches.page;
     seq.forEach(
       (f, i) => tone(
         f,
         audio.currentTime + i * 0.075,
-        0.16,
-        kind === "hurt" || kind === "boss" ? "sawtooth" : "triangle",
-        0.17,
+        kind === "fell" ? 0.3 : kind === "pickup" ? 0.09 : 0.16,
+        kind === "hurt" || kind === "boss" || kind === "sizzle" ? "sawtooth" : "triangle",
+        kind === "pickup" ? 0.07 : kind === "fell" ? 0.22 : 0.17,
         sfxBus
       )
     );
@@ -7921,14 +9342,17 @@
   var Audio = { start, effect, setScene, setMuffled, setVolumes, nowPlaying, settings };
 
   // src/audio/scenes.ts
-  var CAVE_DEPTH = 70;
-  var DEEP_CAVE_DEPTH = 330;
+  var LAYER_TRACKS = {
+    upper_mines: "cave",
+    lower_mines: "depths",
+    upper_hell: "brimstone",
+    lower_hell: "pandemonium"
+  };
   function musicScene(c) {
     if (!c.playing) return "menu";
     if (c.dead) return "fallen";
     if (c.boss) return "boss";
-    if (c.depth > DEEP_CAVE_DEPTH) return "depths";
-    if (c.depth > CAVE_DEPTH) return "cave";
+    if (LAYER_TRACKS[c.layer]) return LAYER_TRACKS[c.layer];
     if (c.weather === "storm") return "storm";
     if (["tundra", "taiga", "alpine"].includes(c.biome)) return "cold";
     if (["desert", "badlands"].includes(c.biome)) return "desert";
@@ -7972,13 +9396,13 @@
     menuFocalX: BIOME_CENTERS.meadow[0]
   };
   var pretty = (id) => ITEMS[id]?.[0] || id;
-  var clamp6 = (v, a, b) => Math.max(a, Math.min(b, v));
+  var clamp7 = (v, a, b) => Math.max(a, Math.min(b, v));
   var fmt = (n) => String(Math.floor(n)).padStart(2, "0");
   var timeText = () => {
     const t = game.timeOfDay();
     return `DAY ${game.s.day} \xB7 ${fmt(t / 60)}:${fmt(t % 60)} \xB7 ${game.s.weather.toUpperCase()}`;
   };
-  var itemUseLabel = (id) => ITEMS[id][1] === "structure" ? "PLACE" : WEAPONS[id] ? "EQUIP" : ["direwolf_cloak", "hide_coat", "explorer_boots"].includes(id) ? "WEAR" : id === "fishing_rod" ? "FISH" : ["food", "water", "medicine"].includes(ITEMS[id][1]) ? "USE" : "";
+  var itemUseLabel = (id) => ITEMS[id][1] === "structure" ? "PLACE" : WEAPONS[id] ? "EQUIP" : ["direwolf_cloak", "hide_coat", "explorer_boots", "cinder_ward"].includes(id) ? "WEAR" : id === "fishing_rod" ? "FISH" : ["food", "water", "medicine"].includes(ITEMS[id][1]) ? "USE" : "";
   var sound = (kind) => Audio.effect(kind);
   function resize() {
     const ratio = Math.min(devicePixelRatio || 1, UI_RULES.maxPixelRatio);
@@ -8401,7 +9825,7 @@
   }
   function renderNotes(left, right) {
     const biome = game.biome(), t = game.s.tutorial, current2 = TUTORIAL[t.step];
-    left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface; three winding cave roads beneath them.</p><canvas id="atlas-map" class="atlas-map" width="420" height="240" aria-label="Side elevation of the nine regions and cave passages"></canvas><h3>Current ground \xB7 ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(", ")}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
+    left.innerHTML = `<h2>Field Notes</h2><p class="lede">Nine regions across the surface; beneath them the upper and lower mines, and below those, hell.</p><canvas id="atlas-map" class="atlas-map" width="420" height="300" aria-label="Side elevation of the nine regions and the depths below"></canvas><h3>Current ground \xB7 ${biome.name}</h3><p>${biome.note}</p><p>Typical resources: ${[...new Set(biome.resources)].map(pretty).join(", ")}.</p><div class="book-actions"><button data-save>SAVE RECORD</button><button class="quiet" data-menu>MAIN MENU</button></div>`;
     right.innerHTML = `<h2>Lessons &amp; sightings</h2><p class="lede">${current2 ? current2[0] + " \xB7 " + Math.min(current2[2], t.tally[current2[1]] || 0) + "/" + current2[2] : "The first field lessons are complete."}</p><ol class="objective-list">${TUTORIAL.map(([label], i) => `<li class="${i < t.step ? "done" : i === t.step ? "current" : ""}">${label}</li>`).join("")}</ol><h3>Expedition chapters</h3><ol class="objective-list">${CHAPTERS.map(([label], i) => `<li class="${i < game.s.chapter ? "done" : i === game.s.chapter ? "current" : ""}">${label}</li>`).join("")}</ol><h3>Biome ledger</h3>${BIOMES.map((b) => `<div class="biome-entry ${b.id === biome.id ? "current" : ""}"><strong>${b.name}</strong><small>${b.note}</small></div>`).join("")}<h3>Controls</h3><p>A / D move \xB7 W / Space jump and climb \xB7 S descend \xB7 E gather or interact \xB7 F strike \xB7 R / click mine \xB7 G fish \xB7 J / I journal \xB7 M map \xB7 Esc pause \xB7 1\u20135 turn pages.</p>`;
     left.querySelector("[data-save]").onclick = () => {
       game.save();
@@ -8433,23 +9857,53 @@
       ink.stroke();
     }
     const X = (x) => x / WORLD_W * w, Y = (y) => y / WORLD_H * (h - 30) + 14;
-    ink.fillStyle = "#8a8667";
-    ink.beginPath();
-    ink.moveTo(0, h);
-    for (let x = 0; x <= WORLD_W; x += 25) ink.lineTo(X(x), Y(surfaceAt(x)));
-    ink.lineTo(w, h);
-    ink.fill();
-    ink.strokeStyle = "#f1dfb3";
-    ink.lineWidth = 3;
-    for (let level = 1; level <= 3; level++) {
+    const step = WORLD_W / 420;
+    const bands = [
+      [LAYERS[1].top, LAYERS[2].top, "#8a8667"],
+      [LAYERS[2].top, LAYERS[3].top, "#6f7483"],
+      [LAYERS[3].top, LAYERS[4].top, "#8d5a4a"],
+      [LAYERS[4].top, WORLD_H, "#6e3434"]
+    ];
+    for (const [top, bottom, color] of bands) {
+      ink.fillStyle = color;
       ink.beginPath();
-      for (let x = 0; x <= WORLD_W; x += 35) {
+      ink.moveTo(0, Y(bottom));
+      for (let x = 0; x <= WORLD_W; x += step) ink.lineTo(X(x), Y(Math.max(top, surfaceAt(x))));
+      ink.lineTo(w, Y(bottom));
+      ink.fill();
+    }
+    ink.strokeStyle = "#f1dfb3";
+    ink.lineWidth = 1.6;
+    for (let level = 1; level <= CAVE_LEVELS; level++) {
+      ink.beginPath();
+      for (let x = 0; x <= WORLD_W; x += step) {
         const xx = X(x), yy = Y(caveY(x, level));
         if (!x) ink.moveTo(xx, yy);
         else ink.lineTo(xx, yy);
       }
       ink.stroke();
     }
+    ink.fillStyle = "#2b1a18";
+    ink.beginPath();
+    for (let x = 0; x <= WORLD_W; x += step) ink.lineTo(X(x), Y(underworldCeiling(x)));
+    for (let x = WORLD_W; x >= 0; x -= step) ink.lineTo(X(x), Y(underworldFloor(x)));
+    ink.fill();
+    ink.fillStyle = "#e8702a";
+    for (let x = 0; x <= WORLD_W; x += step)
+      if (underworldFloor(x) > LAVA_Y)
+        ink.fillRect(X(x), Y(LAVA_Y), 1.2, Y(underworldFloor(x)) - Y(LAVA_Y));
+    ink.strokeStyle = "#3a2a1a";
+    ink.lineWidth = 1;
+    for (const shaft of SHAFTS) {
+      ink.beginPath();
+      ink.moveTo(X(shaft.x), Y(shaft.top));
+      ink.lineTo(X(shaft.x), Y(shaft.bottom));
+      ink.stroke();
+    }
+    ink.font = 'italic 10px "EB Garamond", Georgia, serif';
+    ink.textAlign = "left";
+    ink.fillStyle = "#f5ead0";
+    for (const layer of LAYERS.slice(2)) ink.fillText(layer.name, 4, Y(layer.top) + 11);
     ink.font = 'bold 10px "EB Garamond", Georgia, serif';
     ink.textAlign = "center";
     ink.fillStyle = "#322c24";
@@ -8507,10 +9961,11 @@
     state.lastUI = now;
     const v = game.s.vitals;
     ["health", "hydration", "calories", "stamina"].forEach((id) => {
-      $(id + "-bar").style.width = clamp6(v[id], 0, 100) + "%";
+      $(id + "-bar").style.width = clamp7(v[id], 0, 100) + "%";
       $(id + "-value").textContent = String(Math.round(v[id]));
     });
-    $("biome-name").textContent = game.biome().name.toUpperCase();
+    const layer = game.layer();
+    $("biome-name").textContent = layer.id === "surface" ? game.biome().name.toUpperCase() : layer.id === "upper_mines" ? game.biome().name.toUpperCase() + " \xB7 " + layer.name.toUpperCase() : layer.name.toUpperCase();
     $("world-time").textContent = timeText();
     $("condition-line").textContent = game.vitalReasons()[0];
     $("weapon-name").textContent = pretty(game.s.player.weapon);
@@ -8521,7 +9976,7 @@
     let prompt = "";
     if (game.s.placing) prompt = `<b>CLICK</b> Place ${pretty(game.s.placing)} \xB7 Esc cancels`;
     else if (near) {
-      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "icebox" ? "Add ice" : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
+      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "icebox" ? "Add ice" : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
       prompt = `<b>E</b> ${action}`;
     } else prompt = "<b>E</b> Explore and gather";
     $("interaction-prompt").innerHTML = prompt;
@@ -8529,7 +9984,7 @@
     $("boss-hud").classList.toggle("hidden", !boss2);
     if (boss2) {
       $("boss-name").textContent = BOSSES[game.s.altar.level - 1].name.toUpperCase();
-      $("boss-bar").style.width = clamp6(boss2.hp / boss2.maxHp * 100, 0, 100) + "%";
+      $("boss-bar").style.width = clamp7(boss2.hp / boss2.maxHp * 100, 0, 100) + "%";
       $("boss-value").textContent = `${Math.ceil(boss2.hp)} / ${boss2.maxHp}`;
     }
     const msg = game.messages[0];
@@ -8552,22 +10007,31 @@
   }
   function camera() {
     const p = game.s.player;
-    state.camera.x = clamp6(p.x - innerWidth / 2, 0, Math.max(0, WORLD_W - innerWidth));
-    state.camera.y = clamp6(p.y - innerHeight / 2, 0, Math.max(0, WORLD_H - innerHeight));
+    state.camera.x = clamp7(p.x - innerWidth / 2, 0, Math.max(0, WORLD_W - innerWidth));
+    state.camera.y = clamp7(p.y - innerHeight / 2, 0, Math.max(0, WORLD_H - innerHeight));
   }
   function drawWorld() {
     camera();
     if (!state.playing) {
-      state.camera.x = clamp6(
+      state.camera.x = clamp7(
         3600 + Math.sin(performance.now() / 12e3) * 380 - innerWidth * 0.2,
         0,
         WORLD_W - innerWidth
       );
-      state.camera.y = clamp6(
+      state.camera.y = clamp7(
         surfaceAt(UI_RULES.menuFocalX) - innerHeight * 0.62,
         0,
         WORLD_H - innerHeight
       );
+    }
+    const events = game.takeEvents();
+    if (events.length) {
+      spawnEffects(game, events);
+      for (const e of events)
+        if (e.type === "fell") setTimeout(() => sound("fell"), 950);
+        else if (e.type === "crumble") sound("crumble");
+        else if (e.type === "pickup") sound("pickup");
+        else if (e.type === "sizzle") sound("sizzle");
     }
     draw(ctx, game, state.camera, innerWidth, innerHeight, !state.playing);
   }
@@ -8588,7 +10052,7 @@
         playing: state.playing,
         dead: game.s.dead,
         boss: !!game.s.altar.activeBoss,
-        depth: game.s.player.y - surfaceAt(game.s.player.x),
+        layer: game.layer().id,
         weather: game.s.weather,
         biome: game.biome().id,
         night: game.isNight()

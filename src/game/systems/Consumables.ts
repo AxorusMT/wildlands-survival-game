@@ -18,13 +18,16 @@ export class Consumables extends System {
       this.game.say(itemName(id) + ' equipped.');
       return { ok: true };
     }
-    if (id === 'direwolf_cloak' || id === 'hide_coat' || id === 'explorer_boots') {
-      const key = (
-        { direwolf_cloak: 'cloak', hide_coat: 'coat', explorer_boots: 'boots' } as Record<
-          string,
-          'cloak' | 'coat' | 'boots'
-        >
-      )[id];
+    const wear = (
+      {
+        direwolf_cloak: 'cloak',
+        hide_coat: 'coat',
+        explorer_boots: 'boots',
+        cinder_ward: 'ward',
+      } as Record<string, 'cloak' | 'coat' | 'boots' | 'ward'>
+    )[id];
+    if (wear) {
+      const key = wear;
       this.game.s.player[key] = !this.game.s.player[key];
       this.game.say(itemName(id) + (this.game.s.player[key] ? ' worn.' : ' stowed.'));
       return { ok: true };

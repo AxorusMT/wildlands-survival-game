@@ -40,6 +40,9 @@ export const RECIPES: Recipe[] = (
     ['obsidian_axe', { obsidian: 5, steel_ingot: 3, hide: 1 }, 'forge', 5],
     ['obsidian_pick', { obsidian: 5, steel_ingot: 3, hide: 1 }, 'forge', 5],
     ['obsidian_blade', { obsidian: 7, steel_ingot: 4, hide: 2 }, 'forge', 5],
+    ['cinder_ward', { obsidian: 6, sulfur: 6, hide: 8, ice: 8 }, 'forge', 5],
+    ['hellstone_ingot', { hellstone: 3, coal: 2, sulfur: 1 }, 'forge', 6],
+    ['hellfire_blade', { hellstone_ingot: 8, obsidian: 6, hide: 2 }, 'forge', 6],
     [
       'effergy',
       { obsidian: 24, steel_ingot: 18, sulfur: 12, bone: 16, hide: 12, ice: 6, antibiotic: 2 },

@@ -4,17 +4,19 @@ import type { Rng } from '../core/random.ts';
 import type {
   GameMessage,
   GameResult,
+  WorldEvent,
   GameState,
   InventoryEntry,
   ResourceNode,
   SaveStorage,
   Structure,
 } from '../core/types.ts';
-import { biomeAt } from '../data/world.ts';
+import { biomeAt, layerAt, lavaAt } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
 import { Consumables } from './systems/Consumables.ts';
 import { Crafting } from './systems/Crafting.ts';
+import { Drops } from './systems/Drops.ts';
 import { Effergy } from './systems/Effergy.ts';
 import { Environment } from './systems/Environment.ts';
 import { Interaction } from './systems/Interaction.ts';
@@ -35,6 +37,8 @@ export class Game {
   s!: GameState;
   rng!: Rng;
   messages!: GameMessage[];
+  /** Passing events for effects and sound; not saved. */
+  events: WorldEvent[] = [];
 
   readonly terrain = new Terrain(this);
   readonly environment = new Environment(this);
@@ -47,6 +51,7 @@ export class Game {
   readonly physics = new Physics(this);
   readonly wildlife = new Wildlife(this);
   readonly effergy = new Effergy(this);
+  readonly drops = new Drops(this);
   readonly world = new WorldGenerator(this);
   readonly saves = new SaveSystem(this);
 
@@ -59,7 +64,7 @@ export class Game {
     this.rng = seededRandom(seed);
     this.s = {
       version: 3,
-      layout: 2,
+      layout: 3,
       seed,
       elapsed: 0,
       day: 1,
@@ -101,6 +106,8 @@ export class Game {
       structures: [],
       caches: [],
       tiles: [],
+      tileEdits: {},
+      drops: [],
       effects: [],
       tutorial: { step: 0, tally: {} },
       chapter: 0,
@@ -111,6 +118,7 @@ export class Game {
       lastSave: Date.now(),
     };
     this.messages = [];
+    this.events = [];
     this.world.generate();
     this.s.player.y = this.groundTopAt(RULES.spawnX) + 1;
     this.say('Field record I · Stranded in the meadow. Find wood, stone, and fiber.');
@@ -127,7 +135,19 @@ export class Game {
     this.environment.collectRain(dt);
     this.s.player.invuln = Math.max(0, this.s.player.invuln - dt);
     for (const a of this.s.animals) this.wildlife.step(a, dt);
+    this.drops.step(dt);
     this.survival.update(dt);
+  }
+
+  event(type: WorldEvent['type'], x: number, y: number, kind: string, dir?: number) {
+    this.events.push({ type, x, y, kind, dir });
+    if (this.events.length > 64) this.events.shift();
+  }
+  /** Hands over and clears the events since the last call. */
+  takeEvents() {
+    const out = this.events;
+    this.events = [];
+    return out;
   }
 
   say(message: string, tone = 'ink') {
@@ -138,6 +158,13 @@ export class Game {
   // ─── Place and surroundings ───────────────────────────────────────────────
   biome(x = this.s.player.x, y = this.s.player.y) {
     return biomeAt(x, y);
+  }
+  layer(x = this.s.player.x, y = this.s.player.y) {
+    return layerAt(x, y);
+  }
+  inLava() {
+    const p = this.s.player;
+    return lavaAt(p.x, p.y - 8);
   }
   near(type: string, radius = 110) {
     return this.s.structures.find((st) => st.type === type && dist(st, this.s.player) <= radius);
@@ -172,6 +199,9 @@ export class Game {
   }
   floorNear(x: number, y: number) {
     return this.terrain.floorNear(x, y);
+  }
+  setTile(tx: number, ty: number, kind: number) {
+    this.terrain.setTile(tx, ty, kind);
   }
   mineTileAt(x: number, y: number): GameResult {
     return this.terrain.mineTileAt(x, y);

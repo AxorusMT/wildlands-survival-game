@@ -124,15 +124,19 @@ function effect(kind: string) {
     mine: [170, 120],
     jump: [260, 370],
     fish: [315, 420],
+    fell: [130, 92, 70, 58],
+    crumble: [210, 150, 110],
+    pickup: [660, 880],
+    sizzle: [900, 700],
   };
   const seq = pitches[kind] || pitches.page;
   seq.forEach((f, i) =>
     tone(
       f,
       audio.currentTime + i * 0.075,
-      0.16,
-      kind === 'hurt' || kind === 'boss' ? 'sawtooth' : 'triangle',
-      0.17,
+      kind === 'fell' ? 0.3 : kind === 'pickup' ? 0.09 : 0.16,
+      kind === 'hurt' || kind === 'boss' || kind === 'sizzle' ? 'sawtooth' : 'triangle',
+      kind === 'pickup' ? 0.07 : kind === 'fell' ? 0.22 : 0.17,
       sfxBus,
     ),
   );

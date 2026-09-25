@@ -1,6 +1,6 @@
 import { clamp } from '../../core/math.ts';
 import { itemName } from '../../data/items.ts';
-import { TILE, TILE_COLS, TILE_ROWS, WORLD_H } from '../../data/world.ts';
+import { MINE_TIER, TILE, TILE_COLS, TILE_ROWS, TILE_YIELD, WORLD_H } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -10,6 +10,13 @@ export class Terrain extends System {
     return tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS
       ? 0
       : this.game.s.tiles[ty * TILE_COLS + tx] || 0;
+  }
+  /** Changes one tile and remembers the change for the field record. */
+  setTile(tx: number, ty: number, kind: number) {
+    if (tx < 0 || ty < 0 || tx >= TILE_COLS || ty >= TILE_ROWS) return;
+    const index = ty * TILE_COLS + tx;
+    this.game.s.tiles[index] = kind;
+    this.game.s.tileEdits[index] = kind;
   }
   groundTopAt(x: number) {
     const tx = clamp(Math.floor(x / TILE), 0, TILE_COLS - 1);
@@ -32,22 +39,22 @@ export class Terrain extends System {
     if (!kind) return { ok: false, reason: 'There is no solid ground there.' };
     if (Math.hypot(x - this.game.s.player.x, y - (this.game.s.player.y - 24)) > RULES.mineReach)
       return { ok: false, reason: 'Move closer to mine this tile.' };
-    const need = kind === 6 ? 4 : kind === 5 ? 2 : kind === 2 ? 1 : 0;
+    const need = MINE_TIER[kind] ?? 1;
     if (this.game.toolTier('pick') < need)
       return { ok: false, reason: 'This ground needs a tier ' + need + ' pickaxe.' };
     if (this.game.s.vitals.stamina < RULES.mineStamina)
       return { ok: false, reason: 'Too exhausted to mine.' };
     this.game.s.vitals.stamina -= RULES.mineStamina;
-    this.game.s.tiles[ty * TILE_COLS + tx] = 0;
-    const yieldItem = (
-      { 1: 'dirt', 2: 'stone', 3: 'dirt', 4: 'clay', 5: 'ice', 6: 'stone' } as Record<
-        number,
-        string
-      >
-    )[kind];
-    this.game.add(yieldItem, 1);
-    if (kind === 6 && this.game.rng() < 0.22) this.game.add('obsidian', 1);
-    this.game.say('Mined ' + itemName(yieldItem).toLowerCase() + '.', 'good');
-    return { ok: true, item: yieldItem };
+    this.setTile(tx, ty, 0);
+    const cx = tx * TILE + TILE / 2,
+      cy = ty * TILE + TILE / 2,
+      spec = TILE_YIELD[kind] ?? { item: 'stone' };
+    this.game.event('dig', cx, cy, String(kind));
+    this.game.drops.spawn(spec.item, 1, cx, cy);
+    if (spec.bonus && this.game.rng() < spec.bonus[1]) {
+      this.game.drops.spawn(spec.bonus[0], 1, cx, cy);
+      this.game.say('Found ' + itemName(spec.bonus[0]).toLowerCase() + ' in the rock!', 'good');
+    }
+    return { ok: true, item: spec.item };
   }
 }

@@ -24,16 +24,7 @@ import {
   glow,
   limb,
 } from './graphics.ts';
-import {
-  ART,
-  BIOME_STEP,
-  FIRST_CENTER,
-  blendAt,
-  artAt,
-  daylight,
-  duskiness,
-  overcastOf,
-} from './palette.ts';
+import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
 import type { Canvas2D, RenderGame } from './types.ts';
 import type { Point } from '../core/types.ts';
 
@@ -63,6 +54,18 @@ export function collectLights(g: RenderGame, menu: boolean, t: number): Light[] 
   for (const n of g.s.nodes)
     if (n.hp > 0 && n.kind === 'crystal')
       lights.push({ x: n.x, y: n.y - 16, r: 95, color: '#8fe3df', warm: 0.18 });
+    else if (n.hp > 0 && n.kind === 'hellstone')
+      lights.push({ x: n.x, y: n.y - 12, r: 120, color: '#ff6a2a', warm: 0.3 });
+  // The creatures of hell smoulder, so they show as glowing shapes in the dark.
+  for (const a of g.s.animals)
+    if (!a.deadUntil && (a.type === 'hellhound' || a.type === 'ember_bat'))
+      lights.push({
+        x: a.x,
+        y: a.y - (a.type === 'hellhound' ? 34 : 24),
+        r: a.type === 'hellhound' ? 150 : 110,
+        color: '#ff5a1f',
+        warm: 0.32,
+      });
   return lights;
 }
 export function drawLighting(
@@ -116,7 +119,25 @@ export function drawLighting(
     m.fillStyle = gr;
     m.fill();
   }
-  const lights = collectLights(g, menu, t).filter(
+  // Lava lights the dark around it; one glow per few columns of exposed melt.
+  const lavaLights: Light[] = [];
+  if (cam.y + h > 3400) {
+    for (let tx = Math.floor(cam.x / T) - 4; tx <= Math.ceil((cam.x + w) / T) + 4; tx += 3)
+      for (
+        let ty = Math.max(0, Math.floor(cam.y / T) - 4);
+        ty <= Math.ceil((cam.y + h) / T) + 4;
+        ty++
+      ) {
+        const x = tx * T + T / 2,
+          y = ty * T + T / 2;
+        if (!g.tileAt(tx, ty) && D.lavaAt(x, y)) {
+          const flicker = Math.sin(t * 3 + tx) * 10;
+          lavaLights.push({ x, y: y - 20, r: 230 + flicker, color: '#ff7a2a', warm: 0.5 });
+          break;
+        }
+      }
+  }
+  const lights = [...collectLights(g, menu, t), ...lavaLights].filter(
     (l) =>
       l.x - cam.x > -l.r && l.x - cam.x < w + l.r && l.y - cam.y > -l.r && l.y - cam.y < h + l.r,
   );
@@ -132,6 +153,12 @@ export function drawLighting(
     m.fillRect(sx - l.r, sy - l.r, l.r * 2, l.r * 2);
   }
   c.drawImage(mask, 0, 0, w, h);
+  // Hell casts everything in a red, smouldering haze that deepens toward the bottom.
+  const hell = smooth(D.LAYERS[3].top - 350, D.LAYERS[4].top + 300, cam.y + h / 2);
+  if (hell > 0) {
+    c.fillStyle = rgba('#8a1a0c', 0.05 + hell * 0.08);
+    c.fillRect(0, 0, w, h);
+  }
   const dark = Math.max(night, caveVisible ? 0.5 : 0);
   c.save();
   c.globalCompositeOperation = 'lighter';

@@ -81,6 +81,29 @@ export interface ResourceNode extends Point {
   depletedUntil: number;
   phase: number;
   underground?: boolean;
+  /** When the node was last struck, for the hit shake. */
+  hitAt?: number;
+  /** When a tree was felled; it topples, then stands as a stump until it regrows. */
+  felledAt?: number;
+  /** Which way a felled tree falls: 1 east, -1 west. */
+  fallDir?: number;
+}
+/** Materials lying in the world, waiting to be picked up. */
+export interface Drop extends Point {
+  id: number;
+  item: string;
+  qty: number;
+  vx: number;
+  vy: number;
+  /** Game time the drop appeared; drops cannot be collected for a moment after. */
+  born: number;
+  resting: boolean;
+}
+/** A passing event for the renderer and audio: felling, crumbling, chips, pickups. */
+export interface WorldEvent extends Point {
+  type: 'chip' | 'fell' | 'crumble' | 'dig' | 'pickup' | 'sizzle';
+  kind: string;
+  dir?: number;
 }
 export interface Animal extends Point {
   id: number;
@@ -95,6 +118,9 @@ export interface Animal extends Point {
   deadUntil: number;
   warning: number;
   phase: number;
+  /** Cave tunnel a flier patrols, or the underground floor a walker keeps to. */
+  tunnel?: number;
+  underground?: boolean;
   companion?: boolean;
   hitAt?: number;
   howlAt?: number;
@@ -114,6 +140,8 @@ export interface FieldCache extends Point {
   id: number;
   opened: boolean;
   biome: string;
+  /** Set for caches found underground, which hold deeper supplies. */
+  layer?: string;
 }
 export interface Player extends Point {
   vx: number;
@@ -125,6 +153,7 @@ export interface Player extends Point {
   cloak: boolean;
   coat: boolean;
   boots: boolean;
+  ward?: boolean;
   attackAt: number;
   invuln: number;
 }
@@ -166,6 +195,9 @@ export interface GameState {
   structures: Structure[];
   caches: FieldCache[];
   tiles: number[];
+  /** Tiles changed from the generated world, by index; saves store only these. */
+  tileEdits: Record<number, number>;
+  drops: Drop[];
   effects: unknown[];
   tutorial: { step: number; tally: Record<string, number> };
   chapter: number;

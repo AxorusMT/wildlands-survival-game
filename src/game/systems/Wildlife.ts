@@ -3,12 +3,29 @@ import type { Animal } from '../../core/types.ts';
 import { BOSSES } from '../../data/bosses.ts';
 import { itemName } from '../../data/items.ts';
 import { WEAPONS } from '../../data/resources.ts';
-import { WORLD_W, caveY } from '../../data/world.ts';
+import { LAVA_Y, WORLD_W, caveY, underworldFloor } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
 
+const ANIMAL_NAMES: Record<string, string> = {
+  deer: 'Deer',
+  wolf: 'Wolf',
+  boar: 'Boar',
+  bat: 'Bat',
+  scorpion: 'Scorpion',
+  ember_bat: 'Ember bat',
+  hellhound: 'Hellhound',
+};
+
 export class Wildlife extends System {
+  /** Where an animal stands (or hovers) at x: its tunnel, the underworld floor, or the ground. */
+  restY(a: Animal, x: number) {
+    if (a.tunnel) return caveY(x, a.tunnel) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
+    if (a.type === 'bat') return caveY(x, 1) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
+    if (a.underground) return this.game.floorNear(x, underworldFloor(x) - 20);
+    return this.game.groundTopAt(x) - 1;
+  }
   attack() {
     if (this.game.s.dead) return { ok: false, reason: 'You must recover first.' };
     const p = this.game.s.player,
@@ -42,7 +59,9 @@ export class Wildlife extends System {
     this.game.say(
       itemName(p.weapon) +
         ' struck ' +
-        (target.type === 'boss' ? BOSSES[this.game.s.altar.level - 1].name : 'a ' + target.type) +
+        (target.type === 'boss'
+          ? BOSSES[this.game.s.altar.level - 1].name
+          : 'a ' + (ANIMAL_NAMES[target.type] || target.type).toLowerCase()) +
         ' for ' +
         Math.round(damage) +
         '.',
@@ -67,16 +86,25 @@ export class Wildlife extends System {
         'victory',
       );
     } else {
-      if (animal.type === 'bat') {
-        this.game.add('chitin', 2);
-        this.game.add('feathers', 1);
+      const at = animal.x === undefined ? this.game.s.player : animal,
+        loot = (id: string, qty: number) => this.game.drops.spawn(id, qty, at.x, at.y - 20);
+      if (animal.type === 'ember_bat') {
+        loot('sulfur', 2);
+        loot('chitin', 2);
+      } else if (animal.type === 'hellhound') {
+        loot('hide', 3);
+        loot('bone', 3);
+        loot('hellstone', 1 + Math.floor(this.game.rng() * 2));
+      } else if (animal.type === 'bat') {
+        loot('chitin', 2);
+        loot('feathers', 1);
       } else if (animal.type === 'scorpion') {
-        this.game.add('chitin', 3);
-        this.game.add('venom', 1);
+        loot('chitin', 3);
+        loot('venom', 1);
       } else {
-        this.game.add('raw_meat', animal.type === 'boar' ? 5 : 3);
-        this.game.add('hide', 2);
-        this.game.add('bone', animal.type === 'wolf' ? 2 : 1);
+        loot('raw_meat', animal.type === 'boar' ? 5 : 3);
+        loot('hide', 2);
+        loot('bone', animal.type === 'wolf' ? 2 : 1);
       }
       if (
         animal.type === 'wolf' &&
@@ -96,17 +124,26 @@ export class Wildlife extends System {
         a.deadUntil = 0;
         a.hp = a.maxHp;
         a.x = a.homeX + (this.game.rng() - 0.5) * 180;
-        a.y = a.type === 'bat' ? caveY(a.x, 1) : this.game.groundTopAt(a.x) - 1;
+        a.y = this.restY(a, a.x);
       }
       return;
     }
     const p = this.game.s.player,
       d = dist(a, p),
       boss = a.type === 'boss';
-    const aggressive = ['wolf', 'boar', 'scorpion', 'bat', 'boss'].includes(a.type);
+    const aggressive = [
+      'wolf',
+      'boar',
+      'scorpion',
+      'bat',
+      'boss',
+      'ember_bat',
+      'hellhound',
+    ].includes(a.type);
+    const range = boss ? 350 : a.type === 'bat' ? 145 : a.type === 'hellhound' ? 300 : 210;
     let vx = 0;
     if (a.type === 'deer' && d < 175) vx = Math.sign(a.x - p.x);
-    else if (aggressive && d < (boss ? 350 : a.type === 'bat' ? 145 : 210) && !this.game.s.dead) {
+    else if (aggressive && d < range && !this.game.s.dead) {
       vx = Math.sign(p.x - a.x);
       if (Math.abs(a.x - p.x) < (boss ? 75 : 30)) vx = 0;
       if (d < (boss ? 94 : 45) && this.game.s.elapsed >= a.attackAt) {
@@ -132,11 +169,15 @@ export class Wildlife extends System {
       if (dist(a, p) < (boss ? 108 : 55) && p.invuln <= 0 && !this.game.s.dead) {
         const damage = boss
           ? BOSSES[this.game.s.altar.level - 1].bite
-          : a.type === 'boar'
-            ? 14
-            : a.type === 'scorpion'
-              ? 8
-              : 9;
+          : a.type === 'hellhound'
+            ? 26
+            : a.type === 'ember_bat'
+              ? 15
+              : a.type === 'boar'
+                ? 14
+                : a.type === 'scorpion'
+                  ? 8
+                  : 9;
         this.game.s.vitals.health -= damage * (p.cloak ? 0.68 : p.coat ? 0.82 : 1);
         this.game.s.vitals.morale = clamp(
           this.game.s.vitals.morale - (boss ? 9 : 4),
@@ -151,7 +192,7 @@ export class Wildlife extends System {
         )
           this.game.contract('wound');
         this.game.say(
-          (boss ? 'Direwolf' : a.type[0].toUpperCase() + a.type.slice(1)) +
+          (boss ? 'Direwolf' : ANIMAL_NAMES[a.type] || a.type) +
             ' attack! ' +
             Math.round(damage * (p.cloak ? 0.68 : p.coat ? 0.82 : 1)) +
             ' damage.',
@@ -175,17 +216,25 @@ export class Wildlife extends System {
           : 32
         : boss
           ? 85
-          : a.type === 'scorpion'
-            ? 67
-            : d < 210
-              ? 105
-              : 30;
+          : a.type === 'hellhound'
+            ? d < range
+              ? 150
+              : 45
+            : a.type === 'ember_bat'
+              ? d < range
+                ? 135
+                : 40
+              : a.type === 'scorpion'
+                ? 67
+                : d < 210
+                  ? 105
+                  : 30;
     if (Math.abs(vx) > 0.5) a.angle = vx > 0 ? 0 : Math.PI;
-    a.x = clamp(a.x + vx * speed * dt, 20, WORLD_W - 20);
-    a.y =
-      a.type === 'bat'
-        ? caveY(a.x, 1) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13
-        : this.game.groundTopAt(a.x) - 1;
+    const nx = clamp(a.x + vx * speed * dt, 20, WORLD_W - 20);
+    // Hounds of the underworld never wade into the lava; they turn at the shore.
+    if (a.underground && underworldFloor(nx) > LAVA_Y - 6) a.angle = a.angle ? 0 : Math.PI;
+    else a.x = nx;
+    a.y = this.restY(a, a.x);
     for (const st of this.game.s.structures)
       if (
         st.type === 'spike_trap' &&

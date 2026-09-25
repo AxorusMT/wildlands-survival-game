@@ -24,16 +24,7 @@ import {
   glow,
   limb,
 } from './graphics.ts';
-import {
-  ART,
-  BIOME_STEP,
-  FIRST_CENTER,
-  blendAt,
-  artAt,
-  daylight,
-  duskiness,
-  overcastOf,
-} from './palette.ts';
+import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
 import { leaf } from './resources.ts';
 import type { Canvas2D, Motion, RenderGame } from './types.ts';
 import type { Animal, Player } from '../core/types.ts';
@@ -477,7 +468,15 @@ export function drawAnimal(c: Canvas2D, g: RenderGame, a: Animal, x: number, y: 
     hurt = t - m.hurt < 0.16;
   c.save();
   c.translate(x + (hurt ? Math.sin(t * 90) * 2 : 0), y + 1);
-  if (a.type !== 'bat') ellipse(c, 0, 0, boss ? 44 : 24, boss ? 6 : 4, 'rgba(15,15,12,0.25)');
+  if (a.type !== 'bat' && a.type !== 'ember_bat')
+    ellipse(
+      c,
+      0,
+      0,
+      boss ? 44 : a.type === 'hellhound' ? 32 : 24,
+      boss ? 6 : 4,
+      'rgba(15,15,12,0.25)',
+    );
   c.scale(facing, 1);
   if (hurt) c.filter = 'brightness(1.9) saturate(0.4)';
   if (boss) {
@@ -504,10 +503,36 @@ export function drawAnimal(c: Canvas2D, g: RenderGame, a: Animal, x: number, y: 
     drawWolf(c, m, t, a, '#7b8284', a.warning > 0 ? '#e0624a' : '#e8c46a');
   else if (a.type === 'boar') drawBoar(c, m, t, a);
   else if (a.type === 'bat') drawBat(c, t, a);
-  else if (a.type === 'scorpion') drawScorpion(c, m, t, a);
+  else if (a.type === 'ember_bat') {
+    // A bat of the upper hell: charred, ember-veined, trailing sparks.
+    glow(c, 0, -24, 34, '#ff7a2a', 0.35 + Math.sin(t * 9 + a.phase) * 0.1);
+    c.filter = hurt
+      ? 'brightness(1.9)'
+      : 'sepia(1) saturate(3.2) hue-rotate(-28deg) brightness(0.85)';
+    drawBat(c, t, a);
+    c.filter = 'none';
+    glow(c, 5, -2, 5, '#ffd27a', 0.9);
+  } else if (a.type === 'hellhound') {
+    // A hound of the underworld: a big, black-red wolf with burning eyes and a smoking back.
+    glow(c, 0, -30, 70, '#ff4a1a', 0.18 + Math.sin(t * 4 + a.phase) * 0.05);
+    c.scale(1.3, 1.3);
+    drawWolf(c, m, t, a, '#5e2428', a.warning > 0 ? '#fff0a0' : '#ff7a2a');
+    for (let i = 0; i < 4; i++) {
+      const k = (t * 0.9 + i * 0.25 + a.phase) % 1;
+      ellipse(c, -10 + i * 7, -40 - k * 26, 3 + k * 5, 2 + k * 4, rgba('#5a4442', 0.35 * (1 - k)));
+    }
+  } else if (a.type === 'scorpion') drawScorpion(c, m, t, a);
   c.filter = 'none';
   c.restore();
-  const top: Record<string, number> = { deer: 100, wolf: 56, boar: 50, bat: 50, scorpion: 60 };
+  const top: Record<string, number> = {
+    deer: 100,
+    wolf: 56,
+    boar: 50,
+    bat: 50,
+    scorpion: 60,
+    ember_bat: 50,
+    hellhound: 76,
+  };
   if (!boss && a.hp < a.maxHp && a.hp > 0) {
     const by = y - (top[a.type] || 60) - 6;
     c.fillStyle = 'rgba(30,25,20,0.65)';
@@ -572,7 +597,7 @@ export function drawWeapon(c: Canvas2D, weapon: string, t: number) {
 export function drawPlayer(c: Canvas2D, p: Player, x: number, y: number, t: number) {
   const m = track(-1, p.x, p.y, 0, t),
     facing = Math.cos(p.face) >= 0 ? 1 : -1,
-    shaft = D.ENTRANCES.some((e) => Math.abs(p.x - e) < 47) && p.y > D.surfaceAt(p.x) + 8,
+    shaft = D.inShaft(p.x, p.y) && p.y > D.surfaceAt(p.x) + 8,
     climbing = shaft && !p.grounded,
     air = !p.grounded && !climbing,
     walking = p.grounded ? m.move : 0,

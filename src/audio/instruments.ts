@@ -14,6 +14,7 @@ export interface Kit {
   noise: AudioBuffer;
   pulse25: PeriodicWave;
   pulse12: PeriodicWave;
+  organ: PeriodicWave;
   drive: Float32Array<ArrayBuffer>;
   fuzz: Float32Array<ArrayBuffer>;
 }
@@ -90,6 +91,24 @@ function pulseWave(ctx: BaseAudioContext, duty: number) {
   return ctx.createPeriodicWave(real, imag);
 }
 
+/** Full pipe-organ registration: 8', 4', 2 2/3', 2', 1 3/5', and 1' ranks in one waveform. */
+function organWave(ctx: BaseAudioContext) {
+  const ranks: Record<number, number> = {
+      1: 1,
+      2: 0.75,
+      3: 0.45,
+      4: 0.55,
+      5: 0.2,
+      6: 0.3,
+      8: 0.35,
+    },
+    n = 12,
+    real = new Float32Array(n),
+    imag = new Float32Array(n);
+  for (const [h, a] of Object.entries(ranks)) imag[+h] = a;
+  return ctx.createPeriodicWave(real, imag);
+}
+
 function shaper(amount: number) {
   const curve = new Float32Array(1024);
   for (let i = 0; i < curve.length; i++) {
@@ -114,6 +133,7 @@ export function kit(ctx: BaseAudioContext): Kit {
       noise,
       pulse25: pulseWave(ctx, 0.25),
       pulse12: pulseWave(ctx, 0.125),
+      organ: organWave(ctx),
       drive: shaper(2.2),
       fuzz: shaper(14),
     };
@@ -596,6 +616,86 @@ const epiano: Instrument = {
 };
 
 /** "Aah" choir: detuned saws through a vowel formant bank on the part. */
+/** Pipe organ with a breathy chiff at the start of each note and a slow tremulant. */
+const organ: Instrument = {
+  cutoff: 7000,
+  vibrato: 6.4,
+  voice: (k, out, t, m, dur, v) => {
+    const f = hz(m);
+    const { g, end } = adsr(k, t, dur, 0.035, 0.2, 0.92, 0.18, 0.075 * v);
+    const a = osc(k, k.organ, f, t, end),
+      b = osc(k, k.organ, f, t, end, 5);
+    vibrato(out, [a, b], f, t, 5, 0.05);
+    a.connect(g);
+    b.connect(g);
+    g.connect(out.node);
+    const chiff = perc(k, t, 0.05 * v, 0.06),
+      bp = filter(k, 'bandpass', Math.min(f * 4, 9000), 2);
+    noise(k, t, t + 0.12)
+      .connect(bp)
+      .connect(chiff.g)
+      .connect(out.node);
+  },
+};
+
+/** A vowel formant bank for a part; `vowel` is [frequency, Q, level] per formant. */
+function formants(k: Kit, vowel: number[][]) {
+  const input = gain(k, 1),
+    output = gain(k, 1);
+  for (const [freq, q, level] of vowel) {
+    const bp = filter(k, 'bandpass', freq, q);
+    input.connect(bp).connect(gain(k, level)).connect(output);
+  }
+  return { input, output };
+}
+
+/** Low male voices on a dark "oh", for chanting. */
+const chant: Instrument = {
+  vibrato: 4.6,
+  insert: (k) =>
+    formants(k, [
+      [430, 7, 1],
+      [820, 8, 0.6],
+      [2700, 10, 0.12],
+    ]),
+  voice: (k, out, t, m, dur, v) => {
+    const f = hz(m);
+    const {
+      gs: [l, r],
+      end,
+    } = adsrN(2, k, t, dur, 0.09, 0.4, 0.85, 0.3, 0.2 * v);
+    const oscs = [-10, 0, 10].map((c) => osc(k, 'sawtooth', f, t, end, c));
+    if (dur > 0.4) vibrato(out, oscs, f, t, 9, 0.3);
+    oscs[0].connect(l);
+    oscs[1].connect(l);
+    oscs[1].connect(r);
+    oscs[2].connect(r);
+    l.connect(out.left);
+    r.connect(out.right);
+  },
+};
+
+/** A church bell tolling: hum, prime, minor-third tierce, quint, and nominal partials. */
+const toll: Instrument = {
+  voice: (k, out, t, m, _dur, v) => {
+    const f = hz(m);
+    for (const [ratio, level, decay] of [
+      [0.5, 0.5, 5],
+      [1, 0.8, 4],
+      [1.2, 0.45, 2.6],
+      [1.5, 0.3, 2.2],
+      [2, 0.5, 1.8],
+      [2.66, 0.2, 1],
+    ]) {
+      const e = perc(k, t, 0.06 * v * level, decay, 0.004);
+      osc(k, 'sine', f * ratio, t, e.end)
+        .connect(e.g)
+        .connect(out.node);
+    }
+    click(k, out.node, t, 2400, 0.08 * v, 0.05, 1.5);
+  },
+};
+
 const choir: Instrument = {
   vibrato: 5,
   insert: (k) => {
@@ -682,7 +782,7 @@ const guitar: Instrument = {
     const pre = gain(k, 3),
       ws = k.ctx.createWaveShaper(),
       mid = filter(k, 'peaking', 700, 1),
-      post = gain(k, 0.35);
+      post = gain(k, 0.2);
     ws.curve = k.fuzz;
     mid.gain.value = -5;
     return insertChain(pre, ws, mid, post);
@@ -1006,6 +1106,9 @@ export const INSTRUMENTS = {
   marimba,
   epiano,
   choir,
+  chant,
+  organ,
+  toll,
   howl,
   orchhit,
   guitar,

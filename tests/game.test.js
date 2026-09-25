@@ -21,17 +21,17 @@ const station = (game, type) =>
 
 test('long side-view world has shaped terrain, connected caves, and nearby starter resources', () => {
   const g = fresh();
-  assert.equal(D.WORLD_W, 10800);
-  assert.equal(D.WORLD_H, 1920);
+  assert.equal(D.WORLD_W, 30000);
+  assert.equal(D.WORLD_H, 4480);
   assert.equal(g.biome().id, 'meadow');
   assert.ok(
-    Math.max(...[2200, 2350, 2500, 2650, 2800].map(D.surfaceAt)) -
-      Math.min(...[2200, 2350, 2500, 2650, 2800].map(D.surfaceAt)) >
+    Math.max(...[7000, 7300, 7600, 7900, 8200].map(D.surfaceAt)) -
+      Math.min(...[7000, 7300, 7600, 7900, 8200].map(D.surfaceAt)) >
       20,
   );
   assert.equal(D.baseTileAt(130, 0), 0);
   assert.equal(D.caveAt(D.ENTRANCES[3], D.caveY(D.ENTRANCES[3], 2)), true);
-  assert.ok(g.s.tiles.length > 20000);
+  assert.ok(g.s.tiles.length > 100000);
   for (const kind of ['wood', 'stone', 'fiber', 'flint', 'water'])
     assert.ok(
       g.s.nodes.some(
@@ -218,12 +218,15 @@ test('gravity, jumping, shaft descent, and close-range mining work', () => {
   g.s.player.grounded = false;
   for (let i = 0; i < 160; i++) g.move(0, 1, 0.016);
   assert.ok(g.s.player.y > D.caveY(ex, 1));
-  g.s.player.x = 4200;
-  g.s.player.y = g.groundTopAt(4200) - 1;
-  const tx = Math.floor(4245 / D.TILE),
-    ty = Math.floor(D.surfaceAt(4245) / D.TILE) + 1;
+  const mx = D.BIOME_CENTERS.meadow[0] + 400;
+  g.s.player.x = mx;
+  g.s.player.y = g.groundTopAt(mx) - 1;
+  const tx = Math.floor((mx + 45) / D.TILE),
+    ty = Math.floor(D.surfaceAt(mx + 45) / D.TILE) + 1;
   const before = g.count('dirt');
   assert.equal(g.mineTileAt(tx * D.TILE + 16, ty * D.TILE + 16).ok, true);
+  // The earth pops out as a pickup and flies to the player.
+  for (let i = 0; i < 120; i++) g.tick(1 / 60);
   assert.equal(g.count('dirt'), before + 1);
   assert.equal(g.tileAt(tx, ty), 0);
 });

@@ -24,16 +24,7 @@ import {
   glow,
   limb,
 } from './graphics.ts';
-import {
-  ART,
-  BIOME_STEP,
-  FIRST_CENTER,
-  blendAt,
-  artAt,
-  daylight,
-  duskiness,
-  overcastOf,
-} from './palette.ts';
+import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
 import type { Canvas2D, RenderGame } from './types.ts';
 import type { Point } from '../core/types.ts';
 
@@ -57,6 +48,9 @@ export const BASE: Record<number, string> = {
   5: '#b7ccd2',
   6: '#9a5f4a',
   7: '#2f2a35',
+  8: '#4b566a',
+  9: '#6e4038',
+  10: '#5c2230',
 };
 export function chunkSig(g: RenderGame, cx: number, cy: number) {
   let s = 17;
@@ -106,7 +100,13 @@ export function renderBack(g: RenderGame, cx: number, cy: number, scale: number)
             ? '#27313a'
             : '#242a30';
       const earth = biome === 'desert' ? '#4a3b2b' : biome === 'badlands' ? '#4a3029' : '#3b3028';
-      const col = mix(earth, rock, smooth(30, 170, depth));
+      // Deeper layers: cold blue-black stone, then scorched ash, then the red dark of hell.
+      const deep = mix(
+        mix(rock, '#1b2130', smooth(D.LAYERS[2].top - 150, D.LAYERS[2].top + 150, y)),
+        mix('#1f0f0d', '#140507', smooth(D.LAYERS[4].top - 150, D.LAYERS[4].top + 150, y)),
+        smooth(D.LAYERS[3].top - 150, D.LAYERS[3].top + 150, y),
+      );
+      const col = mix(earth, deep, smooth(30, 170, depth));
       k.fillStyle = col;
       k.fillRect(x, y, T + 0.6, T + 0.6);
       // Faint rock plates give the back wall depth without competing with the solid ground.
@@ -279,8 +279,8 @@ export function textureMaterial(
   const left = x0 * T,
     top = y0 * T;
   // Continuous strata lines drawn in world space so they flow across tiles.
-  if (look === 2 || look === 6 || look === 5 || look === 7) {
-    const gap = look === 6 ? 11 : look === 5 ? 15 : 23;
+  if (look === 2 || look === 6 || look === 5 || look === 7 || look >= 8) {
+    const gap = look === 6 ? 11 : look === 5 ? 15 : look === 10 ? 17 : look === 9 ? 13 : 23;
     for (let yy = top - gap; yy < top + CPX + gap; yy += gap) {
       k.beginPath();
       for (let xx = left - 8; xx <= left + CPX + 8; xx += 16) {
@@ -386,6 +386,56 @@ export function textureMaterial(
             '#6e5a8c',
           );
         }
+      } else if (look === 8) {
+        // Deepstone: dense blue-grey slabs with glints of mica.
+        blobPath(
+          k,
+          x + 8 + r(1) * 16,
+          y + 8 + r(2) * 16,
+          8 + r(3) * 5,
+          5 + r(4) * 3,
+          tx * 17 + ty,
+          0.2,
+        );
+        k.fillStyle = shade(base, 0.06);
+        k.fill();
+        k.strokeStyle = rgba(shade(base, -0.35), 0.5);
+        k.lineWidth = 1;
+        k.stroke();
+        if (r(5) < 0.45) ellipse(k, x + r(6) * T, y + r(7) * T, 1.3, 1.3, '#b9d2e6');
+        if (r(8) < 0.2) ellipse(k, x + r(9) * T, y + r(10) * T, 1.6, 1.1, '#e8f1f8');
+      } else if (look === 9) {
+        // Ash rock: crumbly, cracked, with embers still glowing in the seams.
+        k.strokeStyle = rgba('#2a1512', 0.7);
+        k.lineWidth = 1.1;
+        k.beginPath();
+        k.moveTo(x + r(1) * T, y);
+        k.lineTo(x + r(2) * T, y + 14 + r(3) * 6);
+        k.lineTo(x + r(4) * T, y + T);
+        k.stroke();
+        for (let i = 0; i < 3; i++)
+          ellipse(k, x + r(i + 5) * T, y + r(i + 8) * T, 2.5, 1.6, shade(base, 0.12));
+        if (r(11) < 0.35) {
+          ellipse(k, x + r(12) * T, y + r(13) * T, 1.6, 1.6, '#ff8a3a');
+          ellipse(k, x + r(12) * T, y + r(13) * T, 3.4, 3.4, rgba('#ff6a1a', 0.25));
+        }
+      } else if (look === 10) {
+        // Hellrock: near-black crimson split by molten veins.
+        if (r(1) < 0.5) {
+          const vx = x + r(2) * T;
+          k.strokeStyle = rgba('#ff5a1f', 0.75);
+          k.lineWidth = 1.4;
+          k.beginPath();
+          k.moveTo(vx, y);
+          k.quadraticCurveTo(vx + (r(3) - 0.5) * 20, y + 16, vx + (r(4) - 0.5) * 14, y + T);
+          k.stroke();
+          k.strokeStyle = rgba('#ffc46a', 0.5);
+          k.lineWidth = 0.6;
+          k.stroke();
+        }
+        blobPath(k, x + 16, y + 16, 9 + r(5) * 5, 6 + r(6) * 4, tx * 7 + ty * 3, 0.3);
+        k.fillStyle = shade(base, -0.08);
+        k.fill();
       } else if (look === 3) {
         for (let i = 0; i < 3; i++) {
           const yy = y + 5 + i * 10 + r(i) * 4;
@@ -626,6 +676,7 @@ export function drawTerrain(c: Canvas2D, g: RenderGame, cam: Point, w: number, h
   for (const [ch, cx, cy] of visible)
     if (ch.back)
       c.drawImage(ch.back, snap(cx * CPX - cam.x), snap(cy * CPX - cam.y), CPX + 0.5, CPX + 0.5);
+  drawLava(c, g, cam, w, h);
   for (const [ch, cx, cy] of visible)
     if (ch.front)
       c.drawImage(
@@ -636,22 +687,71 @@ export function drawTerrain(c: Canvas2D, g: RenderGame, cam: Point, w: number, h
         CPX + PAD * 2,
       );
 }
-export function drawLadders(c: Canvas2D, cam: Point, w: number) {
-  for (const ex of D.ENTRANCES) {
-    const sx = ex - cam.x;
+/** Molten rock, drawn live so it churns and glows. */
+export function drawLava(c: Canvas2D, g: RenderGame, cam: Point, w: number, h: number) {
+  if (cam.y + h < 3400) return;
+  const now = performance.now() / 1000,
+    tx0 = Math.floor(cam.x / T),
+    tx1 = Math.ceil((cam.x + w) / T),
+    ty0 = Math.max(0, Math.floor(cam.y / T)),
+    ty1 = Math.min(D.TILE_ROWS - 1, Math.ceil((cam.y + h) / T));
+  const lava = (tx: number, ty: number) =>
+    !g.tileAt(tx, ty) && D.lavaAt(tx * T + T / 2, ty * T + T / 2);
+  for (let tx = tx0; tx <= tx1; tx++)
+    for (let ty = ty0; ty <= ty1; ty++) {
+      if (!lava(tx, ty)) continue;
+      const x = tx * T - cam.x,
+        y = ty * T - cam.y,
+        top = !lava(tx, ty - 1);
+      const gr = c.createLinearGradient(0, y, 0, y + T);
+      gr.addColorStop(0, top ? '#ffb347' : '#f0661e');
+      gr.addColorStop(1, '#c2330f');
+      c.fillStyle = gr;
+      c.fillRect(x, y, T + 0.5, T + 0.5);
+      // Slow crust plates drift across the melt.
+      const drift = Math.sin(now * 0.6 + tx * 0.9 + ty * 1.7);
+      ellipse(c, x + 16 + drift * 6, y + 18, 7, 3, rgba('#7a1d0c', 0.45));
+      if (top) {
+        c.beginPath();
+        c.moveTo(x, y + 4);
+        for (let i = 0; i <= 4; i++)
+          c.lineTo(x + (i * T) / 4, y + 3 + Math.sin(now * 2.4 + (tx * 4 + i) * 0.8) * 2.5);
+        c.lineTo(x + T, y + 8);
+        c.lineTo(x, y + 8);
+        c.closePath();
+        c.fillStyle = '#ffe08a';
+        c.fill();
+        glow(c, x + 16, y + 2, 34, '#ff7a2a', 0.22);
+      }
+    }
+}
+/** Ladders down every shaft, with a rope-lashed frame over each surface mouth. */
+export function drawLadders(c: Canvas2D, cam: Point, w: number, h: number) {
+  for (const shaft of D.SHAFTS) {
+    const sx = shaft.x - cam.x;
     if (sx < -90 || sx > w + 90) continue;
-    const y1 = D.surfaceAt(ex) - cam.y - 24,
-      y2 = D.caveY(ex, 3) + 40 - cam.y;
+    const surface = shaft.top < D.surfaceAt(shaft.x) + 20,
+      y1 = (surface ? D.surfaceAt(shaft.x) - 24 : shaft.top) - cam.y,
+      y2 = shaft.bottom + 40 - cam.y;
+    if (y2 < -40 || y1 > h + 40) continue;
+    const deep = shaft.top > D.LAYERS[3].top,
+      wood = deep ? '#4a3a3a' : '#7a5d42',
+      rung = deep ? '#6d5250' : '#a58560';
     for (const rx of [-22, 22]) {
       line(c, sx + rx, y1, sx + rx, y2, INK, 7);
-      line(c, sx + rx, y1, sx + rx, y2, '#7a5d42', 4.5);
-      line(c, sx + rx - 1, y1, sx + rx - 1, y2, '#9a7a56', 1.3);
+      line(c, sx + rx, y1, sx + rx, y2, wood, 4.5);
+      line(c, sx + rx - 1, y1, sx + rx - 1, y2, shade(wood, 0.2), 1.3);
     }
-    for (let y = y1 + 14; y < y2; y += 20) {
+    for (
+      let y = Math.max(y1 + 14, y1 + 14 + Math.floor((-40 - y1) / 20) * 20);
+      y < Math.min(y2, h + 40);
+      y += 20
+    ) {
       line(c, sx - 22, y + 2, sx + 22, y + 2, 'rgba(0,0,0,0.3)', 3);
       line(c, sx - 22, y, sx + 22, y, INK, 5);
-      line(c, sx - 22, y, sx + 22, y, '#a58560', 3);
+      line(c, sx - 22, y, sx + 22, y, rung, 3);
     }
+    if (!surface) continue;
     // A rope-lashed frame marks the shaft mouth from the surface.
     line(c, sx - 30, y1 + 26, sx - 26, y1 - 30, INK, 6);
     line(c, sx + 30, y1 + 26, sx + 26, y1 - 30, INK, 6);

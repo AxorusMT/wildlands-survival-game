@@ -24,16 +24,7 @@ import {
   glow,
   limb,
 } from './graphics.ts';
-import {
-  ART,
-  BIOME_STEP,
-  FIRST_CENTER,
-  blendAt,
-  artAt,
-  daylight,
-  duskiness,
-  overcastOf,
-} from './palette.ts';
+import { ART, blendAt, artAt, daylight, duskiness, overcastOf } from './palette.ts';
 import { leaf, crystalPrism } from './resources.ts';
 import type { Canvas2D, RenderGame } from './types.ts';
 import type { Structure } from '../core/types.ts';
