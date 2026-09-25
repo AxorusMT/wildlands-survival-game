@@ -46,7 +46,10 @@ export class Ailments extends System {
     if (source === 'spoiled' && sk.ironGut > 0) return false;
     if (id === 'frostbite' && sk.coldBlooded) return false;
     // Hale bodies and a wayfarer's kit sometimes shrug a sickness off.
-    const resist = sk.disease + (this.game.equipment.has('wayfarer') ? 0.2 : 0);
+    const resist =
+      sk.disease +
+      (this.game.equipment.has('wayfarer') ? 0.2 : 0) +
+      (this.game.equipment.fullSet() === 'plaguedoctor' ? 0.15 : 0);
     if (!now && def.kind !== 'injury' && this.game.rng() < Math.min(0.7, resist)) return false;
     // An iron gut shrugs off half of what it eats and drinks.
     if (

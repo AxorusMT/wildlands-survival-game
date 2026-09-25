@@ -31,14 +31,29 @@ export function drawTide(
       if (floor > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor) - Math.max(0, top));
     }
   } else {
-    c.fillStyle = 'rgba(40, 110, 120, 0.42)';
+    const kind = g.pocket.waterKind();
+    c.fillStyle =
+      kind === 'magma'
+        ? 'rgba(255, 110, 30, 0.62)'
+        : kind === 'deep'
+          ? 'rgba(20, 70, 110, 0.4)'
+          : 'rgba(40, 110, 120, 0.42)';
     c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
   }
+  const magma = g.pocket.waterKind() === 'magma';
   // A lighter band just under the surface, and a rippling (or sluggish, bubbling) crest line.
   const wet = (x: number) => !mire || D.surfaceAt((x + ax) * PX) / PX - ay > top + 1;
-  c.fillStyle = mire ? 'rgba(160, 170, 80, 0.55)' : 'rgba(120, 200, 200, 0.25)';
+  c.fillStyle = magma
+    ? 'rgba(255, 200, 80, 0.8)'
+    : mire
+      ? 'rgba(160, 170, 80, 0.55)'
+      : 'rgba(120, 200, 200, 0.25)';
   for (let x = x0; x < x1; x++) if (wet(x)) c.fillRect(x, Math.max(0, top), 1, 3);
-  c.fillStyle = mire ? 'rgba(214, 210, 140, 0.75)' : 'rgba(210, 245, 240, 0.7)';
+  c.fillStyle = magma
+    ? 'rgba(255, 240, 180, 0.9)'
+    : mire
+      ? 'rgba(214, 210, 140, 0.75)'
+      : 'rgba(210, 245, 240, 0.7)';
   const speed = mire ? 0.3 : 1;
   for (let x = x0; x < x1; x++) {
     if (!wet(x)) continue;
@@ -101,6 +116,26 @@ export function drawRealmAir(
     c.fillStyle = `rgba(255, 246, 220, ${(0.22 * guard * (0.85 + 0.15 * Math.sin(t * 1.3))).toFixed(2)})`;
     c.fillRect(0, 0, w, h);
   }
+  // The Garden's seasons tint the air: summer glare, autumn haze, winter snow.
+  const season = g.pocket.here() ? g.pocket.season() : null;
+  if (season && season.id !== 'spring') {
+    c.fillStyle =
+      season.id === 'summer'
+        ? 'rgba(255, 220, 140, 0.14)'
+        : season.id === 'autumn'
+          ? 'rgba(200, 110, 50, 0.12)'
+          : 'rgba(210, 230, 255, 0.18)';
+    c.fillRect(0, 0, w, h);
+    if (season.id !== 'summer') {
+      c.fillStyle =
+        season.id === 'winter' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(216, 112, 58, 0.8)';
+      for (let i = 0; i < 70; i++) {
+        const x = Math.floor((((hash(i, 41) * w + t * 14 * (hash(i, 42) - 0.3)) % w) + w) % w),
+          y = Math.floor((hash(i, 43) * h + t * (18 + hash(i, 44) * 20)) % h);
+        c.fillRect(x, y, season.id === 'winter' ? 1 : 2, 1);
+      }
+    }
+  }
   // The hymn: a cold blue haze and drifting notes.
   const hymn = g.pocket.hymnLevel();
   if (hymn > 0) {
@@ -116,7 +151,15 @@ export function drawRealmAir(
     }
   }
   const fall = g.pocket.pendingCaveIn();
-  if (fall?.kind === 'shards') {
+  if (fall?.kind === 'star') {
+    // A column of gathering starlight over the spot where the pulse will land.
+    const sx = Math.round(fall.x / PX - ax),
+      k = Math.max(0, 1 - (fall.at - g.s.elapsed) / 2.6);
+    c.fillStyle = `rgba(200, 210, 255, ${(0.12 + k * 0.3).toFixed(2)})`;
+    c.fillRect(sx - 40, 0, 80, h);
+    c.fillStyle = `rgba(255, 244, 208, ${(0.2 + k * 0.5).toFixed(2)})`;
+    c.fillRect(sx - 10, 0, 20, h);
+  } else if (fall?.kind === 'shards') {
     // A glint high in the crystal canopy, then the glass comes down.
     const sx = Math.round(fall.x / PX - ax),
       sy = Math.max(4, Math.round(fall.y / PX - ay));

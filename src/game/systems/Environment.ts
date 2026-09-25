@@ -25,9 +25,10 @@ export class Environment extends System {
       layer = layerAt(x, y);
     // Below ground the rock sets the temperature; only the upper mines feel the region above.
     if (layer.id === 'upper_mines') return layer.temp + b.temp * 0.25;
-    if (layer.id !== 'surface') return layer.temp;
+    if (layer.id !== 'surface') return layer.temp + this.game.pocket.seasonShift(x);
     return (
       b.temp +
+      this.game.pocket.seasonShift(x) +
       (this.isNight() ? -8 : 0) +
       (this.game.s.weather === 'rain' ? -4 : this.game.s.weather === 'storm' ? -7 : 0)
     );

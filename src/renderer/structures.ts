@@ -531,6 +531,19 @@ Object.assign(STATIC, {
       p.rect(8, 12, 6, 7, '#2a2630');
       p.shadeEdges(0.2, -0.3);
     }),
+  // A diving bell on the seabed: air for the Undertow.
+  diving_bell: () =>
+    sprite(34, 40, 17, 39, (p) => {
+      p.ellipse(17, 16, 15, 15, '#8a6a3a');
+      p.rect(2, 16, 30, 20, '#8a6a3a');
+      p.ellipse(17, 16, 12, 12, '#b8883a');
+      p.rect(5, 16, 24, 18, '#b8883a');
+      p.rect(0, 34, 34, 6, '#5a4028');
+      p.rect(10, 12, 14, 12, '#3a5a6a');
+      p.rect(11, 13, 5, 4, '#bfe8ff');
+      for (const x of [4, 29]) for (let y = 18; y < 34; y += 5) p.set(x, y, '#f0c870');
+      p.rect(15, 0, 4, 3, '#5a4028');
+    }),
   // A brass grille over a steam pipe (the Clockwork Barrow's traps).
   steam_vent: () =>
     sprite(30, 6, 15, 5, (p) => {
@@ -567,6 +580,12 @@ function chestSprite(kind: string, open: boolean): Sprite {
     barrow: ['#5a4028', '#f0c870'],
     saltflats: ['#b4a48e', '#f0c0c8'],
     choir: ['#5a6a7a', '#dfeaf6'],
+    feverlands: ['#4a5a2a', '#e6dcc6'],
+    observatory: ['#2a2e50', '#9ab0ff'],
+    gutter: ['#5a4a2a', '#f0c850'],
+    undertow: ['#2a4a5a', '#bfe8ff'],
+    emberheart: ['#3a1a10', '#ff8a3a'],
+    garden: ['#4a6a3a', '#f0a0c0'],
   };
   const [body, metal] = trim[kind] ?? ['#7a5a3c', '#d8b848'];
   return cached(`dchest:${kind}:${open}`, () =>

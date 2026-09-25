@@ -579,6 +579,15 @@ canvas.icon {
 .hud-renown {
   font: 400 11px var(--caps);
 }
+.hud-stat.air .hud-track i {
+  background: #7ac8f0;
+}
+.hud-stat.hidden {
+  display: none;
+}
+#hud.dreaming .hud-left .hud-track i {
+  filter: hue-rotate(80deg) saturate(1.4);
+}
 .hud-renown span {
   color: #a8402a;
 }

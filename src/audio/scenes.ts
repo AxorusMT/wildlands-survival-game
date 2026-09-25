@@ -34,6 +34,12 @@ const LAYER_TRACKS: Record<string, string> = {
   barrow: 'barrow',
   saltflats: 'saltflats',
   choir: 'choir',
+  feverlands: 'feverlands',
+  observatory: 'observatory',
+  gutter: 'gutter',
+  undertow: 'undertow',
+  emberheart: 'emberheart',
+  garden: 'garden',
 };
 /** Each dungeon's own music; the Citadel keeps the throne-room theme of lower hell. */
 const DUNGEON_TRACKS: Record<string, string> = {

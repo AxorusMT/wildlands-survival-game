@@ -38,7 +38,21 @@ export interface RealmCtx {
 }
 
 export interface RealmHazard {
-  id: 'tide' | 'ash' | 'cavein' | 'shards' | 'mire' | 'traps' | 'sun' | 'hymn';
+  id:
+    | 'tide'
+    | 'ash'
+    | 'cavein'
+    | 'shards'
+    | 'mire'
+    | 'traps'
+    | 'sun'
+    | 'hymn'
+    | 'fever'
+    | 'stars'
+    | 'curse'
+    | 'pressure'
+    | 'magma'
+    | 'seasons';
   name: string;
   /** What it does, for the Atlas and the banner. */
   text: string;

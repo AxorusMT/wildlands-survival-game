@@ -152,6 +152,8 @@ export class Equipment extends System {
     // Realm sets: bonewalker plate and amberguard add to the ward they carry.
     if (this.fullSet() === 'bonewalker') d += 3;
     if (this.fullSet() === 'amberguard') d += 2;
+    if (this.fullSet() === 'leviathan') d += 3;
+    if (this.fullSet() === 'forgeborn') d += 4;
     // A Phalanx spear or Juggernaut hammer guards you while it is your ready weapon.
     d += this.game.armoury.stats(this.game.s.player.weapon).defense;
     return d;
@@ -272,7 +274,7 @@ export class Equipment extends System {
       this.maxMana(),
     );
     let regen = 0;
-    if (fx.has('regen')) regen += 0.6;
+    if (fx.has('regen') || this.fullSet() === 'druid') regen += 0.6;
     if (fx.has('buff:regeneration')) regen += 1.2;
     if (fx.has('spores')) regen += 0.5;
     if (fx.has('home')) regen += 0.35;

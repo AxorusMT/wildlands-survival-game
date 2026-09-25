@@ -140,7 +140,11 @@ export class Armoury extends System {
       (melee ? sk.meleeDmg : 0) +
       (heavy ? sk.heavyDmg : 0) +
       (shooter ? sk.rangedDmg + (set === 'gearwright' ? 0.1 : 0) : 0) +
-      (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === 'prismweave' ? 0.1 : 0) : 0) +
+      (magic
+        ? sk.magicDmg +
+          (sk.elementalist ? 0.15 : 0) +
+          (set === 'prismweave' || set === 'astral' ? 0.1 : 0)
+        : 0) +
       mastery * 0.01 +
       (mastery >= 20 ? 0.1 : 0);
     const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);

@@ -219,6 +219,19 @@ export const RECIPES: Recipe[] = (
     ['barrow_key', { barrow_fragment: 3 }, 'waystone', 7],
     ['saltflats_key', { saltflats_fragment: 3 }, 'waystone', 7],
     ['choir_key', { choir_fragment: 3 }, 'waystone', 7],
+    // Band IV keys from Band III spoils; Band V from Band IV.
+    ['feverlands_fragment', { brass_ingot: 2, saltglass: 3, rime_silver: 2 }, 'starforge', 9],
+    ['observatory_fragment', { rime_silver: 3, prism_glass: 4, brass_ingot: 2 }, 'starforge', 9],
+    ['gutter_fragment', { gold_ingot: 6, brass_ingot: 2, saltglass: 2 }, 'starforge', 9],
+    ['undertow_fragment', { plague_ivory: 3, astral_lens: 2, crown_gold: 2 }, 'starforge', 10],
+    ['emberheart_fragment', { crown_gold: 3, astral_lens: 2, hellstone_ingot: 4 }, 'starforge', 10],
+    ['garden_fragment', { plague_ivory: 3, fever_bloom: 4, astral_lens: 2 }, 'starforge', 10],
+    ['feverlands_key', { feverlands_fragment: 3 }, 'waystone', 9],
+    ['observatory_key', { observatory_fragment: 3 }, 'waystone', 9],
+    ['gutter_key', { gutter_fragment: 3 }, 'waystone', 9],
+    ['undertow_key', { undertow_fragment: 3 }, 'waystone', 10],
+    ['emberheart_key', { emberheart_fragment: 3 }, 'waystone', 10],
+    ['garden_key', { garden_fragment: 3 }, 'waystone', 10],
     // The Drowned Orchard.
     ['tidecaller_spear', { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, 'workbench', 4],
     ['brine_wand', { brinewood: 6, tide_pearl: 4, crystal: 2 }, 'workbench', 4],
@@ -251,6 +264,27 @@ export const RECIPES: Recipe[] = (
     ['rime_silver', { rime_silver_ore: 3, coal: 1 }, 'furnace', 7],
     ['choir_stave', { rime_silver: 10, frost_lily: 4, crystal: 4 }, 'starforge', 9],
     ['bellhammer', { rime_silver: 12, bell_bronze: 4, wood: 3 }, 'starforge', 9],
+    ['respirator', { iron_ingot: 4, reeds: 6, crystal: 2, hide: 2 }, 'workbench', 5],
+    // The Feverlands.
+    ['venom_blade', { plague_ivory: 10, venom: 6, gold_ingot: 2 }, 'starforge', 9],
+    ['plague_censer', { plague_ivory: 8, fever_bloom: 6, silk: 4 }, 'starforge', 9],
+    ['fever_tonic', { fever_bloom: 3, boiled_water: 1 }, 'apothecary', 8],
+    // The Sunken Observatory.
+    ['astral_tome', { astral_lens: 10, silk: 6, fallen_star: 3 }, 'starforge', 10],
+    ['star_spear', { astral_lens: 8, starmetal_ingot: 4, wood: 3 }, 'starforge', 10],
+    // The Gutter of Kings.
+    ['gilded_greatblade', { crown_gold: 14, gold_ingot: 4, hide: 2 }, 'starforge', 10],
+    ['thiefs_whip', { crown_gold: 8, silk: 6, hide: 2 }, 'starforge', 9],
+    ['purging_salts', { salt: 4, herb: 2, crystal: 1 }, 'apothecary', 8],
+    // The Undertow.
+    ['leviathan_harpoon', { abyssal_pearl: 12, voidsteel_ingot: 3, wood: 3 }, 'starforge', 11],
+    ['tidebreaker', { abyssal_pearl: 12, voidsteel_ingot: 3, silk: 4 }, 'starforge', 11],
+    // Emberheart.
+    ['anvil_maul', { heartstone: 14, voidsteel_ingot: 3, wood: 3 }, 'starforge', 11],
+    ['heartfire_staff', { heartstone: 10, ruby: 3, crystal: 4 }, 'starforge', 11],
+    // The Garden of Lost Seasons.
+    ['season_bow', { seasonbloom: 10, wood: 6, silk: 4 }, 'starforge', 11],
+    ['thornlash', { seasonbloom: 12, hide: 3, silk: 3 }, 'starforge', 11],
     // ── Armour ──
     ...ARMOR_RECIPES,
     // ── The weapon hierarchy, and infusions ──

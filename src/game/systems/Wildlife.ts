@@ -110,7 +110,9 @@ export class Wildlife extends System {
             (0.6 + this.game.rng() * 0.8) *
             (spec.boss ? 3 : 1) *
             more *
-            (1 + this.game.skills.get('coins')),
+            (1 +
+              this.game.skills.get('coins') +
+              (this.game.equipment.fullSet() === 'gilded' ? 0.25 : 0)),
         ),
       );
       this.game.drops.spawn('coin', coins, at.x, at.y - 20);
@@ -449,6 +451,7 @@ export class Wildlife extends System {
       const thorns =
         this.game.skills.get('thorns') + (this.game.equipment.has('vanguard') ? 0.25 : 0);
       if (taken && thorns) this.game.combat.hurtMob(a, taken * thorns, p);
+      if (taken) this.game.pocket.feverBite();
       this.bite(a);
     }
     if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {

@@ -114,7 +114,7 @@ export class Survival extends System {
     const layer = this.game.layer().id,
       ward = this.game.s.player.ward ? 1 : 0,
       fx = this.game.equipment.effects();
-    if (fx.has('lava') || fx.has('buff:fireward')) return 0;
+    if (fx.has('lava') || fx.has('buff:fireward') || fx.has('forgeward')) return 0;
     const k = fx.has('heat') ? 0.5 : 1;
     if (layer === 'upper_hell') return RULES.upperHellHeat[ward] * k;
     if (layer === 'lower_hell') return RULES.lowerHellHeat[ward] * k;
@@ -127,6 +127,7 @@ export class Survival extends System {
     if (
       !this.game.inLava() ||
       fx.has('buff:fireward') ||
+      fx.has('forgeward') ||
       this.game.equipment.fullSet() === 'cinder'
     )
       return 0;
@@ -137,7 +138,10 @@ export class Survival extends System {
     const v = this.game.s.vitals,
       p = this.game.s.player;
     // Skills and a wayfarer's clothes shrug off some of the cold and the heat.
-    const air = this.game.temperature(),
+    // A druid's garb keeps the Garden's seasons off.
+    const air =
+        this.game.temperature() -
+        (this.game.equipment.has('seasonward') ? this.game.pocket.seasonShift() : 0),
       skills = this.game.skills.stats(),
       wayfarer = this.game.equipment.has('wayfarer') ? 4 : 0,
       coldResist =

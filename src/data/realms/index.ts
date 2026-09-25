@@ -1,6 +1,12 @@
 // Generated realms: templates, modifiers, and which one fills the pocket strip right now.
 import { BARROW } from './barrow.ts';
 import { CHOIR } from './choir.ts';
+import { EMBERHEART } from './emberheart.ts';
+import { FEVERLANDS } from './feverlands.ts';
+import { GARDEN } from './garden.ts';
+import { GUTTER } from './gutter.ts';
+import { OBSERVATORY } from './observatory.ts';
+import { UNDERTOW } from './undertow.ts';
 import { GLASSWOOD } from './glasswood.ts';
 import { MARCHES } from './marches.ts';
 import { ORCHARD } from './orchard.ts';
@@ -17,6 +23,11 @@ export { ashStorm } from './steppe.ts';
 export { ventActive } from './barrow.ts';
 export { hymnAt } from './choir.ts';
 export type { MarchesGeometry } from './marches.ts';
+export { FEVER_BITES, FEVER_CHANCE } from './feverlands.ts';
+export { starPulse } from './observatory.ts';
+export { AIR_SECONDS, type UndertowGeometry } from './undertow.ts';
+export { magmaLevel, type EmberGeometry } from './emberheart.ts';
+export { SEASONS, SEASON_SECONDS, seasonAt } from './garden.ts';
 
 /** Every realm a Waystone can open, band by band. */
 export const REALMS: RealmTemplate[] = [
@@ -28,6 +39,12 @@ export const REALMS: RealmTemplate[] = [
   BARROW,
   SALTFLATS,
   CHOIR,
+  FEVERLANDS,
+  OBSERVATORY,
+  GUTTER,
+  UNDERTOW,
+  EMBERHEART,
+  GARDEN,
 ];
 export const realmById = (id: string) => REALMS.find((r) => r.id === id);
 export const REALM_IDS = new Set(REALMS.map((r) => r.id));

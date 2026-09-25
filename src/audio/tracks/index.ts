@@ -27,6 +27,12 @@ import { marches } from './marches.ts';
 import { barrow } from './barrow.ts';
 import { saltflats } from './saltflats.ts';
 import { choir } from './choir.ts';
+import { feverlands } from './feverlands.ts';
+import { observatory } from './observatory.ts';
+import { gutter } from './gutter.ts';
+import { undertow } from './undertow.ts';
+import { emberheart } from './emberheart.ts';
+import { garden } from './garden.ts';
 import { town } from './town.ts';
 import { voidsong } from './voidsong.ts';
 
@@ -62,6 +68,12 @@ export const TRACK_LIST: Track[] = [
   barrow,
   saltflats,
   choir,
+  feverlands,
+  observatory,
+  gutter,
+  undertow,
+  emberheart,
+  garden,
 ];
 
 export const TRACKS: Record<string, Track> = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));

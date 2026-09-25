@@ -10,6 +10,7 @@
   var data_exports = {};
   __export(data_exports, {
     ACCESSORIES: () => ACCESSORIES,
+    AIR_SECONDS: () => AIR_SECONDS,
     AMMO: () => AMMO,
     ARMOR: () => ARMOR,
     ARMOR_ITEMS: () => ARMOR_ITEMS,
@@ -42,6 +43,8 @@
     ENTRANCES: () => ENTRANCES,
     EVOLUTIONS: () => EVOLUTIONS,
     FAMILIES: () => FAMILIES,
+    FEVER_BITES: () => FEVER_BITES,
+    FEVER_CHANCE: () => FEVER_CHANCE,
     FOOD: () => FOOD,
     GEMS: () => GEMS,
     GEN_ITEMS: () => GEN_ITEMS,
@@ -87,6 +90,8 @@
     ROOM_SIZE: () => ROOM_SIZE,
     ROW_POINTS: () => ROW_POINTS,
     RW: () => RW,
+    SEASONS: () => SEASONS,
+    SEASON_SECONDS: () => SEASON_SECONDS,
     SETTLERS: () => SETTLERS,
     SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
@@ -148,6 +153,7 @@
     lavaAt: () => lavaAt,
     layerAt: () => layerAt,
     layoutTile: () => layoutTile,
+    magmaLevel: () => magmaLevel,
     makeDimensions: () => makeDimensions,
     masteryFor: () => masteryFor,
     masteryLevel: () => masteryLevel,
@@ -168,11 +174,13 @@
     rollMods: () => rollMods,
     rollQuality: () => rollQuality,
     rotRate: () => rotRate,
+    seasonAt: () => seasonAt,
     seedOf: () => seedOf,
     setActiveRealm: () => setActiveRealm,
     settlerById: () => settlerById,
     shelfSlots: () => shelfSlots,
     skillById: () => skillById,
+    starPulse: () => starPulse,
     surfaceAt: () => surfaceAt,
     syncPocket: () => syncPocket,
     tideLevel: () => tideLevel,
@@ -642,6 +650,40 @@
         "The rot eats you from within"
       ]
     },
+    fever_dream: {
+      name: "Fever-dream",
+      cause: "The bites and spores of the Feverlands",
+      treat: "Fever tonic",
+      item: "fever_tonic",
+      kind: "illness",
+      incubate: 30,
+      worsen: 200,
+      effect: { stamina: 0.4, hydration: 0.04 },
+      cures: { fever_tonic: 3, antibiotic: 1 },
+      immunity: 900,
+      symptoms: [
+        "The edges of things shimmer",
+        "Your record says things that are not so",
+        "You cannot trust your own eyes"
+      ]
+    },
+    gold_sickness: {
+      name: "Gold sickness",
+      cause: "The cursed gold of the Gutter of Kings",
+      treat: "Purging salts",
+      item: "purging_salts",
+      kind: "illness",
+      incubate: 20,
+      worsen: 240,
+      effect: { speed: 0.22, hydration: 0.05 },
+      cures: { purging_salts: 3 },
+      immunity: 600,
+      symptoms: [
+        "A heaviness in the limbs",
+        "Your pockets drag like stones",
+        "Gold-fevered and slow"
+      ]
+    },
     // ── Injuries ──
     bleeding: {
       name: "Bleeding",
@@ -968,6 +1010,18 @@
     saltglass_bow: ["bow", 8],
     choir_stave: ["staff", 9],
     bellhammer: ["warhammer", 9],
+    venom_blade: ["blade", 9],
+    plague_censer: ["tome", 9],
+    astral_tome: ["tome", 10],
+    star_spear: ["spear", 10],
+    gilded_greatblade: ["greatsword", 10],
+    thiefs_whip: ["whip", 9],
+    leviathan_harpoon: ["spear", 11],
+    tidebreaker: ["crossbow", 11],
+    anvil_maul: ["warhammer", 11],
+    heartfire_staff: ["staff", 11],
+    season_bow: ["bow", 11],
+    thornlash: ["whip", 11],
     ruby_staff: ["staff", 3],
     emerald_staff: ["staff", 3],
     sapphire_staff: ["staff", 4],
@@ -1259,7 +1313,9 @@
     "salt_wraith",
     "choir_wraith",
     "cantor",
-    "grand_cantor"
+    "grand_cantor",
+    "drowned_diver",
+    "plague_knight"
   ]);
   var GEMS = {
     ruby: { name: "Ruby", text: "+8% damage", mods: { dmg: 0.08 } },
@@ -1395,6 +1451,66 @@
       tier: 9,
       bonus: "hymnward",
       bonusText: "The hymn cannot slow or chill you; shrug off 6\xB0 of cold"
+    },
+    {
+      key: "plaguedoctor",
+      name: "Plague doctor",
+      bar: "plague_ivory",
+      defense: [9, 12, 9],
+      station: "starforge",
+      tier: 9,
+      bonus: "plagueward",
+      bonusText: "Bites here carry no disease and the fever-dream cannot fool you; 15% more likely to shrug off sickness"
+    },
+    {
+      key: "astral",
+      name: "Astral",
+      bar: "astral_lens",
+      defense: [9, 12, 9],
+      station: "starforge",
+      tier: 10,
+      bonus: "starward",
+      bonusText: "Star pulses pass through you; magic +10%"
+    },
+    {
+      key: "gilded",
+      name: "Gilded",
+      bar: "crown_gold",
+      defense: [10, 13, 10],
+      station: "starforge",
+      tier: 9,
+      bonus: "goldward",
+      bonusText: "Cursed gold cannot sicken you; 25% more silver marks"
+    },
+    {
+      key: "leviathan",
+      name: "Leviathan",
+      bar: "abyssal_pearl",
+      defense: [11, 14, 11],
+      station: "starforge",
+      tier: 11,
+      bonus: "gills",
+      bonusText: "Breathe the sea and swim freely; +3 defense"
+    },
+    {
+      key: "forgeborn",
+      name: "Forgeborn",
+      bar: "heartstone",
+      defense: [12, 16, 12],
+      station: "starforge",
+      tier: 11,
+      bonus: "forgeward",
+      bonusText: "Magma and lava cannot burn you; +4 defense"
+    },
+    {
+      key: "druid",
+      name: "Druid",
+      bar: "seasonbloom",
+      defense: [10, 13, 10],
+      station: "starforge",
+      tier: 11,
+      bonus: "seasonward",
+      bonusText: "The turning year cannot touch you; regenerate health"
     },
     // ── Archetypes, in three bands ──
     {
@@ -1686,6 +1802,18 @@
       spread: 0.12
     },
     brass_repeater: { kind: "bow", projectile: "bolt", delay: 0.42, speed: 1e3 },
+    plague_censer: { kind: "magic", projectile: "plague_spark", delay: 0.14, speed: 540, mana: 3 },
+    astral_tome: { kind: "magic", projectile: "star_spark", delay: 0.13, speed: 560, mana: 3 },
+    tidebreaker: { kind: "bow", projectile: "bolt", delay: 0.8, speed: 1200 },
+    heartfire_staff: { kind: "magic", projectile: "heartfire", delay: 0.45, speed: 620, mana: 12 },
+    season_bow: {
+      kind: "bow",
+      projectile: "arrow",
+      delay: 0.5,
+      speed: 1100,
+      count: 2,
+      spread: 0.06
+    },
     saltglass_bow: { kind: "bow", projectile: "arrow", delay: 0.5, speed: 1e3 },
     choir_stave: {
       kind: "magic",
@@ -1751,6 +1879,17 @@
     heat_bolt: { color: "#ffb060", glow: "#fff0a0", life: 2.2, size: 11, homing: 1.6, fire: true },
     hymn_note: { color: "#bfe0ff", glow: "#e8f4ff", life: 2.4, size: 10, homing: 1.2 },
     choir_note: { color: "#dff0ff", glow: "#9ad0ff", life: 1.6, size: 9, homing: 3 },
+    plague_bolt: { color: "#b8c870", glow: "#e8f070", life: 2, size: 10, homing: 1 },
+    star_bolt: { color: "#fff0c0", glow: "#9ab0ff", life: 1.8, size: 10 },
+    coin_shot: { color: "#f0c850", glow: "#fff0a0", life: 1.6, size: 7, gravity: 200 },
+    lure_orb: { color: "#fff0a0", glow: "#ffe070", life: 2.6, size: 12, homing: 2.4 },
+    bubble: { color: "#bfe8ff", glow: "#e8f8ff", life: 2.4, size: 12, drag: 0.8 },
+    thorn: { color: "#6a8a3a", life: 1.6, size: 8 },
+    petal: { color: "#f0a0c0", glow: "#ffd0e0", life: 2, size: 8, homing: 1.4 },
+    star_pulse: { color: "#fff4d0", glow: "#9ab0ff", life: 2.4, size: 22, gravity: 900 },
+    plague_spark: { color: "#e8f070", glow: "#b8c870", life: 1.1, size: 6, homing: 4 },
+    star_spark: { color: "#fff0c0", glow: "#9ab0ff", life: 1.1, size: 6, homing: 4.4 },
+    heartfire: { color: "#ffb060", glow: "#ff6a2a", life: 1.4, size: 12, pierce: 1, fire: true },
     // Monster attacks.
     dart: { color: "#8a9058", life: 2.2, size: 7 },
     fireball: { color: "#ff6a2a", glow: "#ffb347", life: 2.6, size: 12, fire: true },
@@ -1799,7 +1938,19 @@
     saltcrust: 42,
     saltglass_rock: 43,
     rimesnow: 44,
-    choirstone: 45
+    choirstone: 45,
+    fever_loam: 46,
+    plague_rock: 47,
+    starglass: 48,
+    observatory_stone: 49,
+    sewer_brick: 50,
+    crown_rock: 51,
+    abyss_sand: 52,
+    pearl_rock: 53,
+    heartstone_block: 54,
+    slag: 55,
+    bloom_loam: 56,
+    seasonstone: 57
   };
   var BUFFS = {
     swiftness: { name: "Swiftness", text: "+25% speed", color: "#8ad0f0" },
@@ -1863,6 +2014,28 @@
     saint_cog: { effects: ["trapsense", "speed20"], text: "Steam cannot scald you; +20% speed" },
     tyrant_eye: { effects: ["shade", "damage10"], text: "The sun cannot parch you; +10% damage" },
     hymnal_bell: { effects: ["hymnward", "mana40"], text: "The hymn cannot hold you; +40 mana" },
+    respirator: {
+      effects: ["breath"],
+      text: "Breath lasts three times as long underwater; toxic air cannot choke you"
+    },
+    rot_mask: {
+      effects: ["plagueward", "regen"],
+      text: "Plague bites carry nothing; regenerate health"
+    },
+    astrolabe: { effects: ["starward", "mana40"], text: "Star pulses pass through you; +40 mana" },
+    pauper_crown: {
+      effects: ["goldward", "damage10"],
+      text: "Cursed gold cannot touch you; +10% damage"
+    },
+    leviathan_scale: { effects: ["gills", "defense3"], text: "Breathe the sea; +3 defense" },
+    anvil_spark: {
+      effects: ["forgeward", "fire"],
+      text: "Magma cannot burn you; strikes may ignite"
+    },
+    seasons_seed: {
+      effects: ["seasonward", "regen"],
+      text: "The seasons cannot touch you; regenerate"
+    },
     miners_lamp: { effects: ["light"], text: "Light around you" },
     magma_stone: { effects: ["lava"], text: "Resist lava and heat" },
     watcher_eye: { effects: ["damage10", "light"], text: "+10% damage; see in the dark" },
@@ -1919,7 +2092,19 @@
     42: "sandstone_wall",
     43: "stone_wall",
     44: "stone_wall",
-    45: "stone_wall"
+    45: "stone_wall",
+    46: "dirt_wall",
+    47: "stone_wall",
+    48: "stone_wall",
+    49: "stone_wall",
+    50: "stone_wall",
+    51: "stone_wall",
+    52: "sandstone_wall",
+    53: "stone_wall",
+    54: "stone_wall",
+    55: "stone_wall",
+    56: "dirt_wall",
+    57: "stone_wall"
   });
   Object.assign(WALL_ITEM, {
     3: "sandstone_wall",
@@ -2215,6 +2400,25 @@
     engine_heart: 600,
     mirage_crown: 600,
     hymnal_core: 600,
+    plague_ivory: 40,
+    fever_bloom: 14,
+    astral_lens: 44,
+    crown_gold: 30,
+    abyssal_pearl: 60,
+    heartstone: 60,
+    seasonbloom: 20,
+    feverlands_fragment: 160,
+    observatory_fragment: 160,
+    gutter_fragment: 160,
+    undertow_fragment: 220,
+    emberheart_fragment: 220,
+    garden_fragment: 220,
+    rot_heart: 900,
+    astronomer_eye: 900,
+    kings_ransom: 1200,
+    leviathan_heart: 1200,
+    anvil_heart: 1200,
+    warden_face: 1200,
     coin: 1
   };
 
@@ -2594,6 +2798,72 @@
     bellhammer: ["Bellhammer", "weapon"],
     hymnal_bell: ["Hymnal bell", "accessory"],
     hymnal_core: ["Core of the Hymnal", "trophy"],
+    // ── Band IV and V realms ──
+    feverlands_fragment: ["Feverlands key fragment", "key"],
+    observatory_fragment: ["Observatory key fragment", "key"],
+    gutter_fragment: ["Gutter key fragment", "key"],
+    undertow_fragment: ["Undertow key fragment", "key"],
+    emberheart_fragment: ["Emberheart key fragment", "key"],
+    garden_fragment: ["Garden key fragment", "key"],
+    feverlands_key: ["Feverlands key", "key"],
+    observatory_key: ["Sunken Observatory key", "key"],
+    gutter_key: ["Gutter of Kings key", "key"],
+    undertow_key: ["Undertow key", "key"],
+    emberheart_key: ["Emberheart key", "key"],
+    garden_key: ["Garden of Lost Seasons key", "key"],
+    diving_bell: ["Diving bell", "structure"],
+    respirator: ["Respirator", "accessory"],
+    // The Feverlands.
+    plague_ivory: ["Plague ivory", "ore"],
+    fever_bloom: ["Fever bloom", "material"],
+    fever_loam: ["Fever loam", "block"],
+    plague_rock: ["Plague rock", "block"],
+    venom_blade: ["Venom blade", "weapon"],
+    plague_censer: ["Plague censer", "weapon"],
+    rot_mask: ["Rot mask", "accessory"],
+    rot_heart: ["Heart of Rot", "trophy"],
+    fever_tonic: ["Fever tonic", "medicine", 6e3],
+    // The Sunken Observatory.
+    astral_lens: ["Astral lens", "ore"],
+    starglass: ["Starglass", "block"],
+    observatory_stone: ["Observatory stone", "block"],
+    astral_tome: ["Astral tome", "weapon"],
+    star_spear: ["Star spear", "weapon"],
+    astrolabe: ["Astrolabe", "accessory"],
+    astronomer_eye: ["The Astronomer's eye", "trophy"],
+    // The Gutter of Kings.
+    crown_gold: ["Crown gold", "ore"],
+    sewer_brick: ["Sewer brick", "block"],
+    crown_rock: ["Crown rock", "block"],
+    gilded_greatblade: ["Gilded greatblade", "weapon"],
+    thiefs_whip: ["Thief's whip", "weapon"],
+    pauper_crown: ["Pauper's crown", "accessory"],
+    kings_ransom: ["King's ransom", "trophy"],
+    purging_salts: ["Purging salts", "medicine", 9e3],
+    // The Undertow.
+    abyssal_pearl: ["Abyssal pearl", "ore"],
+    abyss_sand: ["Abyss sand", "block"],
+    pearl_rock: ["Pearl rock", "block"],
+    leviathan_harpoon: ["Leviathan harpoon", "weapon"],
+    tidebreaker: ["Tidebreaker", "weapon"],
+    leviathan_scale: ["Leviathan scale", "accessory"],
+    leviathan_heart: ["Heart of the Leviathan", "trophy"],
+    // Emberheart.
+    heartstone: ["Heartstone", "ore"],
+    heartstone_block: ["Heartstone block", "block"],
+    slag: ["Slag", "block"],
+    anvil_maul: ["Anvil maul", "weapon"],
+    heartfire_staff: ["Heartfire staff", "weapon"],
+    anvil_spark: ["Anvil spark", "accessory"],
+    anvil_heart: ["Heart of the Anvil", "trophy"],
+    // The Garden of Lost Seasons.
+    seasonbloom: ["Seasonbloom", "material"],
+    bloom_loam: ["Bloom loam", "block"],
+    seasonstone: ["Seasonstone", "block"],
+    season_bow: ["Season bow", "weapon"],
+    thornlash: ["Thornlash", "weapon"],
+    seasons_seed: ["Seed of Seasons", "accessory"],
+    warden_face: ["The Warden's face", "trophy"],
     // ── Getting about ──
     bucket: ["Bucket", "tool"],
     water_bucket: ["Water bucket", "tool"],
@@ -2876,6 +3146,19 @@
     ["barrow_key", { barrow_fragment: 3 }, "waystone", 7],
     ["saltflats_key", { saltflats_fragment: 3 }, "waystone", 7],
     ["choir_key", { choir_fragment: 3 }, "waystone", 7],
+    // Band IV keys from Band III spoils; Band V from Band IV.
+    ["feverlands_fragment", { brass_ingot: 2, saltglass: 3, rime_silver: 2 }, "starforge", 9],
+    ["observatory_fragment", { rime_silver: 3, prism_glass: 4, brass_ingot: 2 }, "starforge", 9],
+    ["gutter_fragment", { gold_ingot: 6, brass_ingot: 2, saltglass: 2 }, "starforge", 9],
+    ["undertow_fragment", { plague_ivory: 3, astral_lens: 2, crown_gold: 2 }, "starforge", 10],
+    ["emberheart_fragment", { crown_gold: 3, astral_lens: 2, hellstone_ingot: 4 }, "starforge", 10],
+    ["garden_fragment", { plague_ivory: 3, fever_bloom: 4, astral_lens: 2 }, "starforge", 10],
+    ["feverlands_key", { feverlands_fragment: 3 }, "waystone", 9],
+    ["observatory_key", { observatory_fragment: 3 }, "waystone", 9],
+    ["gutter_key", { gutter_fragment: 3 }, "waystone", 9],
+    ["undertow_key", { undertow_fragment: 3 }, "waystone", 10],
+    ["emberheart_key", { emberheart_fragment: 3 }, "waystone", 10],
+    ["garden_key", { garden_fragment: 3 }, "waystone", 10],
     // The Drowned Orchard.
     ["tidecaller_spear", { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, "workbench", 4],
     ["brine_wand", { brinewood: 6, tide_pearl: 4, crystal: 2 }, "workbench", 4],
@@ -2908,6 +3191,27 @@
     ["rime_silver", { rime_silver_ore: 3, coal: 1 }, "furnace", 7],
     ["choir_stave", { rime_silver: 10, frost_lily: 4, crystal: 4 }, "starforge", 9],
     ["bellhammer", { rime_silver: 12, bell_bronze: 4, wood: 3 }, "starforge", 9],
+    ["respirator", { iron_ingot: 4, reeds: 6, crystal: 2, hide: 2 }, "workbench", 5],
+    // The Feverlands.
+    ["venom_blade", { plague_ivory: 10, venom: 6, gold_ingot: 2 }, "starforge", 9],
+    ["plague_censer", { plague_ivory: 8, fever_bloom: 6, silk: 4 }, "starforge", 9],
+    ["fever_tonic", { fever_bloom: 3, boiled_water: 1 }, "apothecary", 8],
+    // The Sunken Observatory.
+    ["astral_tome", { astral_lens: 10, silk: 6, fallen_star: 3 }, "starforge", 10],
+    ["star_spear", { astral_lens: 8, starmetal_ingot: 4, wood: 3 }, "starforge", 10],
+    // The Gutter of Kings.
+    ["gilded_greatblade", { crown_gold: 14, gold_ingot: 4, hide: 2 }, "starforge", 10],
+    ["thiefs_whip", { crown_gold: 8, silk: 6, hide: 2 }, "starforge", 9],
+    ["purging_salts", { salt: 4, herb: 2, crystal: 1 }, "apothecary", 8],
+    // The Undertow.
+    ["leviathan_harpoon", { abyssal_pearl: 12, voidsteel_ingot: 3, wood: 3 }, "starforge", 11],
+    ["tidebreaker", { abyssal_pearl: 12, voidsteel_ingot: 3, silk: 4 }, "starforge", 11],
+    // Emberheart.
+    ["anvil_maul", { heartstone: 14, voidsteel_ingot: 3, wood: 3 }, "starforge", 11],
+    ["heartfire_staff", { heartstone: 10, ruby: 3, crystal: 4 }, "starforge", 11],
+    // The Garden of Lost Seasons.
+    ["season_bow", { seasonbloom: 10, wood: 6, silk: 4 }, "starforge", 11],
+    ["thornlash", { seasonbloom: 12, hide: 3, silk: 3 }, "starforge", 11],
     // ── Armour ──
     ...ARMOR_RECIPES,
     // ── The weapon hierarchy, and infusions ──
@@ -2969,6 +3273,13 @@
     saltglass: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
     rime_silver_ore: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
     frost_lily: { yield: [1, 2], hp: 2, regen: 240 },
+    plague_ivory: { yield: [2, 3], tool: "pick", req: 7, hp: 6, regen: 0 },
+    fever_bloom: { yield: [1, 2], hp: 2, regen: 240 },
+    astral_lens: { yield: [2, 3], tool: "pick", req: 7, hp: 6, regen: 0 },
+    crown_gold: { yield: [2, 4], tool: "pick", req: 7, hp: 6, regen: 0 },
+    abyssal_pearl: { yield: [2, 3], tool: "pick", req: 8, hp: 6, regen: 0 },
+    heartstone: { yield: [2, 3], tool: "pick", req: 8, hp: 7, regen: 0 },
+    seasonbloom: { yield: [1, 3], hp: 2, regen: 260 },
     topaz: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     onyx: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     opal: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
@@ -3052,6 +3363,18 @@
     saltglass_bow: [8, 72, 0],
     choir_stave: [9, 96, 0],
     bellhammer: [9, 190, 60],
+    venom_blade: [9, 158, 66],
+    plague_censer: [9, 42, 0],
+    astral_tome: [10, 54, 0],
+    star_spear: [10, 178, 100],
+    gilded_greatblade: [10, 272, 80],
+    thiefs_whip: [9, 94, 128],
+    leviathan_harpoon: [11, 222, 104],
+    tidebreaker: [11, 226, 0],
+    anvil_maul: [11, 298, 62],
+    heartfire_staff: [11, 150, 0],
+    season_bow: [11, 134, 0],
+    thornlash: [11, 146, 130],
     sapphire_staff: [4, 30, 0],
     emerald_staff: [4, 22, 0],
     frostbrand: [6, 84, 72],
@@ -3849,10 +4172,660 @@
     }
   };
 
+  // src/data/realms/emberheart.ts
+  var HEARTSTONE = 54;
+  var SLAG = 55;
+  function magmaLevel(geo, t) {
+    const cycle = 120, p = t % cycle;
+    const k = p < 60 ? 0 : p < 80 ? (p - 60) / 20 : p < 100 ? 1 : 1 - (p - 100) / 20;
+    return geo.low + (geo.high - geo.low) * k * k * (3 - 2 * k);
+  }
+  function build3(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 950;
+    const lane = (base, k) => walkable((x) => base + 80 * noise1(x / 800, s(k)), 10);
+    const high = lane(1300, 1), mid = lane(1800, 2), deep = lane(2350, 3);
+    const ladderXs = Array.from({ length: 10 }, (_, i) => Math.round(700 + i * ((RW - 1400) / 10)));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const floors = [high(x), mid(x), deep(x)];
+      let open = y < floors[2] && y > floors[0] - 360;
+      const whole = Math.abs(x - arena) < 640 || Math.abs(x - arrive) < 320;
+      for (const f of [floors[0], floors[1]])
+        if (y >= f && y < f + 60 && (whole || noise1(x / 260, s(4)) > -0.35)) open = false;
+      for (const lx of ladderXs)
+        if (Math.abs(x - lx) < 44 && y > floors[0] - 20 && y < floors[2]) open = true;
+      if (open) return 0;
+      return fbm2(x / 170, y / 120, s(5)) > 0.6 ? HEARTSTONE : SLAG;
+    };
+    return {
+      tile,
+      surface: () => 0,
+      floors: [mid, high, deep],
+      ladders: ladderXs.map((x) => ({ x, top: high(x) - 4, bottom: deep(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: high,
+      low: 2400,
+      high: 1850
+    };
+  }
+  var EMBERHEART = {
+    id: "emberheart",
+    name: "Emberheart",
+    band: 5,
+    note: "The forge at the bottom of the world. Three ledges climb a molten cavern, and every two minutes the magma rises through them.",
+    sky: "cavern",
+    temp: 46,
+    ambient: [0.3, 0.12, 0.05],
+    daylight: 0,
+    wall: SLAG,
+    hazard: {
+      id: "magma",
+      name: "Rising magma",
+      text: "Every two minutes the magma climbs past the lowest ledge, holds, and sinks. Standing in it burns fast. Climb before it comes.",
+      ward: "forgeward"
+    },
+    fragment: "emberheart_fragment",
+    key: "emberheart_key",
+    material: "heartstone",
+    relic: "anvil_spark",
+    boss: "anvil_god",
+    elite: "forge_colossus",
+    music: "emberheart",
+    ores: ["heartstone", "hellstone", "obsidian"],
+    nodes: [
+      ["heartstone", 6],
+      ["hellstone", 3],
+      ["obsidian", 3],
+      ["sulfur", 2],
+      ["coal", 2],
+      ["ruby", 1]
+    ],
+    nodeCount: 66,
+    mobs: [
+      { type: "slag_slime", weight: 3 },
+      { type: "anvil_golem", weight: 2 },
+      { type: "hammer_knight", weight: 3 },
+      { type: "cinder_wyrm", weight: 2 },
+      { type: "forge_drake", weight: 3, air: true }
+    ],
+    mobCount: 42,
+    chests: 5,
+    chestLoot: [
+      ["emberheart_fragment", 1, 2, 0.6],
+      ["garden_fragment", 1, 1, 0.3],
+      ["heartstone", 3, 6, 0.8],
+      ["hellstone_ingot", 3, 6, 0.6],
+      ["healing_draught", 3, 5, 1],
+      ["fireward_potion", 1, 2, 0.6],
+      ["life_fruit", 1, 1, 0.25]
+    ],
+    biome: {
+      id: "emberheart",
+      name: "Emberheart",
+      x: 17,
+      y: 0,
+      color: "#8a2a1a",
+      shade: "#ff8a3a",
+      temp: 46,
+      note: "The forge at the bottom of the world.",
+      resources: ["heartstone", "hellstone", "obsidian"]
+    },
+    build: build3
+  };
+
+  // src/data/realms/feverlands.ts
+  var FEVER_LOAM = 46;
+  var PLAGUE_ROCK = 47;
+  var FEVER_BITES = ["fever", "dysentery", "poisoning", "fever_dream", "marrow_rot"];
+  var FEVER_CHANCE = 0.3;
+  function build4(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable(
+      (x) => 1400 + 160 * fbm1(x / 900, s(1), 3) + 30 * noise1(x / 120, s(2)),
+      14
+    );
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 440, arena + 440);
+    const floor = walkable(ground);
+    const roots = walkable((x) => 1950 + 100 * fbm1(x / 800, s(3)) + 30 * Math.sin(x / 130));
+    const ladderXs = [0.14, 0.36, 0.58, 0.8].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) return 0;
+      const r = roots(x);
+      if (y > r - 120 - 24 * Math.sin(x / 60) && y < r && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < r) return 0;
+      if (y > g + 70 && fbm2(x / 160, y / 110, s(4)) > 0.66) return PLAGUE_ROCK;
+      return y < g + 120 ? FEVER_LOAM : PLAGUE_ROCK;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, roots],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: roots(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var FEVERLANDS = {
+    id: "feverlands",
+    name: "Feverlands",
+    band: 4,
+    note: "A steaming swamp-jungle where every creature carries a sickness. A fever-dream makes your own record lie to you.",
+    sky: "open",
+    temp: 31,
+    ambient: [0.1, 0.12, 0.06],
+    daylight: 0.8,
+    wall: FEVER_LOAM,
+    hazard: {
+      id: "fever",
+      name: "Plague bites",
+      text: "Every bite here may carry a disease, and the fever-dream scrambles what your record shows. Carry medicine, and trust the symptoms over the numbers.",
+      ward: "plagueward"
+    },
+    fragment: "feverlands_fragment",
+    key: "feverlands_key",
+    material: "plague_ivory",
+    relic: "rot_mask",
+    boss: "mother_of_rot",
+    elite: "plague_knight",
+    music: "feverlands",
+    ores: ["plague_ivory", "emerald", "gold_ore"],
+    nodes: [
+      ["wood", 4],
+      ["plague_ivory", 5],
+      ["fever_bloom", 4],
+      ["herb", 3],
+      ["honey", 2],
+      ["emerald", 1],
+      ["water", 1]
+    ],
+    nodeCount: 74,
+    mobs: [
+      { type: "plague_rat", weight: 4 },
+      { type: "rot_toad", weight: 3 },
+      { type: "ivory_beetle", weight: 2 },
+      { type: "bog_shaman", weight: 2 },
+      { type: "fever_mosquito", weight: 3, air: true }
+    ],
+    mobCount: 42,
+    chests: 5,
+    chestLoot: [
+      ["feverlands_fragment", 1, 2, 0.6],
+      ["observatory_fragment", 1, 1, 0.3],
+      ["plague_ivory", 3, 6, 0.8],
+      ["antibiotic", 1, 3, 0.8],
+      ["fever_tonic", 1, 2, 0.6],
+      ["healing_draught", 2, 4, 1],
+      ["life_fruit", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "feverlands",
+      name: "Feverlands",
+      x: 13,
+      y: 0,
+      color: "#6a7a3a",
+      shade: "#b8c870",
+      temp: 31,
+      note: "A steaming swamp-jungle where everything carries a sickness.",
+      resources: ["plague_ivory", "fever_bloom", "herb"]
+    },
+    build: build4
+  };
+
+  // src/data/realms/garden.ts
+  var BLOOM_LOAM = 56;
+  var SEASONSTONE = 57;
+  var SEASONS = [
+    { id: "spring", name: "Spring", temp: 0, rot: 1, color: "#8ad070" },
+    { id: "summer", name: "Summer", temp: 22, rot: 1.8, color: "#f0c850" },
+    { id: "autumn", name: "Autumn", temp: -4, rot: 2.4, color: "#d8703a" },
+    { id: "winter", name: "Winter", temp: -32, rot: 0.2, color: "#bfe0ff" }
+  ];
+  var SEASON_SECONDS = 150;
+  var seasonAt = (t, seed = 0) => SEASONS[Math.floor((t + seed % 101) / SEASON_SECONDS) % 4];
+  function build5(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable(
+      (x) => 1420 + 140 * fbm1(x / 1100, s(1), 3) + 24 * noise1(x / 150, s(2)),
+      12
+    );
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 480, arena + 480);
+    const floor = walkable(ground);
+    const roots = walkable((x) => 1980 + 90 * fbm1(x / 900, s(3)) + 20 * Math.sin(x / 150));
+    const ladderXs = [0.17, 0.4, 0.62, 0.84].map((f) => Math.round(RW * f));
+    const walls = Array.from(
+      { length: 12 },
+      (_, i) => 900 + i * ((RW - 1800) / 12) + 100 * noise1(i, s(4))
+    );
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      for (const wx of walls)
+        if (Math.abs(x - wx) < 40 && y < g && y > g - 70 && Math.abs(wx - arena) > 560 && Math.abs(wx - arrive) > 300)
+          return SEASONSTONE;
+      if (y < g) return 0;
+      const r = roots(x);
+      if (y > r - 120 && y < r && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < r) return 0;
+      if (y < g + 80) return BLOOM_LOAM;
+      return fbm2(x / 190, y / 130, s(5)) > 0.5 ? SEASONSTONE : BLOOM_LOAM;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, roots],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: roots(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var GARDEN = {
+    id: "garden",
+    name: "Garden of Lost Seasons",
+    band: 5,
+    note: "A walled garden where the year turns every few minutes: rain, blaze, rot, and killing frost, over and over.",
+    sky: "open",
+    temp: 14,
+    ambient: [0.1, 0.12, 0.08],
+    daylight: 1,
+    wall: BLOOM_LOAM,
+    hazard: {
+      id: "seasons",
+      name: "The turning year",
+      text: "The season changes every two and a half minutes. Summer scorches, autumn rots food fast, and winter freezes. Dress for all four, or for none.",
+      ward: "seasonward"
+    },
+    fragment: "garden_fragment",
+    key: "garden_key",
+    material: "seasonbloom",
+    relic: "seasons_seed",
+    boss: "four_faced_warden",
+    elite: "harvest_lord",
+    music: "garden",
+    ores: ["seasonbloom", "emerald", "gold_ore"],
+    nodes: [
+      ["wood", 4],
+      ["seasonbloom", 5],
+      ["berry", 3],
+      ["herb", 3],
+      ["wheat", 2],
+      ["emerald", 1],
+      ["honey", 1]
+    ],
+    nodeCount: 76,
+    mobs: [
+      { type: "thorn_stag", weight: 3 },
+      { type: "bramble_golem", weight: 2 },
+      { type: "season_wolf", weight: 4 },
+      { type: "bloom_sprite", weight: 2, air: true },
+      { type: "petal_moth", weight: 3, air: true }
+    ],
+    mobCount: 42,
+    chests: 5,
+    chestLoot: [
+      ["garden_fragment", 1, 2, 0.6],
+      ["undertow_fragment", 1, 1, 0.3],
+      ["seasonbloom", 3, 6, 0.8],
+      ["hearty_stew", 1, 3, 0.6],
+      ["healing_draught", 3, 5, 1],
+      ["voidsteel_ingot", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.25]
+    ],
+    biome: {
+      id: "garden",
+      name: "Garden of Lost Seasons",
+      x: 18,
+      y: 0,
+      color: "#5a8a4a",
+      shade: "#c8e0a0",
+      temp: 14,
+      note: "A walled garden where the year turns every few minutes.",
+      resources: ["seasonbloom", "berry", "herb"]
+    },
+    build: build5
+  };
+
+  // src/data/realms/gutter.ts
+  var SEWER_BRICK = 50;
+  var CROWN_ROCK = 51;
+  function build6(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 950;
+    const lane = (base, k) => walkable((x) => base + 60 * noise1(x / 900, s(k)), 8);
+    const upper = lane(1200, 1), main = lane(1720, 2), lower = lane(2260, 3);
+    const HEIGHT = [150, 200, 160];
+    const hall = { x0: RW - 1700, x1: RW - 260, top: 1400 };
+    const vaults = Array.from({ length: 10 }, (_, i) => ({
+      x: 900 + i * ((RW - 2600) / 10) + 120 * noise1(i * 1.9, s(4)),
+      floor: i % 2 ? upper : lower
+    }));
+    const ladderXs = Array.from({ length: 8 }, (_, i) => Math.round(820 + i * ((RW - 1800) / 8)));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const floors = [upper(x), main(x), lower(x)];
+      let open = floors.some((f, i) => y < f && y > f - HEIGHT[i] + 12 * Math.sin(x / 50));
+      for (const v of vaults)
+        if (Math.abs(x - v.x) < 160 && y < v.floor(v.x) && y > v.floor(v.x) - 220) open = true;
+      if (!open && x > hall.x0 && x < hall.x1 && y > hall.top && y < main(x)) open = true;
+      if (!open) {
+        for (const lx of ladderXs)
+          if (Math.abs(x - lx) < 44 && y > upper(lx) - 60 && y < lower(lx)) open = true;
+      }
+      if (open) return 0;
+      return fbm2(x / 150, y / 110, s(5)) > 0.68 ? CROWN_ROCK : SEWER_BRICK;
+    };
+    return {
+      tile,
+      surface: () => 0,
+      floors: [main, upper, lower],
+      ladders: ladderXs.map((x) => ({ x, top: upper(x) - 4, bottom: lower(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: main
+    };
+  }
+  var GUTTER = {
+    id: "gutter",
+    name: "Gutter of Kings",
+    band: 4,
+    note: "The sewers under a dead city of kings. Vaults everywhere, rich loot, and cursed gold that sickens whoever hoards it.",
+    sky: "cavern",
+    temp: 16,
+    ambient: [0.12, 0.1, 0.05],
+    daylight: 0,
+    wall: SEWER_BRICK,
+    hazard: {
+      id: "curse",
+      name: "Cursed gold",
+      text: "Every coin and gold ingot picked up here risks gold sickness, which weighs you down. Take only what you need, or ward yourself.",
+      ward: "goldward"
+    },
+    fragment: "gutter_fragment",
+    key: "gutter_key",
+    material: "crown_gold",
+    relic: "pauper_crown",
+    boss: "pauper_king",
+    elite: "gilded_guard",
+    music: "gutter",
+    ores: ["crown_gold", "gold_ore", "ruby"],
+    nodes: [
+      ["crown_gold", 6],
+      ["gold_ore", 3],
+      ["coal", 2],
+      ["stone", 2],
+      ["ruby", 1],
+      ["emerald", 1],
+      ["water", 1]
+    ],
+    nodeCount: 66,
+    mobs: [
+      { type: "gutter_rat", weight: 4 },
+      { type: "crown_thief", weight: 3 },
+      { type: "gilded_slime", weight: 3 },
+      { type: "tax_collector", weight: 2 },
+      { type: "sewer_eel", weight: 2 }
+    ],
+    mobCount: 42,
+    chests: 10,
+    chestLoot: [
+      ["gutter_fragment", 1, 2, 0.6],
+      ["feverlands_fragment", 1, 1, 0.3],
+      ["crown_gold", 3, 8, 0.9],
+      ["coin", 60, 160, 1],
+      ["gold_ingot", 3, 6, 0.6],
+      ["ruby", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "gutter",
+      name: "Gutter of Kings",
+      x: 15,
+      y: 0,
+      color: "#6a5a2a",
+      shade: "#d8b848",
+      temp: 16,
+      note: "The sewers under a dead city of kings.",
+      resources: ["crown_gold", "gold_ore", "coal"]
+    },
+    build: build6
+  };
+
+  // src/data/realms/observatory.ts
+  var STARGLASS = 48;
+  var OBSERVATORY_STONE = 49;
+  function build7(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => {
+      const step = Math.round(fbm1(x / 700, s(1), 2) * 3) * 90;
+      return 1450 - step + 12 * noise1(x / 200, s(2));
+    }, 24);
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 460, arena + 460);
+    const floor = walkable(ground, 24);
+    const chasms = Array.from(
+      { length: 8 },
+      (_, i) => 1100 + i * ((RW - 2400) / 8) + 160 * noise1(i * 2.1, s(3))
+    );
+    const vault = walkable((x) => 2100 + 90 * fbm1(x / 1e3, s(4)));
+    const ladderXs = [0.2, 0.45, 0.7].map((f) => Math.round(RW * f));
+    const pillars = Array.from({ length: 14 }, (_, i) => 800 + i * ((RW - 1600) / 14));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      const chasm = chasms.some((c) => Math.abs(x - c) < 110) && y > g - 10 && y < vault(x) - 130;
+      if (chasm) return 0;
+      for (const px of pillars)
+        if (Math.abs(x - px) < 18 && y < g && y > g - 260 && Math.abs(px - arena) > 520 && Math.abs(px - arrive) > 300)
+          return y > g - 250 ? OBSERVATORY_STONE : 0;
+      if (y < g) return 0;
+      const v = vault(x);
+      if (y > v - 130 && y < v && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < v) return 0;
+      if (y > g + 50 && fbm2(x / 170, y / 120, s(5)) > 0.64) return STARGLASS;
+      return OBSERVATORY_STONE;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, vault],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: vault(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  function starPulse(t, seed = 0) {
+    const cycle = 40, phase = (t + seed % 37) % cycle;
+    return phase > cycle - 3 ? (phase - (cycle - 3)) / 3 : 0;
+  }
+  var OBSERVATORY = {
+    id: "observatory",
+    name: "Sunken Observatory",
+    band: 4,
+    note: "A star-temple sunk into endless night. You fall slowly here; star pulses crash down on anyone under the open sky.",
+    sky: "open",
+    temp: 4,
+    ambient: [0.1, 0.1, 0.2],
+    daylight: 0.25,
+    wall: OBSERVATORY_STONE,
+    hazard: {
+      id: "stars",
+      name: "Star pulses",
+      text: "Gravity is weak here. Every forty seconds a star pulse gathers over you (watch the light) and crashes down. Step aside, or stand under stone.",
+      ward: "starward"
+    },
+    fragment: "observatory_fragment",
+    key: "observatory_key",
+    material: "astral_lens",
+    relic: "astrolabe",
+    boss: "the_astronomer",
+    elite: "constellation",
+    music: "observatory",
+    ores: ["astral_lens", "crystal", "sapphire"],
+    nodes: [
+      ["astral_lens", 5],
+      ["crystal", 4],
+      ["stone", 3],
+      ["sapphire", 2],
+      ["void_lily", 2],
+      ["opal", 1]
+    ],
+    nodeCount: 66,
+    mobs: [
+      { type: "comet_hound", weight: 4 },
+      { type: "lens_golem", weight: 2 },
+      { type: "star_wisp", weight: 3, air: true },
+      { type: "orrery_drone", weight: 2, air: true },
+      { type: "moon_moth", weight: 3, air: true }
+    ],
+    mobCount: 40,
+    chests: 5,
+    chestLoot: [
+      ["observatory_fragment", 1, 2, 0.6],
+      ["gutter_fragment", 1, 1, 0.3],
+      ["astral_lens", 3, 6, 0.8],
+      ["fallen_star", 1, 3, 0.8],
+      ["healing_draught", 2, 4, 1],
+      ["starmetal_ingot", 2, 4, 0.5],
+      ["life_fruit", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "observatory",
+      name: "Sunken Observatory",
+      x: 14,
+      y: 0,
+      color: "#3a4070",
+      shade: "#8a90d0",
+      temp: 4,
+      note: "A star-temple sunk into endless night.",
+      resources: ["astral_lens", "crystal", "void_lily"]
+    },
+    build: build7
+  };
+
+  // src/data/realms/undertow.ts
+  var ABYSS_SAND = 52;
+  var PEARL_ROCK = 53;
+  var AIR_SECONDS = 40;
+  function build8(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => {
+      const trench = Math.max(0, noise1(x / 600, s(1)) - 0.3) * 700;
+      return 1600 + trench + 120 * fbm1(x / 900, s(2));
+    }, 20);
+    ground = flatten(ground, arrive - 240, arrive + 240, 1500);
+    ground = flatten(ground, arena - 460, arena + 460, 1700);
+    const floor = walkable(ground, 20);
+    const caves = walkable((x) => 2450 + 90 * fbm1(x / 1e3, s(3)));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) {
+        const reef = fbm2(x / 90, y / 140, s(4));
+        return reef > 0.78 && y > g - 260 && Math.abs(x - arrive) > 300 && Math.abs(x - arena) > 520 ? PEARL_ROCK : 0;
+      }
+      const c = caves(x);
+      if (y > c - 140 && y < c && x > 200 && x < RW - 200) return 0;
+      if (y < g + 60) return ABYSS_SAND;
+      return fbm2(x / 200, y / 140, s(5)) > 0.55 ? PEARL_ROCK : ABYSS_SAND;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, caves],
+      ladders: [],
+      arrive,
+      arena,
+      arenaFloor: floor,
+      sea: 700
+    };
+  }
+  var UNDERTOW = {
+    id: "undertow",
+    name: "The Undertow",
+    band: 5,
+    note: "A drowned abyss. All of it lies under the sea: swim, count your breath, and make for the diving bells.",
+    sky: "open",
+    temp: 4,
+    ambient: [0.04, 0.1, 0.16],
+    daylight: 0.3,
+    wall: ABYSS_SAND,
+    hazard: {
+      id: "pressure",
+      name: "Drowning deep",
+      text: "The realm is underwater. Your breath lasts forty seconds; diving bells refill it. A respirator slows the drain; leviathan scale lets you breathe the sea.",
+      ward: "gills"
+    },
+    fragment: "undertow_fragment",
+    key: "undertow_key",
+    material: "abyssal_pearl",
+    relic: "leviathan_scale",
+    boss: "the_leviathan",
+    elite: "abyssal_titan",
+    music: "undertow",
+    ores: ["abyssal_pearl", "salt", "sapphire"],
+    nodes: [
+      ["abyssal_pearl", 5],
+      ["salt", 3],
+      ["reeds", 3],
+      ["clay", 2],
+      ["sapphire", 1],
+      ["opal", 1]
+    ],
+    nodeCount: 64,
+    mobs: [
+      { type: "razor_eel", weight: 3 },
+      { type: "pearl_crab", weight: 3 },
+      { type: "drowned_diver", weight: 2 },
+      { type: "abyss_angler", weight: 3, air: true },
+      { type: "jelly_bell", weight: 3, air: true }
+    ],
+    mobCount: 40,
+    chests: 5,
+    chestLoot: [
+      ["undertow_fragment", 1, 2, 0.6],
+      ["emberheart_fragment", 1, 1, 0.3],
+      ["abyssal_pearl", 3, 6, 0.8],
+      ["respirator", 1, 1, 0.2],
+      ["healing_draught", 3, 5, 1],
+      ["voidsteel_ingot", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.25]
+    ],
+    biome: {
+      id: "undertow",
+      name: "The Undertow",
+      x: 16,
+      y: 0,
+      color: "#1a4a6a",
+      shade: "#5a9ac0",
+      temp: 4,
+      note: "A drowned abyss.",
+      resources: ["abyssal_pearl", "salt", "reeds"]
+    },
+    build: build8,
+    extra(geo, ctx2) {
+      for (let lx = 900; lx < RW - 500; lx += 700 + Math.floor(ctx2.rng() * 300)) {
+        const x = ctx2.x0 + lx;
+        ctx2.furnish("diving_bell", x, ctx2.floorAt(x, geo.floors[0](lx) - 30));
+      }
+    }
+  };
+
   // src/data/realms/glasswood.ts
   var GLASSLOAM = 36;
   var PRISMROCK = 37;
-  function build3(seed) {
+  function build9(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable((x) => 1350 + 180 * fbm1(x / 1400, s(1)) + 40 * noise1(x / 240, s(2)), 12);
@@ -3958,13 +4931,13 @@
       note: "A forest of crystal that rings in the wind.",
       resources: ["prism_glass", "lumen_moss", "crystal", "wood"]
     },
-    build: build3
+    build: build9
   };
 
   // src/data/realms/marches.ts
   var MARROW_MUD = 38;
   var BONEROCK = 39;
-  function build4(seed) {
+  function build10(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3, base = 1500;
     let ground = walkable((x) => {
@@ -4072,7 +5045,7 @@
       note: "A grey fen where giants died.",
       resources: ["marrow_iron_ore", "reeds", "herb", "bone"]
     },
-    build: build4
+    build: build10
   };
 
   // src/data/realms/orchard.ts
@@ -4081,7 +5054,7 @@
     const phase = t / 150 * Math.PI * 2;
     return geo.tideMid + Math.sin(phase) * 70 + Math.sin(phase * 2.7) * 12;
   }
-  function build5(seed) {
+  function build11(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable(
@@ -4176,13 +5149,13 @@
       note: "A sunken fruit country under a restless tide.",
       resources: ["brinewood", "bog_apple", "reeds", "clay", "herb"]
     },
-    build: build5
+    build: build11
   };
 
   // src/data/realms/saltflats.ts
   var SALTCRUST = 42;
   var SALTGLASS_ROCK = 43;
-  function build6(seed) {
+  function build12(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable((x) => {
@@ -4282,7 +5255,7 @@
       note: "A dead sea turned to a white plain.",
       resources: ["saltglass", "salt", "cactus_fruit"]
     },
-    build: build6,
+    build: build12,
     extra(geo, ctx2) {
       for (let i = 0; i < 6 + ctx2.tier; i++) {
         const lx = 700 + ctx2.rng() * (RW - 1400), x = ctx2.x0 + lx;
@@ -4299,7 +5272,7 @@
     const cycle = 200, phase = (t + seed % 97) % cycle;
     return phase > cycle - 60 ? Math.min(1, (phase - (cycle - 60)) / 8, (cycle - phase) / 8) : 0;
   }
-  function build7(seed) {
+  function build13(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable((x) => {
@@ -4395,7 +5368,7 @@
       note: "Burnt grassland where old kilns smoulder.",
       resources: ["cinderflax", "kilnstone_ore", "coal", "sulfur"]
     },
-    build: build7,
+    build: build13,
     extra(geo, ctx2) {
       for (const f of [0.26, 0.5, 0.74]) {
         const x = ctx2.x0 + RW * f + 90;
@@ -4407,7 +5380,7 @@
   // src/data/realms/warren.ts
   var WARREN_EARTH = 33;
   var AMBERSTONE = 34;
-  function build8(seed) {
+  function build14(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 950;
     const lane = (base, k) => walkable((x) => base + 170 * fbm1(x / 1300, s(k)) + 30 * noise1(x / 260, s(k + 1)));
@@ -4511,7 +5484,7 @@
       note: "A realm that is all burrow.",
       resources: ["burrow_amber", "mushroom", "gold_ore", "iron_ore"]
     },
-    build: build8
+    build: build14
   };
 
   // src/data/realms/modifiers.ts
@@ -4598,7 +5571,13 @@
     MARCHES,
     BARROW,
     SALTFLATS,
-    CHOIR
+    CHOIR,
+    FEVERLANDS,
+    OBSERVATORY,
+    GUTTER,
+    UNDERTOW,
+    EMBERHEART,
+    GARDEN
   ];
   var realmById = (id) => REALMS.find((r) => r.id === id);
   var REALM_IDS = new Set(REALMS.map((r) => r.id));
@@ -4748,7 +5727,19 @@
     42: 0,
     43: 5,
     44: 0,
-    45: 6
+    45: 6,
+    46: 0,
+    47: 7,
+    48: 7,
+    49: 7,
+    50: 6,
+    51: 7,
+    52: 0,
+    53: 8,
+    54: 8,
+    55: 7,
+    56: 0,
+    57: 7
   };
   var TILE_YIELD = {
     1: { item: "dirt" },
@@ -4791,7 +5782,19 @@
     42: { item: "saltcrust", bonus: ["salt", 0.3] },
     43: { item: "saltglass_rock", bonus: ["saltglass", 0.25] },
     44: { item: "rimesnow", bonus: ["ice", 0.2] },
-    45: { item: "choirstone", bonus: ["rime_silver_ore", 0.12] }
+    45: { item: "choirstone", bonus: ["rime_silver_ore", 0.12] },
+    46: { item: "fever_loam", bonus: ["fever_bloom", 0.05] },
+    47: { item: "plague_rock", bonus: ["plague_ivory", 0.14] },
+    48: { item: "starglass", bonus: ["astral_lens", 0.2] },
+    49: { item: "observatory_stone", bonus: ["fallen_star", 0.02] },
+    50: { item: "sewer_brick", bonus: ["coin", 0.2] },
+    51: { item: "crown_rock", bonus: ["crown_gold", 0.3] },
+    52: { item: "abyss_sand", bonus: ["tide_pearl", 0.05] },
+    53: { item: "pearl_rock", bonus: ["abyssal_pearl", 0.14] },
+    54: { item: "heartstone_block", bonus: ["heartstone", 0.3] },
+    55: { item: "slag", bonus: ["coal", 0.2] },
+    56: { item: "bloom_loam", bonus: ["seasonbloom", 0.05] },
+    57: { item: "seasonstone", bonus: ["emerald", 0.03] }
   };
   function dimensionAt(x) {
     if (x < OVERWORLD_W) return null;
@@ -6551,6 +7554,655 @@
       respawn: 0
     }
   });
+  Object.assign(MOBS, {
+    plague_rat: {
+      name: "Plague rat",
+      hp: 460,
+      damage: 44,
+      speed: [56, 170],
+      move: "walker",
+      sight: 360,
+      reach: 46,
+      cooldown: 1,
+      defense: 12,
+      loot: [L2("raw_meat", 1, 1, 0.4), L2("hide", 1, 1, 0.5)],
+      respawn: 130,
+      disease: ["fever", 0.12]
+    },
+    rot_toad: {
+      name: "Rot toad",
+      hp: 560,
+      damage: 48,
+      speed: [40, 120],
+      move: "hopper",
+      sight: 300,
+      reach: 50,
+      cooldown: 1.3,
+      defense: 14,
+      loot: [L2("gel", 1, 3, 1), L2("fever_bloom", 1, 1, 0.4)],
+      respawn: 140,
+      disease: ["dysentery", 0.15]
+    },
+    ivory_beetle: {
+      name: "Ivory beetle",
+      hp: 720,
+      damage: 52,
+      speed: [30, 90],
+      move: "walker",
+      sight: 300,
+      reach: 52,
+      cooldown: 1.5,
+      defense: 34,
+      loot: [L2("plague_ivory", 1, 3, 1), L2("beetle_carapace", 1, 2, 0.5)],
+      respawn: 170
+    },
+    bog_shaman: {
+      name: "Bog shaman",
+      hp: 540,
+      damage: 44,
+      speed: [26, 80],
+      move: "walker",
+      sight: 540,
+      reach: 46,
+      cooldown: 2,
+      defense: 16,
+      ranged: {
+        projectile: "plague_bolt",
+        range: 540,
+        speed: 440,
+        damage: 52,
+        count: 3,
+        spread: 0.24
+      },
+      loot: [L2("fever_bloom", 1, 2, 1), L2("feverlands_fragment", 1, 1, 0.05)],
+      respawn: 170,
+      disease: ["fever_dream", 0.12]
+    },
+    fever_mosquito: {
+      name: "Fever mosquito",
+      hp: 380,
+      damage: 40,
+      speed: [70, 200],
+      move: "flier",
+      sight: 420,
+      reach: 40,
+      cooldown: 1,
+      defense: 6,
+      loot: [L2("venom", 1, 1, 0.5)],
+      respawn: 110,
+      disease: ["fever", 0.2]
+    },
+    plague_knight: {
+      name: "Plague knight",
+      hp: 3200,
+      damage: 66,
+      speed: [34, 110],
+      move: "walker",
+      sight: 720,
+      reach: 66,
+      cooldown: 1.5,
+      defense: 40,
+      ranged: {
+        projectile: "plague_bolt",
+        range: 520,
+        speed: 480,
+        damage: 56,
+        count: 5,
+        spread: 0.24
+      },
+      loot: [L2("plague_ivory", 5, 9, 1), L2("feverlands_fragment", 1, 2, 1), L2("antibiotic", 1, 3, 1)],
+      respawn: 600,
+      disease: ["fever_dream", 0.2]
+    },
+    comet_hound: {
+      name: "Comet hound",
+      hp: 600,
+      damage: 52,
+      speed: [60, 210],
+      move: "walker",
+      sight: 420,
+      reach: 50,
+      cooldown: 1,
+      defense: 18,
+      loot: [L2("fallen_star", 1, 1, 0.3), L2("hide", 1, 2, 1)],
+      respawn: 140
+    },
+    lens_golem: {
+      name: "Lens golem",
+      hp: 980,
+      damage: 60,
+      speed: [20, 60],
+      move: "walker",
+      sight: 340,
+      reach: 64,
+      cooldown: 1.8,
+      defense: 44,
+      ranged: { projectile: "star_bolt", range: 460, speed: 600, damage: 56, count: 1, spread: 0 },
+      loot: [L2("astral_lens", 2, 4, 1), L2("crystal", 1, 2, 1)],
+      respawn: 200
+    },
+    star_wisp: {
+      name: "Star wisp",
+      hp: 480,
+      damage: 46,
+      speed: [50, 140],
+      move: "floater",
+      sight: 500,
+      reach: 42,
+      cooldown: 2.2,
+      defense: 10,
+      ranged: { projectile: "star_bolt", range: 500, speed: 420, damage: 52, count: 2, spread: 0.2 },
+      loot: [L2("fallen_star", 1, 1, 0.25), L2("observatory_fragment", 1, 1, 0.05)],
+      respawn: 150
+    },
+    orrery_drone: {
+      name: "Orrery drone",
+      hp: 540,
+      damage: 48,
+      speed: [60, 160],
+      move: "flier",
+      sight: 520,
+      reach: 44,
+      cooldown: 2,
+      defense: 24,
+      ranged: { projectile: "star_bolt", range: 480, speed: 520, damage: 50, count: 3, spread: 0.14 },
+      loot: [L2("brass_gear", 1, 3, 1), L2("astral_lens", 1, 1, 0.3)],
+      respawn: 150
+    },
+    moon_moth: {
+      name: "Moon moth",
+      hp: 440,
+      damage: 46,
+      speed: [60, 180],
+      move: "flier",
+      sight: 440,
+      reach: 42,
+      cooldown: 1.1,
+      defense: 8,
+      loot: [L2("silk", 1, 2, 1), L2("void_lily", 1, 1, 0.3)],
+      respawn: 120
+    },
+    constellation: {
+      name: "Constellation",
+      hp: 3400,
+      damage: 64,
+      speed: [40, 130],
+      move: "floater",
+      sight: 760,
+      reach: 60,
+      cooldown: 1.5,
+      defense: 36,
+      ranged: { projectile: "star_bolt", range: 560, speed: 520, damage: 58, count: 6, spread: 0.28 },
+      loot: [
+        L2("astral_lens", 5, 9, 1),
+        L2("observatory_fragment", 1, 2, 1),
+        L2("fallen_star", 2, 4, 1)
+      ],
+      respawn: 600
+    },
+    gutter_rat: {
+      name: "Gutter rat",
+      hp: 480,
+      damage: 46,
+      speed: [56, 170],
+      move: "walker",
+      sight: 360,
+      reach: 46,
+      cooldown: 1,
+      defense: 12,
+      loot: [L2("coin", 4, 12, 1), L2("hide", 1, 1, 0.4)],
+      respawn: 120,
+      disease: ["fever", 0.12]
+    },
+    crown_thief: {
+      name: "Crown thief",
+      hp: 560,
+      damage: 52,
+      speed: [60, 210],
+      move: "walker",
+      sight: 460,
+      reach: 48,
+      cooldown: 1,
+      defense: 16,
+      loot: [L2("coin", 10, 30, 1), L2("crown_gold", 1, 1, 0.3)],
+      respawn: 140,
+      disease: ["wound", 0.16]
+    },
+    gilded_slime: {
+      name: "Gilded slime",
+      hp: 620,
+      damage: 48,
+      speed: [40, 110],
+      move: "hopper",
+      sight: 300,
+      reach: 48,
+      cooldown: 1.3,
+      defense: 26,
+      loot: [L2("gel", 1, 3, 1), L2("crown_gold", 1, 2, 0.6)],
+      respawn: 140
+    },
+    tax_collector: {
+      name: "Tax collector",
+      hp: 640,
+      damage: 50,
+      speed: [26, 80],
+      move: "walker",
+      sight: 560,
+      reach: 46,
+      cooldown: 2,
+      defense: 24,
+      ranged: { projectile: "coin_shot", range: 560, speed: 620, damage: 54, count: 4, spread: 0.18 },
+      loot: [L2("coin", 20, 50, 1), L2("gutter_fragment", 1, 1, 0.05)],
+      respawn: 170
+    },
+    sewer_eel: {
+      name: "Sewer eel",
+      hp: 520,
+      damage: 50,
+      speed: [46, 140],
+      move: "floater",
+      sight: 340,
+      reach: 46,
+      cooldown: 1.2,
+      defense: 10,
+      loot: [L2("raw_fish", 1, 2, 1)],
+      respawn: 130,
+      disease: ["dysentery", 0.16]
+    },
+    gilded_guard: {
+      name: "Gilded guard",
+      hp: 3400,
+      damage: 68,
+      speed: [30, 100],
+      move: "walker",
+      sight: 720,
+      reach: 70,
+      cooldown: 1.5,
+      defense: 48,
+      ranged: { projectile: "coin_shot", range: 520, speed: 640, damage: 58, count: 6, spread: 0.22 },
+      loot: [L2("crown_gold", 6, 10, 1), L2("gutter_fragment", 1, 2, 1), L2("gold_ingot", 3, 6, 1)],
+      respawn: 600
+    },
+    razor_eel: {
+      name: "Razor eel",
+      hp: 720,
+      damage: 60,
+      speed: [60, 190],
+      move: "floater",
+      sight: 420,
+      reach: 50,
+      cooldown: 1.1,
+      defense: 16,
+      loot: [L2("raw_fish", 1, 3, 1), L2("abyssal_pearl", 1, 1, 0.2)],
+      respawn: 140,
+      disease: ["bleeding", 0.2]
+    },
+    pearl_crab: {
+      name: "Pearl crab",
+      hp: 900,
+      damage: 62,
+      speed: [30, 90],
+      move: "walker",
+      sight: 320,
+      reach: 54,
+      cooldown: 1.5,
+      defense: 48,
+      loot: [L2("crab_shell", 2, 3, 1), L2("abyssal_pearl", 1, 2, 0.5)],
+      respawn: 160
+    },
+    drowned_diver: {
+      name: "Drowned diver",
+      hp: 840,
+      damage: 64,
+      speed: [34, 100],
+      move: "floater",
+      sight: 400,
+      reach: 56,
+      cooldown: 1.4,
+      defense: 30,
+      loot: [L2("bone", 2, 4, 1), L2("respirator", 1, 1, 0.03), L2("undertow_fragment", 1, 1, 0.05)],
+      respawn: 170,
+      disease: ["wound", 0.18]
+    },
+    abyss_angler: {
+      name: "Abyss angler",
+      hp: 700,
+      damage: 58,
+      speed: [40, 120],
+      move: "floater",
+      sight: 560,
+      reach: 46,
+      cooldown: 2.2,
+      defense: 20,
+      ranged: { projectile: "lure_orb", range: 540, speed: 420, damage: 64, count: 1, spread: 0 },
+      loot: [L2("raw_fish", 2, 3, 1), L2("abyssal_pearl", 1, 1, 0.3)],
+      respawn: 160
+    },
+    jelly_bell: {
+      name: "Jelly bell",
+      hp: 600,
+      damage: 56,
+      speed: [30, 90],
+      move: "floater",
+      sight: 380,
+      reach: 46,
+      cooldown: 1.4,
+      defense: 8,
+      loot: [L2("gel", 2, 4, 1)],
+      respawn: 130,
+      disease: ["poisoning", 0.22]
+    },
+    abyssal_titan: {
+      name: "Abyssal titan",
+      hp: 4200,
+      damage: 76,
+      speed: [30, 100],
+      move: "floater",
+      sight: 760,
+      reach: 72,
+      cooldown: 1.6,
+      defense: 50,
+      ranged: { projectile: "bubble", range: 540, speed: 420, damage: 66, count: 6, spread: 0.3 },
+      loot: [
+        L2("abyssal_pearl", 6, 10, 1),
+        L2("undertow_fragment", 1, 2, 1),
+        L2("voidsteel_ingot", 1, 3, 1)
+      ],
+      respawn: 600
+    },
+    slag_slime: {
+      name: "Slag slime",
+      hp: 760,
+      damage: 60,
+      speed: [40, 110],
+      move: "hopper",
+      sight: 320,
+      reach: 50,
+      cooldown: 1.3,
+      defense: 30,
+      loot: [L2("gel", 1, 3, 1), L2("heartstone", 1, 1, 0.4)],
+      respawn: 140
+    },
+    anvil_golem: {
+      name: "Anvil golem",
+      hp: 1300,
+      damage: 72,
+      speed: [20, 60],
+      move: "walker",
+      sight: 340,
+      reach: 70,
+      cooldown: 1.8,
+      defense: 58,
+      loot: [L2("heartstone", 2, 4, 1), L2("hellstone_ingot", 1, 2, 0.5)],
+      respawn: 200
+    },
+    hammer_knight: {
+      name: "Hammer knight",
+      hp: 980,
+      damage: 70,
+      speed: [30, 100],
+      move: "walker",
+      sight: 400,
+      reach: 66,
+      cooldown: 1.5,
+      defense: 44,
+      loot: [L2("heartstone", 1, 2, 1), L2("emberheart_fragment", 1, 1, 0.05)],
+      respawn: 170,
+      disease: ["fracture", 0.1]
+    },
+    cinder_wyrm: {
+      name: "Cinder wyrm",
+      hp: 880,
+      damage: 66,
+      speed: [46, 150],
+      move: "floater",
+      sight: 420,
+      reach: 52,
+      cooldown: 1.3,
+      defense: 26,
+      ranged: { projectile: "kiln_ember", range: 460, speed: 480, damage: 62, count: 3, spread: 0.2 },
+      loot: [L2("heartstone", 1, 2, 1), L2("sulfur", 2, 4, 1)],
+      respawn: 160
+    },
+    forge_drake: {
+      name: "Forge drake",
+      hp: 820,
+      damage: 64,
+      speed: [60, 190],
+      move: "flier",
+      sight: 500,
+      reach: 50,
+      cooldown: 1.8,
+      defense: 24,
+      ranged: { projectile: "fireball", range: 520, speed: 520, damage: 66, count: 2, spread: 0.16 },
+      loot: [L2("obsidian", 1, 3, 1), L2("hide", 1, 2, 1)],
+      respawn: 150
+    },
+    forge_colossus: {
+      name: "Forge colossus",
+      hp: 4400,
+      damage: 80,
+      speed: [26, 90],
+      move: "walker",
+      sight: 760,
+      reach: 76,
+      cooldown: 1.7,
+      defense: 60,
+      ranged: {
+        projectile: "kiln_ember",
+        range: 520,
+        speed: 520,
+        damage: 70,
+        count: 6,
+        spread: 0.26
+      },
+      loot: [
+        L2("heartstone", 6, 10, 1),
+        L2("emberheart_fragment", 1, 2, 1),
+        L2("hellstone_ingot", 3, 6, 1)
+      ],
+      respawn: 600
+    },
+    thorn_stag: {
+      name: "Thorn stag",
+      hp: 900,
+      damage: 66,
+      speed: [50, 190],
+      move: "walker",
+      sight: 420,
+      reach: 58,
+      cooldown: 1.3,
+      defense: 28,
+      loot: [L2("raw_meat", 2, 3, 1), L2("hide", 1, 3, 1)],
+      respawn: 150,
+      disease: ["bleeding", 0.16]
+    },
+    bramble_golem: {
+      name: "Bramble golem",
+      hp: 1280,
+      damage: 72,
+      speed: [22, 70],
+      move: "walker",
+      sight: 340,
+      reach: 68,
+      cooldown: 1.7,
+      defense: 50,
+      ranged: { projectile: "thorn", range: 460, speed: 600, damage: 60, count: 3, spread: 0.2 },
+      loot: [L2("seasonbloom", 2, 4, 1), L2("wood", 3, 6, 1)],
+      respawn: 200
+    },
+    season_wolf: {
+      name: "Season wolf",
+      hp: 820,
+      damage: 64,
+      speed: [56, 200],
+      move: "walker",
+      sight: 420,
+      reach: 52,
+      cooldown: 1,
+      defense: 24,
+      loot: [L2("hide", 1, 2, 1), L2("raw_meat", 1, 2, 1)],
+      respawn: 140,
+      disease: ["rabies", 0.03]
+    },
+    bloom_sprite: {
+      name: "Bloom sprite",
+      hp: 640,
+      damage: 58,
+      speed: [50, 140],
+      move: "floater",
+      sight: 520,
+      reach: 44,
+      cooldown: 2.2,
+      defense: 14,
+      ranged: { projectile: "petal", range: 520, speed: 460, damage: 60, count: 3, spread: 0.26 },
+      loot: [L2("seasonbloom", 1, 2, 1), L2("garden_fragment", 1, 1, 0.05)],
+      respawn: 150
+    },
+    petal_moth: {
+      name: "Petal moth",
+      hp: 600,
+      damage: 56,
+      speed: [60, 180],
+      move: "flier",
+      sight: 440,
+      reach: 44,
+      cooldown: 1.1,
+      defense: 10,
+      loot: [L2("silk", 1, 2, 1), L2("berry", 1, 3, 0.5)],
+      respawn: 120
+    },
+    harvest_lord: {
+      name: "Harvest lord",
+      hp: 4600,
+      damage: 82,
+      speed: [30, 100],
+      move: "walker",
+      sight: 760,
+      reach: 74,
+      cooldown: 1.6,
+      defense: 54,
+      ranged: { projectile: "thorn", range: 520, speed: 620, damage: 70, count: 6, spread: 0.26 },
+      loot: [L2("seasonbloom", 6, 10, 1), L2("garden_fragment", 1, 2, 1), L2("life_fruit", 1, 1, 0.3)],
+      respawn: 600
+    },
+    mother_of_rot: {
+      name: "The Mother of Rot",
+      hp: 11500,
+      damage: 64,
+      speed: [40, 120],
+      move: "hopper",
+      sight: 1400,
+      reach: 100,
+      cooldown: 1.3,
+      defense: 40,
+      boss: true,
+      loot: [
+        L2("rot_heart", 1, 1, 1),
+        L2("plague_ivory", 12, 18, 1),
+        L2("feverlands_fragment", 2, 3, 1),
+        L2("life_fruit", 1, 1, 1)
+      ],
+      respawn: 0,
+      disease: ["fever", 0.3]
+    },
+    the_astronomer: {
+      name: "The Astronomer",
+      hp: 12e3,
+      damage: 66,
+      speed: [70, 200],
+      move: "floater",
+      sight: 1400,
+      reach: 90,
+      cooldown: 1.2,
+      defense: 42,
+      boss: true,
+      loot: [
+        L2("astronomer_eye", 1, 1, 1),
+        L2("astral_lens", 12, 18, 1),
+        L2("observatory_fragment", 2, 3, 1),
+        L2("life_fruit", 1, 1, 1)
+      ],
+      respawn: 0
+    },
+    pauper_king: {
+      name: "The Pauper King",
+      hp: 12500,
+      damage: 70,
+      speed: [40, 130],
+      move: "walker",
+      sight: 1400,
+      reach: 96,
+      cooldown: 1.3,
+      defense: 46,
+      boss: true,
+      loot: [
+        L2("kings_ransom", 1, 1, 1),
+        L2("crown_gold", 12, 18, 1),
+        L2("gutter_fragment", 2, 3, 1),
+        L2("coin", 400, 800, 1),
+        L2("life_fruit", 1, 1, 1)
+      ],
+      respawn: 0
+    },
+    the_leviathan: {
+      name: "The Leviathan",
+      hp: 15500,
+      damage: 78,
+      speed: [80, 230],
+      move: "floater",
+      sight: 1600,
+      reach: 110,
+      cooldown: 1.2,
+      defense: 50,
+      boss: true,
+      loot: [
+        L2("leviathan_heart", 1, 1, 1),
+        L2("abyssal_pearl", 14, 20, 1),
+        L2("undertow_fragment", 2, 3, 1),
+        L2("life_fruit", 1, 1, 1)
+      ],
+      respawn: 0
+    },
+    anvil_god: {
+      name: "The Anvil God",
+      hp: 16500,
+      damage: 84,
+      speed: [30, 100],
+      move: "walker",
+      sight: 1600,
+      reach: 120,
+      cooldown: 1.4,
+      defense: 60,
+      boss: true,
+      loot: [
+        L2("anvil_heart", 1, 1, 1),
+        L2("heartstone", 14, 20, 1),
+        L2("emberheart_fragment", 2, 3, 1),
+        L2("life_fruit", 1, 1, 1)
+      ],
+      respawn: 0
+    },
+    four_faced_warden: {
+      name: "The Four-Faced Warden",
+      hp: 16e3,
+      damage: 80,
+      speed: [50, 150],
+      move: "walker",
+      sight: 1600,
+      reach: 110,
+      cooldown: 1.3,
+      defense: 54,
+      boss: true,
+      loot: [
+        L2("warden_face", 1, 1, 1),
+        L2("seasonbloom", 14, 20, 1),
+        L2("garden_fragment", 2, 3, 1),
+        L2("life_fruit", 1, 1, 1)
+      ],
+      respawn: 0
+    }
+  });
   for (const st of SETTLERS)
     MOBS[st.id] = {
       name: `${st.name} ${st.title}`,
@@ -6579,7 +8231,13 @@
     ossuary_hydra: { item: "marches_key", place: "marches", music: "boss" },
     engine_saint: { item: "barrow_key", place: "barrow", music: "boss" },
     mirage_tyrant: { item: "saltflats_key", place: "saltflats", music: "boss" },
-    the_hymnal: { item: "choir_key", place: "choir", music: "boss" }
+    the_hymnal: { item: "choir_key", place: "choir", music: "boss" },
+    mother_of_rot: { item: "feverlands_key", place: "feverlands", music: "boss" },
+    the_astronomer: { item: "observatory_key", place: "observatory", music: "boss" },
+    pauper_king: { item: "gutter_key", place: "gutter", music: "boss" },
+    the_leviathan: { item: "undertow_key", place: "undertow", music: "boss" },
+    anvil_god: { item: "emberheart_key", place: "emberheart", music: "boss" },
+    four_faced_warden: { item: "garden_key", place: "garden", music: "boss" }
   };
   var isAggressive = (type) => type === "boss" || (MOBS[type]?.sight ?? 0) > 0;
   var mobName = (type) => MOBS[type]?.name ?? type;
@@ -6677,7 +8335,49 @@
     engine_saint: "golem",
     mirage_tyrant: "wisp",
     tyrant_mirage: "wisp",
-    the_hymnal: "golem"
+    the_hymnal: "golem",
+    plague_rat: "wolf",
+    rot_toad: "slime",
+    ivory_beetle: "scorpion",
+    bog_shaman: "wraith",
+    fever_mosquito: "bat",
+    plague_knight: "knight",
+    comet_hound: "hellhound",
+    lens_golem: "golem",
+    star_wisp: "wisp",
+    orrery_drone: "wisp",
+    moon_moth: "bat",
+    constellation: "wisp",
+    gutter_rat: "wolf",
+    crown_thief: "ghoul",
+    gilded_slime: "slime",
+    tax_collector: "bones",
+    sewer_eel: "serpent",
+    gilded_guard: "knight",
+    razor_eel: "serpent",
+    pearl_crab: "scorpion",
+    drowned_diver: "ghoul",
+    abyss_angler: "wisp",
+    jelly_bell: "slime",
+    abyssal_titan: "golem",
+    slag_slime: "slime",
+    anvil_golem: "golem",
+    hammer_knight: "knight",
+    cinder_wyrm: "serpent",
+    forge_drake: "harpy",
+    forge_colossus: "golem",
+    thorn_stag: "boar",
+    bramble_golem: "golem",
+    season_wolf: "wolf",
+    bloom_sprite: "wisp",
+    petal_moth: "bat",
+    harvest_lord: "knight",
+    mother_of_rot: "slime",
+    the_astronomer: "wisp",
+    pauper_king: "ghoul",
+    the_leviathan: "serpent",
+    anvil_god: "golem",
+    four_faced_warden: "knight"
   };
 
   // src/data/food.ts
@@ -7235,6 +8935,96 @@
       { coldResist: 3 },
       "Shrug off 3\xB0 of cold"
     ),
+    creatures(
+      "feverlands",
+      "The Feverlands",
+      [
+        "plague_rat",
+        "rot_toad",
+        "ivory_beetle",
+        "bog_shaman",
+        "fever_mosquito",
+        "plague_knight",
+        "mother_of_rot"
+      ],
+      { disease: 0.08 },
+      "8% chance to shrug off a sickness"
+    ),
+    creatures(
+      "observatory",
+      "The Sunken Observatory",
+      [
+        "comet_hound",
+        "lens_golem",
+        "star_wisp",
+        "orrery_drone",
+        "moon_moth",
+        "constellation",
+        "the_astronomer"
+      ],
+      { magicDmg: 0.05, maxMana: 20 },
+      "+5% magic damage, +20 mana"
+    ),
+    creatures(
+      "gutter",
+      "The Gutter of Kings",
+      [
+        "gutter_rat",
+        "crown_thief",
+        "gilded_slime",
+        "tax_collector",
+        "sewer_eel",
+        "gilded_guard",
+        "pauper_king"
+      ],
+      { coins: 0.2 },
+      "20% more silver marks"
+    ),
+    creatures(
+      "undertow",
+      "The Undertow",
+      [
+        "razor_eel",
+        "pearl_crab",
+        "drowned_diver",
+        "abyss_angler",
+        "jelly_bell",
+        "abyssal_titan",
+        "the_leviathan"
+      ],
+      { defense: 3 },
+      "+3 defense"
+    ),
+    creatures(
+      "emberheart",
+      "Emberheart",
+      [
+        "slag_slime",
+        "anvil_golem",
+        "hammer_knight",
+        "cinder_wyrm",
+        "forge_drake",
+        "forge_colossus",
+        "anvil_god"
+      ],
+      { meleeDmg: 0.06 },
+      "+6% melee damage"
+    ),
+    creatures(
+      "garden",
+      "The Garden of Lost Seasons",
+      [
+        "thorn_stag",
+        "bramble_golem",
+        "season_wolf",
+        "bloom_sprite",
+        "petal_moth",
+        "harvest_lord",
+        "four_faced_warden"
+      ],
+      { maxHp: 30 },
+      "+30 health"
+    ),
     {
       id: "regions",
       name: "The nine regions",
@@ -7279,7 +9069,13 @@
         "marches",
         "barrow",
         "saltflats",
-        "choir"
+        "choir",
+        "feverlands",
+        "observatory",
+        "gutter",
+        "undertow",
+        "emberheart",
+        "garden"
       ],
       bonus: { xp: 0.1 },
       bonusText: "+10% renown"
@@ -7347,7 +9143,13 @@
         "hydra_tooth",
         "saint_cog",
         "tyrant_eye",
-        "hymnal_bell"
+        "hymnal_bell",
+        "rot_mask",
+        "astrolabe",
+        "pauper_crown",
+        "leviathan_scale",
+        "anvil_spark",
+        "seasons_seed"
       ],
       bonus: { luck: 0.1 },
       bonusText: "Loot 10% more likely"
@@ -7373,7 +9175,19 @@
     hydra_heart: ["regen"],
     engine_heart: ["stamina"],
     mirage_crown: ["damage10"],
-    hymnal_core: ["defense3"]
+    hymnal_core: ["defense3"],
+    rot_mask: ["plagueward", "regen"],
+    astrolabe: ["starward", "mana40"],
+    pauper_crown: ["goldward", "damage10"],
+    leviathan_scale: ["gills", "defense3"],
+    anvil_spark: ["forgeward", "fire"],
+    seasons_seed: ["seasonward", "regen"],
+    rot_heart: ["regen"],
+    astronomer_eye: ["magic15"],
+    kings_ransom: ["damage10"],
+    leviathan_heart: ["defense3"],
+    anvil_heart: ["lava"],
+    warden_face: ["stamina"]
   };
   var EFFECT_TEXT = {
     swim: "swim freely",
@@ -7394,7 +9208,15 @@
     speed20: "+20% speed",
     mana40: "+40 mana",
     magic15: "+15% magic damage",
-    defense3: "+3 defense"
+    defense3: "+3 defense",
+    plagueward: "plague bites carry nothing",
+    starward: "star pulses pass through you",
+    goldward: "cursed gold cannot touch you",
+    gills: "breathe the sea",
+    forgeward: "magma cannot burn you",
+    seasonward: "the seasons cannot touch you",
+    lava: "resist lava and heat",
+    breath: "hold your breath far longer"
   };
   var relicText = (id) => (RELIC_EFFECTS[id] ?? []).map((k) => EFFECT_TEXT[k] ?? k).join(", ");
   var shelfSlots = (renown) => 3 + (renown >= 20 ? 1 : 0) + (renown >= 40 ? 1 : 0);
@@ -7524,7 +9346,7 @@
       if (source && sk.ironGut >= 1) return false;
       if (source === "spoiled" && sk.ironGut > 0) return false;
       if (id === "frostbite" && sk.coldBlooded) return false;
-      const resist = sk.disease + (this.game.equipment.has("wayfarer") ? 0.2 : 0);
+      const resist = sk.disease + (this.game.equipment.has("wayfarer") ? 0.2 : 0) + (this.game.equipment.fullSet() === "plaguedoctor" ? 0.15 : 0);
       if (!now && def.kind !== "injury" && this.game.rng() < Math.min(0.7, resist)) return false;
       if (!now && def.kind === "illness" && (this.game.s.buffs.iron_gut ?? 0) > 0 && this.game.rng() < 0.5)
         return false;
@@ -7751,7 +9573,7 @@
     stats(id) {
       const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet();
       const melee = !f.ranged, heavy = family === "greatsword" || family === "battleaxe" || family === "warhammer", shooter = family === "bow" || family === "crossbow", magic = f.ranged === "magic";
-      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (set === "gearwright" ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === "prismweave" ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
+      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (set === "gearwright" ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === "prismweave" || set === "astral" ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
       const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
       const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
       return {
@@ -8430,6 +10252,207 @@
             for (const dx of [-200, 200]) this.minion("choir_wraith", a.x + dx, a.y - 200);
           if (!this.game.equipment.has("hymnward") && dist(a, p) < 500)
             s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.012, 30, 41);
+          break;
+        }
+        // ── Band IV and V realms ──
+        case "mother_of_rot": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          if (this.due(a, "leap", rage ? 3 : 4.5)) {
+            a.vy = -760;
+            a.vx = face * Math.min(520, Math.abs(p.x - a.x) * 1.2);
+            a.timers.landing = 1;
+            a.warning = 0.5;
+          }
+          const air = (a.vy ?? 0) < 0 || a.timers.landing;
+          if (!air) a.vx = (a.vx ?? 0) * 0.9;
+          const before = a.vy ?? 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (a.timers.landing && before > 0 && (a.vy ?? 0) === 0) {
+            a.timers.landing = 0;
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                320,
+                48,
+                "mob"
+              );
+            this.game.sound("slam", a.x, a.y, 1.3);
+          }
+          if (this.due(a, "spit", 2.4))
+            this.game.combat.mobShoot(a, "plague_bolt", 440, 46, rage ? 5 : 3, 0.22);
+          if (this.due(a, "brood", rage ? 8 : 12))
+            for (const dx of [-160, 160])
+              this.minion("rot_toad", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          if (rage && this.due(a, "miasma", 7)) this.ring(a, "plague_bolt", 12, 300, 44, t);
+          break;
+        }
+        case "the_astronomer": {
+          this.steer(
+            a,
+            p.x + Math.cos(t * 0.6) * 320,
+            p.y - 240 + Math.sin(t) * 60,
+            spec.speed[1],
+            dt,
+            1.4
+          );
+          if (this.due(a, "fan", 2))
+            this.game.combat.mobShoot(a, "star_bolt", 520, 50, rage ? 7 : 5, 0.14);
+          if (this.due(a, "orbit", rage ? 5 : 7)) this.ring(a, "star_bolt", 16, 300, 46, t);
+          if (this.due(a, "pulse", rage ? 6 : 9))
+            for (const dx of [-120, 0, 120])
+              this.game.combat.spawn(
+                "star_pulse",
+                { x: p.x + dx, y: p.y - 540 },
+                Math.PI / 2,
+                700,
+                56,
+                "mob"
+              );
+          if (rage && this.due(a, "upend", 10)) {
+            p.vy = -820;
+            this.game.say("The Astronomer turns the sky over!", "danger");
+            this.game.sound("portal", p.x, p.y, 1);
+          }
+          if (this.due(a, "stars", rage ? 10 : 14))
+            for (const dx of [-220, 220]) this.minion("star_wisp", a.x + dx, a.y);
+          break;
+        }
+        case "pauper_king": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 160 ? face * (rage ? spec.speed[1] : spec.speed[0]) : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "coins", 1.8))
+            this.game.combat.mobShoot(a, "coin_shot", 640, 50, rage ? 7 : 5, 0.18);
+          if (dist(a, p) < 150 && this.due(a, "tax", 5)) {
+            const take = Math.floor(this.game.count("coin") * 0.1);
+            if (take > 0) {
+              this.game.remove("coin", take);
+              a.hp = Math.min(a.maxHp, a.hp + take * 4);
+              this.game.say(`The Pauper King taxes you ${take} marks, and grows stronger.`, "danger");
+            }
+          }
+          if (this.due(a, "thieves", rage ? 8 : 12))
+            for (const dx of [-180, 180])
+              this.minion("crown_thief", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          if (rage && this.due(a, "rain", 6))
+            for (let i = 0; i < 9; i++)
+              this.game.combat.spawn(
+                "coin_shot",
+                { x: p.x + (i - 4) * 70, y: p.y - 480 },
+                Math.PI / 2,
+                260,
+                44,
+                "mob"
+              );
+          break;
+        }
+        case "the_leviathan": {
+          a.timers ??= {};
+          const charging = t < (a.timers.charge ?? 0);
+          if (!charging)
+            this.steer(
+              a,
+              p.x - face * 260,
+              p.y - 40 + Math.sin(t * 1.3) * 120,
+              spec.speed[0],
+              dt,
+              1.2
+            );
+          else {
+            a.x += (a.vx ?? 0) * dt;
+            a.y += (a.vy ?? 0) * dt;
+          }
+          if (!charging && this.due(a, "charge", rage ? 4 : 6)) {
+            const d = Math.hypot(p.x - a.x, p.y - a.y) || 1;
+            a.vx = (p.x - a.x) / d * 620;
+            a.vy = (p.y - 30 - a.y) / d * 620;
+            a.timers.charge = t + 1.1;
+            a.warning = 0.6;
+            this.game.sound("boss", a.x, a.y, 1.3);
+          }
+          if (this.due(a, "bubbles", 3)) this.ring(a, "bubble", rage ? 14 : 10, 260, 58, t);
+          if (rage && dist(a, p) < 600) p.x += Math.sign(a.x - p.x) * 40 * dt;
+          if (this.due(a, "eels", rage ? 9 : 13))
+            for (const dx of [-240, 240]) this.minion("razor_eel", a.x + dx, a.y);
+          break;
+        }
+        case "anvil_god": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 220 ? face * spec.speed[0] : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "slam", rage ? 3 : 4)) {
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                380,
+                60,
+                "mob"
+              );
+            this.game.sound("slam", a.x, a.y, 1.5);
+            a.warning = 0.4;
+          }
+          if (this.due(a, "sparks", 2.4))
+            this.game.combat.mobShoot(a, "kiln_ember", 520, 56, rage ? 7 : 5, 0.18);
+          if (this.due(a, "rain", rage ? 5 : 8))
+            for (let i = 0; i < 8; i++)
+              this.game.combat.spawn(
+                "fireball",
+                { x: p.x + (i - 3.5) * 80, y: p.y - 500 },
+                Math.PI / 2,
+                260,
+                52,
+                "mob"
+              );
+          if (rage && this.due(a, "geyser", 6))
+            for (const dx of [-300, -150, 150, 300])
+              this.game.combat.spawn(
+                "fireball",
+                { x: a.x + dx, y: a.y - 10 },
+                -Math.PI / 2,
+                620,
+                58,
+                "mob"
+              );
+          if (this.due(a, "smiths", rage ? 10 : 14))
+            for (const dx of [-200, 200])
+              this.minion("hammer_knight", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          break;
+        }
+        case "four_faced_warden": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 200 ? face * spec.speed[0] * (rage ? 1.4 : 1) : 0;
+          this.game.wildlife.moveBody(a, dt);
+          const faceNow = Math.floor((t - (a.timers.start ?? 0)) / 12) % 4;
+          if (faceNow !== a.timers.face) {
+            a.timers.face = faceNow;
+            this.game.say(
+              `The Warden turns its ${["spring", "summer", "autumn", "winter"][faceNow]} face!`,
+              "danger"
+            );
+            a.warning = 0.8;
+          }
+          if (this.due(a, "volley", 2)) {
+            if (faceNow === 0) this.game.combat.mobShoot(a, "petal", 460, 50, rage ? 7 : 5, 0.26);
+            else if (faceNow === 1)
+              this.game.combat.mobShoot(a, "heat_bolt", 480, 58, rage ? 4 : 3, 0.2);
+            else if (faceNow === 2) this.ring(a, "thorn", rage ? 14 : 10, 380, 54, t);
+            else this.game.combat.mobShoot(a, "frost_bolt", 520, 56, rage ? 6 : 4, 0.16);
+          }
+          if (faceNow === 3 && dist(a, p) < 500 && !this.game.equipment.has("seasonward"))
+            s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.02, 30, 41);
+          if (faceNow === 1 && dist(a, p) < 500 && !this.game.equipment.has("seasonward"))
+            s.vitals.hydration = clamp(s.vitals.hydration - dt * 0.3, 0, 100);
+          if (this.due(a, "pack", rage ? 9 : 13))
+            for (const dx of [-200, 200])
+              this.minion("season_wolf", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
           break;
         }
         case "unmaker": {
@@ -9485,7 +11508,7 @@
       },
       realm: {
         usage: "realm <id> [tier] | realm home | realm close",
-        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir) at a tier and step in, go home, or collapse it.",
+        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden) at a tier and step in, go home, or collapse it.",
         run: ([id, tier]) => {
           const pocket = this.game.pocket;
           if (id === "home") return pocket.leave().ok ? ["Home."] : ["! No realm is open."];
@@ -9817,8 +11840,8 @@
     temperatureAt(x, y) {
       const b = biomeAt(x, y), layer = layerAt(x, y);
       if (layer.id === "upper_mines") return layer.temp + b.temp * 0.25;
-      if (layer.id !== "surface") return layer.temp;
-      return b.temp + (this.isNight() ? -8 : 0) + (this.game.s.weather === "rain" ? -4 : this.game.s.weather === "storm" ? -7 : 0);
+      if (layer.id !== "surface") return layer.temp + this.game.pocket.seasonShift(x);
+      return b.temp + this.game.pocket.seasonShift(x) + (this.isNight() ? -8 : 0) + (this.game.s.weather === "rain" ? -4 : this.game.s.weather === "storm" ? -7 : 0);
     }
     // Moves the clock forward and occasionally turns the weather.
     advance(dt) {
@@ -9966,6 +11989,8 @@
       d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has("vanguard") ? 3 : 0);
       if (this.fullSet() === "bonewalker") d += 3;
       if (this.fullSet() === "amberguard") d += 2;
+      if (this.fullSet() === "leviathan") d += 3;
+      if (this.fullSet() === "forgeborn") d += 4;
       d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
@@ -10063,7 +12088,7 @@
         this.maxMana()
       );
       let regen = 0;
-      if (fx.has("regen")) regen += 0.6;
+      if (fx.has("regen") || this.fullSet() === "druid") regen += 0.6;
       if (fx.has("buff:regeneration")) regen += 1.2;
       if (fx.has("spores")) regen += 0.5;
       if (fx.has("home")) regen += 0.35;
@@ -10720,7 +12745,7 @@
     // ─── Time passing ──────────────────────────────────────────────────────────
     /** Ages food in the pack and in every larder, burns storages' ice, and melts ice you carry. */
     advance(dt) {
-      const s = this.game.s, env2 = this.game.environment, air = this.game.temperature(), near = this.nearest(), cool = this.game.pocket.preserves() ? 0 : this.packCooling();
+      const s = this.game.s, env2 = this.game.environment, air = this.game.temperature(), near = this.nearest(), cool = this.game.pocket.preserves() ? 0 : this.packCooling() * (this.game.pocket.here() ? this.game.pocket.season()?.rot ?? 1 : 1);
       const coolFor = near ? Math.min(dt, this.coldLeft(near)) : 0, mult = near ? this.multiplier(near) : 1;
       for (const e of s.inventory)
         if (e.fresh !== void 0) e.fresh -= (coolFor * mult + (dt - coolFor)) * rotRate(air) * cool;
@@ -10906,6 +12931,12 @@
   var Pocket = class extends System {
     caveInAt = 0;
     caveIn = null;
+    /** Seconds of breath left in the Undertow. */
+    breath = AIR_SECONDS;
+    drowningSaid = 0;
+    goldWas = -1;
+    magmaWas = false;
+    seasonWas = "";
     hymnWas = false;
     sunWas = false;
     ventAt = 0;
@@ -10956,7 +12987,8 @@
       return this.has("hungering") && this.here() ? 1.5 : 1;
     }
     gravityScale() {
-      return this.has("low_gravity") && this.here() ? 0.55 : 1;
+      const light = this.has("low_gravity") || this.inst()?.realm === "observatory";
+      return light && this.here() ? 0.55 : 1;
     }
     diseaseScale() {
       return this.has("blighted") && this.here() ? 2 : 1;
@@ -11015,6 +13047,8 @@
       this.banner = { name: tpl.name, tier: inst.tier, mods: inst.mods, at: this.game.s.elapsed };
       this.game.say(`You step into the ${tpl.name} \xB7 Tier ${TIER_NAMES[inst.tier]}.`, "victory");
       this.caveInAt = this.game.s.elapsed + 20;
+      this.breath = AIR_SECONDS;
+      this.goldWas = -1;
     }
     /** Leaves the realm for the Waystone you came from (it stays open behind you). */
     leave() {
@@ -11193,13 +13227,51 @@
     waterLevel() {
       const r = activeRealm();
       if (r?.tpl.hazard.id === "mire") return r.geo.mire;
+      if (r?.tpl.hazard.id === "pressure") return r.geo.sea;
+      if (r?.tpl.hazard.id === "magma")
+        return magmaLevel(r.geo, this.game.s.elapsed);
       if (!r || r.tpl.hazard.id !== "tide") return null;
       return tideLevel(r.geo, this.game.s.elapsed);
     }
     /** What fills the low ground: water, mire, or nothing. */
     waterKind() {
       const id = activeRealm()?.tpl.hazard.id;
-      return id === "tide" || id === "mire" ? id : null;
+      if (id === "pressure") return "deep";
+      return id === "tide" || id === "mire" || id === "magma" ? id : null;
+    }
+    /** Whether the player stands in the Emberheart's magma. */
+    inMagma() {
+      const p = this.game.s.player;
+      return this.waterKind() === "magma" && this.underwater(p.x, p.y - 8);
+    }
+    /** Breath left and its most, for the air gauge (null when breath is not an issue). */
+    air() {
+      if (this.waterKind() !== "deep" || !this.here() || this.game.equipment.has("gills"))
+        return null;
+      return [this.breath, AIR_SECONDS];
+    }
+    /** The Garden's season, if the player is in it. */
+    season() {
+      const r = activeRealm();
+      if (!r || r.tpl.hazard.id !== "seasons") return null;
+      return seasonAt(this.game.s.elapsed, r.inst.seed);
+    }
+    /** How far the Garden's season moves the air from its usual temperature. */
+    seasonShift(x = this.game.s.player.x) {
+      if (!inPocket(x)) return 0;
+      return this.season()?.temp ?? 0;
+    }
+    /** A Feverlands bite: it may carry any of the realm's sicknesses. */
+    feverBite() {
+      const r = activeRealm();
+      if (!r || r.tpl.hazard.id !== "fever" || !this.here()) return;
+      if (this.game.equipment.has("plagueward")) return;
+      if (this.game.rng() < FEVER_CHANCE * this.diseaseScale())
+        this.game.ailments.contract(FEVER_BITES[Math.floor(this.game.rng() * FEVER_BITES.length)]);
+    }
+    /** Whether the fever-dream is scrambling what the record shows. */
+    dreaming() {
+      return this.game.ailments.showing().some((a) => a.id === "fever_dream") && !this.game.equipment.has("plagueward");
     }
     /** Whether the player wades in the Marches' mire. */
     inMire() {
@@ -11237,6 +13309,7 @@
       let k = 1;
       if (this.inMire() && !fx.has("mirewalk")) k *= 0.55;
       if (this.hymnLevel() > 0.5 && !fx.has("hymnward") && !this.warmed()) k *= 0.6;
+      if (this.inMagma() && !fx.has("forgeward")) k *= 0.5;
       return k;
     }
     /** Steam vents blowing near a point. */
@@ -11254,7 +13327,8 @@
     /** Whether the player wades below the tide and it hinders them. */
     submerged() {
       const p = this.game.s.player;
-      return this.waterKind() === "tide" && this.underwater(p.x, p.y - 24) && !this.game.equipment.has("swim");
+      const kind = this.waterKind();
+      return (kind === "tide" || kind === "deep") && this.underwater(p.x, p.y - 24) && !this.game.equipment.has("swim") && !this.game.equipment.has("gills");
     }
     /** Strength of the ash storm where the player stands (0 when clear, sheltered, or warded). */
     ashLevel() {
@@ -11343,6 +13417,71 @@
           );
         this.hymnWas = hymn;
         if (hymn && !guarded) v.bodyTemp = clamp(v.bodyTemp - dt * 0.025 * hard, 30, 41);
+      }
+      if (tpl.hazard.id === "stars") {
+        if (!this.caveIn && starPulse(s.elapsed, inst.seed) > 0 && s.elapsed > this.caveInAt) {
+          this.caveIn = { x: p.x, y: p.y - 520, at: s.elapsed + 2.6, kind: "star" };
+          this.game.sound("star", p.x, p.y - 200, 1);
+          this.game.say("Light gathers overhead: a star pulse is coming!", "danger");
+        }
+        if (this.caveIn && s.elapsed >= this.caveIn.at) {
+          const c = this.caveIn, ward = fx.has("starward");
+          for (const dx of [-50, 0, 50])
+            this.game.combat.spawn(
+              "star_pulse",
+              { x: c.x + dx, y: c.y },
+              Math.PI / 2,
+              700,
+              ward ? 0 : 52 * hard,
+              "mob"
+            );
+          this.game.sound("thunder", c.x, c.y + 400, 0.9);
+          this.caveIn = null;
+          this.caveInAt = s.elapsed + 30;
+        }
+      }
+      if (tpl.hazard.id === "curse") {
+        const gold = this.game.count("coin") + this.game.count("gold_ingot") * 20 + this.game.count("crown_gold") * 5;
+        if (this.goldWas >= 0 && gold > this.goldWas && !fx.has("goldward")) {
+          if (this.game.rng() < 0.1 * hard * this.diseaseScale())
+            this.game.ailments.contract("gold_sickness");
+        }
+        this.goldWas = gold;
+      }
+      if (tpl.hazard.id === "pressure") {
+        const bell2 = s.structures.some((st) => st.type === "diving_bell" && dist(st, p) < 120);
+        if (bell2) this.breath = Math.min(AIR_SECONDS, this.breath + dt * 12);
+        else if (!fx.has("gills") && this.underwater(p.x, p.y - 40))
+          this.breath = Math.max(0, this.breath - dt * (fx.has("breath") ? 1 / 3 : 1) * hard);
+        if (this.breath <= 0) {
+          v.health = clamp(v.health - dt * 10, 0, this.game.maxHealth());
+          if (s.elapsed > this.drowningSaid) {
+            this.drowningSaid = s.elapsed + 4;
+            this.game.say("You are drowning! Find a diving bell!", "danger");
+          }
+        } else if (this.breath < 10 && s.elapsed > this.drowningSaid && !bell2) {
+          this.drowningSaid = s.elapsed + 6;
+          this.game.say("Your breath is running out.", "danger");
+        }
+      }
+      if (tpl.hazard.id === "magma") {
+        const rising = magmaLevel(activeRealm().geo, s.elapsed) < activeRealm().geo.low - 20;
+        if (rising && !this.magmaWas)
+          this.game.say("The magma is rising! Climb to the high ledges.", "danger");
+        this.magmaWas = rising;
+        if (this.inMagma() && !fx.has("forgeward")) {
+          v.health = clamp(v.health - dt * 16 * hard, 0, this.game.maxHealth());
+          if (this.game.rng() < dt * 0.3) this.game.ailments.contract("burn", true);
+        }
+      }
+      if (tpl.hazard.id === "seasons") {
+        const season = this.season();
+        if (season.id !== this.seasonWas && this.seasonWas)
+          this.game.say(
+            `${season.name} comes to the garden.`,
+            season.id === "winter" || season.id === "summer" ? "danger" : "ink"
+          );
+        this.seasonWas = season.id;
       }
       if (tpl.hazard.id === "tide") {
         const under = this.underwater(p.x, p.y - 24);
@@ -12045,7 +14184,7 @@
     /** Health lost per second to the heat of the hell layers. */
     heat() {
       const layer = this.game.layer().id, ward = this.game.s.player.ward ? 1 : 0, fx = this.game.equipment.effects();
-      if (fx.has("lava") || fx.has("buff:fireward")) return 0;
+      if (fx.has("lava") || fx.has("buff:fireward") || fx.has("forgeward")) return 0;
       const k = fx.has("heat") ? 0.5 : 1;
       if (layer === "upper_hell") return RULES.upperHellHeat[ward] * k;
       if (layer === "lower_hell") return RULES.lowerHellHeat[ward] * k;
@@ -12054,14 +14193,14 @@
     /** Health lost per second standing in lava, after wards and charms. */
     lavaBurn() {
       const fx = this.game.equipment.effects(), p = this.game.s.player;
-      if (!this.game.inLava() || fx.has("buff:fireward") || this.game.equipment.fullSet() === "cinder")
+      if (!this.game.inLava() || fx.has("buff:fireward") || fx.has("forgeward") || this.game.equipment.fullSet() === "cinder")
         return 0;
       return RULES.lavaDamage[p.ward ? 1 : 0] * (fx.has("lava") ? 0.35 : fx.has("fire") ? 0.7 : 1);
     }
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
+      const air = this.game.temperature() - (this.game.equipment.has("seasonward") ? this.game.pocket.seasonShift() : 0), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
@@ -12580,7 +14719,7 @@
         const coins = Math.max(
           1,
           Math.round(
-            spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more * (1 + this.game.skills.get("coins"))
+            spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more * (1 + this.game.skills.get("coins") + (this.game.equipment.fullSet() === "gilded" ? 0.25 : 0))
           )
         );
         this.game.drops.spawn("coin", coins, at.x, at.y - 20);
@@ -12842,6 +14981,7 @@
         );
         const thorns = this.game.skills.get("thorns") + (this.game.equipment.has("vanguard") ? 0.25 : 0);
         if (taken && thorns) this.game.combat.hurtMob(a, taken * thorns, p);
+        if (taken) this.game.pocket.feverBite();
         this.bite(a);
       }
       if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {
@@ -13615,10 +15755,10 @@
     }
   };
   var sprites = /* @__PURE__ */ new Map();
-  function cached(key, build9) {
+  function cached(key, build15) {
     let s = sprites.get(key);
     if (!s) {
-      s = build9();
+      s = build15();
       if (sprites.size > 4e3) sprites.clear();
       sprites.set(key, s);
     }
@@ -13903,6 +16043,76 @@
       flowers: ["#bfe0ff"],
       snowy: true
     },
+    feverlands: {
+      sky: ["#8a9a5a", "#e8e0a0"],
+      hills: ["#8a9a5a", "#6a7a44", "#4e5e34", "#3a4626"],
+      skyline: "rolling",
+      tree: "willow",
+      leaves: ["#4a6a2a", "#6a8a3a", "#9ab858"],
+      bark: "#4a3a24",
+      grass: ["#5a6a2a", "#7a8a3a", "#a8b858"],
+      cap: "moss",
+      flowers: ["#e8f070", "#c8584a"]
+    },
+    observatory: {
+      sky: ["#0a0c24", "#2a3060"],
+      hills: ["#2a2e50", "#222644", "#1a1e38", "#14182c"],
+      skyline: "spires",
+      tree: "voidtree",
+      leaves: ["#8a9aff", "#bfd0ff", "#fff0c0"],
+      bark: "#3a3a5a",
+      grass: ["#3a3e60", "#4a5078", "#6a70a0"],
+      cap: "none",
+      flowers: ["#fff0c0"],
+      alien: true
+    },
+    gutter: {
+      sky: ["#120e06", "#2e2410"],
+      hills: ["#2e2410", "#262010", "#1e180c", "#161208"],
+      skyline: "spires",
+      tree: "dead",
+      leaves: ["#6a5a2a", "#8a7a3a", "#d8b848"],
+      bark: "#4a3a1a",
+      grass: ["#4a4430", "#5a5440", "#7a7258"],
+      cap: "none",
+      flowers: ["#d8b848"],
+      alien: true
+    },
+    undertow: {
+      sky: ["#06182a", "#1a4a6a"],
+      hills: ["#1a3a54", "#143048", "#10263c", "#0a1c30"],
+      skyline: "sea",
+      tree: "willow",
+      leaves: ["#2a6a5a", "#3a8a6a", "#5ab08a"],
+      bark: "#2a4a3a",
+      grass: ["#3a6a5a", "#4a8a6a", "#6ab08a"],
+      cap: "none",
+      flowers: ["#f0a0c0", "#bfe8ff"],
+      alien: true
+    },
+    emberheart: {
+      sky: ["#1a0604", "#4a1a0a"],
+      hills: ["#4a1a0a", "#3a1408", "#2a0e06", "#1e0a04"],
+      skyline: "spires",
+      tree: "dead",
+      leaves: ["#8a3a1a", "#c85a2a", "#ff8a3a"],
+      bark: "#3a2018",
+      grass: ["#4a2a1a", "#6a3a1a", "#8a4a2a"],
+      cap: "none",
+      flowers: ["#ff8a3a"],
+      alien: true
+    },
+    garden: {
+      sky: ["#9ac0d8", "#f4ecd8"],
+      hills: ["#a8c890", "#8aac74", "#6c905a", "#507444"],
+      skyline: "rolling",
+      tree: "oak",
+      leaves: ["#4a7a3a", "#6a9a4a", "#d8703a"],
+      bark: "#5a4028",
+      grass: ["#5a8a3a", "#7aaa4a", "#a8d070"],
+      cap: "grass",
+      flowers: ["#f0a0c0", "#f0c850", "#d8703a", "#bfe0ff"]
+    },
     pocket: {
       sky: ["#0a080c", "#1a1420"],
       hills: ["#1a1420", "#16121c", "#120e18", "#0e0a14"],
@@ -13976,7 +16186,19 @@
     42: { base: "#e2dccf", pattern: "sand", cap: "region", wall: "#7a7266" },
     43: { base: "#d8b8b8", pattern: "crystal", accent: "#fff4f6", glow: "#e8a0a8", wall: "#5a4448" },
     44: { base: "#e4eef6", pattern: "ice", cap: "snow", wall: "#4a5a6a" },
-    45: { base: "#a8b8cc", pattern: "bigbrick", accent: "#e8f4ff", wall: "#2a3444" }
+    45: { base: "#a8b8cc", pattern: "bigbrick", accent: "#e8f4ff", wall: "#2a3444" },
+    46: { base: "#5a6a34", pattern: "mud", cap: "region", wall: "#22281a" },
+    47: { base: "#d8d0b0", pattern: "strata", accent: "#b8c870", wall: "#4a4630" },
+    48: { base: "#3a4a8a", pattern: "crystal", accent: "#dfe8ff", glow: "#8a9aff", wall: "#141a3a" },
+    49: { base: "#4a4a6a", pattern: "bigbrick", accent: "#8a90d0", wall: "#1a1a2e" },
+    50: { base: "#5a5444", pattern: "brick", accent: "#7a7258", wall: "#221e16" },
+    51: { base: "#8a7030", pattern: "crystal", accent: "#fff0a0", glow: "#d8b848", wall: "#2e2410" },
+    52: { base: "#8a9aa0", pattern: "sand", cap: "region", wall: "#2a3a44" },
+    53: { base: "#b8b0c8", pattern: "crystal", accent: "#f8f0ff", glow: "#bfe8ff", wall: "#3a3448" },
+    54: { base: "#8a2a1a", pattern: "hell", accent: "#ff8a3a", wall: "#2a0a06" },
+    55: { base: "#3a3438", pattern: "ash", accent: "#ff6a2a", wall: "#141014" },
+    56: { base: "#5a7a3a", pattern: "soil", cap: "region", wall: "#1e2a14" },
+    57: { base: "#a8a088", pattern: "bigbrick", accent: "#d8d0b0", wall: "#3a3628" }
   };
   var groundOf = (kind) => GROUND[kind] ?? GROUND[2];
   function daylight(t) {
@@ -14009,6 +16231,12 @@
     gearwright: "#b8883a",
     saltwarden: "#ece6da",
     choirsilver: "#a8c0e0",
+    plaguedoctor: "#3a3a2a",
+    astral: "#9ab0ff",
+    gilded: "#f0c850",
+    leviathan: "#5a9ac0",
+    forgeborn: "#8a2a1a",
+    druid: "#8ad070",
     warden: "#8a9098",
     bulwark: "#c04a3a",
     aegis: "#f0e0a0",
@@ -14214,6 +16442,66 @@
     saltflats_key: ["key", "#f0a0b0"],
     choir_key: ["key", "#bfe0ff"],
     steam_vent: ["crate", "#8a6a3a"],
+    // Band IV and V realms.
+    feverlands_fragment: ["scroll", "#b8c870"],
+    feverlands_key: ["key", "#b8c870"],
+    observatory_fragment: ["scroll", "#8a9aff"],
+    observatory_key: ["key", "#8a9aff"],
+    gutter_fragment: ["scroll", "#d8b848"],
+    gutter_key: ["key", "#d8b848"],
+    undertow_fragment: ["scroll", "#5a9ac0"],
+    undertow_key: ["key", "#5a9ac0"],
+    emberheart_fragment: ["scroll", "#ff8a3a"],
+    emberheart_key: ["key", "#ff8a3a"],
+    garden_fragment: ["scroll", "#8ad070"],
+    garden_key: ["key", "#8ad070"],
+    diving_bell: ["crate", "#5a9ac0"],
+    respirator: ["ring", "#8a9aa8"],
+    plague_ivory: ["ore", "#e6dcc6", "#5a6a3a"],
+    fever_bloom: ["bundle", "#e8f070"],
+    fever_loam: ["block", "#5a6a34"],
+    plague_rock: ["block", "#d8d0b0"],
+    venom_blade: ["sword", "#8ad070"],
+    plague_censer: ["tome", "#b8c870"],
+    rot_mask: ["core", "#6a7a3a"],
+    rot_heart: ["heart", "#8a9a3a"],
+    fever_tonic: ["bottle", "#e8f070"],
+    astral_lens: ["crystal", "#9ab0ff"],
+    starglass: ["block", "#3a4a8a"],
+    observatory_stone: ["block", "#4a4a6a"],
+    astral_tome: ["tome", "#9ab0ff"],
+    star_spear: ["spear", "#fff0c0"],
+    astrolabe: ["ring", "#d8b848"],
+    astronomer_eye: ["orb", "#bfd0ff"],
+    crown_gold: ["ore", "#f0c850", "#5a4a2a"],
+    sewer_brick: ["block", "#5a5444"],
+    crown_rock: ["block", "#8a7030"],
+    gilded_greatblade: ["sword", "#f0c850"],
+    thiefs_whip: ["whip", "#6a5a4a"],
+    pauper_crown: ["star", "#d8b848"],
+    kings_ransom: ["coin", "#f0c850"],
+    purging_salts: ["bottle", "#ece8de"],
+    abyssal_pearl: ["orb", "#bfe8ff"],
+    abyss_sand: ["block", "#8a9aa0"],
+    pearl_rock: ["block", "#b8b0c8"],
+    leviathan_harpoon: ["spear", "#5a9ac0"],
+    tidebreaker: ["crossbow", "#5a9ac0"],
+    leviathan_scale: ["pelt", "#5a9ac0"],
+    leviathan_heart: ["heart", "#5a9ac0"],
+    heartstone: ["ore", "#ff8a3a", "#3a1a10"],
+    heartstone_block: ["block", "#8a2a1a"],
+    slag: ["block", "#3a3438"],
+    anvil_maul: ["hammer", "#ff8a3a", "#3a2018"],
+    heartfire_staff: ["staff", "#ff8a3a"],
+    anvil_spark: ["core", "#ffb060"],
+    anvil_heart: ["heart", "#ff6a2a"],
+    seasonbloom: ["bundle", "#f0a0c0"],
+    bloom_loam: ["block", "#5a7a3a"],
+    seasonstone: ["block", "#a8a088"],
+    season_bow: ["bow", "#8ad070"],
+    thornlash: ["whip", "#6a8a3a"],
+    seasons_seed: ["seed", "#d8703a"],
+    warden_face: ["core", "#d8703a"],
     prism_glass: ["crystal", "#a8e0ff"],
     lumen_moss: ["bundle", "#e8f0a0"],
     glassloam: ["block", "#9aa8b8"],
@@ -16184,6 +18472,433 @@
       light: [0.5, 0.65, 0.9]
     }
   });
+  Object.assign(MOBS3, {
+    plague_rat: {
+      tpl: "quad",
+      body: "#6a6a3a",
+      belly: "#a8a870",
+      eye: "#ff5a3a",
+      w: 18,
+      h: 10,
+      parts: ["ears", "tail", "snout"],
+      top: 18
+    },
+    rot_toad: {
+      tpl: "slime",
+      body: "#6a8a3a",
+      belly: "#a8b858",
+      eye: "#1b1716",
+      w: 22,
+      h: 14,
+      top: 22
+    },
+    ivory_beetle: {
+      tpl: "crawler",
+      body: "#e6dcc6",
+      belly: "#8a7a5a",
+      eye: "#1b1716",
+      w: 26,
+      h: 12,
+      parts: ["shell", "horns"],
+      top: 20
+    },
+    bog_shaman: {
+      tpl: "biped",
+      body: "#5a6a3a",
+      belly: "#b8c870",
+      eye: "#e8f070",
+      w: 14,
+      h: 32,
+      parts: ["hood", "robe", "staff"],
+      top: 38
+    },
+    fever_mosquito: {
+      tpl: "flyer",
+      body: "#4a3a2a",
+      belly: "#c8584a",
+      eye: "#ff3a2a",
+      w: 16,
+      h: 7,
+      parts: ["stinger"],
+      top: 12
+    },
+    plague_knight: {
+      tpl: "biped",
+      body: "#3a3a2a",
+      belly: "#b8c870",
+      eye: "#e8f070",
+      w: 24,
+      h: 46,
+      parts: ["armor", "hood", "sword", "shield"],
+      top: 56
+    },
+    comet_hound: {
+      tpl: "quad",
+      body: "#3a4070",
+      belly: "#bfd0ff",
+      eye: "#fff0a0",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "mane"],
+      top: 24,
+      light: [0.4, 0.4, 0.6]
+    },
+    lens_golem: {
+      tpl: "biped",
+      body: "#5a6a98",
+      belly: "#1a1a3a",
+      eye: "#bfe8ff",
+      w: 28,
+      h: 42,
+      parts: ["armor", "eye"],
+      top: 52,
+      light: [0.3, 0.45, 0.7]
+    },
+    star_wisp: {
+      tpl: "floater",
+      body: "#fff0c0",
+      belly: "#9ab0ff",
+      eye: "#3a3a8a",
+      w: 16,
+      h: 16,
+      parts: ["glow"],
+      top: 22,
+      light: [0.6, 0.6, 0.9]
+    },
+    orrery_drone: {
+      tpl: "flyer",
+      body: "#b8883a",
+      belly: "#5a4028",
+      eye: "#9ad8ff",
+      w: 22,
+      h: 10,
+      parts: ["eye"],
+      top: 16
+    },
+    moon_moth: {
+      tpl: "flyer",
+      body: "#dfe4f4",
+      belly: "#8a90d0",
+      eye: "#1b1b3a",
+      w: 22,
+      h: 9,
+      parts: ["ears"],
+      top: 14
+    },
+    constellation: {
+      tpl: "floater",
+      body: "#9ab0ff",
+      belly: "#fff0c0",
+      eye: "#1a1a3a",
+      w: 40,
+      h: 40,
+      parts: ["glow", "crown"],
+      top: 52,
+      light: [0.6, 0.65, 1]
+    },
+    gutter_rat: {
+      tpl: "quad",
+      body: "#5a5040",
+      belly: "#a89878",
+      eye: "#ff5a3a",
+      w: 18,
+      h: 10,
+      parts: ["ears", "tail", "snout"],
+      top: 18
+    },
+    crown_thief: {
+      tpl: "biped",
+      body: "#3a3040",
+      belly: "#d8b848",
+      eye: "#1b1716",
+      w: 14,
+      h: 30,
+      parts: ["hood", "sword"],
+      top: 36
+    },
+    gilded_slime: {
+      tpl: "slime",
+      body: "#d8b848",
+      belly: "#a88a2a",
+      eye: "#3a2a0a",
+      w: 20,
+      h: 14,
+      top: 20,
+      light: [0.5, 0.4, 0.1]
+    },
+    tax_collector: {
+      tpl: "biped",
+      body: "#4a3a2a",
+      belly: "#d8b848",
+      eye: "#1b1716",
+      w: 16,
+      h: 32,
+      parts: ["hood", "robe", "staff"],
+      top: 38
+    },
+    sewer_eel: {
+      tpl: "worm",
+      body: "#4a5a3a",
+      eye: "#e8f070",
+      w: 32,
+      h: 8,
+      top: 14
+    },
+    gilded_guard: {
+      tpl: "biped",
+      body: "#d8b848",
+      belly: "#6a4a1a",
+      eye: "#1b1716",
+      w: 26,
+      h: 48,
+      parts: ["armor", "crown", "sword", "shield"],
+      top: 58
+    },
+    razor_eel: {
+      tpl: "worm",
+      body: "#3a6a8a",
+      eye: "#fff0a0",
+      w: 36,
+      h: 9,
+      top: 16
+    },
+    pearl_crab: {
+      tpl: "crawler",
+      body: "#d8d0e0",
+      belly: "#8a7aa0",
+      eye: "#1b1716",
+      w: 30,
+      h: 14,
+      parts: ["claws", "shell"],
+      top: 22
+    },
+    drowned_diver: {
+      tpl: "biped",
+      body: "#3a5a6a",
+      belly: "#8a9aa8",
+      eye: "#9af0e8",
+      w: 16,
+      h: 32,
+      parts: ["armor", "hood"],
+      top: 38
+    },
+    abyss_angler: {
+      tpl: "floater",
+      body: "#1a2a3a",
+      belly: "#3a5a6a",
+      eye: "#fff0a0",
+      w: 24,
+      h: 18,
+      parts: ["eye", "glow"],
+      top: 26,
+      light: [0.7, 0.65, 0.3]
+    },
+    jelly_bell: {
+      tpl: "floater",
+      body: "#d8a0e0",
+      belly: "#f0d0ff",
+      eye: "#3a1a4a",
+      w: 18,
+      h: 22,
+      parts: ["ghost"],
+      top: 28,
+      light: [0.5, 0.3, 0.6]
+    },
+    abyssal_titan: {
+      tpl: "floater",
+      body: "#1a3a5a",
+      belly: "#5a9ac0",
+      eye: "#fff0a0",
+      w: 48,
+      h: 50,
+      parts: ["armor", "horns"],
+      top: 62
+    },
+    slag_slime: {
+      tpl: "slime",
+      body: "#5a3a2a",
+      belly: "#ff8a3a",
+      eye: "#ffe070",
+      w: 20,
+      h: 14,
+      top: 20,
+      light: [0.6, 0.3, 0.1]
+    },
+    anvil_golem: {
+      tpl: "biped",
+      body: "#6a6468",
+      belly: "#ff8a3a",
+      eye: "#ffe070",
+      w: 32,
+      h: 44,
+      parts: ["armor", "embers"],
+      top: 54,
+      light: [0.6, 0.3, 0.1]
+    },
+    hammer_knight: {
+      tpl: "biped",
+      body: "#6a3a2a",
+      belly: "#c8a060",
+      eye: "#ff8a3a",
+      w: 20,
+      h: 38,
+      parts: ["armor", "horns", "shield"],
+      top: 46
+    },
+    cinder_wyrm: {
+      tpl: "worm",
+      body: "#8a3a1a",
+      eye: "#ffe070",
+      w: 40,
+      h: 10,
+      top: 18,
+      light: [0.8, 0.35, 0.1]
+    },
+    forge_drake: {
+      tpl: "flyer",
+      body: "#6a2a1a",
+      belly: "#ff8a3a",
+      eye: "#ffe070",
+      w: 30,
+      h: 13,
+      parts: ["wings", "tail", "embers"],
+      top: 22,
+      light: [0.7, 0.3, 0.1]
+    },
+    forge_colossus: {
+      tpl: "biped",
+      body: "#6a4a44",
+      belly: "#ff8a3a",
+      eye: "#ffe070",
+      w: 40,
+      h: 58,
+      parts: ["armor", "horns", "embers"],
+      top: 70,
+      light: [0.9, 0.4, 0.12]
+    },
+    thorn_stag: {
+      tpl: "quad",
+      body: "#6a5a3a",
+      belly: "#c8b890",
+      eye: "#1b1716",
+      w: 28,
+      h: 22,
+      parts: ["antlers", "tail", "longlegs"],
+      top: 38
+    },
+    bramble_golem: {
+      tpl: "biped",
+      body: "#4a6a3a",
+      belly: "#8a5a3a",
+      eye: "#f0c850",
+      w: 30,
+      h: 42,
+      parts: ["armor"],
+      top: 52
+    },
+    season_wolf: {
+      tpl: "quad",
+      body: "#8a8a7a",
+      belly: "#e8e0d0",
+      eye: "#f0c850",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "mane"],
+      top: 24
+    },
+    bloom_sprite: {
+      tpl: "floater",
+      body: "#f0a0c0",
+      belly: "#8ad070",
+      eye: "#1b1716",
+      w: 14,
+      h: 16,
+      parts: ["glow"],
+      top: 22,
+      light: [0.6, 0.5, 0.5]
+    },
+    petal_moth: {
+      tpl: "flyer",
+      body: "#f0c0d8",
+      belly: "#d8703a",
+      eye: "#1b1716",
+      w: 22,
+      h: 9,
+      parts: ["ears"],
+      top: 14
+    },
+    harvest_lord: {
+      tpl: "biped",
+      body: "#d8703a",
+      belly: "#6a5a3a",
+      eye: "#f0c850",
+      w: 28,
+      h: 50,
+      parts: ["hood", "robe", "staff", "crown"],
+      top: 60
+    },
+    mother_of_rot: {
+      tpl: "slime",
+      body: "#6a7a3a",
+      belly: "#b8c870",
+      eye: "#3a0a0a",
+      w: 70,
+      h: 48,
+      parts: ["crown"],
+      top: 60
+    },
+    the_astronomer: {
+      tpl: "floater",
+      body: "#3a4070",
+      belly: "#bfd0ff",
+      eye: "#fff0a0",
+      w: 50,
+      h: 70,
+      parts: ["robe", "crown", "eye"],
+      top: 82,
+      light: [0.6, 0.65, 1]
+    },
+    pauper_king: {
+      tpl: "biped",
+      body: "#6a5a4a",
+      belly: "#d8b848",
+      eye: "#1b1716",
+      w: 44,
+      h: 72,
+      parts: ["robe", "crown", "staff"],
+      top: 84
+    },
+    the_leviathan: {
+      tpl: "worm",
+      body: "#4a9ac0",
+      eye: "#fff0a0",
+      w: 140,
+      h: 26,
+      top: 46,
+      light: [0.6, 0.85, 1]
+    },
+    anvil_god: {
+      tpl: "biped",
+      body: "#7a6a64",
+      belly: "#ff8a3a",
+      eye: "#ffe070",
+      w: 60,
+      h: 90,
+      parts: ["armor", "crown", "embers"],
+      top: 104,
+      light: [1, 0.5, 0.15]
+    },
+    four_faced_warden: {
+      tpl: "biped",
+      body: "#5a8a4a",
+      belly: "#d8703a",
+      eye: "#bfe0ff",
+      w: 54,
+      h: 86,
+      parts: ["armor", "crown", "hood"],
+      top: 98
+    }
+  });
   var SKINS = [
     "#d8a47c",
     "#b8805a",
@@ -17048,6 +19763,11 @@
       if (g.heldItem() === "torch")
         out.push([p.x + (Math.cos(p.face) >= 0 ? 16 : -16), p.y - 40, 1.2, 0.9, 0.55]);
     }
+    if (!menu2 && g.pocket.waterKind() === "magma" && g.pocket.here()) {
+      const level = g.pocket.waterLevel();
+      for (let x = Math.floor((p.x - 900) / 160) * 160; x < p.x + 900; x += 160)
+        out.push([x, level - 10, 1.1, 0.5, 0.15]);
+    }
     for (const b of g.combat.projectiles) {
       const spec = PROJECTILES[b.kind];
       if (!spec?.glow) continue;
@@ -17070,6 +19790,7 @@
       else if (s.type === "furnace" || s.type === "forge") out.push([s.x, s.y - 20, 1, 0.6, 0.3]);
       else if (s.type === "effergy") out.push([s.x, s.y - 60, 0.85, 0.72, 1]);
       else if (s.type === "shrine" && s.crop !== "spent") out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
+      else if (s.type === "diving_bell") out.push([s.x, s.y - 24, 0.6, 0.8, 0.9]);
       else if (s.type === "relic_shelf" && Object.keys(s.store).length)
         out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
       else if (s.type === "kiln") out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);
@@ -17089,6 +19810,9 @@
       else if (n.kind === "prism_glass") out.push([n.x, n.y - 12, 0.4, 0.7, 0.95]);
       else if (n.kind === "saltglass") out.push([n.x, n.y - 12, 0.8, 0.5, 0.55]);
       else if (n.kind === "lumen_moss") out.push([n.x, n.y - 8, 0.6, 0.65, 0.3]);
+      else if (n.kind === "astral_lens") out.push([n.x, n.y - 12, 0.45, 0.5, 1]);
+      else if (n.kind === "heartstone") out.push([n.x, n.y - 12, 0.9, 0.4, 0.12]);
+      else if (n.kind === "abyssal_pearl") out.push([n.x, n.y - 12, 0.5, 0.7, 0.8]);
     }
     for (const a of g.s.animals) {
       if (a.deadUntil) continue;
@@ -17441,6 +20165,8 @@
     "cinderflax",
     "lumen_moss",
     "frost_lily",
+    "fever_bloom",
+    "seasonbloom",
     "berry",
     "herb",
     "fiber",
@@ -17543,6 +20269,24 @@
             if (!bare) p.set(x, 12, "#f0f8a0");
           }
           break;
+        case "fever_bloom":
+          p.line(9, 15, 9, 7, "#4a5a2a");
+          if (!bare) {
+            p.ellipse(9, 6, 4, 3, "#e8f070");
+            p.set(9, 6, "#c8584a");
+          }
+          break;
+        case "seasonbloom":
+          p.line(9, 15, 9, 6, "#5a7a3a");
+          if (!bare)
+            for (const [x, y, c] of [
+              [6, 6, "#8ad070"],
+              [12, 6, "#f0c850"],
+              [6, 10, "#d8703a"],
+              [12, 10, "#bfe0ff"]
+            ])
+              p.rect(x, y, 2, 2, c);
+          break;
         case "frost_lily":
           p.line(9, 15, 9, 8, "#5a7a8a");
           p.ellipse(7, 13, 3, 1, "#6a8a9a");
@@ -17605,6 +20349,11 @@
     brass_gear: { rock: "#5a4a34", fleck: "#f0c870", shine: "#fff0a0" },
     saltglass: { rock: "#c8c0b4", crystal: "#f0c0c8", glow: true },
     rime_silver_ore: { rock: "#5a6a7a", fleck: "#e8f4ff", shine: "#ffffff" },
+    plague_ivory: { rock: "#5a6a3a", fleck: "#e6dcc6", shine: "#ffffff" },
+    astral_lens: { rock: "#2a2e50", crystal: "#9ab0ff", glow: true },
+    crown_gold: { rock: "#5a4a2a", fleck: "#f0c850", shine: "#fff0a0" },
+    abyssal_pearl: { rock: "#3a4a5a", crystal: "#e8f8ff", glow: true },
+    heartstone: { rock: "#3a1a10", crystal: "#ff8a3a", glow: true },
     coal: { rock: "#5a5a5e", fleck: "#1c1c20", shine: "#8a8a96" },
     ice: { rock: "#8fb8d0", crystal: "#dff4ff" },
     obsidian: { rock: "#3a3448", crystal: "#2a2433", shine: "#9a8ac0" },
@@ -17736,13 +20485,15 @@
         if (floor > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor) - Math.max(0, top));
       }
     } else {
-      c.fillStyle = "rgba(40, 110, 120, 0.42)";
+      const kind = g.pocket.waterKind();
+      c.fillStyle = kind === "magma" ? "rgba(255, 110, 30, 0.62)" : kind === "deep" ? "rgba(20, 70, 110, 0.4)" : "rgba(40, 110, 120, 0.42)";
       c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
     }
+    const magma = g.pocket.waterKind() === "magma";
     const wet = (x) => !mire || data_exports.surfaceAt((x + ax) * PX) / PX - ay > top + 1;
-    c.fillStyle = mire ? "rgba(160, 170, 80, 0.55)" : "rgba(120, 200, 200, 0.25)";
+    c.fillStyle = magma ? "rgba(255, 200, 80, 0.8)" : mire ? "rgba(160, 170, 80, 0.55)" : "rgba(120, 200, 200, 0.25)";
     for (let x = x0; x < x1; x++) if (wet(x)) c.fillRect(x, Math.max(0, top), 1, 3);
-    c.fillStyle = mire ? "rgba(214, 210, 140, 0.75)" : "rgba(210, 245, 240, 0.7)";
+    c.fillStyle = magma ? "rgba(255, 240, 180, 0.9)" : mire ? "rgba(214, 210, 140, 0.75)" : "rgba(210, 245, 240, 0.7)";
     const speed = mire ? 0.3 : 1;
     for (let x = x0; x < x1; x++) {
       if (!wet(x)) continue;
@@ -17789,6 +20540,18 @@
       c.fillStyle = `rgba(255, 246, 220, ${(0.22 * guard * (0.85 + 0.15 * Math.sin(t * 1.3))).toFixed(2)})`;
       c.fillRect(0, 0, w, h);
     }
+    const season = g.pocket.here() ? g.pocket.season() : null;
+    if (season && season.id !== "spring") {
+      c.fillStyle = season.id === "summer" ? "rgba(255, 220, 140, 0.14)" : season.id === "autumn" ? "rgba(200, 110, 50, 0.12)" : "rgba(210, 230, 255, 0.18)";
+      c.fillRect(0, 0, w, h);
+      if (season.id !== "summer") {
+        c.fillStyle = season.id === "winter" ? "rgba(255, 255, 255, 0.85)" : "rgba(216, 112, 58, 0.8)";
+        for (let i = 0; i < 70; i++) {
+          const x = Math.floor(((hash3(i, 41) * w + t * 14 * (hash3(i, 42) - 0.3)) % w + w) % w), y = Math.floor((hash3(i, 43) * h + t * (18 + hash3(i, 44) * 20)) % h);
+          c.fillRect(x, y, season.id === "winter" ? 1 : 2, 1);
+        }
+      }
+    }
     const hymn = g.pocket.hymnLevel();
     if (hymn > 0) {
       const guard = g.equipment.has("hymnward") || g.pocket.warmed() ? 0.35 : 1;
@@ -17802,7 +20565,13 @@
       }
     }
     const fall = g.pocket.pendingCaveIn();
-    if (fall?.kind === "shards") {
+    if (fall?.kind === "star") {
+      const sx = Math.round(fall.x / PX - ax), k = Math.max(0, 1 - (fall.at - g.s.elapsed) / 2.6);
+      c.fillStyle = `rgba(200, 210, 255, ${(0.12 + k * 0.3).toFixed(2)})`;
+      c.fillRect(sx - 40, 0, 80, h);
+      c.fillStyle = `rgba(255, 244, 208, ${(0.2 + k * 0.5).toFixed(2)})`;
+      c.fillRect(sx - 10, 0, 20, h);
+    } else if (fall?.kind === "shards") {
       const sx = Math.round(fall.x / PX - ax), sy = Math.max(4, Math.round(fall.y / PX - ay));
       c.fillStyle = "rgba(220, 245, 255, 0.9)";
       for (let i = 0; i < 18; i++) {
@@ -18519,6 +21288,18 @@
       p.rect(8, 12, 6, 7, "#2a2630");
       p.shadeEdges(0.2, -0.3);
     }),
+    // A diving bell on the seabed: air for the Undertow.
+    diving_bell: () => sprite(34, 40, 17, 39, (p) => {
+      p.ellipse(17, 16, 15, 15, "#8a6a3a");
+      p.rect(2, 16, 30, 20, "#8a6a3a");
+      p.ellipse(17, 16, 12, 12, "#b8883a");
+      p.rect(5, 16, 24, 18, "#b8883a");
+      p.rect(0, 34, 34, 6, "#5a4028");
+      p.rect(10, 12, 14, 12, "#3a5a6a");
+      p.rect(11, 13, 5, 4, "#bfe8ff");
+      for (const x of [4, 29]) for (let y = 18; y < 34; y += 5) p.set(x, y, "#f0c870");
+      p.rect(15, 0, 4, 3, "#5a4028");
+    }),
     // A brass grille over a steam pipe (the Clockwork Barrow's traps).
     steam_vent: () => sprite(30, 6, 15, 5, (p) => {
       p.rect(0, 1, 30, 5, "#5a4028");
@@ -18550,7 +21331,13 @@
       marches: ["#6a6454", "#e6dcc6"],
       barrow: ["#5a4028", "#f0c870"],
       saltflats: ["#b4a48e", "#f0c0c8"],
-      choir: ["#5a6a7a", "#dfeaf6"]
+      choir: ["#5a6a7a", "#dfeaf6"],
+      feverlands: ["#4a5a2a", "#e6dcc6"],
+      observatory: ["#2a2e50", "#9ab0ff"],
+      gutter: ["#5a4a2a", "#f0c850"],
+      undertow: ["#2a4a5a", "#bfe8ff"],
+      emberheart: ["#3a1a10", "#ff8a3a"],
+      garden: ["#4a6a3a", "#f0a0c0"]
     };
     const [body, metal] = trim[kind] ?? ["#7a5a3c", "#d8b848"];
     return cached(
@@ -21239,7 +24026,7 @@
       this.ctx = ctx2;
       this.out = out;
       const k = kit(ctx2);
-      const bed = (name, build9) => {
+      const bed = (name, build15) => {
         const g = ctx2.createGain();
         g.gain.value = 0;
         const n = ctx2.createBufferSource();
@@ -21247,7 +24034,7 @@
         n.loop = true;
         n.playbackRate.value = 0.97 + Object.keys(this.beds).length * 0.013;
         n.start();
-        build9(n).connect(g).connect(out);
+        build15(n).connect(g).connect(out);
         this.beds[name] = g;
       };
       bed("rain", (n) => {
@@ -23518,6 +26305,277 @@
     }
   );
 
+  // src/audio/tracks/feverlands.ts
+  var feverlands = compose(
+    {
+      id: "feverlands",
+      title: "Fever Canopy",
+      mood: "The Feverlands",
+      bpm: 104,
+      bars: 24,
+      parts: {
+        tom: { inst: "tom", vol: 0.55, rev: 0.4 },
+        kick: { inst: "kick", vol: 0.5 },
+        shaker: { inst: "shaker", vol: 0.4, pan: 0.3 },
+        drip: { inst: "drip", vol: 0.4, rev: 0.7, echo: 0.4, pan: -0.3 },
+        marimba: { inst: "marimba", vol: 0.65, rev: 0.4 },
+        reed: { inst: "reed", vol: 0.6, rev: 0.5, echo: 0.2 },
+        bass: { inst: "bass", vol: 0.7 },
+        pad: { inst: "pad", vol: 0.4, rev: 0.6, cutoff: 1600 },
+        howl: { inst: "howl", vol: 0.25, rev: 0.8 }
+      }
+    },
+    (s) => {
+      const progA = "Em F Em Dm Em F G Em", progB = "Am G F Em Am G F E";
+      const theme = "e5:4 f5:4 g5:8 | b5:8 a5:4 g5:4 | f5:4 e5:4 d5:8 | e5:16 | g5:4 a5:4 b5:4 c6:4 | b5:8 a5:8 | g5:4 f5:4 e5:4 d5:4 | e5:16";
+      const pulse2 = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("tom", bar, "x..x..x...x.x..x", n, { vel: 0.8 });
+        s.grid("kick", bar, "x.......x.......", n);
+        s.grid("shaker", bar, "xxx.xxx.xxx.xxx.", n, { vel: 0.6 });
+        s.arp("marimba", bar, prog, "0 1 2 1 0 2 1 2", 52, 2, { vel: 0.7 });
+        s.bass("bass", bar, prog, "R:6 R:2 5:4 R:4", 40);
+        s.pad("pad", bar, prog, 57, { vel: 0.45 });
+        for (let i = 0; i < n; i += 2) s.at("drip", bar + i + 0.5, i % 4 ? "b6" : "e7", 0.25, 0.6);
+      };
+      s.play("reed", 0, theme);
+      pulse2(0, progA);
+      s.play("howl", 8, "e4:32 | b3:32 | e4:32 | b3:32", { vel: 0.5 });
+      s.play("reed", 8, theme, { transpose: -12, vel: 0.7 });
+      pulse2(8, progB);
+      s.play("reed", 16, theme);
+      s.play("marimba", 16, theme, { transpose: 12, vel: 0.4 });
+      pulse2(16, progA);
+    }
+  );
+
+  // src/audio/tracks/observatory.ts
+  var observatory = compose(
+    {
+      id: "observatory",
+      title: "The Drowned Orrery",
+      mood: "The Sunken Observatory",
+      bpm: 72,
+      bars: 16,
+      parts: {
+        musicbox: { inst: "musicbox", vol: 0.55, rev: 0.7, echo: 0.35 },
+        harp: { inst: "harp", vol: 0.55, rev: 0.6, pan: -0.2 },
+        bell: { inst: "bell", vol: 0.4, rev: 0.8, echo: 0.3, pan: 0.2 },
+        choir: { inst: "choir", vol: 0.5, rev: 0.8 },
+        sub: { inst: "sub", vol: 0.5 },
+        crystal: { inst: "crystal", vol: 0.45, rev: 0.7, echo: 0.3 },
+        swell: { inst: "swell", vol: 0.3, rev: 0.6 }
+      },
+      echoBeats: 1,
+      echoFeedback: 0.45
+    },
+    (s) => {
+      const progA = "Dm Bb F C Dm Gm A A", progB = "Bb C Dm Dm Gm A Dm Dm";
+      const orbit = (bar, prog) => {
+        s.arp("harp", bar, prog, "0 2 4 2 1 3 5 3", 50, 2, { vel: 0.6 });
+        s.pad("choir", bar, prog, 62, { vel: 0.6 });
+        s.bass("sub", bar, prog, "R:16", 33);
+        for (let i = 0; i < 8; i += 2) s.at("bell", bar + i, i % 4 ? "a5" : "d6", 4, 0.5);
+      };
+      s.play(
+        "musicbox",
+        0,
+        "d6:4 f6:4 a6:8 | bb5:8 d6:8 | a5:4 c6:4 f6:8 | e6:16 | d6:4 f6:4 a6:4 g6:4 | f6:8 e6:8 | d6:4 e6:4 c#6:8 | a5:16"
+      );
+      orbit(0, progA);
+      s.play(
+        "crystal",
+        8,
+        "f5:8 g5:8 | a5:12 r:4 | d6:8 c6:4 a5:4 | f5:16 | g5:8 a5:8 | bb5:4 a5:4 g5:8 | f5:16 | d5:16"
+      );
+      s.play("swell", 8, "d4:32 | a3:32", { vel: 0.5 });
+      orbit(8, progB);
+    }
+  );
+
+  // src/audio/tracks/gutter.ts
+  var gutter = compose(
+    {
+      id: "gutter",
+      title: "Kings of Nothing",
+      mood: "The Gutter of Kings",
+      bpm: 110,
+      bars: 24,
+      parts: {
+        pizz: { inst: "pizz", vol: 0.65, rev: 0.4 },
+        tamb: { inst: "tamb", vol: 0.35, pan: 0.3 },
+        rim: { inst: "rim", vol: 0.4, rev: 0.4, pan: -0.3 },
+        kick: { inst: "kick", vol: 0.5 },
+        bass: { inst: "bass", vol: 0.7 },
+        organ: { inst: "organ", vol: 0.45, rev: 0.6 },
+        brass: { inst: "brass", vol: 0.55, rev: 0.5 },
+        drip: { inst: "drip", vol: 0.35, rev: 0.7, echo: 0.3 },
+        pad: { inst: "pad", vol: 0.35, rev: 0.6, cutoff: 1800 }
+      }
+    },
+    (s) => {
+      const progA = "Gm Gm Cm D Gm Eb D D", progB = "Eb F Gm Gm Cm D Gm Gm";
+      const sneak = "g4:2 r:2 bb4:2 r:2 d5:4 c5:4 | bb4:2 a4:2 g4:4 d4:8 | eb5:4 d5:4 c5:4 bb4:4 | a4:8 f#4:8 | g4:2 bb4:2 d5:2 g5:2 f5:4 eb5:4 | d5:4 c5:4 bb4:8 | a4:4 c5:4 f#4:4 a4:4 | g4:16";
+      const court = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("kick", bar, "x.......x.......", n);
+        s.grid("rim", bar, "....x.......x...", n, { vel: 0.7 });
+        s.grid("tamb", bar, "..x...x...x...x.", n, { vel: 0.6 });
+        s.bass("bass", bar, prog, "R:4 5:4 R:4 5:4", 36);
+        s.pad("pad", bar, prog, 58, { vel: 0.4 });
+        for (let i = 0; i < n; i += 4) s.at("drip", bar + i + 0.7, "d7", 0.25, 0.5);
+      };
+      s.play("pizz", 0, sneak);
+      court(0, progA);
+      s.play(
+        "organ",
+        8,
+        "bb4:8 c5:8 | d5:12 r:4 | g5:8 f5:4 eb5:4 | d5:16 | eb5:8 f5:8 | g5:4 f5:4 eb5:8 | d5:8 f#5:8 | g5:16"
+      );
+      s.hits("brass", 8, "Eb F Gm Gm Cm D Gm Gm", "x.......x.....x.", 55, { vel: 0.4 });
+      court(8, progB);
+      s.play("pizz", 16, sneak);
+      s.play("brass", 16, sneak, { transpose: -12, vel: 0.5 });
+      court(16, progA);
+    }
+  );
+
+  // src/audio/tracks/undertow.ts
+  var undertow = compose(
+    {
+      id: "undertow",
+      title: "Pressure",
+      mood: "The Undertow",
+      bpm: 64,
+      bars: 16,
+      parts: {
+        sub: { inst: "sub", vol: 0.7 },
+        pad: { inst: "pad", vol: 0.55, rev: 0.8, cutoff: 1200 },
+        bell: { inst: "bell", vol: 0.4, rev: 0.9, echo: 0.45 },
+        howl: { inst: "howl", vol: 0.35, rev: 0.9 },
+        harp: { inst: "harp", vol: 0.4, rev: 0.8, pan: 0.2 },
+        drip: { inst: "drip", vol: 0.35, rev: 0.8, echo: 0.4, pan: -0.3 },
+        strings: { inst: "strings", vol: 0.4, rev: 0.8, cutoff: 1400 }
+      },
+      echoBeats: 1.5,
+      echoFeedback: 0.5
+    },
+    (s) => {
+      const progA = "Am F C G Am F E E", progB = "F G Am Am F G E E";
+      const deep = (bar, prog) => {
+        s.bass("sub", bar, prog, "R:16", 33);
+        s.pad("pad", bar, prog, 57, { vel: 0.6 });
+        s.arp("harp", bar, prog, "0 2 1 3", 50, 4, { vel: 0.4 });
+        for (let i = 0; i < 8; i++) s.at("drip", bar + i + 0.3, i % 2 ? "e7" : "a6", 0.25, 0.4);
+      };
+      s.play(
+        "bell",
+        0,
+        "a5:8 e5:8 | c6:16 | b5:8 g5:8 | e5:16 | a5:8 c6:8 | f5:16 | e5:8 g#5:8 | a5:16"
+      );
+      s.play("howl", 2, "a3:24 r:8 | e3:32", { vel: 0.6 });
+      deep(0, progA);
+      s.play(
+        "strings",
+        8,
+        "c5:16 | d5:16 | e5:12 r:4 | a4:16 | c5:8 d5:8 | e5:8 d5:8 | b4:16 | g#4:16"
+      );
+      s.play("howl", 12, "e3:32", { vel: 0.5 });
+      deep(8, progB);
+    }
+  );
+
+  // src/audio/tracks/emberheart.ts
+  var emberheart = compose(
+    {
+      id: "emberheart",
+      title: "Anvil of the World",
+      mood: "Emberheart",
+      bpm: 120,
+      bars: 28,
+      parts: {
+        taiko: { inst: "taiko", vol: 0.7, rev: 0.4 },
+        bigkick: { inst: "bigkick", vol: 0.6 },
+        snare: { inst: "snare", vol: 0.4, rev: 0.3 },
+        orchhit: { inst: "orchhit", vol: 0.45, rev: 0.4 },
+        synthbass: { inst: "synthbass", vol: 0.65 },
+        brass: { inst: "brass", vol: 0.6, rev: 0.5 },
+        strings: { inst: "strings", vol: 0.45, rev: 0.5 },
+        choir: { inst: "choir", vol: 0.4, rev: 0.7 },
+        crash: { inst: "crash", vol: 0.35, rev: 0.4 }
+      }
+    },
+    (s) => {
+      const progA = "Em Em C D Em Em B B", progB = "C D Em Em C D B B";
+      const hammer = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("taiko", bar, "x..x..x.x..x..x.", n);
+        s.grid("bigkick", bar, "x.......x.......", n);
+        s.grid("snare", bar, "....x.......x...", n, { vel: 0.7 });
+        s.bass("synthbass", bar, prog, "R:2 R:2 R:2 R:2 5:4 R:4", 28);
+        s.arp("strings", bar, prog, "0 1 2 1", 52, 2, { vel: 0.5 });
+      };
+      hammer(0, progA);
+      s.hits("orchhit", 0, progA, "x...........x...", 60, { vel: 0.5 });
+      s.play(
+        "brass",
+        8,
+        "e5:8 g5:8 | b5:12 r:4 | a5:8 g5:4 f#5:4 | g5:16 | e5:4 f#5:4 g5:4 b5:4 | c6:8 b5:8 | a5:4 g5:4 f#5:8 | b5:16",
+        { transpose: -12 }
+      );
+      s.pad("choir", 8, progB, 62, { vel: 0.6 });
+      hammer(8, progB);
+      s.grid("crash", 16, "x...............");
+      s.play(
+        "brass",
+        16,
+        "e5:8 g5:8 | b5:12 r:4 | a5:8 g5:4 f#5:4 | g5:16 | e5:4 f#5:4 g5:4 b5:4 | c6:8 b5:8 | a5:4 g5:4 f#5:8 | b5:16"
+      );
+      hammer(16, progA);
+      s.hits("orchhit", 16, progA, "x.......x...x...", 60, { vel: 0.6 });
+      s.pad("choir", 24, "Em:4", 62, { vel: 0.5 });
+      hammer(24, "Em Em C B");
+    }
+  );
+
+  // src/audio/tracks/garden.ts
+  var garden = compose(
+    {
+      id: "garden",
+      title: "Four Seasons Turning",
+      mood: "The Garden of Lost Seasons",
+      bpm: 96,
+      bars: 24,
+      parts: {
+        flute: { inst: "flute", vol: 0.6, rev: 0.5, echo: 0.2 },
+        harp: { inst: "harp", vol: 0.55, rev: 0.5, pan: -0.2 },
+        strings: { inst: "strings", vol: 0.5, rev: 0.6 },
+        pizz: { inst: "pizz", vol: 0.55, rev: 0.4, pan: 0.2 },
+        musicbox: { inst: "musicbox", vol: 0.5, rev: 0.7, echo: 0.3 },
+        bass: { inst: "bass", vol: 0.6 },
+        shaker: { inst: "shaker", vol: 0.3 },
+        pad: { inst: "pad", vol: 0.4, rev: 0.6 }
+      }
+    },
+    (s) => {
+      const prog = "C G Am F C G F G", theme = "e5:4 g5:4 c6:8 | b5:4 a5:4 g5:8 | a5:4 c6:4 e6:4 c6:4 | f5:16 | e5:4 g5:4 c6:4 e6:4 | d6:8 b5:8 | a5:4 g5:4 f5:4 a5:4 | g5:16";
+      const turn = (bar) => {
+        const n = s.progression(bar, prog).length;
+        s.arp("harp", bar, prog, "0 1 2 3 2 1 2 1", 48, 2, { vel: 0.6 });
+        s.bass("bass", bar, prog, "R:8 5:8", 36);
+        s.grid("shaker", bar, "..x...x...x...x.", n, { vel: 0.5 });
+      };
+      s.play("flute", 0, theme);
+      turn(0);
+      s.pad("strings", 8, prog, 62, { vel: 0.7 });
+      s.play("pizz", 8, theme, { transpose: -12, vel: 0.7 });
+      turn(8);
+      s.play("musicbox", 16, theme, { transpose: 12, vel: 0.6 });
+      s.pad("pad", 16, prog, 60, { vel: 0.5 });
+      turn(16);
+    }
+  );
+
   // src/audio/tracks/town.ts
   var town = compose(
     {
@@ -23658,7 +26716,13 @@
     marches,
     barrow,
     saltflats,
-    choir2
+    choir2,
+    feverlands,
+    observatory,
+    gutter,
+    undertow,
+    emberheart,
+    garden
   ];
   var TRACKS = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
 
@@ -23811,7 +26875,13 @@
     marches: "marches",
     barrow: "barrow",
     saltflats: "saltflats",
-    choir: "choir"
+    choir: "choir",
+    feverlands: "feverlands",
+    observatory: "observatory",
+    gutter: "gutter",
+    undertow: "undertow",
+    emberheart: "emberheart",
+    garden: "garden"
   };
   var DUNGEON_TRACKS = {
     crypt: "dungeon",
@@ -25070,11 +28140,19 @@
     if (!force && now - state.lastUI < UI_RULES.hudRefreshMs) return;
     state.lastUI = now;
     const v = game.s.vitals;
-    ["health", "hydration", "calories", "stamina"].forEach((id) => {
-      const most = id === "health" ? game.maxHealth() : 100;
-      $(id + "-bar").style.width = clamp3(v[id] / most * 100, 0, 100) + "%";
-      $(id + "-value").textContent = String(Math.round(v[id]));
+    const dream = game.pocket.dreaming();
+    ["health", "hydration", "calories", "stamina"].forEach((id, i) => {
+      const most = id === "health" ? game.maxHealth() : 100, shown = dream ? clamp3(v[id] + Math.sin(now / 700 + i * 2.3) * 35 + Math.sin(now / 230 + i) * 8, 0, most) : v[id];
+      $(id + "-bar").style.width = clamp3(shown / most * 100, 0, 100) + "%";
+      $(id + "-value").textContent = dream && Math.sin(now / 400 + i) > 0.6 ? "??" : String(Math.round(shown));
     });
+    $("hud").classList.toggle("dreaming", dream);
+    const air = game.pocket.air();
+    $("air-stat").classList.toggle("hidden", !air);
+    if (air) {
+      $("air-bar").style.width = clamp3(air[0] / air[1] * 100, 0, 100) + "%";
+      $("air-value").textContent = String(Math.ceil(air[0]));
+    }
     const maxMana = game.equipment.maxMana();
     $("mana-bar").style.width = clamp3(game.s.mana / maxMana * 100, 0, 100) + "%";
     $("mana-value").textContent = String(Math.round(game.s.mana));

@@ -9,8 +9,14 @@ import {
   RW,
   TIER_NAMES,
   TIER_SCALE,
+  AIR_SECONDS,
+  FEVER_BITES,
+  FEVER_CHANCE,
   ashStorm,
   hymnAt,
+  magmaLevel,
+  seasonAt,
+  starPulse,
   modById,
   realmById,
   rollMods,
@@ -19,8 +25,10 @@ import {
   tideLevel,
   ventActive,
   weighted,
+  type EmberGeometry,
   type Loot,
   type MarchesGeometry,
+  type UndertowGeometry,
   type OrchardGeometry,
   type RealmCtx,
   type RealmInstance,
@@ -60,7 +68,13 @@ const UNSTABLE_SECONDS = 600;
  */
 export class Pocket extends System {
   private caveInAt = 0;
-  private caveIn: { x: number; y: number; at: number; kind?: 'shards' } | null = null;
+  private caveIn: { x: number; y: number; at: number; kind?: 'shards' | 'star' } | null = null;
+  /** Seconds of breath left in the Undertow. */
+  breath = AIR_SECONDS;
+  private drowningSaid = 0;
+  private goldWas = -1;
+  private magmaWas = false;
+  private seasonWas = '';
   private hymnWas = false;
   private sunWas = false;
   private ventAt = 0;
@@ -122,7 +136,9 @@ export class Pocket extends System {
     return this.has('hungering') && this.here() ? 1.5 : 1;
   }
   gravityScale() {
-    return this.has('low_gravity') && this.here() ? 0.55 : 1;
+    // The Sunken Observatory is always light; Low gravity realms too.
+    const light = this.has('low_gravity') || this.inst()?.realm === 'observatory';
+    return light && this.here() ? 0.55 : 1;
   }
   diseaseScale() {
     return this.has('blighted') && this.here() ? 2 : 1;
@@ -188,6 +204,8 @@ export class Pocket extends System {
     this.banner = { name: tpl.name, tier: inst.tier, mods: inst.mods, at: this.game.s.elapsed };
     this.game.say(`You step into the ${tpl.name} · Tier ${TIER_NAMES[inst.tier]}.`, 'victory');
     this.caveInAt = this.game.s.elapsed + 20;
+    this.breath = AIR_SECONDS;
+    this.goldWas = -1;
   }
   /** Leaves the realm for the Waystone you came from (it stays open behind you). */
   leave(): GameResult {
@@ -398,13 +416,54 @@ export class Pocket extends System {
   waterLevel(): number | null {
     const r = activeRealm();
     if (r?.tpl.hazard.id === 'mire') return (r.geo as MarchesGeometry).mire;
+    if (r?.tpl.hazard.id === 'pressure') return (r.geo as UndertowGeometry).sea;
+    if (r?.tpl.hazard.id === 'magma')
+      return magmaLevel(r.geo as EmberGeometry, this.game.s.elapsed);
     if (!r || r.tpl.hazard.id !== 'tide') return null;
     return tideLevel(r.geo as OrchardGeometry, this.game.s.elapsed);
   }
   /** What fills the low ground: water, mire, or nothing. */
-  waterKind(): 'tide' | 'mire' | null {
+  waterKind(): 'tide' | 'mire' | 'deep' | 'magma' | null {
     const id = activeRealm()?.tpl.hazard.id;
-    return id === 'tide' || id === 'mire' ? id : null;
+    if (id === 'pressure') return 'deep';
+    return id === 'tide' || id === 'mire' || id === 'magma' ? id : null;
+  }
+  /** Whether the player stands in the Emberheart's magma. */
+  inMagma() {
+    const p = this.game.s.player;
+    return this.waterKind() === 'magma' && this.underwater(p.x, p.y - 8);
+  }
+  /** Breath left and its most, for the air gauge (null when breath is not an issue). */
+  air(): [number, number] | null {
+    if (this.waterKind() !== 'deep' || !this.here() || this.game.equipment.has('gills'))
+      return null;
+    return [this.breath, AIR_SECONDS];
+  }
+  /** The Garden's season, if the player is in it. */
+  season() {
+    const r = activeRealm();
+    if (!r || r.tpl.hazard.id !== 'seasons') return null;
+    return seasonAt(this.game.s.elapsed, r.inst.seed);
+  }
+  /** How far the Garden's season moves the air from its usual temperature. */
+  seasonShift(x = this.game.s.player.x) {
+    if (!inPocket(x)) return 0;
+    return this.season()?.temp ?? 0;
+  }
+  /** A Feverlands bite: it may carry any of the realm's sicknesses. */
+  feverBite() {
+    const r = activeRealm();
+    if (!r || r.tpl.hazard.id !== 'fever' || !this.here()) return;
+    if (this.game.equipment.has('plagueward')) return;
+    if (this.game.rng() < FEVER_CHANCE * this.diseaseScale())
+      this.game.ailments.contract(FEVER_BITES[Math.floor(this.game.rng() * FEVER_BITES.length)]);
+  }
+  /** Whether the fever-dream is scrambling what the record shows. */
+  dreaming() {
+    return (
+      this.game.ailments.showing().some((a) => a.id === 'fever_dream') &&
+      !this.game.equipment.has('plagueward')
+    );
   }
   /** Whether the player wades in the Marches' mire. */
   inMire() {
@@ -445,6 +504,7 @@ export class Pocket extends System {
     let k = 1;
     if (this.inMire() && !fx.has('mirewalk')) k *= 0.55;
     if (this.hymnLevel() > 0.5 && !fx.has('hymnward') && !this.warmed()) k *= 0.6;
+    if (this.inMagma() && !fx.has('forgeward')) k *= 0.5;
     return k;
   }
   /** Steam vents blowing near a point. */
@@ -468,10 +528,12 @@ export class Pocket extends System {
   /** Whether the player wades below the tide and it hinders them. */
   submerged() {
     const p = this.game.s.player;
+    const kind = this.waterKind();
     return (
-      this.waterKind() === 'tide' &&
+      (kind === 'tide' || kind === 'deep') &&
       this.underwater(p.x, p.y - 24) &&
-      !this.game.equipment.has('swim')
+      !this.game.equipment.has('swim') &&
+      !this.game.equipment.has('gills')
     );
   }
   /** Strength of the ash storm where the player stands (0 when clear, sheltered, or warded). */
@@ -577,6 +639,82 @@ export class Pocket extends System {
         );
       this.hymnWas = hymn;
       if (hymn && !guarded) v.bodyTemp = clamp(v.bodyTemp - dt * 0.025 * hard, 30, 41);
+    }
+    // Star pulses: light gathers overhead, then a star crashes down where you stood.
+    if (tpl.hazard.id === 'stars') {
+      if (!this.caveIn && starPulse(s.elapsed, inst.seed) > 0 && s.elapsed > this.caveInAt) {
+        this.caveIn = { x: p.x, y: p.y - 520, at: s.elapsed + 2.6, kind: 'star' };
+        this.game.sound('star', p.x, p.y - 200, 1);
+        this.game.say('Light gathers overhead: a star pulse is coming!', 'danger');
+      }
+      if (this.caveIn && s.elapsed >= this.caveIn.at) {
+        const c = this.caveIn,
+          ward = fx.has('starward');
+        for (const dx of [-50, 0, 50])
+          this.game.combat.spawn(
+            'star_pulse',
+            { x: c.x + dx, y: c.y },
+            Math.PI / 2,
+            700,
+            ward ? 0 : 52 * hard,
+            'mob',
+          );
+        this.game.sound('thunder', c.x, c.y + 400, 0.9);
+        this.caveIn = null;
+        this.caveInAt = s.elapsed + 30;
+      }
+    }
+    // Cursed gold: each handful of gold picked up risks gold sickness.
+    if (tpl.hazard.id === 'curse') {
+      const gold =
+        this.game.count('coin') +
+        this.game.count('gold_ingot') * 20 +
+        this.game.count('crown_gold') * 5;
+      if (this.goldWas >= 0 && gold > this.goldWas && !fx.has('goldward')) {
+        if (this.game.rng() < 0.1 * hard * this.diseaseScale())
+          this.game.ailments.contract('gold_sickness');
+      }
+      this.goldWas = gold;
+    }
+    // The Undertow: every breath counts; diving bells hold air.
+    if (tpl.hazard.id === 'pressure') {
+      const bell = s.structures.some((st) => st.type === 'diving_bell' && dist(st, p) < 120);
+      if (bell) this.breath = Math.min(AIR_SECONDS, this.breath + dt * 12);
+      else if (!fx.has('gills') && this.underwater(p.x, p.y - 40))
+        this.breath = Math.max(0, this.breath - dt * (fx.has('breath') ? 1 / 3 : 1) * hard);
+      if (this.breath <= 0) {
+        v.health = clamp(v.health - dt * 10, 0, this.game.maxHealth());
+        if (s.elapsed > this.drowningSaid) {
+          this.drowningSaid = s.elapsed + 4;
+          this.game.say('You are drowning! Find a diving bell!', 'danger');
+        }
+      } else if (this.breath < 10 && s.elapsed > this.drowningSaid && !bell) {
+        this.drowningSaid = s.elapsed + 6;
+        this.game.say('Your breath is running out.', 'danger');
+      }
+    }
+    // Emberheart: the magma climbs; standing in it burns fast.
+    if (tpl.hazard.id === 'magma') {
+      const rising =
+        magmaLevel(activeRealm()!.geo as EmberGeometry, s.elapsed) <
+        (activeRealm()!.geo as EmberGeometry).low - 20;
+      if (rising && !this.magmaWas)
+        this.game.say('The magma is rising! Climb to the high ledges.', 'danger');
+      this.magmaWas = rising;
+      if (this.inMagma() && !fx.has('forgeward')) {
+        v.health = clamp(v.health - dt * 16 * hard, 0, this.game.maxHealth());
+        if (this.game.rng() < dt * 0.3) this.game.ailments.contract('burn', true);
+      }
+    }
+    // The Garden: the year turns.
+    if (tpl.hazard.id === 'seasons') {
+      const season = this.season()!;
+      if (season.id !== this.seasonWas && this.seasonWas)
+        this.game.say(
+          `${season.name} comes to the garden.`,
+          season.id === 'winter' || season.id === 'summer' ? 'danger' : 'ink',
+        );
+      this.seasonWas = season.id;
     }
     // The tide: wading soaks and chills you.
     if (tpl.hazard.id === 'tide') {

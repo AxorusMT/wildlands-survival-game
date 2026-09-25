@@ -272,7 +272,7 @@ export class Dev extends System {
     },
     realm: {
       usage: 'realm <id> [tier] | realm home | realm close',
-      help: 'Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir) at a tier and step in, go home, or collapse it.',
+      help: 'Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir, feverlands, observatory, gutter, undertow, emberheart, garden) at a tier and step in, go home, or collapse it.',
       run: ([id, tier]) => {
         const pocket = this.game.pocket;
         if (id === 'home') return pocket.leave().ok ? ['Home.'] : ['! No realm is open.'];

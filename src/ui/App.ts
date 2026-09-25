@@ -1473,11 +1473,24 @@ function updateUI(force = false) {
   if (!force && now - state.lastUI < UI_RULES.hudRefreshMs) return;
   state.lastUI = now;
   const v = game.s.vitals;
-  (['health', 'hydration', 'calories', 'stamina'] as (keyof Vitals)[]).forEach((id) => {
-    const most = id === 'health' ? game.maxHealth() : 100;
-    $(id + '-bar').style.width = clamp((v[id] / most) * 100, 0, 100) + '%';
-    $(id + '-value').textContent = String(Math.round(v[id]));
+  // The fever-dream lies: the record shows numbers that drift from the truth.
+  const dream = game.pocket.dreaming();
+  (['health', 'hydration', 'calories', 'stamina'] as (keyof Vitals)[]).forEach((id, i) => {
+    const most = id === 'health' ? game.maxHealth() : 100,
+      shown = dream
+        ? clamp(v[id] + Math.sin(now / 700 + i * 2.3) * 35 + Math.sin(now / 230 + i) * 8, 0, most)
+        : v[id];
+    $(id + '-bar').style.width = clamp((shown / most) * 100, 0, 100) + '%';
+    $(id + '-value').textContent =
+      dream && Math.sin(now / 400 + i) > 0.6 ? '??' : String(Math.round(shown));
   });
+  $('hud').classList.toggle('dreaming', dream);
+  const air = game.pocket.air();
+  $('air-stat').classList.toggle('hidden', !air);
+  if (air) {
+    $('air-bar').style.width = clamp((air[0] / air[1]) * 100, 0, 100) + '%';
+    $('air-value').textContent = String(Math.ceil(air[0]));
+  }
   const maxMana = game.equipment.maxMana();
   $('mana-bar').style.width = clamp((game.s.mana / maxMana) * 100, 0, 100) + '%';
   $('mana-value').textContent = String(Math.round(game.s.mana));

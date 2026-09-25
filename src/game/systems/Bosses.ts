@@ -576,6 +576,213 @@ export class Bosses extends System {
           s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.012, 30, 41);
         break;
       }
+      // ── Band IV and V realms ──
+      case 'mother_of_rot': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        // She heaves herself at you in great, splashing leaps.
+        if (this.due(a, 'leap', rage ? 3 : 4.5)) {
+          a.vy = -760;
+          a.vx = face * Math.min(520, Math.abs(p.x - a.x) * 1.2);
+          a.timers.landing = 1;
+          a.warning = 0.5;
+        }
+        const air = (a.vy ?? 0) < 0 || a.timers.landing;
+        if (!air) a.vx = (a.vx ?? 0) * 0.9;
+        const before = a.vy ?? 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (a.timers.landing && before > 0 && (a.vy ?? 0) === 0) {
+          a.timers.landing = 0;
+          for (const dir of [-1, 1])
+            this.game.combat.spawn(
+              'shockwave',
+              { x: a.x, y: a.y - 14 },
+              dir > 0 ? 0 : Math.PI,
+              320,
+              48,
+              'mob',
+            );
+          this.game.sound('slam', a.x, a.y, 1.3);
+        }
+        if (this.due(a, 'spit', 2.4))
+          this.game.combat.mobShoot(a, 'plague_bolt', 440, 46, rage ? 5 : 3, 0.22);
+        if (this.due(a, 'brood', rage ? 8 : 12))
+          for (const dx of [-160, 160])
+            this.minion('rot_toad', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        if (rage && this.due(a, 'miasma', 7)) this.ring(a, 'plague_bolt', 12, 300, 44, t);
+        break;
+      }
+      case 'the_astronomer': {
+        this.steer(
+          a,
+          p.x + Math.cos(t * 0.6) * 320,
+          p.y - 240 + Math.sin(t) * 60,
+          spec.speed[1],
+          dt,
+          1.4,
+        );
+        if (this.due(a, 'fan', 2))
+          this.game.combat.mobShoot(a, 'star_bolt', 520, 50, rage ? 7 : 5, 0.14);
+        if (this.due(a, 'orbit', rage ? 5 : 7)) this.ring(a, 'star_bolt', 16, 300, 46, t);
+        if (this.due(a, 'pulse', rage ? 6 : 9))
+          for (const dx of [-120, 0, 120])
+            this.game.combat.spawn(
+              'star_pulse',
+              { x: p.x + dx, y: p.y - 540 },
+              Math.PI / 2,
+              700,
+              56,
+              'mob',
+            );
+        // It turns the sky over: you are flung upward.
+        if (rage && this.due(a, 'upend', 10)) {
+          p.vy = -820;
+          this.game.say('The Astronomer turns the sky over!', 'danger');
+          this.game.sound('portal', p.x, p.y, 1);
+        }
+        if (this.due(a, 'stars', rage ? 10 : 14))
+          for (const dx of [-220, 220]) this.minion('star_wisp', a.x + dx, a.y);
+        break;
+      }
+      case 'pauper_king': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = Math.abs(p.x - a.x) > 160 ? face * (rage ? spec.speed[1] : spec.speed[0]) : 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (this.due(a, 'coins', 1.8))
+          this.game.combat.mobShoot(a, 'coin_shot', 640, 50, rage ? 7 : 5, 0.18);
+        // The tax: close enough, and he takes a tenth of your marks.
+        if (dist(a, p) < 150 && this.due(a, 'tax', 5)) {
+          const take = Math.floor(this.game.count('coin') * 0.1);
+          if (take > 0) {
+            this.game.remove('coin', take);
+            a.hp = Math.min(a.maxHp, a.hp + take * 4);
+            this.game.say(`The Pauper King taxes you ${take} marks, and grows stronger.`, 'danger');
+          }
+        }
+        if (this.due(a, 'thieves', rage ? 8 : 12))
+          for (const dx of [-180, 180])
+            this.minion('crown_thief', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        if (rage && this.due(a, 'rain', 6))
+          for (let i = 0; i < 9; i++)
+            this.game.combat.spawn(
+              'coin_shot',
+              { x: p.x + (i - 4) * 70, y: p.y - 480 },
+              Math.PI / 2,
+              260,
+              44,
+              'mob',
+            );
+        break;
+      }
+      case 'the_leviathan': {
+        a.timers ??= {};
+        const charging = t < (a.timers.charge ?? 0);
+        if (!charging)
+          this.steer(
+            a,
+            p.x - face * 260,
+            p.y - 40 + Math.sin(t * 1.3) * 120,
+            spec.speed[0],
+            dt,
+            1.2,
+          );
+        else {
+          a.x += (a.vx ?? 0) * dt;
+          a.y += (a.vy ?? 0) * dt;
+        }
+        if (!charging && this.due(a, 'charge', rage ? 4 : 6)) {
+          const d = Math.hypot(p.x - a.x, p.y - a.y) || 1;
+          a.vx = ((p.x - a.x) / d) * 620;
+          a.vy = ((p.y - 30 - a.y) / d) * 620;
+          a.timers.charge = t + 1.1;
+          a.warning = 0.6;
+          this.game.sound('boss', a.x, a.y, 1.3);
+        }
+        if (this.due(a, 'bubbles', 3)) this.ring(a, 'bubble', rage ? 14 : 10, 260, 58, t);
+        // Its wake drags you toward the jaws.
+        if (rage && dist(a, p) < 600) p.x += Math.sign(a.x - p.x) * 40 * dt;
+        if (this.due(a, 'eels', rage ? 9 : 13))
+          for (const dx of [-240, 240]) this.minion('razor_eel', a.x + dx, a.y);
+        break;
+      }
+      case 'anvil_god': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = Math.abs(p.x - a.x) > 220 ? face * spec.speed[0] : 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (this.due(a, 'slam', rage ? 3 : 4)) {
+          for (const dir of [-1, 1])
+            this.game.combat.spawn(
+              'shockwave',
+              { x: a.x, y: a.y - 14 },
+              dir > 0 ? 0 : Math.PI,
+              380,
+              60,
+              'mob',
+            );
+          this.game.sound('slam', a.x, a.y, 1.5);
+          a.warning = 0.4;
+        }
+        if (this.due(a, 'sparks', 2.4))
+          this.game.combat.mobShoot(a, 'kiln_ember', 520, 56, rage ? 7 : 5, 0.18);
+        if (this.due(a, 'rain', rage ? 5 : 8))
+          for (let i = 0; i < 8; i++)
+            this.game.combat.spawn(
+              'fireball',
+              { x: p.x + (i - 3.5) * 80, y: p.y - 500 },
+              Math.PI / 2,
+              260,
+              52,
+              'mob',
+            );
+        // Geysers of magma burst from the floor around him.
+        if (rage && this.due(a, 'geyser', 6))
+          for (const dx of [-300, -150, 150, 300])
+            this.game.combat.spawn(
+              'fireball',
+              { x: a.x + dx, y: a.y - 10 },
+              -Math.PI / 2,
+              620,
+              58,
+              'mob',
+            );
+        if (this.due(a, 'smiths', rage ? 10 : 14))
+          for (const dx of [-200, 200])
+            this.minion('hammer_knight', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        break;
+      }
+      case 'four_faced_warden': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = Math.abs(p.x - a.x) > 200 ? face * spec.speed[0] * (rage ? 1.4 : 1) : 0;
+        this.game.wildlife.moveBody(a, dt);
+        // It turns a new face every twelve seconds: spring, summer, autumn, winter.
+        const faceNow = Math.floor((t - (a.timers.start ?? 0)) / 12) % 4;
+        if (faceNow !== a.timers.face) {
+          a.timers.face = faceNow;
+          this.game.say(
+            `The Warden turns its ${['spring', 'summer', 'autumn', 'winter'][faceNow]} face!`,
+            'danger',
+          );
+          a.warning = 0.8;
+        }
+        if (this.due(a, 'volley', 2)) {
+          if (faceNow === 0) this.game.combat.mobShoot(a, 'petal', 460, 50, rage ? 7 : 5, 0.26);
+          else if (faceNow === 1)
+            this.game.combat.mobShoot(a, 'heat_bolt', 480, 58, rage ? 4 : 3, 0.2);
+          else if (faceNow === 2) this.ring(a, 'thorn', rage ? 14 : 10, 380, 54, t);
+          else this.game.combat.mobShoot(a, 'frost_bolt', 520, 56, rage ? 6 : 4, 0.16);
+        }
+        if (faceNow === 3 && dist(a, p) < 500 && !this.game.equipment.has('seasonward'))
+          s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.02, 30, 41);
+        if (faceNow === 1 && dist(a, p) < 500 && !this.game.equipment.has('seasonward'))
+          s.vitals.hydration = clamp(s.vitals.hydration - dt * 0.3, 0, 100);
+        if (this.due(a, 'pack', rage ? 9 : 13))
+          for (const dx of [-200, 200])
+            this.minion('season_wolf', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        break;
+      }
       case 'unmaker': {
         this.steer(
           a,

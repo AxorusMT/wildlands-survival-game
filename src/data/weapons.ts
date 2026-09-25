@@ -312,6 +312,18 @@ export const SIGNATURE: Record<string, [FamilyId, number]> = {
   saltglass_bow: ['bow', 8],
   choir_stave: ['staff', 9],
   bellhammer: ['warhammer', 9],
+  venom_blade: ['blade', 9],
+  plague_censer: ['tome', 9],
+  astral_tome: ['tome', 10],
+  star_spear: ['spear', 10],
+  gilded_greatblade: ['greatsword', 10],
+  thiefs_whip: ['whip', 9],
+  leviathan_harpoon: ['spear', 11],
+  tidebreaker: ['crossbow', 11],
+  anvil_maul: ['warhammer', 11],
+  heartfire_staff: ['staff', 11],
+  season_bow: ['bow', 11],
+  thornlash: ['whip', 11],
   ruby_staff: ['staff', 3],
   emerald_staff: ['staff', 3],
   sapphire_staff: ['staff', 4],
@@ -696,6 +708,8 @@ export const UNDEAD = new Set([
   'choir_wraith',
   'cantor',
   'grand_cantor',
+  'drowned_diver',
+  'plague_knight',
 ]);
 
 // ── Gems ────────────────────────────────────────────────────────────────────────────────────

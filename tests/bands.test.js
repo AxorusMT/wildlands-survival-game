@@ -12,10 +12,22 @@ const wear = (g, set) => {
     g.equipment.wear(`${set}_${piece}`);
   }
 };
-const BAND23 = ['glasswood', 'marches', 'barrow', 'saltflats', 'choir'];
+const BAND23 = [
+  'glasswood',
+  'marches',
+  'barrow',
+  'saltflats',
+  'choir',
+  'feverlands',
+  'observatory',
+  'gutter',
+  'undertow',
+  'emberheart',
+  'garden',
+];
 
 test('every realm is complete: creatures, boss, keys, relic, music, and codex page', () => {
-  assert.equal(D.REALMS.length, 8);
+  assert.equal(D.REALMS.length, 14);
   for (const tpl of D.REALMS) {
     for (const m of tpl.mobs) assert.ok(D.MOBS[m.type], `${tpl.id} mob ${m.type}`);
     assert.ok(D.MOBS[tpl.boss]?.boss, `${tpl.id} boss`);
@@ -40,12 +52,29 @@ test('every realm is complete: creatures, boss, keys, relic, music, and codex pa
     // Its set, and its signature weapons, sit in the hierarchy.
     assert.ok(D.ARMOR_SETS.some((s) => s.bonus === tpl.hazard.ward));
   }
-  for (const w of ['prism_wand', 'bonecleaver', 'brass_repeater', 'mirage_blade', 'bellhammer'])
+  for (const w of [
+    'prism_wand',
+    'bonecleaver',
+    'brass_repeater',
+    'mirage_blade',
+    'bellhammer',
+    'venom_blade',
+    'astral_tome',
+    'gilded_greatblade',
+    'leviathan_harpoon',
+    'anvil_maul',
+    'season_bow',
+  ])
     assert.ok(D.SIGNATURE[w] && D.WEAPONS[w] && D.RECIPES.some((r) => r.id === w), w);
   // Band II keys come from Band I spoils; Band III from Band II.
   const cost = (id) => D.RECIPES.find((r) => r.id === id).cost;
   assert.ok(cost('glasswood_fragment').tide_pearl);
   assert.ok(cost('choir_fragment').marrow_ingot);
+  assert.ok(cost('feverlands_fragment').rime_silver);
+  assert.ok(cost('undertow_fragment').plague_ivory);
+  // Bands rise in order.
+  for (const id of ['feverlands', 'observatory', 'gutter']) assert.equal(D.realmById(id).band, 4);
+  for (const id of ['undertow', 'emberheart', 'garden']) assert.equal(D.realmById(id).band, 5);
 });
 
 test('the new realms open, furnish themselves, and their great foes answer', () => {
@@ -217,4 +246,115 @@ test('polish: realm set extras come from the full set, not the relic that shares
   const armour = (g) => g.equipment.worn().armor.reduce((n, id) => n + D.ARMOR[id].defense, 0);
   assert.equal(amber.equipment.defense(), base.equipment.defense() + armour(amber) + 2);
   assert.ok(ash.equipment.speedBonus() > base.equipment.speedBonus() + 0.09);
+});
+
+test('Feverlands bites carry sickness, and the fever-dream scrambles the record', () => {
+  const g = fresh();
+  g.command('realm feverlands 1');
+  let caught = 0;
+  for (let i = 0; i < 60; i++) {
+    g.s.ailments = [];
+    g.pocket.feverBite();
+    caught += g.s.ailments.length;
+  }
+  assert.ok(caught > 5 && caught < 40, `${caught} of 60`);
+  g.s.ailments = [{ id: 'fever_dream', stage: 2, next: 9999, since: 0 }];
+  assert.ok(g.pocket.dreaming());
+  wear(g, 'plaguedoctor');
+  assert.equal(g.pocket.dreaming(), false);
+  g.s.ailments = [];
+  for (let i = 0; i < 40; i++) g.pocket.feverBite();
+  assert.equal(g.s.ailments.length, 0, 'the plague doctor is untouched');
+});
+
+test('the Observatory is light, and its star pulses gather, then fall', () => {
+  const g = fresh();
+  g.command('realm observatory 1');
+  assert.ok(g.pocket.gravityScale() < 1);
+  g.s.player.y = g.groundTopAt(g.s.player.x) + 1;
+  const seed = g.s.pocket.seed;
+  while (D.starPulse(g.s.elapsed, seed) <= 0 || g.s.elapsed < 30) g.s.elapsed += 1;
+  g.pocket.update(0.1);
+  assert.equal(g.pocket.pendingCaveIn()?.kind, 'star');
+  g.s.elapsed += 3;
+  g.pocket.update(0.1);
+  assert.ok(g.combat.projectiles.some((b) => b.kind === 'star_pulse' && b.damage > 0));
+});
+
+test('cursed gold sickens hoarders in the Gutter; the gilded are safe', () => {
+  const g = fresh();
+  g.command('realm gutter 1');
+  assert.ok(g.s.structures.filter((st) => st.type === 'dungeon_chest' && inside(st)).length >= 8);
+  g.pocket.update(0.1);
+  for (let i = 0; i < 80 && !g.ailments.has('gold_sickness'); i++) {
+    g.add('coin', 10);
+    g.pocket.update(0.1);
+  }
+  assert.ok(g.ailments.has('gold_sickness'));
+  const w = fresh();
+  w.command('realm gutter 1');
+  wear(w, 'gilded');
+  w.pocket.update(0.1);
+  for (let i = 0; i < 80; i++) {
+    w.add('coin', 10);
+    w.pocket.update(0.1);
+  }
+  assert.equal(w.ailments.has('gold_sickness'), false);
+});
+
+test('in the Undertow you swim, your breath runs out, and diving bells restore it', () => {
+  const g = fresh();
+  g.command('realm undertow 1');
+  const p = g.s.player;
+  p.invuln = 0;
+  assert.ok(g.pocket.submerged());
+  assert.ok(g.s.structures.some((st) => st.type === 'diving_bell' && inside(st)));
+  p.x += 400;
+  p.y = g.groundTopAt(p.x);
+  for (const st of g.s.structures) if (st.type === 'diving_bell') st.x = 0;
+  g.pocket.update(10);
+  assert.ok(g.pocket.air()[0] < 31);
+  const hp = g.s.vitals.health;
+  g.pocket.update(40);
+  assert.ok(g.s.vitals.health < hp, 'drowning');
+  const bell = g.s.structures.find((st) => st.type === 'diving_bell');
+  bell.x = p.x;
+  bell.y = p.y;
+  g.pocket.update(5);
+  assert.ok(g.pocket.air()[0] > 30);
+  wear(g, 'leviathan');
+  assert.equal(g.pocket.air(), null);
+  assert.equal(g.pocket.submerged(), false);
+});
+
+test('Emberheart magma rises through the low ledge and burns', () => {
+  const g = fresh();
+  g.command('realm emberheart 1');
+  const geo = D.activeRealm().geo;
+  assert.equal(D.magmaLevel(geo, 10), geo.low);
+  assert.ok(Math.abs(D.magmaLevel(geo, 90) - geo.high) < 1);
+  g.s.elapsed = Math.ceil(g.s.elapsed / 120) * 120 + 90;
+  const p = g.s.player;
+  p.y = geo.high + 200;
+  assert.ok(g.pocket.inMagma());
+  const hp = g.s.vitals.health;
+  g.pocket.update(1);
+  assert.ok(g.s.vitals.health < hp - 5);
+  wear(g, 'forgeborn');
+  const hp2 = g.s.vitals.health;
+  g.pocket.update(1);
+  assert.equal(g.s.vitals.health, hp2);
+});
+
+test('the Garden turns through four seasons that change the air', () => {
+  const g = fresh();
+  g.command('realm garden 1');
+  const seed = g.s.pocket.seed;
+  const seen = new Map();
+  for (let t = 0; t < D.SEASON_SECONDS * 4; t += 30) {
+    g.s.elapsed = t;
+    seen.set(D.seasonAt(t, seed).id, g.temperature());
+  }
+  assert.equal(seen.size, 4);
+  assert.ok(seen.get('summer') > seen.get('winter') + 40);
 });
