@@ -35,6 +35,7 @@ import { Physics } from './systems/Physics.ts';
 import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
+import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Town } from './systems/Town.ts';
@@ -72,6 +73,7 @@ export class Game {
   readonly equipment = new Equipment(this);
   readonly combat = new Combat(this);
   readonly armoury = new Armoury(this);
+  readonly skills = new Skills(this);
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
   readonly pocket = new Pocket(this);
@@ -160,6 +162,7 @@ export class Game {
       pocket: null,
       realms: {},
       armoury: {},
+      meta: { renown: 0, skills: [], mastery: {} },
       placing: null,
       dead: false,
       lastSave: Date.now(),
@@ -236,6 +239,10 @@ export class Game {
   }
   sheltered() {
     return !!this.near('shelter', 130);
+  }
+  /** Relics set on a shelf at camp (as many as renown allows). */
+  shelvedRelics() {
+    return this.skills.shelved();
   }
   cooled() {
     return !!this.larder.nearest();

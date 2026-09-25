@@ -272,9 +272,48 @@ Each weapon also has its own upgrade line:
 
 Signature weapons, such as the Tidecaller spear and the Hellrazor, belong to a family and tier but stand outside the grid.
 
+### Builds and lasting progress
+
+Nothing here resets. The world is persistent, and so is everything you learn in it.
+
+- **Renown** (the bar under DEFENSE on the HUD) comes from nearly everything: the first kill of each creature, crafting, placing, gathering, reaching new places, clearing realm tiers, curing illnesses and settling townsfolk. Each of its 60 levels grants a skill point.
+- **Skills** (Gear › Skills) come in five trees:
+  - **Warfare**: melee weapons, health and defense.
+  - **Marksman**: bows, crossbows and critical hits.
+  - **Arcana**: staves, tomes, mana and infusions.
+  - **Survival**: hunger, thirst, cold, disease and food keeping.
+  - **Wayfinding**: realms, keys, loot, gathering and movement.
+
+  Each tree has four rows of six skills. The rows open after 3, 6 and 10 points spent in that tree. After 14 points in a tree come its three keystones (2 points each), which change how you play:
+
+  | Tree       | Keystones                              |
+  | ---------- | -------------------------------------- |
+  | Warfare    | Berserker, Juggernaut, Bladestorm      |
+  | Marksman   | Deadeye, Quiver master, Skirmisher     |
+  | Arcana     | Overchannel, Mana shield, Elementalist |
+  | Survival   | Iron gut, Cold-blooded, Field medic    |
+  | Wayfinding | Riftborn, Treasure sense, Wanderer     |
+
+  Unlearning everything costs 3 fallen stars and 200 marks.
+
+- **Weapon mastery**: every family levels from 1 to 20 as you deal damage with it. Each level adds 1% damage. Level 5 steadies a blade's combo, 10 adds critical chance, 15 quickens your blows, and 20 adds another 10%.
+- **Archetype armour**: four builds (Vanguard, Ranger, Arcanist and Wayfarer), each available at three tiers (iron, hellstone and starmetal). Their bonuses:
+  - **Vanguard**: defense, and foes that bite you take damage back.
+  - **Ranger**: critical hits, and a chance to keep your ammunition.
+  - **Arcanist**: +40 mana.
+  - **Wayfarer**: resistance to disease and cold, and food keeps longer in your pack.
+- **The Codex** (Beasts › The Codex) has 20 pages:
+  - the creatures of every region, dungeon and realm;
+  - the regions, dungeons and worlds you have visited;
+  - the maladies you have survived, the foods you have eaten, the families of arms, the weapons you have hoarded, and the relics.
+
+  Finishing a page grants a lasting bonus.
+
+- **The relic shelf** is built at the workbench. Relics set on it (the realm bosses' prizes and great trophies) lend their gifts wherever you are. It holds three relics, four at renown 20 and five at renown 40.
+
 ### Gear, potions, and crystals
 
-- **Armour:** seventeen sets (copper, iron, silver, gold, the three Band I realm sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
+- **Armour:** twenty-nine sets (copper, iron, silver, gold, the three Band I realm sets, the twelve archetype sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
 - **Accessories:** three can be worn at once, including double jumps, gliding, speed, regeneration, light, lava resistance and more.
 - **Ranged weapons:** bows fire arrows (plain, fire, crystal), and staves spend mana: embers, bone shards, icicles, homing sun bolts, spores and void beams.
 - **Healing:** healing draughts heal instantly and bring on a short potion sickness.
@@ -282,7 +321,7 @@ Signature weapons, such as the Tidecaller spear and the Hellrazor, belong to a f
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 345 recipes and 476 items (134 weapons), and 58 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 382 recipes and 513 items (134 weapons), and 66 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 

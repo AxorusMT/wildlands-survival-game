@@ -57,9 +57,15 @@ export class Larder extends System {
   }
   /** Multiplier on rot in the pack from worn cooling charms. */
   packCooling() {
-    return this.game.equipment
+    const charm = this.game.equipment
       .worn()
       .accessories.reduce((k, id) => Math.min(k, PACK_COOLING[id] ?? 1), 1);
+    // Preservers and a wayfarer's pack keep food longer still.
+    return (
+      charm *
+      Math.max(0.2, 1 - this.game.skills.get('packRot')) *
+      (this.game.equipment.has('wayfarer') ? 0.6 : 1)
+    );
   }
 
   // ─── Stowing and taking ────────────────────────────────────────────────────
@@ -103,7 +109,7 @@ export class Larder extends System {
     if (!this.game.count(spec.fuel))
       return { ok: false, reason: `It needs ${itemName(spec.fuel).toLowerCase()}.` };
     this.game.remove(spec.fuel);
-    st.fuel += spec.per ?? 900;
+    st.fuel += (spec.per ?? 900) * (1 + this.game.skills.get('ice'));
     this.warned.delete(st.id);
     this.game.sound('place', st.x, st.y, 0.6);
     this.game.say(`${spec.name} cooled with ${itemName(spec.fuel).toLowerCase()}.`, 'good');

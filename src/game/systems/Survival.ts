@@ -136,7 +136,14 @@ export class Survival extends System {
   update(dt: number) {
     const v = this.game.s.vitals,
       p = this.game.s.player;
-    const cold = this.game.temperature();
+    // Skills and a wayfarer's clothes shrug off some of the cold and the heat.
+    const air = this.game.temperature(),
+      skills = this.game.skills.stats(),
+      wayfarer = this.game.equipment.has('wayfarer') ? 4 : 0,
+      coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer,
+      heatResist = skills.heatResist + wayfarer,
+      cold =
+        air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
     const shelter = this.game.sheltered(),
       fire = !!this.game.nearLitFire();
     const rain =
@@ -163,16 +170,19 @@ export class Survival extends System {
     if ((this.game.s.buffs.warm_belly ?? 0) > 0 && cold < 15) target += 2.2;
     target = clamp(target, 30, 41);
     v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
-    const drain = this.game.pocket.drainScale();
+    const drain = this.game.pocket.drainScale(),
+      sk = this.game.skills.stats(),
+      thirst = drain * Math.max(0.3, 1 + sk.thirst),
+      hunger = drain * Math.max(0.3, 1 + sk.calories);
     v.hydration = clamp(
       v.hydration -
-        dt * drain * (0.045 + (cold > 26 ? 0.045 : 0) + (cold > 40 ? (p.ward ? 0.05 : 0.14) : 0)),
+        dt * thirst * (0.045 + (cold > 26 ? 0.045 : 0) + (cold > 40 ? (p.ward ? 0.05 : 0.14) : 0)),
       0,
       100,
     );
-    v.calories = clamp(v.calories - dt * drain * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
+    v.calories = clamp(v.calories - dt * hunger * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
     v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
-    v.vitamins = clamp(v.vitamins - dt * drain * 0.012, 0, RULES.maxVital);
+    v.vitamins = clamp(v.vitamins - dt * hunger * 0.012, 0, RULES.maxVital);
     v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
     v.hygiene = clamp(
       v.hygiene - dt * (this.game.biome().id === 'marsh' ? 0.025 : 0.011),
@@ -183,7 +193,10 @@ export class Survival extends System {
       v.stamina +
         dt *
           (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) *
-          ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1),
+          ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0
+            ? 1.4
+            : 1) *
+          (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)),
       0,
       100,
     );

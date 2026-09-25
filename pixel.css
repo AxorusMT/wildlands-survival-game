@@ -575,8 +575,71 @@ canvas.icon {
   display: flex;
   gap: 3px;
 }
-.hud-defense {
+.hud-defense,
+.hud-renown {
   font: 400 11px var(--caps);
+}
+.hud-renown span {
+  color: #a8402a;
+}
+.renown-track {
+  width: 96px;
+  height: 4px;
+  margin-top: 2px;
+  background: #2a1c12;
+  border: 1px solid #5a3e26;
+}
+.renown-track i {
+  display: block;
+  height: 100%;
+  background: #c8902a;
+}
+.skill-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.skill {
+  text-align: left;
+  padding: 4px 5px;
+  font: 400 11px/1.2 var(--body, inherit);
+  background: #e8d8b8;
+  border: 2px solid #b8a080;
+  color: #6a5a44;
+  cursor: pointer;
+  min-width: 0;
+}
+.skill strong {
+  display: block;
+  font: 400 10px var(--caps);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.skill small {
+  display: block;
+  font-size: 10px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.skill.ready {
+  border-color: #c8902a;
+  color: #3a2818;
+}
+.skill.learned {
+  background: #3a6a3a;
+  border-color: #6ab86a;
+  color: #f0e8d0;
+}
+.skill.key {
+  border-style: double;
+  border-width: 3px;
+}
+.book-row.selected {
+  outline: 2px solid #c8902a;
 }
 
 @media (max-width: 800px) {

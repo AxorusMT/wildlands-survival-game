@@ -324,6 +324,8 @@ export interface GameState {
   spawn?: { x: number; y: number } | null;
   /** Each settler's home, by settler id: the seat of their room. */
   town: { homes: Record<string, { x: number; y: number }> };
+  /** Lasting progress: renown earned, skills learned, and damage dealt with each weapon family. */
+  meta?: { renown: number; skills: string[]; mastery: Record<string, number> };
   /** Every weapon kind owned: its quality, level, infusion, gems, and evolutions. */
   armoury?: Record<string, { q: number; lvl: number; inf?: string; gems: string[]; evo: string[] }>;
   /** The generated realm open in the pocket strip, if any. */

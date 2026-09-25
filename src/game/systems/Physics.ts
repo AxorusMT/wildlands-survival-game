@@ -59,7 +59,7 @@ export class Physics extends System {
       return true;
     }
     const boost = fx.has('jump') || fx.has('speed') ? 1.18 : 1;
-    p.vy = -RULES.jumpVelocity * boost;
+    p.vy = -RULES.jumpVelocity * boost * (1 + this.game.skills.get('jump'));
     p.grounded = false;
     this.airJumps = 1;
     this.game.s.vitals.stamina -= RULES.jumpStamina;
@@ -116,7 +116,7 @@ export class Physics extends System {
     } else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
       if (p.grounded) this.jump();
       else {
-        p.vy = -RULES.climbVelocity;
+        p.vy = -RULES.climbVelocity * (1 + this.game.skills.get('climb'));
         v.stamina = clamp(v.stamina - dt * 5, 0, RULES.maxVital);
       }
     } else if (shaft && dy > 0) p.vy = Math.min(p.vy + 160 * dt, 170);

@@ -91,18 +91,27 @@ export class Wildlife extends System {
       return;
     }
     const at = animal.x === undefined ? this.game.s.player : animal;
+    // War cry: each kill steadies your breath.
+    const breath = this.game.skills.get('killStamina');
+    if (breath) this.game.s.vitals.stamina = clamp(this.game.s.vitals.stamina + breath, 0, 100);
     const more = this.game.pocket.lootScale(at.x);
     if (spec && !animal.minion && animal.type !== 'deer') {
       // Silver marks, more from tougher foes, many from the great ones.
       const coins = Math.max(
         1,
-        Math.round((spec.hp / 20) * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more),
+        Math.round(
+          (spec.hp / 20) *
+            (0.6 + this.game.rng() * 0.8) *
+            (spec.boss ? 3 : 1) *
+            more *
+            (1 + this.game.skills.get('coins')),
+        ),
       );
       this.game.drops.spawn('coin', coins, at.x, at.y - 20);
     }
     if (spec) {
       for (const [id, min, max, chance] of spec.loot)
-        if (this.game.rng() < chance)
+        if (this.game.rng() < chance * (1 + this.game.skills.get('luck')))
           this.game.drops.spawn(
             id,
             Math.max(1, Math.round((min + Math.floor(this.game.rng() * (max - min + 1))) * more)),
@@ -418,7 +427,15 @@ export class Wildlife extends System {
     ) {
       a.attackAt = t + spec.cooldown * 0.6;
       this.cry(a, 'attack');
-      this.game.combat.hurtPlayer(spec.damage, mobName(a.type) + ' attack!', spec.disease);
+      const taken = this.game.combat.hurtPlayer(
+        spec.damage,
+        mobName(a.type) + ' attack!',
+        spec.disease,
+      );
+      // Riposte and a vanguard's plate turn part of the blow back on the biter.
+      const thorns =
+        this.game.skills.get('thorns') + (this.game.equipment.has('vanguard') ? 0.25 : 0);
+      if (taken && thorns) this.game.combat.hurtMob(a, taken * thorns, p);
       this.bite(a);
     }
     if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {

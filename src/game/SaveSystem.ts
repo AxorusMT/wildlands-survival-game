@@ -144,6 +144,7 @@ export class SaveSystem extends System {
     s.pocket ??= null;
     s.realms ??= {};
     s.armoury ??= {};
+    s.meta ??= { renown: 0, skills: [], mastery: {} };
     s.vitals.vitamins ??= 70;
     s.immune ??= {};
     // Older records carry one disease; it becomes an ailment already showing.

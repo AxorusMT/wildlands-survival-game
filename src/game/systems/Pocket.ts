@@ -91,12 +91,22 @@ export class Pocket extends System {
   damageScale() {
     const i = this.inst();
     if (!i || !this.here()) return 1;
-    return TIER_SCALE.damage(i.tier) * (i.mods.includes('savage') ? 1.3 : 1);
+    return (
+      TIER_SCALE.damage(i.tier) *
+      (i.mods.includes('savage') ? 1.3 : 1) *
+      Math.max(0.5, 1 - this.game.skills.get('tierHarm'))
+    );
   }
   lootScale(x: number) {
     const i = this.inst();
     if (!i || !inPocket(x)) return 1;
-    return TIER_SCALE.loot(i.tier) + i.mods.reduce((n, m) => n + (modById(m)?.loot ?? 0), 0);
+    const sk = this.game.skills.stats();
+    return (
+      TIER_SCALE.loot(i.tier) +
+      i.mods.reduce((n, m) => n + (modById(m)?.loot ?? 0), 0) +
+      sk.realmLoot +
+      (sk.treasureSense ? 0.2 : 0)
+    );
   }
   speedScale(a: Animal) {
     return this.has('frenzied') && inPocket(a.x) ? 1.3 : 1;
@@ -128,7 +138,13 @@ export class Pocket extends System {
       return { ok: false, reason: `Clear tier ${TIER_NAMES[tier - 1] ?? 'I'} first.` };
     if (!god && !this.game.count(tpl.key))
       return { ok: false, reason: `You need a ${itemName(tpl.key).toLowerCase()}.` };
-    if (!god) this.game.remove(tpl.key);
+    // Keywise and Riftborn wayfinders sometimes turn a key without spending it.
+    const keep = this.game.skills.get('keySave') + (this.game.skills.flag('riftborn') ? 0.3 : 0);
+    if (!god) {
+      if (this.game.rng() < keep)
+        this.game.say('The key turns, but stays whole in your hand.', 'good');
+      else this.game.remove(tpl.key);
+    }
     const seed = Math.floor(this.game.rng() * 2 ** 31);
     const inst: RealmInstance = {
       realm: realmId,
@@ -279,7 +295,10 @@ export class Pocket extends System {
       ctx.mob(m.type, x0 + lx, m.air ? y - 140 - rng() * 80 : y);
     }
     // Chests, more of them in a Treasure trove.
-    const nChests = tpl.chests + (mods.has('treasure') ? 3 : 0);
+    const nChests =
+      tpl.chests +
+      (mods.has('treasure') ? 3 : 0) +
+      (this.game.skills.flag('treasureSense') ? 2 : 0);
     for (let i = 0; i < nChests; i++) {
       const lx = ((i + 0.5) / nChests) * (RW - 1400) + 400 + (rng() - 0.5) * 300;
       if (clear(lx)) ctx.chest(x0 + lx, spot(lx), tpl.chestLoot);
@@ -356,6 +375,7 @@ export class Pocket extends System {
     if (!rec.relic) {
       rec.relic = true;
       this.game.add(tpl.relic);
+      this.game.progress.record('relic:' + tpl.relic);
       this.game.say(`The ${itemName(tpl.relic)} is yours: a relic of the ${tpl.name}.`, 'victory');
     }
     if (first && inst.tier < MAX_TIER)
@@ -440,8 +460,9 @@ export class Pocket extends System {
         );
       this.stormWas = storm;
       if (storm && !fx.has('ashward')) {
-        v.stamina = clamp(v.stamina - dt * 4, 0, 100);
-        v.hydration = clamp(v.hydration - dt * 0.35, 0, 100);
+        const hard = 1 - Math.min(0.8, this.game.skills.get('hazard'));
+        v.stamina = clamp(v.stamina - dt * 4 * hard, 0, 100);
+        v.hydration = clamp(v.hydration - dt * 0.35 * hard, 0, 100);
         v.hygiene = clamp(v.hygiene - dt * 0.2, 0, 100);
       }
     }
@@ -464,7 +485,7 @@ export class Pocket extends System {
             { x: c.x + (i - 2) * 34 + (this.game.rng() - 0.5) * 14, y: c.y + 8 },
             Math.PI / 2,
             60 + this.game.rng() * 80,
-            warned ? 13 : 26,
+            (warned ? 13 : 26) * (1 - Math.min(0.8, this.game.skills.get('hazard'))),
             'mob',
           );
         this.game.sound('slam', c.x, c.y, 1);

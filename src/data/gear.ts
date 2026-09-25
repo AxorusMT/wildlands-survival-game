@@ -90,6 +90,127 @@ export const ARMOR_SETS: {
     bonus: 'tremor',
     bonusText: 'Sense cave-ins; falling rock does half damage; +2 defense',
   },
+  // ── Archetypes, in three bands ──
+  {
+    key: 'warden',
+    name: 'Warden',
+    bar: 'iron_ingot',
+    defense: [3, 5, 3],
+    station: 'workbench',
+    tier: 3,
+    bonus: 'vanguard',
+    bonusText: 'Vanguard: +3 defense; biters take a quarter of their blow back',
+  },
+  {
+    key: 'bulwark',
+    name: 'Bulwark',
+    bar: 'hellstone_ingot',
+    defense: [6, 9, 6],
+    station: 'forge',
+    tier: 6,
+    bonus: 'vanguard',
+    bonusText: 'Vanguard: +3 defense; biters take a quarter of their blow back',
+  },
+  {
+    key: 'aegis',
+    name: 'Aegis',
+    bar: 'starmetal_ingot',
+    defense: [11, 15, 11],
+    station: 'starforge',
+    tier: 9,
+    bonus: 'vanguard',
+    bonusText: 'Vanguard: +3 defense; biters take a quarter of their blow back',
+  },
+  {
+    key: 'stalker',
+    name: 'Stalker',
+    bar: 'iron_ingot',
+    defense: [2, 3, 2],
+    station: 'workbench',
+    tier: 3,
+    bonus: 'ranger',
+    bonusText: 'Ranger: +10% critical chance; a quarter of arrows kept',
+  },
+  {
+    key: 'farstrider',
+    name: 'Farstrider',
+    bar: 'hellstone_ingot',
+    defense: [4, 6, 4],
+    station: 'forge',
+    tier: 6,
+    bonus: 'ranger',
+    bonusText: 'Ranger: +10% critical chance; a quarter of arrows kept',
+  },
+  {
+    key: 'windrider',
+    name: 'Windrider',
+    bar: 'starmetal_ingot',
+    defense: [8, 11, 8],
+    station: 'starforge',
+    tier: 9,
+    bonus: 'ranger',
+    bonusText: 'Ranger: +10% critical chance; a quarter of arrows kept',
+  },
+  {
+    key: 'acolyte',
+    name: 'Acolyte',
+    bar: 'iron_ingot',
+    defense: [1, 2, 1],
+    station: 'workbench',
+    tier: 3,
+    bonus: 'arcanist',
+    bonusText: 'Arcanist: +40 mana; spells cost 20% less',
+  },
+  {
+    key: 'magus',
+    name: 'Magus',
+    bar: 'hellstone_ingot',
+    defense: [3, 4, 3],
+    station: 'forge',
+    tier: 6,
+    bonus: 'arcanist',
+    bonusText: 'Arcanist: +40 mana; spells cost 20% less',
+  },
+  {
+    key: 'archon',
+    name: 'Archon',
+    bar: 'starmetal_ingot',
+    defense: [6, 8, 6],
+    station: 'starforge',
+    tier: 9,
+    bonus: 'arcanist',
+    bonusText: 'Arcanist: +40 mana; spells cost 20% less',
+  },
+  {
+    key: 'drifter',
+    name: 'Drifter',
+    bar: 'iron_ingot',
+    defense: [2, 3, 2],
+    station: 'workbench',
+    tier: 3,
+    bonus: 'wayfarer',
+    bonusText: 'Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off',
+  },
+  {
+    key: 'nomad',
+    name: 'Nomad',
+    bar: 'hellstone_ingot',
+    defense: [4, 6, 4],
+    station: 'forge',
+    tier: 6,
+    bonus: 'wayfarer',
+    bonusText: 'Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off',
+  },
+  {
+    key: 'voyager',
+    name: 'Voyager',
+    bar: 'starmetal_ingot',
+    defense: [8, 11, 8],
+    station: 'starforge',
+    tier: 9,
+    bonus: 'wayfarer',
+    bonusText: 'Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off',
+  },
   {
     key: 'steel',
     name: 'Steel',
@@ -191,6 +312,12 @@ export const ARMOR_SETS: {
     bonusText: '+20% damage, +8 defense',
   },
 ];
+/** What each band of archetype armour needs besides its metal. */
+const ARCHETYPE_EXTRA: Record<number, Record<string, number>> = {
+  3: { hide: 2, fiber: 4 },
+  6: { obsidian: 2, silk: 3 },
+  9: { sky_silk: 3, crystal: 2 },
+};
 const SLOTS: [ArmorSlot, string, string, number][] = [
   ['head', 'helmet', 'helmet', 10],
   ['body', 'chestplate', 'chestplate', 16],
@@ -223,9 +350,12 @@ export const ARMOR_RECIPES: [string, Record<string, number>, string, number][] =
               ? { sand: 10, steel_ingot: 3 }
               : s.key === 'cinder'
                 ? { obsidian: 6, hellstone_ingot: 3 }
-                : suffix === 'chestplate'
-                  ? { hide: 2 }
-                  : {};
+                : ARCHETYPE_EXTRA[s.tier] &&
+                    ['vanguard', 'ranger', 'arcanist', 'wayfarer'].includes(s.bonus)
+                  ? ARCHETYPE_EXTRA[s.tier]
+                  : suffix === 'chestplate'
+                    ? { hide: 2 }
+                    : {};
       return [`${s.key}_${suffix}`, { [s.bar]: n, ...extra }, s.station, s.tier] as [
         string,
         Record<string, number>,

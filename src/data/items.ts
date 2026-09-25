@@ -278,6 +278,7 @@ export const ITEMS: Record<string, ItemSpec> = {
   iron_gut_brew: ['Iron-gut brew', 'medicine', 3000],
   // ── Realms and Waystones ──
   waystone: ['Waystone', 'structure'],
+  relic_shelf: ['Relic shelf', 'structure'],
   kiln: ['Old kiln', 'structure'],
   shrine: ['Realm shrine', 'structure'],
   orchard_fragment: ['Orchard key fragment', 'key'],

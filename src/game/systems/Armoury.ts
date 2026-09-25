@@ -1,5 +1,5 @@
 import type { GameResult } from '../../core/types.ts';
-import { RANGED } from '../../data/gear.ts';
+import { ARMOR_SETS, RANGED } from '../../data/gear.ts';
 import { itemName } from '../../data/items.ts';
 import { WEAPONS } from '../../data/resources.ts';
 import {
@@ -90,6 +90,8 @@ export class Armoury extends System {
     if (!WEAPONS[id] || id === 'fists' || this.all[id]) return;
     const q = rollQuality(this.game.rng, luck);
     this.all[id] = { q, lvl: 0, gems: [], evo: [] };
+    this.game.progress.record('weapon:' + id);
+    this.game.progress.record('family:' + this.classOf(id)[0]);
     if (q >= 2)
       this.game.say(
         `${QUALITIES[q].name} ${itemName(id).toLowerCase()}!`,
@@ -124,37 +126,65 @@ export class Armoury extends System {
       [family, tier] = this.classOf(id),
       f = familyById(family)!,
       m = this.mods(id),
-      base = WEAPONS[id] ?? WEAPONS.fists;
-    const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0));
+      base = WEAPONS[id] ?? WEAPONS.fists,
+      sk = this.game.skills.stats(),
+      mastery = id === 'fists' ? 0 : this.game.skills.mastery(family),
+      set = this.game.equipment.fullSet();
+    // Skills and mastery lift each kind of weapon in their own way.
+    const melee = !f.ranged,
+      heavy = family === 'greatsword' || family === 'battleaxe' || family === 'warhammer',
+      shooter = family === 'bow' || family === 'crossbow',
+      magic = f.ranged === 'magic';
+    const lift =
+      1 +
+      (melee ? sk.meleeDmg : 0) +
+      (heavy ? sk.heavyDmg : 0) +
+      (shooter ? sk.rangedDmg : 0) +
+      (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) : 0) +
+      mastery * 0.01 +
+      (mastery >= 20 ? 0.1 : 0);
+    const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
+    const damage =
+      base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
     return {
       id,
       family,
       tier,
       damage,
-      reach: base[2] * (1 + (m.reach ?? 0)),
-      pace: Math.max(0.4, f.pace + (m.pace ?? 0)),
-      crit: 0.05 + (m.crit ?? 0),
+      reach: base[2] * (1 + (m.reach ?? 0) + (melee ? sk.reach : 0)),
+      pace: Math.max(0.35, (f.pace + (m.pace ?? 0)) / quick) * (mastery >= 15 ? 0.95 : 1),
+      crit:
+        0.05 +
+        (m.crit ?? 0) +
+        sk.crit +
+        (mastery >= 10 ? 0.05 : 0) +
+        (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === 'ranger' ? 0.1 : 0),
       count: m.count ?? 0,
-      pierce: m.pierce ?? 0,
-      bleed: (family === 'battleaxe' ? 0.15 : 0) + (m.bleed ?? 0),
+      pierce: (m.pierce ?? 0) + (shooter ? sk.pierce : 0),
+      bleed:
+        ((family === 'battleaxe' ? 0.15 : 0) + (m.bleed ?? 0) + (shooter ? sk.rangedBleed : 0)) *
+        (1 + sk.bleedDmg),
       poison: m.poison ?? 0,
-      heal: m.heal ?? 0,
+      heal: (m.heal ?? 0) + (melee ? sk.lifesteal : magic ? sk.magicLifesteal : 0),
       execute: m.execute ?? 0,
       berserk: m.berserk ?? 0,
-      boss: m.boss ?? 0,
-      homing: m.homing ?? 0,
-      mana: Math.max(0.3, 1 + (m.mana ?? 0)),
+      boss: (m.boss ?? 0) + sk.bossDmg,
+      homing: (m.homing ?? 0) + (f.ranged ? sk.homing : 0),
+      mana: Math.max(
+        0.3,
+        (1 + (m.mana ?? 0) + sk.manaCost) *
+          (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === 'arcanist' ? 0.8 : 1),
+      ),
       defense: m.defense ?? 0,
       stagger: family === 'warhammer' || !!m.stagger,
       sunder: family === 'warhammer' ? 4 + (m.sunder ?? 0) : 0,
-      mark: family === 'whip' ? 0.15 + (m.mark ?? 0) : 0,
-      combo: family === 'blade' ? (m.combo ?? 1.8) : 1,
+      mark: family === 'whip' ? 0.15 + (m.mark ?? 0) : shooter ? sk.rangedMark : 0,
+      combo: family === 'blade' ? (m.combo ?? 1.8) + sk.combo + (mastery >= 5 ? 0.1 : 0) : 1,
       magic: m.magic ?? 0,
       armorPierce: Math.min(0.9, m.armorPierce ?? 0),
       infusion: e.inf,
     };
   }
-
   // ─── The anvil ─────────────────────────────────────────────────────────────
   private atAnvil(id: string) {
     const [, tier] = this.classOf(id),

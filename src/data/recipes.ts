@@ -201,6 +201,7 @@ export const RECIPES: Recipe[] = (
     ['iron_gut_brew', { herb: 3, venom: 1, boiled_water: 1 }, 'apothecary', 3],
     // ── Realms: Waystones, fragments, and keys ──
     ['waystone', { stone: 40, iron_ingot: 8, crystal: 4 }, 'workbench', 3],
+    ['relic_shelf', { wood: 12, gold_ingot: 4, crystal: 4 }, 'workbench', 4],
     ['orchard_fragment', { crystal: 1, reeds: 6, raw_fish: 2 }, 'workbench', 3],
     ['steppe_fragment', { crystal: 1, sulfur: 4, coal: 4 }, 'workbench', 3],
     ['warren_fragment', { crystal: 1, clay: 6, bone: 4 }, 'workbench', 3],

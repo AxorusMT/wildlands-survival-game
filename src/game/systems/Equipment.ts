@@ -10,6 +10,7 @@ import {
   RANGED,
 } from '../../data/gear.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
+import { RELIC_EFFECTS } from '../../data/codex.ts';
 import { WALLS } from '../../data/town.ts';
 import { TOOL_TIERS, WEAPONS } from '../../data/resources.ts';
 
@@ -127,6 +128,8 @@ export class Equipment extends System {
     if (set) out.add(ARMOR_SETS.find((x) => x.key === set)!.bonus);
     for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
     for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add('buff:' + id);
+    // Relics set on a shelf at camp lend their gifts wherever you are.
+    for (const id of this.game.shelvedRelics()) for (const e of RELIC_EFFECTS[id] ?? []) out.add(e);
     if (this.townCache.at !== Math.floor(this.game.s.elapsed)) {
       this.townCache = { at: Math.floor(this.game.s.elapsed), near: this.game.town.townNear() };
     }
@@ -144,6 +147,8 @@ export class Equipment extends System {
     if (fx.has('defense4')) d += 4;
     if (fx.has('void')) d += 8;
     if (fx.has('buff:ironskin')) d += 8;
+    const sk = this.game.skills.stats();
+    d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has('vanguard') ? 3 : 0);
     // A Phalanx spear or Juggernaut hammer guards you while it is your ready weapon.
     d += this.game.armoury.stats(this.game.s.player.weapon).defense;
     return d;
@@ -168,17 +173,28 @@ export class Equipment extends System {
       (fx.has('speed10') ? 0.1 : 0) +
       (fx.has('speed') ? 0.2 : 0) +
       (fx.has('cold') ? 0.1 : 0) +
-      (fx.has('buff:sweet') ? 0.1 : 0)
+      (fx.has('buff:sweet') ? 0.1 : 0) +
+      this.game.skills.get('speed') -
+      (this.game.skills.flag('juggernaut') ? 0.1 : 0) +
+      (this.game.skills.flag('wanderer') ? 0.15 : 0)
     );
   }
 
   // ─── Health, mana, buffs ───────────────────────────────────────────────────
-  maxHealth() {
+  /** Health from crystals and fruit alone; skills add to it. */
+  private heart() {
     return this.game.s.maxHealth || CRYSTALS.baseHealth;
+  }
+  maxHealth() {
+    return this.heart() + this.game.skills.get('maxHp');
   }
   maxMana() {
     const fx = this.effects();
-    return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has('mana40') ? 40 : 0);
+    return (
+      (this.game.s.maxMana || CRYSTALS.baseMana) +
+      (fx.has('mana40') || fx.has('arcanist') ? 40 : 0) +
+      this.game.skills.get('maxMana')
+    );
   }
   heal(amount: number) {
     const v = this.game.s.vitals;
@@ -192,10 +208,10 @@ export class Equipment extends System {
     const s = this.game.s;
     if (id === 'life_crystal' || id === 'life_fruit') {
       const cap = CRYSTALS.baseHealth + CRYSTALS.lifeMax + (id === 'life_fruit' ? 100 : 0);
-      if (this.maxHealth() >= cap) return { ok: false, reason: 'Your heart can hold no more.' };
-      if (id === 'life_fruit' && this.maxHealth() < CRYSTALS.baseHealth + CRYSTALS.lifeMax)
+      if (this.heart() >= cap) return { ok: false, reason: 'Your heart can hold no more.' };
+      if (id === 'life_fruit' && this.heart() < CRYSTALS.baseHealth + CRYSTALS.lifeMax)
         return { ok: false, reason: 'Life crystals must fill your heart first.' };
-      s.maxHealth = this.maxHealth() + CRYSTALS.lifePer;
+      s.maxHealth = this.heart() + CRYSTALS.lifePer;
       this.heal(CRYSTALS.lifePer);
       this.game.remove(id);
       this.game.sound('crystal');
@@ -217,7 +233,7 @@ export class Equipment extends System {
     if (potion.heal) {
       if ((s.buffs.potion_sickness ?? 0) > 0)
         return { ok: false, reason: 'Your body needs a moment before another draught.' };
-      this.heal(potion.heal);
+      this.heal(potion.heal * (1 + this.game.skills.get('heal')));
       this.addBuff('potion_sickness', 45);
     }
     if (potion.mana) s.mana = clamp(s.mana + potion.mana, 0, this.maxMana());
@@ -243,7 +259,11 @@ export class Equipment extends System {
     }
     const sinceCast = s.elapsed - (this.lastCast ?? -9);
     s.mana = clamp(
-      s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5) * (fx.has('buff:clear_mind') ? 2 : 1),
+      s.mana +
+        dt *
+          (sinceCast > 1.2 ? 7 : 1.5) *
+          (fx.has('buff:clear_mind') ? 2 : 1) *
+          (1 + this.game.skills.get('manaRegen')),
       0,
       this.maxMana(),
     );

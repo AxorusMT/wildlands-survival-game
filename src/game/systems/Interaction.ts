@@ -101,7 +101,11 @@ export class Interaction extends System {
     if (st.type === 'torch' || st.type.startsWith('trap_'))
       return { ok: false, reason: 'Nothing to do here.' };
     if (st.type === 'bedroll') {
-      this.game.s.vitals.fatigue = clamp(this.game.s.vitals.fatigue - 32, 0, RULES.maxVital);
+      this.game.s.vitals.fatigue = clamp(
+        this.game.s.vitals.fatigue - 32 * (1 + this.game.skills.get('rest')),
+        0,
+        RULES.maxVital,
+      );
       this.game.s.vitals.stamina = 100;
       this.game.s.elapsed += 90;
       this.game.sound('rest');
@@ -113,6 +117,8 @@ export class Interaction extends System {
         this.game.sound('place', st.x, st.y, 0.7);
         this.game.say('Fed the campfire with wood.', 'good');
       } else return { ok: false, reason: 'One wood refuels the campfire.' };
+    } else if (st.type === 'relic_shelf') {
+      return { ok: true, action: 'shelf', structure: st };
     } else if (STORAGE[st.type]) {
       return { ok: true, action: 'larder', structure: st };
     } else if (st.type === 'rain_catcher') {
@@ -214,9 +220,12 @@ export class Interaction extends System {
     v.stamina -= 7;
     v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
     v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
+    // Foragers turn up a little more; each gather earns a little renown.
     const roll = () =>
       Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) +
-      (tier >= 3 ? 1 : 0);
+      (tier >= 3 ? 1 : 0) +
+      (this.game.rng() < this.game.skills.get('gather') ? 1 : 0);
+    this.game.progress.record('gather:' + node.kind);
     const form = nodeForm(node.kind),
       s = this.game.s;
     node.hitAt = s.elapsed;

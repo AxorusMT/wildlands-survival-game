@@ -1,6 +1,6 @@
 import { clamp, dist } from '../../core/math.ts';
 import type { Animal, Point } from '../../core/types.ts';
-import { AMMO, PROJECTILES, RANGED } from '../../data/gear.ts';
+import { AMMO, ARMOR_SETS, PROJECTILES, RANGED } from '../../data/gear.ts';
 import { itemName } from '../../data/items.ts';
 import { MOBS, mobName } from '../../data/mobs.ts';
 import { WEAPONS } from '../../data/resources.ts';
@@ -57,9 +57,16 @@ export class Combat extends System {
     const s = this.game.s,
       p = s.player;
     if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
-    const cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1,
-      scaled = amount * this.game.pocket.damageScale(),
-      taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
+    const sk = this.game.skills.stats(),
+      cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1;
+    let scaled = amount * this.game.pocket.damageScale() * Math.max(0.3, 1 + sk.harm);
+    // Mana shield: a quarter of the harm is taken from mana while it lasts.
+    if (sk.manaShield && s.mana > 0) {
+      const soak = Math.min(s.mana, scaled * 0.25);
+      s.mana -= soak;
+      scaled -= soak;
+    }
+    const taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
     s.vitals.health -= taken;
     s.vitals.morale = clamp(s.vitals.morale - 4, 0, RULES.maxVital);
     p.invuln = 0.7;
@@ -91,9 +98,16 @@ export class Combat extends System {
     const spec = MOBS[a.type],
       t = this.game.s.elapsed,
       v = this.game.s.vitals,
-      crit = this.game.rng() < (w?.crit ?? 0.05);
+      sk = this.game.skills.stats(),
+      shooter = w?.family === 'bow' || w?.family === 'crossbow',
+      // Deadeye: a shot at a foe still at full health always lands as a critical.
+      deadeye = !!(sk.deadeye && shooter && a.hp >= a.maxHp),
+      crit = deadeye || this.game.rng() < (w?.crit ?? 0.05);
     // The weapon's bonuses: executions, berserking, great foes, holy light, and marks.
-    let k = crit ? 2 : 1;
+    let k = crit ? (deadeye ? 2.5 : 2 + sk.critDmg) : 1;
+    // Keystones: berserk as health falls, and skirmish on the move.
+    if (sk.berserker) k *= 1 + 0.4 * (1 - v.health / this.game.maxHealth());
+    if (sk.skirmisher && shooter && this.game.s.player.moving) k *= 1.2;
     if (w) {
       if (w.execute && a.hp < a.maxHp * 0.3) k *= 1 + w.execute;
       if (w.berserk && v.health < this.game.maxHealth() / 2) k *= 1 + w.berserk;
@@ -108,7 +122,10 @@ export class Combat extends System {
       raw = amount * this.game.equipment.damageBonus(magic) * k,
       taken = Math.max(1, Math.round(raw - armour * 0.5));
     a.hp -= taken;
-    if (w) this.afflict(a, w, taken);
+    if (w) {
+      this.afflict(a, w, taken);
+      if (w.id !== 'fists') this.game.skills.train(w.family, taken);
+    }
     a.warning = 0;
     const dir = Math.sign(a.x - from.x) || 1;
     if (!spec?.boss && a.type !== 'boss') {
@@ -128,13 +145,18 @@ export class Combat extends System {
     const t = this.game.s.elapsed,
       great = !!MOBS[a.type]?.boss || a.type === 'boss',
       fx = (a.fx ??= {});
+    const sk = this.game.skills.stats(),
+      elemental = (1 + sk.infusion) * (sk.elementalist ? 1.5 : 1);
     const dot = (key: 'bleed' | 'burn' | 'poison', frac: number, secs: number) => {
-      const dps = (taken * frac) / 1;
+      const dps =
+        taken * frac * (key === 'bleed' ? 1 : elemental) * (key === 'burn' ? 1 + sk.burnDmg : 1);
       if (!fx[key] || fx[key]![1] < dps || fx[key]![0] < t) fx[key] = [t + secs, dps];
     };
     if (w.bleed) dot('bleed', w.bleed, 3);
     if (w.poison) dot('poison', w.poison, 4);
     if (w.infusion === 'fire') dot('burn', 0.2, 3);
+    // A kiln heart (worn or on the shelf) sets some blows alight.
+    else if (this.game.equipment.has('fire') && this.game.rng() < 0.3) dot('burn', 0.12, 3);
     if (w.infusion === 'venom') dot('poison', 0.22, 4);
     if (w.infusion === 'frost') fx.slow = t + 3;
     if (w.stagger && !great) fx.stun = t + 0.5;
@@ -211,7 +233,14 @@ export class Combat extends System {
       const arrow = this.ammo();
       if (!arrow)
         return { ok: false, reason: 'No arrows. Make them at a workbench from wood and flint.' };
-      this.game.remove(arrow);
+      // Salvage, quivers, and a ranger's kit sometimes spare the arrow.
+      const sk = this.game.skills.stats(),
+        set = this.game.equipment.fullSet(),
+        save =
+          sk.ammoSave +
+          (sk.quiverMaster ? 0.3 : 0) +
+          (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === 'ranger' ? 0.25 : 0);
+      if (this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
       damage += AMMO[arrow].damage;
       if (AMMO[arrow].effect === 'fire') extra.fire = true;
       if (AMMO[arrow].effect === 'pierce') extra.pierce = 3;
@@ -219,14 +248,23 @@ export class Combat extends System {
       kind = spec.projectile === 'bolt' ? 'bolt' : arrow === 'arrow' ? 'arrow' : arrow;
       this.game.sound('bow');
     } else {
-      if (!this.game.equipment.spendMana(Math.max(1, Math.round((spec.mana ?? 5) * w.mana))))
-        return { ok: false, reason: 'Not enough mana.' };
+      const cost = Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
+      if (!this.game.equipment.spendMana(cost)) {
+        // Overchannel: out of mana, the spell draws on your life instead.
+        if (!this.game.skills.flag('overchannel') || s.vitals.health <= cost * 0.6 + 5)
+          return { ok: false, reason: 'Not enough mana.' };
+        s.vitals.health -= cost * 0.6;
+        this.game.event('burst', p.x, p.y - 30, '#c04a6a');
+      }
       this.game.sound('cast');
     }
     const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 },
       angle = Math.atan2(target.y - origin.y, target.x - origin.x),
-      count = (spec.count ?? 1) + w.count,
-      spread = spec.spread ?? (w.count ? 0.1 : 0),
+      bonusShots =
+        (this.game.rng() < this.game.skills.get('extraShot') ? 1 : 0) +
+        (spec.kind === 'bow' && this.game.skills.flag('quiverMaster') ? 1 : 0),
+      count = (spec.count ?? 1) + w.count + bonusShots,
+      spread = spec.spread ?? (w.count || bonusShots ? 0.1 : 0),
       pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
     if (w.homing) extra.homing = w.homing;
     extra.pierce = pierce;

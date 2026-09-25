@@ -26,6 +26,7 @@
     BUFFS: () => BUFFS,
     CAVE_LEVELS: () => CAVE_LEVELS,
     CHAPTERS: () => CHAPTERS,
+    CODEX: () => CODEX,
     CRYSTALS: () => CRYSTALS,
     DIMENSIONS: () => DIMENSIONS,
     DIM_GAP: () => DIM_GAP,
@@ -37,6 +38,7 @@
     DUNGEONS: () => DUNGEONS,
     DUNGEON_DEFS: () => DUNGEON_DEFS,
     EDGE: () => EDGE,
+    EFFECT_TEXT: () => EFFECT_TEXT,
     ENTRANCES: () => ENTRANCES,
     EVOLUTIONS: () => EVOLUTIONS,
     FAMILIES: () => FAMILIES,
@@ -56,7 +58,10 @@
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
     LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    MASTERY_TITLES: () => MASTERY_TITLES,
     MAX_LEVEL: () => MAX_LEVEL,
+    MAX_MASTERY: () => MAX_MASTERY,
+    MAX_RENOWN: () => MAX_RENOWN,
     MAX_TIER: () => MAX_TIER,
     MEAL_BUFFS: () => MEAL_BUFFS,
     MINE_TIER: () => MINE_TIER,
@@ -77,13 +82,17 @@
     REALMS: () => REALMS,
     REALM_IDS: () => REALM_IDS,
     RECIPES: () => RECIPES,
+    RELIC_EFFECTS: () => RELIC_EFFECTS,
+    RESPEC_COST: () => RESPEC_COST,
     ROOM_SIZE: () => ROOM_SIZE,
+    ROW_POINTS: () => ROW_POINTS,
     RW: () => RW,
     SETTLERS: () => SETTLERS,
     SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
     SIDE_ORDER: () => SIDE_ORDER,
     SIGNATURE: () => SIGNATURE,
+    SKILLS: () => SKILLS,
     SKY_LADDERS: () => SKY_LADDERS,
     SKY_SEA: () => SKY_SEA,
     STAGE_FORCE: () => STAGE_FORCE,
@@ -98,6 +107,7 @@
     TILE_ROWS: () => TILE_ROWS,
     TILE_YIELD: () => TILE_YIELD,
     TOOL_TIERS: () => TOOL_TIERS,
+    TREES: () => TREES,
     TREE_NODES: () => TREE_NODES,
     TUTORIAL: () => TUTORIAL,
     UNDEAD: () => UNDEAD,
@@ -138,6 +148,9 @@
     layerAt: () => layerAt,
     layoutTile: () => layoutTile,
     makeDimensions: () => makeDimensions,
+    masteryFor: () => masteryFor,
+    masteryLevel: () => masteryLevel,
+    masteryTitle: () => masteryTitle,
     meltRate: () => meltRate,
     mobName: () => mobName,
     modById: () => modById,
@@ -148,12 +161,17 @@
     reforgeCost: () => reforgeCost,
     regionAt: () => regionAt,
     regionBounds: () => regionBounds,
+    relicText: () => relicText,
+    renownFor: () => renownFor,
+    renownLevel: () => renownLevel,
     rollMods: () => rollMods,
     rollQuality: () => rollQuality,
     rotRate: () => rotRate,
     seedOf: () => seedOf,
     setActiveRealm: () => setActiveRealm,
     settlerById: () => settlerById,
+    shelfSlots: () => shelfSlots,
+    skillById: () => skillById,
     surfaceAt: () => surfaceAt,
     syncPocket: () => syncPocket,
     tideLevel: () => tideLevel,
@@ -1275,6 +1293,127 @@
       bonus: "tremor",
       bonusText: "Sense cave-ins; falling rock does half damage; +2 defense"
     },
+    // ── Archetypes, in three bands ──
+    {
+      key: "warden",
+      name: "Warden",
+      bar: "iron_ingot",
+      defense: [3, 5, 3],
+      station: "workbench",
+      tier: 3,
+      bonus: "vanguard",
+      bonusText: "Vanguard: +3 defense; biters take a quarter of their blow back"
+    },
+    {
+      key: "bulwark",
+      name: "Bulwark",
+      bar: "hellstone_ingot",
+      defense: [6, 9, 6],
+      station: "forge",
+      tier: 6,
+      bonus: "vanguard",
+      bonusText: "Vanguard: +3 defense; biters take a quarter of their blow back"
+    },
+    {
+      key: "aegis",
+      name: "Aegis",
+      bar: "starmetal_ingot",
+      defense: [11, 15, 11],
+      station: "starforge",
+      tier: 9,
+      bonus: "vanguard",
+      bonusText: "Vanguard: +3 defense; biters take a quarter of their blow back"
+    },
+    {
+      key: "stalker",
+      name: "Stalker",
+      bar: "iron_ingot",
+      defense: [2, 3, 2],
+      station: "workbench",
+      tier: 3,
+      bonus: "ranger",
+      bonusText: "Ranger: +10% critical chance; a quarter of arrows kept"
+    },
+    {
+      key: "farstrider",
+      name: "Farstrider",
+      bar: "hellstone_ingot",
+      defense: [4, 6, 4],
+      station: "forge",
+      tier: 6,
+      bonus: "ranger",
+      bonusText: "Ranger: +10% critical chance; a quarter of arrows kept"
+    },
+    {
+      key: "windrider",
+      name: "Windrider",
+      bar: "starmetal_ingot",
+      defense: [8, 11, 8],
+      station: "starforge",
+      tier: 9,
+      bonus: "ranger",
+      bonusText: "Ranger: +10% critical chance; a quarter of arrows kept"
+    },
+    {
+      key: "acolyte",
+      name: "Acolyte",
+      bar: "iron_ingot",
+      defense: [1, 2, 1],
+      station: "workbench",
+      tier: 3,
+      bonus: "arcanist",
+      bonusText: "Arcanist: +40 mana; spells cost 20% less"
+    },
+    {
+      key: "magus",
+      name: "Magus",
+      bar: "hellstone_ingot",
+      defense: [3, 4, 3],
+      station: "forge",
+      tier: 6,
+      bonus: "arcanist",
+      bonusText: "Arcanist: +40 mana; spells cost 20% less"
+    },
+    {
+      key: "archon",
+      name: "Archon",
+      bar: "starmetal_ingot",
+      defense: [6, 8, 6],
+      station: "starforge",
+      tier: 9,
+      bonus: "arcanist",
+      bonusText: "Arcanist: +40 mana; spells cost 20% less"
+    },
+    {
+      key: "drifter",
+      name: "Drifter",
+      bar: "iron_ingot",
+      defense: [2, 3, 2],
+      station: "workbench",
+      tier: 3,
+      bonus: "wayfarer",
+      bonusText: "Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off"
+    },
+    {
+      key: "nomad",
+      name: "Nomad",
+      bar: "hellstone_ingot",
+      defense: [4, 6, 4],
+      station: "forge",
+      tier: 6,
+      bonus: "wayfarer",
+      bonusText: "Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off"
+    },
+    {
+      key: "voyager",
+      name: "Voyager",
+      bar: "starmetal_ingot",
+      defense: [8, 11, 8],
+      station: "starforge",
+      tier: 9,
+      bonus: "wayfarer",
+      bonusText: "Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off"
+    },
     {
       key: "steel",
       name: "Steel",
@@ -1376,6 +1515,11 @@
       bonusText: "+20% damage, +8 defense"
     }
   ];
+  var ARCHETYPE_EXTRA = {
+    3: { hide: 2, fiber: 4 },
+    6: { obsidian: 2, silk: 3 },
+    9: { sky_silk: 3, crystal: 2 }
+  };
   var SLOTS = [
     ["head", "helmet", "helmet", 10],
     ["body", "chestplate", "chestplate", 16],
@@ -1397,7 +1541,7 @@
   var ARMOR_RECIPES = ARMOR_SETS.flatMap(
     (s) => SLOTS.map(([, suffix, , bars]) => {
       const n = Math.max(4, Math.round(bars * (s.bar === "obsidian" ? 1 : 0.6)));
-      const extra = s.key === "crypt" ? { bone: 6, steel_ingot: 3 } : s.key === "frost" ? { ice: 8, steel_ingot: 3 } : s.key === "sun" ? { sand: 10, steel_ingot: 3 } : s.key === "cinder" ? { obsidian: 6, hellstone_ingot: 3 } : suffix === "chestplate" ? { hide: 2 } : {};
+      const extra = s.key === "crypt" ? { bone: 6, steel_ingot: 3 } : s.key === "frost" ? { ice: 8, steel_ingot: 3 } : s.key === "sun" ? { sand: 10, steel_ingot: 3 } : s.key === "cinder" ? { obsidian: 6, hellstone_ingot: 3 } : ARCHETYPE_EXTRA[s.tier] && ["vanguard", "ranger", "arcanist", "wayfarer"].includes(s.bonus) ? ARCHETYPE_EXTRA[s.tier] : suffix === "chestplate" ? { hide: 2 } : {};
       return [`${s.key}_${suffix}`, { [s.bar]: n, ...extra }, s.station, s.tier];
     })
   );
@@ -2164,6 +2308,7 @@
     iron_gut_brew: ["Iron-gut brew", "medicine", 3e3],
     // ── Realms and Waystones ──
     waystone: ["Waystone", "structure"],
+    relic_shelf: ["Relic shelf", "structure"],
     kiln: ["Old kiln", "structure"],
     shrine: ["Realm shrine", "structure"],
     orchard_fragment: ["Orchard key fragment", "key"],
@@ -2467,6 +2612,7 @@
     ["iron_gut_brew", { herb: 3, venom: 1, boiled_water: 1 }, "apothecary", 3],
     // ── Realms: Waystones, fragments, and keys ──
     ["waystone", { stone: 40, iron_ingot: 8, crystal: 4 }, "workbench", 3],
+    ["relic_shelf", { wood: 12, gold_ingot: 4, crystal: 4 }, "workbench", 4],
     ["orchard_fragment", { crystal: 1, reeds: 6, raw_fish: 2 }, "workbench", 3],
     ["steppe_fragment", { crystal: 1, sulfur: 4, coal: 4 }, "workbench", 3],
     ["warren_fragment", { crystal: 1, clay: 6, bone: 4 }, "workbench", 3],
@@ -5132,6 +5278,503 @@
     rime_lined_pack: 0.3
   };
 
+  // src/data/skills.ts
+  var TREES = [
+    {
+      id: "warfare",
+      name: "Warfare",
+      text: "Blades, axes, hammers, and the nerve to stand close",
+      color: "#c0584a"
+    },
+    { id: "marksman", name: "Marksman", text: "Bows, crossbows, and patience", color: "#6a9a4a" },
+    { id: "arcana", name: "Arcana", text: "Staves, tomes, mana, and infusions", color: "#6a6ac8" },
+    {
+      id: "survival",
+      name: "Survival",
+      text: "Food, cold, sickness, and the long haul",
+      color: "#b8904a"
+    },
+    {
+      id: "wayfinding",
+      name: "Wayfinding",
+      text: "Realms, keys, loot, and the road",
+      color: "#4a9ab0"
+    }
+  ];
+  var ROW_POINTS = [0, 0, 3, 6, 10, 14];
+  var tree = (id, rows) => rows.flatMap(
+    (row, i) => row.map(([nid, name, text, stats]) => ({
+      id: nid,
+      tree: id,
+      row: i + 1,
+      name,
+      text,
+      cost: i === 4 ? 2 : 1,
+      stats,
+      ...i === 4 ? { keystone: true } : {}
+    }))
+  );
+  var SKILLS = [
+    ...tree("warfare", [
+      [
+        ["edge", "Edge", "+6% melee damage", { meleeDmg: 0.06 }],
+        ["grit", "Grit", "+10 health", { maxHp: 10 }],
+        ["footwork", "Footwork", "+4% speed", { speed: 0.04 }],
+        ["second_wind", "Second wind", "Stamina returns 15% faster", { staminaRegen: 0.15 }],
+        ["hardy", "Hardy", "+1 defense", { defense: 1 }],
+        [
+          "cleave",
+          "Cleave",
+          "+8% damage with greatswords, battleaxes, and warhammers",
+          { heavyDmg: 0.08 }
+        ]
+      ],
+      [
+        ["bloodletter", "Bloodletter", "Bleeding hurts 30% more", { bleedDmg: 0.3 }],
+        ["duelists_eye", "Duelist's eye", "+4% critical chance", { crit: 0.04 }],
+        ["tough", "Tough", "+20 health", { maxHp: 20 }],
+        ["long_arm", "Long arm", "+10% melee reach", { reach: 0.1 }],
+        ["rhythm", "Rhythm", "Melee blows 6% faster", { meleeSpeed: 0.06 }],
+        ["savagery", "Savagery", "+8% melee damage", { meleeDmg: 0.08 }]
+      ],
+      [
+        ["iron_skin", "Iron skin", "+3 defense", { defense: 3 }],
+        ["relentless", "Relentless", "Blade combos strike \xD70.3 harder", { combo: 0.3 }],
+        ["war_cry", "War cry", "Each kill restores 6 stamina", { killStamina: 6 }],
+        ["bulwark", "Bulwark", "Take 8% less harm", { harm: -0.08 }],
+        ["brutal", "Brutal", "+25% critical damage", { critDmg: 0.25 }],
+        ["titan_grip", "Titan grip", "+12% damage with heavy weapons", { heavyDmg: 0.12 }]
+      ],
+      [
+        ["vampiric", "Vampiric", "Heal 2% of melee damage dealt", { lifesteal: 0.02 }],
+        ["unbroken", "Unbroken", "+40 health", { maxHp: 40 }],
+        ["riposte", "Riposte", "Foes that strike you take 15% back", { thorns: 0.15 }],
+        ["giantslayer", "Giantslayer", "+15% against great foes", { bossDmg: 0.15 }],
+        ["warpath", "Warpath", "+6% speed", { speed: 0.06 }],
+        ["whirl", "Whirl", "Melee blows 8% faster", { meleeSpeed: 0.08 }]
+      ],
+      [
+        ["berserker", "Berserker", "Up to +40% damage as your health falls", { berserker: 1 }],
+        ["juggernaut", "Juggernaut", "+15 defense, but 10% slower", { juggernaut: 1 }],
+        ["bladestorm", "Bladestorm", "Blade combos land every second blow", { bladestorm: 1 }]
+      ]
+    ]),
+    ...tree("marksman", [
+      [
+        ["steady", "Steady hand", "+6% ranged damage", { rangedDmg: 0.06 }],
+        ["quick_draw", "Quick draw", "Shoot 6% faster", { rangedSpeed: 0.06 }],
+        ["eagle_eye", "Eagle eye", "+3% critical chance", { crit: 0.03 }],
+        ["light_step", "Light step", "+4% speed", { speed: 0.04 }],
+        ["salvage", "Salvage", "15% chance to keep the arrow", { ammoSave: 0.15 }],
+        ["fletching", "Fletching", "Seeking shots turn a little", { homing: 0.6 }]
+      ],
+      [
+        ["piercing", "Piercing", "Shots pass through one more foe", { pierce: 1 }],
+        ["broadheads", "Broadheads", "Arrows and bolts cause bleeding", { rangedBleed: 0.1 }],
+        ["marksman", "Marksman", "+6% critical chance", { crit: 0.06 }],
+        ["deadly", "Deadly", "+25% critical damage", { critDmg: 0.25 }],
+        ["quiver", "Quiver", "15% more chance to keep the arrow", { ammoSave: 0.15 }],
+        ["focus", "Focus", "+8% ranged damage", { rangedDmg: 0.08 }]
+      ],
+      [
+        ["volley", "Volley", "20% chance of an extra shot", { extraShot: 0.2 }],
+        ["hunters_mark", "Hunter's mark", "Shots mark foes to take more harm", { rangedMark: 0.12 }],
+        ["windrunner", "Windrunner", "+6% speed", { speed: 0.06 }],
+        ["lethal", "Lethal", "+8% ranged damage", { rangedDmg: 0.08 }],
+        ["sharpshooter", "Sharpshooter", "+6% critical chance", { crit: 0.06 }],
+        ["swift_hands", "Swift hands", "Shoot 8% faster", { rangedSpeed: 0.08 }]
+      ],
+      [
+        ["seeking", "Seeking", "Shots seek their foes", { homing: 1.5 }],
+        ["rain", "Rain of arrows", "25% more chance of an extra shot", { extraShot: 0.25 }],
+        ["camouflage", "Camouflage", "+3 defense", { defense: 3 }],
+        ["predator", "Predator", "+15% against great foes", { bossDmg: 0.15 }],
+        ["hawkeye", "Hawkeye", "+30% critical damage", { critDmg: 0.3 }],
+        ["trueshot", "Trueshot", "+10% ranged damage", { rangedDmg: 0.1 }]
+      ],
+      [
+        ["deadeye", "Deadeye", "A shot at a foe at full health always strikes \xD72.5", { deadeye: 1 }],
+        [
+          "quiver_master",
+          "Quiver master",
+          "Always one more arrow, and 30% kept",
+          { quiverMaster: 1 }
+        ],
+        ["skirmisher", "Skirmisher", "+20% ranged damage while moving", { skirmisher: 1 }]
+      ]
+    ]),
+    ...tree("arcana", [
+      [
+        ["spark", "Spark", "+6% magic damage", { magicDmg: 0.06 }],
+        ["wellspring", "Wellspring", "+20 mana", { maxMana: 20 }],
+        ["flow", "Flow", "Mana returns 20% faster", { manaRegen: 0.2 }],
+        ["thrift", "Thrift", "Spells cost 8% less", { manaCost: -0.08 }],
+        ["arcane_ward", "Arcane ward", "+1 defense", { defense: 1 }],
+        ["study", "Study", "+10% renown", { xp: 0.1 }]
+      ],
+      [
+        ["amplify", "Amplify", "+8% magic damage", { magicDmg: 0.08 }],
+        ["deep_well", "Deep well", "+30 mana", { maxMana: 30 }],
+        ["channel", "Channel", "Cast 8% faster", { castSpeed: 0.08 }],
+        [
+          "elemental_touch",
+          "Elemental touch",
+          "Infusions burn, poison, and slow 25% harder",
+          { infusion: 0.25 }
+        ],
+        ["seeker_bolts", "Seeker bolts", "Spells seek their foes", { homing: 1 }],
+        ["insight", "Insight", "+4% critical chance", { crit: 0.04 }]
+      ],
+      [
+        ["overflow", "Overflow", "Mana returns 30% faster", { manaRegen: 0.3 }],
+        ["efficiency", "Efficiency", "Spells cost 12% less", { manaCost: -0.12 }],
+        ["potency", "Potency", "+10% magic damage", { magicDmg: 0.1 }],
+        ["kindling", "Kindling", "Burning hurts 40% more", { burnDmg: 0.4 }],
+        ["resonance", "Resonance", "+50 mana", { maxMana: 50 }],
+        ["quickening", "Quickening", "Cast 8% faster", { castSpeed: 0.08 }]
+      ],
+      [
+        ["archmage", "Archmage", "+12% magic damage", { magicDmg: 0.12 }],
+        ["barrier", "Barrier", "+4 defense", { defense: 4 }],
+        ["meditation", "Meditation", "Mana returns 40% faster", { manaRegen: 0.4 }],
+        ["split_cast", "Split cast", "25% chance of an extra bolt", { extraShot: 0.25 }],
+        ["lich_touch", "Lich touch", "Heal 2% of magic damage dealt", { magicLifesteal: 0.02 }],
+        ["arcane_crit", "Arcane fury", "+30% critical damage", { critDmg: 0.3 }]
+      ],
+      [
+        ["overchannel", "Overchannel", "Out of mana, spells cost health instead", { overchannel: 1 }],
+        ["mana_shield", "Mana shield", "A quarter of all harm drains mana first", { manaShield: 1 }],
+        ["elementalist", "Elementalist", "Infusions \xD71.5 and +15% magic damage", { elementalist: 1 }]
+      ]
+    ]),
+    ...tree("survival", [
+      [
+        ["forager", "Forager", "20% chance of an extra find when gathering", { gather: 0.2 }],
+        ["hearty", "Hearty", "+10 health", { maxHp: 10 }],
+        ["small_appetite", "Small appetite", "Hunger 10% slower", { calories: -0.1 }],
+        ["camel", "Camel", "Thirst 10% slower", { thirst: -0.1 }],
+        ["thick_skin", "Thick skin", "Shrug off 2\xB0 of cold", { coldResist: 2 }],
+        ["sun_hardened", "Sun-hardened", "Shrug off 2\xB0 of heat", { heatResist: 2 }]
+      ],
+      [
+        ["preserver", "Preserver", "Food in your pack keeps 15% longer", { packRot: 0.15 }],
+        ["iceman", "Iceman", "Ice lasts 50% longer in storage", { ice: 0.5 }],
+        ["medic", "Medic", "Healing draughts heal 30% more", { heal: 0.3 }],
+        ["resistant", "Resistant", "15% chance to shrug off a sickness", { disease: 0.15 }],
+        ["gatherer", "Gatherer", "20% more chance of an extra find", { gather: 0.2 }],
+        ["cook", "Cook", "Meal comforts last 50% longer", { meals: 0.5 }]
+      ],
+      [
+        ["iron_stomach", "Iron stomach", "Spoiled food no longer sickens you", { ironGut: 0.5 }],
+        ["antibodies", "Antibodies", "Immunities last twice as long", { immunity: 1 }],
+        ["layers", "Layers", "Shrug off 3\xB0 of cold", { coldResist: 3 }],
+        ["desert_born", "Desert-born", "Shrug off 3\xB0 of heat", { heatResist: 3 }],
+        [
+          "provisioner",
+          "Provisioner",
+          "Hunger and thirst 12% slower",
+          { calories: -0.12, thirst: -0.12 }
+        ],
+        ["tough_hide", "Tough hide", "+2 defense", { defense: 2 }]
+      ],
+      [
+        ["survivalist", "Survivalist", "+25 health", { maxHp: 25 }],
+        ["rot_ward", "Rot ward", "Food in your pack keeps 25% longer", { packRot: 0.25 }],
+        ["immune_system", "Hale", "25% chance to shrug off a sickness", { disease: 0.25 }],
+        ["field_dressing", "Field dressing", "Bandages and splints also heal 15", { dressing: 15 }],
+        ["deep_sleep", "Deep sleep", "Rest restores twice as much", { rest: 1 }],
+        ["hunter_gatherer", "Hunter-gatherer", "25% more chance of an extra find", { gather: 0.25 }]
+      ],
+      [
+        ["iron_gut", "Iron gut", "Food and water never make you ill", { ironGut: 1 }],
+        [
+          "cold_blooded",
+          "Cold-blooded",
+          "Shrug off 8\xB0 of cold; frostbite never takes",
+          { coldBlooded: 1 }
+        ],
+        [
+          "field_medic",
+          "Field medic",
+          "Treatments lift a stage more, and heal 20",
+          { fieldMedic: 1 }
+        ]
+      ]
+    ]),
+    ...tree("wayfinding", [
+      [
+        ["swift", "Swift", "+5% speed", { speed: 0.05 }],
+        ["climber", "Climber", "Climb 25% faster", { climb: 0.25 }],
+        ["lucky", "Lucky", "Loot 8% more likely", { luck: 0.08 }],
+        ["coin_sense", "Coin sense", "15% more silver marks", { coins: 0.15 }],
+        ["endurance", "Endurance", "Stamina returns 10% faster", { staminaRegen: 0.1 }],
+        ["springheel", "Springheel", "Jump 8% higher", { jump: 0.08 }]
+      ],
+      [
+        ["rift_sense", "Rift sense", "Realm loot +10%", { realmLoot: 0.1 }],
+        ["tunnel_rat", "Tunnel rat", "Realm hazards 20% gentler", { hazard: 0.2 }],
+        ["scavenger", "Scavenger", "Loot 10% more likely", { luck: 0.1 }],
+        ["pathfinder", "Pathfinder", "+6% speed", { speed: 0.06 }],
+        ["haggler", "Haggler", "Settlers sell 15% cheaper", { haggle: 0.15 }],
+        ["surefoot", "Surefoot", "Jump 8% higher", { jump: 0.08 }]
+      ],
+      [
+        ["treasure_hunter", "Treasure hunter", "Realm loot +10%", { realmLoot: 0.1 }],
+        ["keywise", "Keywise", "10% chance a key is not spent", { keySave: 0.1 }],
+        ["weathered", "Weathered", "Realm hazards 25% gentler", { hazard: 0.25 }],
+        ["fortune", "Fortune", "Loot 10% more likely", { luck: 0.1 }],
+        ["strider", "Strider", "+6% speed", { speed: 0.06 }],
+        ["salvager", "Salvager", "25% more silver marks", { coins: 0.25 }]
+      ],
+      [
+        ["realm_walker", "Realm walker", "Realm loot +15%", { realmLoot: 0.15 }],
+        ["tier_climber", "Tier climber", "Realm tiers hurt 10% less", { tierHarm: 0.1 }],
+        ["keymaster", "Keymaster", "10% more chance a key is not spent", { keySave: 0.1 }],
+        ["gilded", "Gilded", "40% more silver marks", { coins: 0.4 }],
+        ["explorer", "Explorer", "+8% speed", { speed: 0.08 }],
+        ["cartographer", "Cartographer", "+15% renown", { xp: 0.15 }]
+      ],
+      [
+        ["riftborn", "Riftborn", "30% chance a key is not spent", { riftborn: 1 }],
+        [
+          "treasure_sense",
+          "Treasure sense",
+          "Two more chests in every realm; realm loot +20%",
+          { treasureSense: 1 }
+        ],
+        ["wanderer", "Wanderer", "+15% speed; stamina returns 30% faster", { wanderer: 1 }]
+      ]
+    ])
+  ];
+  var skillById = (id) => SKILLS.find((n) => n.id === id);
+  var MAX_RENOWN = 60;
+  var renownFor = (level) => Math.round(60 * Math.pow(level - 1, 1.6));
+  function renownLevel(xp) {
+    let l = 1;
+    while (l < MAX_RENOWN && xp >= renownFor(l + 1)) l++;
+    return l;
+  }
+  var RESPEC_COST = { fallen_star: 3, coin: 200 };
+  var MAX_MASTERY = 20;
+  var masteryFor = (level) => Math.round(400 * Math.pow(level, 1.7));
+  function masteryLevel(xp) {
+    let l = 0;
+    while (l < MAX_MASTERY && xp >= masteryFor(l + 1)) l++;
+    return l;
+  }
+  var MASTERY_TITLES = ["Untried", "Novice", "Adept", "Expert", "Master", "Grandmaster"];
+  var masteryTitle = (level) => MASTERY_TITLES[Math.min(MASTERY_TITLES.length - 1, Math.floor(level / 5) + (level > 0 ? 1 : 0))];
+
+  // src/data/codex.ts
+  var creatures = (id, name, entries, bonus, bonusText) => ({ id, name, group: "Creatures", prefix: "kill:", entries, bonus, bonusText });
+  var CODEX = [
+    creatures(
+      "wilds",
+      "Beasts of the wilds",
+      ["deer", "wolf", "boar", "slime", "scorpion"],
+      { maxHp: 10 },
+      "+10 health"
+    ),
+    creatures(
+      "deeps",
+      "Things of the deep",
+      ["bat", "cave_spider", "ember_bat", "hellhound"],
+      { meleeDmg: 0.03, rangedDmg: 0.03, magicDmg: 0.03 },
+      "+3% damage"
+    ),
+    creatures(
+      "crypt",
+      "The Mossy Crypt",
+      ["skeleton", "skeleton_archer", "bone_bat", "crypt_ghoul", "hollow_king"],
+      { defense: 1 },
+      "+1 defense"
+    ),
+    creatures(
+      "frost_keep",
+      "The Frost Keep",
+      ["frost_wraith", "ice_golem", "snow_slime", "rime_colossus"],
+      { coldResist: 2 },
+      "Shrug off 2\xB0 of cold"
+    ),
+    creatures(
+      "tomb",
+      "The Sunken Tomb",
+      ["mummy", "scarab", "tomb_serpent", "pharaoh"],
+      { heatResist: 2 },
+      "Shrug off 2\xB0 of heat"
+    ),
+    creatures(
+      "citadel",
+      "The Cinder Citadel",
+      ["imp", "cinder_knight", "magma_slime", "archdemon"],
+      { defense: 1 },
+      "+1 defense"
+    ),
+    creatures(
+      "mycelia",
+      "The Mycelial Deep",
+      ["shroomling", "spore_bat", "spore_slime", "mycelid", "sporemother"],
+      { disease: 0.05 },
+      "5% chance to shrug off a sickness"
+    ),
+    creatures(
+      "skyreach",
+      "Skyreach",
+      ["harpy", "cloud_slime", "wind_wisp", "sky_ram", "tempest_roc"],
+      { speed: 0.03 },
+      "+3% speed"
+    ),
+    creatures(
+      "void",
+      "The Hollow Void",
+      ["void_wisp", "void_stalker", "watcher", "unmaker"],
+      { maxMana: 20 },
+      "+20 mana"
+    ),
+    creatures(
+      "orchard",
+      "The Drowned Orchard",
+      ["bog_crab", "drowned", "rotfruit_slime", "orchard_wasp", "orchard_warden", "orchard_mother"],
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    creatures(
+      "steppe",
+      "The Ashen Steppe",
+      ["ash_hound", "steppe_raider", "kiln_golem", "cinder_vulture", "steppe_warlord", "kiln_beast"],
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    creatures(
+      "warren",
+      "The Hollow Warren",
+      ["warren_rat", "amber_beetle", "mole_guard", "burrower", "amber_colossus", "warren_queen"],
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    {
+      id: "regions",
+      name: "The nine regions",
+      group: "Places",
+      prefix: "visit:",
+      entries: [
+        "coast",
+        "marsh",
+        "forest",
+        "meadow",
+        "taiga",
+        "tundra",
+        "alpine",
+        "desert",
+        "badlands"
+      ],
+      bonus: { speed: 0.03 },
+      bonusText: "+3% speed"
+    },
+    {
+      id: "dungeons",
+      name: "The four dungeons",
+      group: "Places",
+      prefix: "visit:",
+      entries: ["crypt", "frost_keep", "tomb", "citadel"],
+      bonus: { defense: 2 },
+      bonusText: "+2 defense"
+    },
+    {
+      id: "worlds",
+      name: "Other worlds",
+      group: "Places",
+      prefix: "visit:",
+      entries: ["mycelia", "skyreach", "void", "orchard", "steppe", "warren"],
+      bonus: { xp: 0.1 },
+      bonusText: "+10% renown"
+    },
+    {
+      id: "maladies",
+      name: "Maladies",
+      group: "Lore",
+      prefix: "ail:",
+      entries: [],
+      count: 8,
+      bonus: { disease: 0.1 },
+      bonusText: "10% chance to shrug off a sickness"
+    },
+    {
+      id: "palate",
+      name: "The palate",
+      group: "Lore",
+      prefix: "eat:",
+      entries: [],
+      count: 15,
+      bonus: { calories: -0.1 },
+      bonusText: "Hunger 10% slower"
+    },
+    {
+      id: "arms",
+      name: "Every family of arms",
+      group: "Lore",
+      prefix: "family:",
+      entries: [
+        "blade",
+        "greatsword",
+        "spear",
+        "battleaxe",
+        "warhammer",
+        "whip",
+        "bow",
+        "crossbow",
+        "staff",
+        "tome"
+      ],
+      bonus: { crit: 0.03 },
+      bonusText: "+3% critical chance"
+    },
+    {
+      id: "hoard",
+      name: "The hoard",
+      group: "Lore",
+      prefix: "weapon:",
+      entries: [],
+      count: 30,
+      bonus: { meleeDmg: 0.04, rangedDmg: 0.04, magicDmg: 0.04 },
+      bonusText: "+4% damage"
+    },
+    {
+      id: "relics",
+      name: "Relics",
+      group: "Lore",
+      prefix: "relic:",
+      entries: ["tide_conch", "kiln_heart", "queens_mandible"],
+      bonus: { luck: 0.1 },
+      bonusText: "Loot 10% more likely"
+    }
+  ];
+  var RELIC_EFFECTS = {
+    tide_conch: ["swim", "defense2"],
+    kiln_heart: ["ashward", "fire"],
+    queens_mandible: ["tremor", "damage10"],
+    mother_heart: ["regen"],
+    kiln_core: ["stamina"],
+    queen_jelly: ["stamina"],
+    spore_heart: ["regen"],
+    roc_plume: ["glide"],
+    eclipse_fang: ["damage10"],
+    beast_core: ["defense2"]
+  };
+  var EFFECT_TEXT = {
+    swim: "swim freely",
+    defense2: "+2 defense",
+    ashward: "ash storms pass you by",
+    fire: "some blows set foes alight",
+    tremor: "sense cave-ins",
+    damage10: "+10% damage",
+    regen: "regenerate health",
+    stamina: "stamina returns faster",
+    glide: "glide on the air"
+  };
+  var relicText = (id) => (RELIC_EFFECTS[id] ?? []).map((k) => EFFECT_TEXT[k] ?? k).join(", ");
+  var shelfSlots = (renown) => 3 + (renown >= 20 ? 1 : 0) + (renown >= 40 ? 1 : 0);
+
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   var dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -5251,9 +5894,14 @@
      * Catching something: it incubates first (unless `now`), so the journal cannot yet name it.
      * Returns whether it took hold.
      */
-    contract(id, now = false) {
-      const def = DISEASES[id];
+    contract(id, now = false, source) {
+      const def = DISEASES[id], sk = this.game.skills.stats();
       if (!def || this.immune(id) || this.has(id)) return false;
+      if (source && sk.ironGut >= 1) return false;
+      if (source === "spoiled" && sk.ironGut > 0) return false;
+      if (id === "frostbite" && sk.coldBlooded) return false;
+      const resist = sk.disease + (this.game.equipment.has("wayfarer") ? 0.2 : 0);
+      if (!now && def.kind !== "injury" && this.game.rng() < Math.min(0.7, resist)) return false;
       if (!now && def.kind === "illness" && (this.game.s.buffs.iron_gut ?? 0) > 0 && this.game.rng() < 0.5)
         return false;
       const t = this.game.s.elapsed, hidden = !now && def.incubate > 0;
@@ -5269,6 +5917,7 @@
     }
     diagnose(id) {
       const def = DISEASES[id];
+      this.game.progress.record("ail:" + id);
       this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
       this.game.say(
         `${def.kind === "injury" ? "Injury" : "Diagnosis"}: ${def.name} \xB7 ${def.symptoms[0].toLowerCase()}. Treat with ${def.treat.toLowerCase()}.`,
@@ -5279,8 +5928,12 @@
     cure(id, quiet = false) {
       const def = DISEASES[id], s = this.game.s;
       s.ailments = this.list().filter((a) => a.id !== id);
-      if (def?.immunity) (s.immune ??= {})[id] = s.elapsed + def.immunity;
-      if (!quiet && def) this.game.say(`${def.name} has passed.`, "good");
+      if (def?.immunity)
+        (s.immune ??= {})[id] = s.elapsed + def.immunity * (1 + this.game.skills.get("immunity"));
+      if (!quiet && def) {
+        this.game.say(`${def.name} has passed.`, "good");
+        this.game.progress.record("cure:" + id);
+      }
       this.sync();
     }
     /** Uses a treatment: each ailment it helps loses stages; those brought to nothing are gone. */
@@ -5294,7 +5947,11 @@
           continue;
         }
         helped = true;
-        a.stage -= power;
+        const medic = this.game.skills.flag("fieldMedic");
+        a.stage -= power + (medic ? 1 : 0);
+        if (medic) this.game.equipment.heal(20);
+        if ((item === "bandage" || item === "splint") && this.game.skills.get("dressing"))
+          this.game.equipment.heal(this.game.skills.get("dressing"));
         a.mend = 0;
         if (a.stage <= 0) this.cure(a.id);
         else a.next = this.game.s.elapsed + def.worsen;
@@ -5439,6 +6096,8 @@
       if (!WEAPONS[id] || id === "fists" || this.all[id]) return;
       const q = rollQuality(this.game.rng, luck);
       this.all[id] = { q, lvl: 0, gems: [], evo: [] };
+      this.game.progress.record("weapon:" + id);
+      this.game.progress.record("family:" + this.classOf(id)[0]);
       if (q >= 2)
         this.game.say(
           `${QUALITIES[q].name} ${itemName(id).toLowerCase()}!`,
@@ -5466,31 +6125,37 @@
       return out;
     }
     stats(id) {
-      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists;
-      const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0));
+      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet();
+      const melee = !f.ranged, heavy = family === "greatsword" || family === "battleaxe" || family === "warhammer", shooter = family === "bow" || family === "crossbow", magic = f.ranged === "magic";
+      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
+      const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
+      const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
       return {
         id,
         family,
         tier,
         damage,
-        reach: base[2] * (1 + (m.reach ?? 0)),
-        pace: Math.max(0.4, f.pace + (m.pace ?? 0)),
-        crit: 0.05 + (m.crit ?? 0),
+        reach: base[2] * (1 + (m.reach ?? 0) + (melee ? sk.reach : 0)),
+        pace: Math.max(0.35, (f.pace + (m.pace ?? 0)) / quick) * (mastery >= 15 ? 0.95 : 1),
+        crit: 0.05 + (m.crit ?? 0) + sk.crit + (mastery >= 10 ? 0.05 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.1 : 0),
         count: m.count ?? 0,
-        pierce: m.pierce ?? 0,
-        bleed: (family === "battleaxe" ? 0.15 : 0) + (m.bleed ?? 0),
+        pierce: (m.pierce ?? 0) + (shooter ? sk.pierce : 0),
+        bleed: ((family === "battleaxe" ? 0.15 : 0) + (m.bleed ?? 0) + (shooter ? sk.rangedBleed : 0)) * (1 + sk.bleedDmg),
         poison: m.poison ?? 0,
-        heal: m.heal ?? 0,
+        heal: (m.heal ?? 0) + (melee ? sk.lifesteal : magic ? sk.magicLifesteal : 0),
         execute: m.execute ?? 0,
         berserk: m.berserk ?? 0,
-        boss: m.boss ?? 0,
-        homing: m.homing ?? 0,
-        mana: Math.max(0.3, 1 + (m.mana ?? 0)),
+        boss: (m.boss ?? 0) + sk.bossDmg,
+        homing: (m.homing ?? 0) + (f.ranged ? sk.homing : 0),
+        mana: Math.max(
+          0.3,
+          (1 + (m.mana ?? 0) + sk.manaCost) * (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "arcanist" ? 0.8 : 1)
+        ),
         defense: m.defense ?? 0,
         stagger: family === "warhammer" || !!m.stagger,
         sunder: family === "warhammer" ? 4 + (m.sunder ?? 0) : 0,
-        mark: family === "whip" ? 0.15 + (m.mark ?? 0) : 0,
-        combo: family === "blade" ? m.combo ?? 1.8 : 1,
+        mark: family === "whip" ? 0.15 + (m.mark ?? 0) : shooter ? sk.rangedMark : 0,
+        combo: family === "blade" ? (m.combo ?? 1.8) + sk.combo + (mastery >= 5 ? 0.1 : 0) : 1,
         magic: m.magic ?? 0,
         armorPierce: Math.min(0.9, m.armorPierce ?? 0),
         infusion: e.inf
@@ -6051,7 +6716,14 @@
     hurtPlayer(amount, source, disease, how = "blow") {
       const s = this.game.s, p = s.player;
       if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
-      const cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1, scaled = amount * this.game.pocket.damageScale(), taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
+      const sk = this.game.skills.stats(), cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1;
+      let scaled = amount * this.game.pocket.damageScale() * Math.max(0.3, 1 + sk.harm);
+      if (sk.manaShield && s.mana > 0) {
+        const soak = Math.min(s.mana, scaled * 0.25);
+        s.mana -= soak;
+        scaled -= soak;
+      }
+      const taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
       s.vitals.health -= taken;
       s.vitals.morale = clamp(s.vitals.morale - 4, 0, RULES.maxVital);
       p.invuln = 0.7;
@@ -6075,8 +6747,10 @@
         this.game.say("Ordinary steel glances off the Direwolf. Obsidian is required.", "danger");
         return 0;
       }
-      const spec = MOBS[a.type], t = this.game.s.elapsed, v = this.game.s.vitals, crit = this.game.rng() < (w?.crit ?? 0.05);
-      let k = crit ? 2 : 1;
+      const spec = MOBS[a.type], t = this.game.s.elapsed, v = this.game.s.vitals, sk = this.game.skills.stats(), shooter = w?.family === "bow" || w?.family === "crossbow", deadeye = !!(sk.deadeye && shooter && a.hp >= a.maxHp), crit = deadeye || this.game.rng() < (w?.crit ?? 0.05);
+      let k = crit ? deadeye ? 2.5 : 2 + sk.critDmg : 1;
+      if (sk.berserker) k *= 1 + 0.4 * (1 - v.health / this.game.maxHealth());
+      if (sk.skirmisher && shooter && this.game.s.player.moving) k *= 1.2;
       if (w) {
         if (w.execute && a.hp < a.maxHp * 0.3) k *= 1 + w.execute;
         if (w.berserk && v.health < this.game.maxHealth() / 2) k *= 1 + w.berserk;
@@ -6087,7 +6761,10 @@
       if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
       const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1, pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === "void" ? 0.5 : 0)), armour = (spec?.defense ?? 0) * cracked * (1 - pierce), raw = amount * this.game.equipment.damageBonus(magic) * k, taken = Math.max(1, Math.round(raw - armour * 0.5));
       a.hp -= taken;
-      if (w) this.afflict(a, w, taken);
+      if (w) {
+        this.afflict(a, w, taken);
+        if (w.id !== "fists") this.game.skills.train(w.family, taken);
+      }
       a.warning = 0;
       const dir = Math.sign(a.x - from.x) || 1;
       if (!spec?.boss && a.type !== "boss") {
@@ -6105,13 +6782,15 @@
     /** What a weapon leaves behind on a blow: wounds, poison, fire, frost, stagger, cracks, marks. */
     afflict(a, w, taken) {
       const t = this.game.s.elapsed, great = !!MOBS[a.type]?.boss || a.type === "boss", fx = a.fx ??= {};
+      const sk = this.game.skills.stats(), elemental = (1 + sk.infusion) * (sk.elementalist ? 1.5 : 1);
       const dot = (key, frac, secs) => {
-        const dps = taken * frac / 1;
+        const dps = taken * frac * (key === "bleed" ? 1 : elemental) * (key === "burn" ? 1 + sk.burnDmg : 1);
         if (!fx[key] || fx[key][1] < dps || fx[key][0] < t) fx[key] = [t + secs, dps];
       };
       if (w.bleed) dot("bleed", w.bleed, 3);
       if (w.poison) dot("poison", w.poison, 4);
       if (w.infusion === "fire") dot("burn", 0.2, 3);
+      else if (this.game.equipment.has("fire") && this.game.rng() < 0.3) dot("burn", 0.12, 3);
       if (w.infusion === "venom") dot("poison", 0.22, 4);
       if (w.infusion === "frost") fx.slow = t + 3;
       if (w.stagger && !great) fx.stun = t + 0.5;
@@ -6165,18 +6844,24 @@
         const arrow = this.ammo();
         if (!arrow)
           return { ok: false, reason: "No arrows. Make them at a workbench from wood and flint." };
-        this.game.remove(arrow);
+        const sk = this.game.skills.stats(), set = this.game.equipment.fullSet(), save = sk.ammoSave + (sk.quiverMaster ? 0.3 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.25 : 0);
+        if (this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
         damage += AMMO[arrow].damage;
         if (AMMO[arrow].effect === "fire") extra.fire = true;
         if (AMMO[arrow].effect === "pierce") extra.pierce = 3;
         kind = spec.projectile === "bolt" ? "bolt" : arrow === "arrow" ? "arrow" : arrow;
         this.game.sound("bow");
       } else {
-        if (!this.game.equipment.spendMana(Math.max(1, Math.round((spec.mana ?? 5) * w.mana))))
-          return { ok: false, reason: "Not enough mana." };
+        const cost = Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
+        if (!this.game.equipment.spendMana(cost)) {
+          if (!this.game.skills.flag("overchannel") || s.vitals.health <= cost * 0.6 + 5)
+            return { ok: false, reason: "Not enough mana." };
+          s.vitals.health -= cost * 0.6;
+          this.game.event("burst", p.x, p.y - 30, "#c04a6a");
+        }
         this.game.sound("cast");
       }
-      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), count = (spec.count ?? 1) + w.count, spread = spec.spread ?? (w.count ? 0.1 : 0), pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
+      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), bonusShots = (this.game.rng() < this.game.skills.get("extraShot") ? 1 : 0) + (spec.kind === "bow" && this.game.skills.flag("quiverMaster") ? 1 : 0), count = (spec.count ?? 1) + w.count + bonusShots, spread = spec.spread ?? (w.count || bonusShots ? 0.1 : 0), pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
       if (w.homing) extra.homing = w.homing;
       extra.pierce = pierce;
       for (let i = 0; i < count; i++) {
@@ -6355,25 +7040,27 @@
         v.protein = clamp(v.protein + pro * worth, 0, RULES.maxVital);
         v.vitamins = clamp(v.vitamins + vit * worth, 0, RULES.maxVital);
         v.morale = clamp(v.morale + (worth < 0.5 ? -7 : MEAL_BUFFS[id] ? 8 : 3), 0, RULES.maxVital);
-        if (state2 === "rotten" && chance(0.72)) ail.contract(chance(0.5) ? "dysentery" : "fever");
-        if (state2 === "spoiled" && chance(0.35)) ail.contract("food_poisoning");
+        if (state2 === "rotten" && chance(0.72))
+          ail.contract(chance(0.5) ? "dysentery" : "fever", false, "food");
+        if (state2 === "spoiled" && chance(0.35)) ail.contract("food_poisoning", false, "spoiled");
         if (RAW.has(id)) {
-          if (chance(0.48)) ail.contract("fever");
-          if (chance(0.12)) ail.contract("tapeworm");
+          if (chance(0.48)) ail.contract("fever", false, "food");
+          if (chance(0.12)) ail.contract("tapeworm", false, "food");
         }
+        this.game.progress.record("eat:" + id);
         const buff = MEAL_BUFFS[id];
         if (buff && worth >= 0.65) {
-          this.game.equipment.addBuff(buff[0], buff[1]);
+          this.game.equipment.addBuff(buff[0], buff[1] * (1 + this.game.skills.get("meals")));
           this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, "good");
         }
       } else if (ITEMS[id]?.[1] === "water") {
         v.hydration = clamp(v.hydration + (state2 === "rotten" ? 15 : 27), 0, RULES.maxVital);
-        if (id === "wild_water" && chance(0.38)) ail.contract("dysentery");
+        if (id === "wild_water" && chance(0.38)) ail.contract("dysentery", false, "water");
         if (id === "brackish_water") {
-          if (chance(0.45)) ail.contract("cholera");
-          if (chance(0.3)) ail.contract("dysentery");
+          if (chance(0.45)) ail.contract("cholera", false, "water");
+          if (chance(0.3)) ail.contract("dysentery", false, "water");
         }
-        if (state2 === "rotten" && chance(0.6)) ail.contract("dysentery");
+        if (state2 === "rotten" && chance(0.6)) ail.contract("dysentery", false, "water");
         if (id === "boiled_water" && state2 !== "rotten")
           this.game.progress.record("drink:boiled_water");
         ail.treat(id);
@@ -6788,8 +7475,8 @@
     }
     // Resources keep a readable footprint: trees space from trees, small finds from each other.
     nodeFits(kind, x, y) {
-      const tree = (k) => TREE_NODES.has(k);
-      const width = (k) => tree(k) ? 92 : k === "water" ? 74 : k === "cache" ? 44 : NODES[k]?.tool ? 38 : 30;
+      const tree2 = (k) => TREE_NODES.has(k);
+      const width = (k) => tree2(k) ? 92 : k === "water" ? 74 : k === "cache" ? 44 : NODES[k]?.tool ? 38 : 30;
       const key = Math.floor(x / 200);
       const others = [key - 1, key, key + 1].flatMap((k) => this.buckets.get(k) ?? []);
       if (!this.buckets.size)
@@ -6800,7 +7487,7 @@
       return others.every((n) => {
         if (Math.abs(n.y - y) > 60) return true;
         const gap = Math.abs(n.x - x);
-        if (tree(kind) !== tree(n.kind))
+        if (tree2(kind) !== tree2(n.kind))
           return gap > (kind === "water" || n.kind === "water" ? 64 : 26);
         return gap > (width(kind) + width(n.kind)) / 2;
       });
@@ -7482,6 +8169,7 @@
       if (set) out.add(ARMOR_SETS.find((x) => x.key === set).bonus);
       for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
       for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add("buff:" + id);
+      for (const id of this.game.shelvedRelics()) for (const e of RELIC_EFFECTS[id] ?? []) out.add(e);
       if (this.townCache.at !== Math.floor(this.game.s.elapsed)) {
         this.townCache = { at: Math.floor(this.game.s.elapsed), near: this.game.town.townNear() };
       }
@@ -7499,6 +8187,8 @@
       if (fx.has("defense4")) d += 4;
       if (fx.has("void")) d += 8;
       if (fx.has("buff:ironskin")) d += 8;
+      const sk = this.game.skills.stats();
+      d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has("vanguard") ? 3 : 0);
       d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
@@ -7515,15 +8205,19 @@
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
-    maxHealth() {
+    /** Health from crystals and fruit alone; skills add to it. */
+    heart() {
       return this.game.s.maxHealth || CRYSTALS.baseHealth;
+    }
+    maxHealth() {
+      return this.heart() + this.game.skills.get("maxHp");
     }
     maxMana() {
       const fx = this.effects();
-      return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has("mana40") ? 40 : 0);
+      return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has("mana40") || fx.has("arcanist") ? 40 : 0) + this.game.skills.get("maxMana");
     }
     heal(amount) {
       const v = this.game.s.vitals;
@@ -7537,10 +8231,10 @@
       const s = this.game.s;
       if (id === "life_crystal" || id === "life_fruit") {
         const cap = CRYSTALS.baseHealth + CRYSTALS.lifeMax + (id === "life_fruit" ? 100 : 0);
-        if (this.maxHealth() >= cap) return { ok: false, reason: "Your heart can hold no more." };
-        if (id === "life_fruit" && this.maxHealth() < CRYSTALS.baseHealth + CRYSTALS.lifeMax)
+        if (this.heart() >= cap) return { ok: false, reason: "Your heart can hold no more." };
+        if (id === "life_fruit" && this.heart() < CRYSTALS.baseHealth + CRYSTALS.lifeMax)
           return { ok: false, reason: "Life crystals must fill your heart first." };
-        s.maxHealth = this.maxHealth() + CRYSTALS.lifePer;
+        s.maxHealth = this.heart() + CRYSTALS.lifePer;
         this.heal(CRYSTALS.lifePer);
         this.game.remove(id);
         this.game.sound("crystal");
@@ -7562,7 +8256,7 @@
       if (potion.heal) {
         if ((s.buffs.potion_sickness ?? 0) > 0)
           return { ok: false, reason: "Your body needs a moment before another draught." };
-        this.heal(potion.heal);
+        this.heal(potion.heal * (1 + this.game.skills.get("heal")));
         this.addBuff("potion_sickness", 45);
       }
       if (potion.mana) s.mana = clamp(s.mana + potion.mana, 0, this.maxMana());
@@ -7587,7 +8281,7 @@
       }
       const sinceCast = s.elapsed - (this.lastCast ?? -9);
       s.mana = clamp(
-        s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5) * (fx.has("buff:clear_mind") ? 2 : 1),
+        s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5) * (fx.has("buff:clear_mind") ? 2 : 1) * (1 + this.game.skills.get("manaRegen")),
         0,
         this.maxMana()
       );
@@ -7953,7 +8647,11 @@
       if (st.type === "torch" || st.type.startsWith("trap_"))
         return { ok: false, reason: "Nothing to do here." };
       if (st.type === "bedroll") {
-        this.game.s.vitals.fatigue = clamp(this.game.s.vitals.fatigue - 32, 0, RULES.maxVital);
+        this.game.s.vitals.fatigue = clamp(
+          this.game.s.vitals.fatigue - 32 * (1 + this.game.skills.get("rest")),
+          0,
+          RULES.maxVital
+        );
         this.game.s.vitals.stamina = 100;
         this.game.s.elapsed += 90;
         this.game.sound("rest");
@@ -7965,6 +8663,8 @@
           this.game.sound("place", st.x, st.y, 0.7);
           this.game.say("Fed the campfire with wood.", "good");
         } else return { ok: false, reason: "One wood refuels the campfire." };
+      } else if (st.type === "relic_shelf") {
+        return { ok: true, action: "shelf", structure: st };
       } else if (STORAGE[st.type]) {
         return { ok: true, action: "larder", structure: st };
       } else if (st.type === "rain_catcher") {
@@ -8061,7 +8761,8 @@
       v.stamina -= 7;
       v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
       v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
-      const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0);
+      const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0) + (this.game.rng() < this.game.skills.get("gather") ? 1 : 0);
+      this.game.progress.record("gather:" + node.kind);
       const form = nodeForm(node.kind), s = this.game.s;
       node.hitAt = s.elapsed;
       this.game.sound(
@@ -8196,7 +8897,8 @@
     }
     /** Multiplier on rot in the pack from worn cooling charms. */
     packCooling() {
-      return this.game.equipment.worn().accessories.reduce((k, id) => Math.min(k, PACK_COOLING[id] ?? 1), 1);
+      const charm = this.game.equipment.worn().accessories.reduce((k, id) => Math.min(k, PACK_COOLING[id] ?? 1), 1);
+      return charm * Math.max(0.2, 1 - this.game.skills.get("packRot")) * (this.game.equipment.has("wayfarer") ? 0.6 : 1);
     }
     // ─── Stowing and taking ────────────────────────────────────────────────────
     stow(st, id, qty = 1) {
@@ -8232,7 +8934,7 @@
       if (!this.game.count(spec.fuel))
         return { ok: false, reason: `It needs ${itemName(spec.fuel).toLowerCase()}.` };
       this.game.remove(spec.fuel);
-      st.fuel += spec.per ?? 900;
+      st.fuel += (spec.per ?? 900) * (1 + this.game.skills.get("ice"));
       this.warned.delete(st.id);
       this.game.sound("place", st.x, st.y, 0.6);
       this.game.say(`${spec.name} cooled with ${itemName(spec.fuel).toLowerCase()}.`, "good");
@@ -8312,7 +9014,7 @@
         return true;
       }
       const boost = fx.has("jump") || fx.has("speed") ? 1.18 : 1;
-      p.vy = -RULES.jumpVelocity * boost;
+      p.vy = -RULES.jumpVelocity * boost * (1 + this.game.skills.get("jump"));
       p.grounded = false;
       this.airJumps = 1;
       this.game.s.vitals.stamina -= RULES.jumpStamina;
@@ -8357,7 +9059,7 @@
       } else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
         if (p.grounded) this.jump();
         else {
-          p.vy = -RULES.climbVelocity;
+          p.vy = -RULES.climbVelocity * (1 + this.game.skills.get("climb"));
           v.stamina = clamp(v.stamina - dt * 5, 0, RULES.maxVital);
         }
       } else if (shaft && dy > 0) p.vy = Math.min(p.vy + 160 * dt, 170);
@@ -8458,12 +9160,13 @@
     damageScale() {
       const i = this.inst();
       if (!i || !this.here()) return 1;
-      return TIER_SCALE.damage(i.tier) * (i.mods.includes("savage") ? 1.3 : 1);
+      return TIER_SCALE.damage(i.tier) * (i.mods.includes("savage") ? 1.3 : 1) * Math.max(0.5, 1 - this.game.skills.get("tierHarm"));
     }
     lootScale(x) {
       const i = this.inst();
       if (!i || !inPocket(x)) return 1;
-      return TIER_SCALE.loot(i.tier) + i.mods.reduce((n, m) => n + (modById(m)?.loot ?? 0), 0);
+      const sk = this.game.skills.stats();
+      return TIER_SCALE.loot(i.tier) + i.mods.reduce((n, m) => n + (modById(m)?.loot ?? 0), 0) + sk.realmLoot + (sk.treasureSense ? 0.2 : 0);
     }
     speedScale(a) {
       return this.has("frenzied") && inPocket(a.x) ? 1.3 : 1;
@@ -8493,7 +9196,12 @@
         return { ok: false, reason: `Clear tier ${TIER_NAMES[tier - 1] ?? "I"} first.` };
       if (!god && !this.game.count(tpl.key))
         return { ok: false, reason: `You need a ${itemName(tpl.key).toLowerCase()}.` };
-      if (!god) this.game.remove(tpl.key);
+      const keep = this.game.skills.get("keySave") + (this.game.skills.flag("riftborn") ? 0.3 : 0);
+      if (!god) {
+        if (this.game.rng() < keep)
+          this.game.say("The key turns, but stays whole in your hand.", "good");
+        else this.game.remove(tpl.key);
+      }
       const seed = Math.floor(this.game.rng() * 2 ** 31);
       const inst = {
         realm: realmId,
@@ -8620,7 +9328,7 @@
         const m = weighted(rng2, mobs), y = spot(lx);
         ctx2.mob(m.type, x0 + lx, m.air ? y - 140 - rng2() * 80 : y);
       }
-      const nChests = tpl.chests + (mods.has("treasure") ? 3 : 0);
+      const nChests = tpl.chests + (mods.has("treasure") ? 3 : 0) + (this.game.skills.flag("treasureSense") ? 2 : 0);
       for (let i = 0; i < nChests; i++) {
         const lx = (i + 0.5) / nChests * (RW - 1400) + 400 + (rng2() - 0.5) * 300;
         if (clear(lx)) ctx2.chest(x0 + lx, spot(lx), tpl.chestLoot);
@@ -8689,6 +9397,7 @@
       if (!rec.relic) {
         rec.relic = true;
         this.game.add(tpl.relic);
+        this.game.progress.record("relic:" + tpl.relic);
         this.game.say(`The ${itemName(tpl.relic)} is yours: a relic of the ${tpl.name}.`, "victory");
       }
       if (first && inst.tier < MAX_TIER)
@@ -8760,8 +9469,9 @@
           );
         this.stormWas = storm2;
         if (storm2 && !fx.has("ashward")) {
-          v.stamina = clamp(v.stamina - dt * 4, 0, 100);
-          v.hydration = clamp(v.hydration - dt * 0.35, 0, 100);
+          const hard = 1 - Math.min(0.8, this.game.skills.get("hazard"));
+          v.stamina = clamp(v.stamina - dt * 4 * hard, 0, 100);
+          v.hydration = clamp(v.hydration - dt * 0.35 * hard, 0, 100);
           v.hygiene = clamp(v.hygiene - dt * 0.2, 0, 100);
         }
       }
@@ -8783,7 +9493,7 @@
               { x: c.x + (i - 2) * 34 + (this.game.rng() - 0.5) * 14, y: c.y + 8 },
               Math.PI / 2,
               60 + this.game.rng() * 80,
-              warned ? 13 : 26,
+              (warned ? 13 : 26) * (1 - Math.min(0.8, this.game.skills.get("hazard"))),
               "mob"
             );
           this.game.sound("slam", c.x, c.y, 1);
@@ -8813,6 +9523,7 @@
   var Progress = class extends System {
     record(key, qty = 1) {
       this.game.s.tutorial.tally[key] = (this.game.s.tutorial.tally[key] || 0) + qty;
+      this.game.skills.noted(key, qty);
       this.advanceTutorial();
       this.advanceChapter();
     }
@@ -9153,6 +9864,202 @@
     }
   };
 
+  // src/game/systems/Skills.ts
+  var ZERO = () => Object.fromEntries(
+    [
+      ...new Set(SKILLS.flatMap((n) => Object.keys(n.stats))),
+      ...CODEX.flatMap((p) => Object.keys(p.bonus))
+    ].map((k) => [k, 0])
+  );
+  var Skills = class extends System {
+    cache = null;
+    get meta() {
+      return this.game.s.meta ??= { renown: 0, skills: [], mastery: {} };
+    }
+    // ─── Renown ────────────────────────────────────────────────────────────────
+    renown() {
+      return this.meta.renown;
+    }
+    level() {
+      return renownLevel(this.meta.renown);
+    }
+    /** Renown into the current level, and what the level needs, for the bar. */
+    progress() {
+      const l = this.level();
+      if (l >= MAX_RENOWN) return [1, 1];
+      return [this.meta.renown - renownFor(l), renownFor(l + 1) - renownFor(l)];
+    }
+    points() {
+      const spent = this.meta.skills.reduce((n, id) => n + (skillById(id)?.cost ?? 0), 0);
+      return this.level() - 1 - spent;
+    }
+    gain(amount) {
+      if (amount <= 0) return;
+      const before = this.level();
+      this.meta.renown += amount * (1 + this.get("xp"));
+      const after = this.level();
+      if (after > before) {
+        this.game.sound("victory");
+        this.game.say(
+          `Renown ${after}! A skill point to spend (${this.points()} unspent) \xB7 Gear \u203A Skills.`,
+          "victory"
+        );
+      }
+    }
+    /** Renown for what the record notes: kills, crafts, places, bosses, and firsts. */
+    noted(key, qty) {
+      const [kind, what] = key.split(":"), first = (this.game.s.tutorial.tally[key] ?? 0) === qty ? 3 : 1;
+      if (!what) return;
+      let xp = 0;
+      if (kind === "kill") {
+        const spec = MOBS[what];
+        xp = Math.max(2, Math.round((spec?.hp ?? 40) / (spec?.boss ? 4 : 6))) * first;
+      } else if (kind === "boss") xp = 250;
+      else if (kind === "craft")
+        xp = (3 + 2 * (RECIPES.find((r) => r.id === what)?.tier ?? 1)) * first;
+      else if (kind === "place") xp = 4 * first;
+      else if (kind === "visit") xp = 40;
+      else if (kind === "realm") xp = 15;
+      else if (kind === "clear" && what.startsWith("tier")) xp = 120 * Number(what.slice(4));
+      else if (kind === "upgrade") xp = 5 * Number(what);
+      else if (kind === "settler") xp = 60;
+      else if (kind === "cure") xp = 15;
+      else if (kind === "gather") xp = 1;
+      else if (kind === "eat" && first > 1) xp = 6;
+      this.gain(xp * qty);
+    }
+    // ─── The trees ─────────────────────────────────────────────────────────────
+    has(id) {
+      return this.meta.skills.includes(id);
+    }
+    spentIn(tree2) {
+      return this.meta.skills.map((id) => skillById(id)).filter((n) => n?.tree === tree2).reduce((k, n) => k + (n?.cost ?? 0), 0);
+    }
+    /** Why a skill cannot be learned, or null. */
+    blocked(id) {
+      const n = skillById(id);
+      if (!n) return "No such skill.";
+      if (this.has(id)) return "Already learned.";
+      if (this.spentIn(n.tree) < ROW_POINTS[n.row])
+        return `Spend ${ROW_POINTS[n.row]} points in ${TREES.find((t) => t.id === n.tree)?.name} first.`;
+      if (this.points() < n.cost) return `It needs ${n.cost} skill point${n.cost > 1 ? "s" : ""}.`;
+      return null;
+    }
+    learn(id) {
+      const why = this.blocked(id);
+      if (why) return { ok: false, reason: why };
+      this.meta.skills.push(id);
+      this.cache = null;
+      const n = skillById(id);
+      this.game.sound(n.keystone ? "crystal" : "page");
+      this.game.say(`Learned ${n.name}: ${n.text}.`, n.keystone ? "victory" : "good");
+      return { ok: true };
+    }
+    respec() {
+      if (!this.meta.skills.length) return { ok: false, reason: "No skills to unlearn." };
+      if (!this.game.dev.god) {
+        if (!this.game.canAfford(RESPEC_COST))
+          return {
+            ok: false,
+            reason: "Unlearning costs " + Object.entries(RESPEC_COST).map(([k, n]) => `${n} ${itemName(k).toLowerCase()}`).join(" and ") + "."
+          };
+        for (const [k, n] of Object.entries(RESPEC_COST)) this.game.remove(k, n);
+      }
+      this.meta.skills = [];
+      this.cache = null;
+      this.game.say("Your skills are unlearned; every point is yours to spend again.", "good");
+      return { ok: true };
+    }
+    // ─── The Codex ─────────────────────────────────────────────────────────────
+    /** How far a page has come: entries found, and needed. */
+    page(p) {
+      const tally = this.game.s.tutorial.tally;
+      if (p.count) {
+        const n = Object.keys(tally).filter((k) => k.startsWith(p.prefix) && tally[k] > 0).length;
+        return [Math.min(n, p.count), p.count];
+      }
+      return [p.entries.filter((e) => (tally[p.prefix + e] ?? 0) > 0).length, p.entries.length];
+    }
+    pageDone(p) {
+      const [a, b] = this.page(p);
+      return a >= b;
+    }
+    // ─── Everything added up ───────────────────────────────────────────────────
+    stats() {
+      const key = this.meta.skills.join(",") + "|" + Math.floor(this.game.s.elapsed / 2);
+      if (this.cache?.key === key) return this.cache.stats;
+      const out = ZERO();
+      const add = (st) => {
+        for (const [k, v] of Object.entries(st)) out[k] = (out[k] ?? 0) + v;
+      };
+      for (const id of this.meta.skills) {
+        const n = skillById(id);
+        if (n) add(n.stats);
+      }
+      for (const p of CODEX) if (this.pageDone(p)) add(p.bonus);
+      this.cache = { key, stats: out };
+      return out;
+    }
+    get(k) {
+      return this.stats()[k] ?? 0;
+    }
+    flag(k) {
+      return this.get(k) > 0;
+    }
+    // ─── The relic shelf ───────────────────────────────────────────────────────
+    shelfSlots() {
+      return shelfSlots(this.level());
+    }
+    /** Relics on every shelf, as many as renown allows. */
+    shelved() {
+      const out = [];
+      for (const st of this.game.s.structures)
+        if (st.type === "relic_shelf") {
+          for (const id of Object.keys(st.store))
+            if (RELIC_EFFECTS[id] && !out.includes(id)) out.push(id);
+        }
+      return out.slice(0, this.shelfSlots());
+    }
+    shelve(st, id) {
+      if (!RELIC_EFFECTS[id])
+        return { ok: false, reason: "Only relics and great trophies rest on the shelf." };
+      if (!this.game.count(id)) return { ok: false, reason: "You do not carry it." };
+      if (this.shelved().length >= this.shelfSlots())
+        return { ok: false, reason: `The shelf holds ${this.shelfSlots()} relics at your renown.` };
+      this.game.remove(id);
+      st.store[id] = 1;
+      this.game.sound("crystal", st.x, st.y);
+      this.game.say(`${itemName(id)} set on the shelf: its gift is yours wherever you roam.`, "good");
+      return { ok: true };
+    }
+    unshelve(st, id) {
+      if (!st.store[id]) return { ok: false, reason: "It is not on this shelf." };
+      delete st.store[id];
+      this.game.add(id);
+      return { ok: true };
+    }
+    // ─── Weapon mastery ────────────────────────────────────────────────────────
+    masteryXp(family) {
+      return this.meta.mastery[family] ?? 0;
+    }
+    mastery(family) {
+      return masteryLevel(this.masteryXp(family));
+    }
+    /** Damage dealt trains the family that dealt it. */
+    train(family, damage) {
+      const before = this.mastery(family);
+      this.meta.mastery[family] = this.masteryXp(family) + damage;
+      const after = this.mastery(family);
+      if (after > before) {
+        const title = masteryTitle(after);
+        this.game.say(
+          `${family[0].toUpperCase() + family.slice(1)} mastery ${after}${after % 5 === 0 ? " \xB7 " + title : ""}.`,
+          after % 5 === 0 ? "victory" : "good"
+        );
+      }
+    }
+  };
+
   // src/game/systems/Survival.ts
   var Survival = class extends System {
     wash() {
@@ -9262,7 +10169,7 @@
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const cold2 = this.game.temperature();
+      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer, heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
@@ -9277,15 +10184,15 @@
       if ((this.game.s.buffs.warm_belly ?? 0) > 0 && cold2 < 15) target += 2.2;
       target = clamp(target, 30, 41);
       v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
-      const drain = this.game.pocket.drainScale();
+      const drain = this.game.pocket.drainScale(), sk = this.game.skills.stats(), thirst = drain * Math.max(0.3, 1 + sk.thirst), hunger = drain * Math.max(0.3, 1 + sk.calories);
       v.hydration = clamp(
-        v.hydration - dt * drain * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0)),
+        v.hydration - dt * thirst * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0)),
         0,
         100
       );
-      v.calories = clamp(v.calories - dt * drain * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
+      v.calories = clamp(v.calories - dt * hunger * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
       v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
-      v.vitamins = clamp(v.vitamins - dt * drain * 0.012, 0, RULES.maxVital);
+      v.vitamins = clamp(v.vitamins - dt * hunger * 0.012, 0, RULES.maxVital);
       v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
       v.hygiene = clamp(
         v.hygiene - dt * (this.game.biome().id === "marsh" ? 0.025 : 0.011),
@@ -9293,7 +10200,7 @@
         RULES.maxVital
       );
       v.stamina = clamp(
-        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) * ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1),
+        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) * ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1) * (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)),
         0,
         100
       );
@@ -9641,7 +10548,7 @@
       const who = settlerById(settlerId), offer = who?.stock.find(([id]) => id === item);
       if (!who || !offer) return { ok: false, reason: "That is not for sale." };
       if (!this.nearSettler(settlerId)) return { ok: false, reason: `Stand beside ${who.name}.` };
-      const cost = offer[1] * qty;
+      const cost = Math.max(1, Math.round(offer[1] * qty * (1 - this.game.skills.get("haggle"))));
       if (this.game.count("coin") < cost)
         return { ok: false, reason: `That costs ${cost} silver marks.` };
       this.game.remove("coin", cost);
@@ -9666,7 +10573,7 @@
     sleep(bed) {
       const s = this.game.s;
       s.spawn = { x: bed.x, y: bed.y };
-      s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45);
+      s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45 * (1 + this.game.skills.get("rest")));
       s.vitals.stamina = 100;
       if (this.game.isNight()) {
         const now = this.game.timeOfDay(), until = (6 * 60 - now + 24 * 60) % (24 * 60);
@@ -9769,17 +10676,21 @@
         return;
       }
       const at = animal.x === void 0 ? this.game.s.player : animal;
+      const breath = this.game.skills.get("killStamina");
+      if (breath) this.game.s.vitals.stamina = clamp(this.game.s.vitals.stamina + breath, 0, 100);
       const more = this.game.pocket.lootScale(at.x);
       if (spec && !animal.minion && animal.type !== "deer") {
         const coins = Math.max(
           1,
-          Math.round(spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more)
+          Math.round(
+            spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more * (1 + this.game.skills.get("coins"))
+          )
         );
         this.game.drops.spawn("coin", coins, at.x, at.y - 20);
       }
       if (spec) {
         for (const [id, min, max, chance] of spec.loot)
-          if (this.game.rng() < chance)
+          if (this.game.rng() < chance * (1 + this.game.skills.get("luck")))
             this.game.drops.spawn(
               id,
               Math.max(1, Math.round((min + Math.floor(this.game.rng() * (max - min + 1))) * more)),
@@ -10021,7 +10932,13 @@
       if (Math.abs(p.x - a.x) < spec.reach * 0.6 + 10 && Math.abs(p.y - 26 - cy) < spec.reach * 0.6 + 20 && t >= a.attackAt) {
         a.attackAt = t + spec.cooldown * 0.6;
         this.cry(a, "attack");
-        this.game.combat.hurtPlayer(spec.damage, mobName(a.type) + " attack!", spec.disease);
+        const taken = this.game.combat.hurtPlayer(
+          spec.damage,
+          mobName(a.type) + " attack!",
+          spec.disease
+        );
+        const thorns = this.game.skills.get("thorns") + (this.game.equipment.has("vanguard") ? 0.25 : 0);
+        if (taken && thorns) this.game.combat.hurtMob(a, taken * thorns, p);
         this.bite(a);
       }
       if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {
@@ -10156,6 +11073,7 @@
       s.pocket ??= null;
       s.realms ??= {};
       s.armoury ??= {};
+      s.meta ??= { renown: 0, skills: [], mastery: {} };
       s.vitals.vitamins ??= 70;
       s.immune ??= {};
       s.ailments ??= s.disease ? [{ id: s.disease, stage: 1, next: s.elapsed + 240, since: s.elapsed }] : [];
@@ -10262,6 +11180,7 @@
     equipment = new Equipment(this);
     combat = new Combat(this);
     armoury = new Armoury(this);
+    skills = new Skills(this);
     bosses = new Bosses(this);
     realms = new Realms(this);
     pocket = new Pocket(this);
@@ -10347,6 +11266,7 @@
         pocket: null,
         realms: {},
         armoury: {},
+        meta: { renown: 0, skills: [], mastery: {} },
         placing: null,
         dead: false,
         lastSave: Date.now()
@@ -10418,6 +11338,10 @@
     }
     sheltered() {
       return !!this.near("shelter", 130);
+    }
+    /** Relics set on a shelf at camp (as many as renown allows). */
+    shelvedRelics() {
+      return this.skills.shelved();
     }
     cooled() {
       return !!this.larder.nearest();
@@ -11110,6 +12034,18 @@
     tidecaller: "#5ac8c0",
     ashwalker: "#8a7a6a",
     amberguard: "#e8a030",
+    warden: "#8a9098",
+    bulwark: "#c04a3a",
+    aegis: "#f0e0a0",
+    stalker: "#4a6a3a",
+    farstrider: "#7a9a4a",
+    windrider: "#bfe0d8",
+    acolyte: "#6a4a8a",
+    magus: "#8a4ac8",
+    archon: "#e0a0ff",
+    drifter: "#9a7a58",
+    nomad: "#c8a070",
+    voyager: "#5ac8e8",
     silver: "#dfe4ea",
     gold: "#f0c850",
     ruby: "#e8304a",
@@ -11293,6 +12229,7 @@
     topaz: ["gem", "#f0b040"],
     // Keeping food.
     cool_pit: ["crate", "#6a6660"],
+    relic_shelf: ["crate", "#b8903a"],
     snow_cellar: ["crate", "#dfeaf2"],
     frost_chest: ["crate", "#8fc0d8"],
     rime_vault: ["crate", "#6a7a98"],
@@ -13728,6 +14665,8 @@
       else if (s.type === "furnace" || s.type === "forge") out.push([s.x, s.y - 20, 1, 0.6, 0.3]);
       else if (s.type === "effergy") out.push([s.x, s.y - 60, 0.85, 0.72, 1]);
       else if (s.type === "shrine" && s.crop !== "spent") out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
+      else if (s.type === "relic_shelf" && Object.keys(s.store).length)
+        out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
       else if (s.type === "kiln") out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);
       else if (s.type === "waystone" && g.s.pocket) out.push([s.x, s.y - 40, 0.45, 0.8, 1]);
       else if (s.type === "rift_gate" || s.type === "portal")
@@ -14054,13 +14993,13 @@
   };
   var regionOf = (n) => data_exports.biomeAt(n.x, n.y).id;
   function drawTree(c, n, x, y, t) {
-    const region = regionOf(n), art2 = ART[region] ?? ART.meadow, style = n.kind === "resin" ? "pine" : n.kind === "honey" ? "oak" : art2.tree, variant = Math.floor(hash3(n.id, 7) * 6), tree = cached(
+    const region = regionOf(n), art2 = ART[region] ?? ART.meadow, style = n.kind === "resin" ? "pine" : n.kind === "honey" ? "oak" : art2.tree, variant = Math.floor(hash3(n.id, 7) * 6), tree2 = cached(
       `tree:${region}:${style}:${variant}:${n.kind}`,
       () => treeSprite(style, art2, variant, n.kind)
     );
     const since = n.felledAt === void 0 ? Infinity : t - n.felledAt;
     if (n.hp > 0) {
-      blit(c, tree, x + hitShake(n, t), y, hash3(n.id, 9) > 0.5);
+      blit(c, tree2, x + hitShake(n, t), y, hash3(n.id, 9) > 0.5);
       return;
     }
     blit(c, stumpSprite(art2.bark), x, y);
@@ -14070,7 +15009,7 @@
       c.translate(Math.round(x), Math.round(y) - 5);
       c.rotate(dir * angle);
       c.globalAlpha = after > 0 ? Math.max(0, 1 - after / FADE) : 1;
-      c.drawImage(tree.cv, -tree.ox, -tree.oy + 5);
+      c.drawImage(tree2.cv, -tree2.ox, -tree2.oy + 5);
       c.restore();
       return;
     }
@@ -14624,13 +15563,13 @@
         } else c.fillRect(sx, y, 1, h - y);
       }
       if (layer >= 1 && !floating) {
-        const tree = k < 0.5 ? A.tree : B.tree, treeCol = shade(col, -0.12);
+        const tree2 = k < 0.5 ? A.tree : B.tree, treeCol = shade(col, -0.12);
         for (let slot = Math.floor((shift - 20) / 14); slot * 14 - shift < w + 20; slot++) {
           if (vnoise(slot * 14, layer, 90, 44) < 0.4 || hash3(slot, layer, 45) < 0.3) continue;
           const wx = slot * 14 + Math.floor(hash3(slot, layer, 46) * 8), y = Math.round(
             base - (skyline(kindA, wx, layer) * (1 - k) + skyline(kindB, wx, layer) * k)
           ), size = 5 + layer * 2 + Math.floor(hash3(slot, layer, 47) * 4);
-          blit(c, silhouetteTree(tree, size, treeCol), wx - shift, y + 1);
+          blit(c, silhouetteTree(tree2, size, treeCol), wx - shift, y + 1);
         }
       }
     }
@@ -14981,6 +15920,26 @@
     })
   });
   Object.assign(STATIC, {
+    // Relics set here glow in their niches.
+    relic_shelf: () => sprite(28, 32, 14, 31, (p) => {
+      p.rect(0, 0, 28, 32, "#5a3e26");
+      p.rect(0, 0, 28, 2, "#8a6440");
+      p.rect(2, 2, 24, 28, "#2a1c12");
+      for (const y of [11, 21, 30]) {
+        p.rect(1, y, 26, 2, "#8a6440");
+        p.rect(1, y, 26, 1, "#b08a5a");
+      }
+      for (const [x, y, c] of [
+        [6, 7, "#5ac8c0"],
+        [20, 7, "#ff8a3a"],
+        [13, 17, "#e8a030"]
+      ]) {
+        p.rect(x - 2, y - 2, 5, 4, c);
+        p.set(x - 1, y - 2, "#ffffff");
+      }
+      p.rect(0, 0, 1, 32, "#3a2818");
+      p.rect(27, 0, 1, 32, "#3a2818");
+    }),
     cool_pit: () => sprite(26, 10, 13, 9, (p) => {
       stones(p, 0, 2, 26, 8, "#6a6660");
       p.rect(4, 3, 18, 5, "#1c1814");
@@ -20240,6 +21199,12 @@
     atlasTier: 1,
     /** The Gear page: what you wear, or the Armoury's weapon hierarchy (and which weapon). */
     gearView: "gear",
+    skillTree: "warfare",
+    /** The Beasts page: the Effergy and bestiary, or the Codex (and which page). */
+    beastsView: "beasts",
+    codexPage: "wilds",
+    /** The relic shelf open on the Pack page. */
+    shelf: null,
     armourySel: "iron_sword",
     camera: { x: 0, y: 0 },
     lastFrame: performance.now(),
@@ -20492,6 +21457,13 @@
         state.atlasView = "rift";
         toggleJournal(true);
       }
+      if (result.action === "shelf") {
+        state.shelf = result.structure ?? null;
+        state.larder = null;
+        state.tab = "pack";
+        sound("open");
+        toggleJournal(true);
+      }
       if (result.action === "larder") {
         state.larder = result.structure ?? null;
         state.chest = null;
@@ -20656,9 +21628,13 @@
     if (tab === "recipes") renderRecipes(left, right);
     if (tab === "vitals") renderVitals(left, right);
     if (tab === "notes") renderNotes(left, right);
-    if (tab === "beasts") renderBeasts(left, right);
+    if (tab === "beasts") {
+      if (state.beastsView === "codex") renderCodex(left, right);
+      else renderBeasts(left, right);
+    }
     if (tab === "gear") {
       if (state.gearView === "armoury") renderArmoury(left, right);
+      else if (state.gearView === "skills") renderSkills(left, right);
       else renderGear(left, right);
     }
     if (tab === "atlas") {
@@ -20738,6 +21714,28 @@
         return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
+    const shelf = state.shelf;
+    if (shelf) {
+      const held = Object.keys(shelf.store).filter((id) => RELIC_EFFECTS[id]), carried = game.s.inventory.filter((e) => RELIC_EFFECTS[e.id]).map((e) => e.id);
+      left.innerHTML = `<h2>Relic shelf</h2><p class="lede">Relics set here lend their gifts wherever you roam. At renown ${game.skills.level()} the shelf holds ${game.skills.shelfSlots()}.</p><h3>On the shelf \xB7 ${Math.min(held.length, game.skills.shelfSlots())} / ${game.skills.shelfSlots()}</h3><div class="book-list">${held.map(
+        (id) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${relicText(id)}</small></div></div><button data-unshelve="${id}">TAKE</button></div>`
+      ).join("") || "<p>Empty.</p>"}</div><h3>Carried relics</h3><div class="book-list">${carried.map(
+        (id) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${relicText(id)}</small></div></div><button data-shelve="${id}">SET</button></div>`
+      ).join("") || "<p>Relics are won from realm bosses; great trophies rest here too.</p>"}</div><div class="book-actions"><button class="quiet" data-close-shelf>CLOSE</button></div>`;
+      const act = (r) => {
+        if (!r.ok) message(r.reason);
+        renderJournal();
+        updateUI(true);
+      };
+      left.querySelectorAll("[data-shelve]").forEach((b) => b.onclick = () => act(game.skills.shelve(shelf, b.dataset.shelve ?? "")));
+      left.querySelectorAll("[data-unshelve]").forEach(
+        (b) => b.onclick = () => act(game.skills.unshelve(shelf, b.dataset.unshelve ?? ""))
+      );
+      left.querySelector("[data-close-shelf]").onclick = () => {
+        state.shelf = null;
+        renderJournal();
+      };
+    }
     const larder = state.larder;
     if (larder) {
       left.innerHTML = larderPanel(larder);
@@ -20983,7 +21981,11 @@
   }
   function renderBeasts(left, right) {
     const a = game.s.altar, cfg = BOSSES[a.level - 1], owned = game.s.structures.some((st) => st.type === "effergy"), near = !!game.near("effergy", 135);
-    left.innerHTML = `<h2>Beasts</h2><p class="lede">The Effergy binds a hunt to the oldest shapes in the dark.</p>${sketch("beast")}<div class="folio-stamp">${owned ? "FOLIO UNSEALED" : "FOLIO SEALED"}</div><h3>Wolf attunement</h3><p>${owned ? "The wolf sigil is ready. Wolf kills fill the counter after attunement. Return to the altar when the Direwolf appears." : "Craft the Effergy at a forge, then place it to unseal this folio."}</p><div class="note-block">A black-glass weapon, obsidian tier or greater, is required to wound any Direwolf variant.</div><p class="muted">Future attunement capacity: ${a.level} sigil${a.level > 1 ? "s" : ""}. Only wolves are recorded in this volume.</p>`;
+    left.innerHTML = `<h2>Beasts</h2><p class="lede">The Effergy binds a hunt to the oldest shapes in the dark.</p>${sketch("beast")}<div class="folio-stamp">${owned ? "FOLIO UNSEALED" : "FOLIO SEALED"}</div><h3>Wolf attunement</h3><p>${owned ? "The wolf sigil is ready. Wolf kills fill the counter after attunement. Return to the altar when the Direwolf appears." : "Craft the Effergy at a forge, then place it to unseal this folio."}</p><div class="note-block">A black-glass weapon, obsidian tier or greater, is required to wound any Direwolf variant.</div><p class="muted">Future attunement capacity: ${a.level} sigil${a.level > 1 ? "s" : ""}. Only wolves are recorded in this volume.</p><div class="book-actions"><button data-codex>THE CODEX \u203A</button></div>`;
+    left.querySelector("[data-codex]").onclick = () => {
+      state.beastsView = "codex";
+      renderJournal();
+    };
     right.innerHTML = `<h2>The Hunt</h2><p class="lede">Level ${a.level} \xB7 ${cfg.name}</p><div class="book-list"><div class="book-row"><span>Attuned</span><strong>${a.attuned === "wolf" ? "Wolves" : "None"}</strong></div><div class="book-row"><span>Wolf kills</span><strong>${a.kills} / ${cfg.kills}</strong></div><div class="book-row"><span>Effergy XP</span><strong>${a.xp}</strong></div><div class="book-row"><span>Direwolf health</span><strong>${cfg.hp}</strong></div><div class="book-row"><span>Bite damage</span><strong>${cfg.bite}</strong></div></div><h3>Victory spoils</h3><p>${Object.entries(
       cfg.rewards
     ).map(([id, n]) => `${n} ${pretty(id)}`).join(
@@ -21019,7 +22021,11 @@
     const buffs = Object.entries(game.s.buffs).filter(([id]) => id !== "potion_sickness").map(
       ([id, left2]) => `<div>\u2022 ${BUFFS[id]?.name ?? id} \xB7 ${BUFFS[id]?.text ?? ""} (${Math.ceil(left2)}s)</div>`
     ).join("");
-    left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot("Head", p.armor?.head)}${slot("Body", p.armor?.body)}${slot("Legs", p.armor?.legs)}</div><h3>Accessories \xB7 ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot("Accessory", game.s.accessories[i])).join("")}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> \xB7 Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> \xB7 Damage <strong>\xD7${eq.damageBonus().toFixed(2)}</strong> \xB7 Speed <strong>\xD7${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set \xB7 ${setInfo.bonusText}</div>` : ""}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ""}<div class="book-actions"><button data-armoury>THE ARMOURY \u203A</button></div>`;
+    left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot("Head", p.armor?.head)}${slot("Body", p.armor?.body)}${slot("Legs", p.armor?.legs)}</div><h3>Accessories \xB7 ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot("Accessory", game.s.accessories[i])).join("")}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> \xB7 Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> \xB7 Damage <strong>\xD7${eq.damageBonus().toFixed(2)}</strong> \xB7 Speed <strong>\xD7${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set \xB7 ${setInfo.bonusText}</div>` : ""}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ""}<div class="book-actions"><button data-armoury>THE ARMOURY \u203A</button><button data-skills>SKILLS \u203A</button></div>`;
+    left.querySelector("[data-skills]").onclick = () => {
+      state.gearView = "skills";
+      renderJournal();
+    };
     left.querySelector("[data-armoury]").onclick = () => {
       state.gearView = "armoury";
       if (WEAPONS[game.s.player.weapon] && game.s.player.weapon !== "fists")
@@ -21121,6 +22127,77 @@
     };
     right.querySelectorAll("[data-buy]").forEach((b) => b.onclick = () => act(town2.buy(state.shop ?? "", b.dataset.buy ?? "")));
     right.querySelectorAll("[data-sell]").forEach((b) => b.onclick = () => act(town2.sell(b.dataset.sell ?? "")));
+  }
+  function renderSkills(left, right) {
+    const sk = game.skills, tree2 = TREES.find((t) => t.id === state.skillTree) ?? TREES[0], spent = sk.spentIn(tree2.id);
+    left.innerHTML = `<h2>Skills</h2><div class="farm-choice">${TREES.map((t) => `<button class="tiny-button ${t.id === tree2.id ? "active" : ""}" data-tree="${t.id}">${t.name.toUpperCase()} ${sk.spentIn(t.id) || ""}</button>`).join("")}</div><p class="lede">${tree2.text}. ${spent} point${spent === 1 ? "" : "s"} spent here.</p>${[
+      1,
+      2,
+      3,
+      4,
+      5
+    ].map((row) => {
+      const open = spent >= ROW_POINTS[row];
+      return `<h3>${row === 5 ? "Keystones" : "Row " + row}${open ? "" : ` \xB7 opens at ${ROW_POINTS[row]} points`}</h3><div class="skill-row">${SKILLS.filter(
+        (n) => n.tree === tree2.id && n.row === row
+      ).map((n) => {
+        const has = sk.has(n.id), why = sk.blocked(n.id);
+        return `<button class="skill ${has ? "learned" : !why ? "ready" : ""} ${n.keystone ? "key" : ""}" data-learn="${n.id}" title="${n.name}: ${n.text}${n.cost > 1 ? " (" + n.cost + " points)" : ""}${why && !has ? " \xB7 " + why : ""}"><strong>${n.name}</strong><small>${n.text}</small></button>`;
+      }).join("")}</div>`;
+    }).join("")}<div class="book-actions"><button class="quiet" data-gear>\u2039 GEAR</button></div>`;
+    const [into, need] = sk.progress();
+    right.innerHTML = `<h2>Renown ${sk.level()}</h2><p class="lede">Everything you do earns renown: slaying, making, finding, clearing realms. Each level is a skill point. Renown never fades.</p><div class="vital-row"><span>Next level</span><span class="mini-track"><i style="width:${clamp3(into / need * 100, 0, 100)}%"></i></span><b>${Math.round(into)}/${need}</b></div><p><strong>${sk.points()}</strong> point${sk.points() === 1 ? "" : "s"} to spend \xB7 relic shelf holds <strong>${sk.shelfSlots()}</strong></p><h3>Weapon mastery</h3><div class="book-list">${FAMILIES.map(
+      (f) => {
+        const lvl = sk.mastery(f.id);
+        return `<div class="book-row"><div><strong>${f.name}</strong><small>${masteryTitle(lvl)}</small></div><span class="qty">${lvl} / ${MAX_MASTERY}</span></div>`;
+      }
+    ).join(
+      ""
+    )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10%.</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL \xB7 3 FALLEN STARS, 200 MARKS</button></div>`;
+    left.querySelectorAll("[data-tree]").forEach(
+      (b) => b.onclick = () => {
+        state.skillTree = b.dataset.tree ?? "warfare";
+        renderJournal();
+      }
+    );
+    const act = (r) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    left.querySelectorAll("[data-learn]").forEach((b) => b.onclick = () => act(sk.learn(b.dataset.learn ?? "")));
+    left.querySelector("[data-gear]").onclick = () => {
+      state.gearView = "gear";
+      renderJournal();
+    };
+    right.querySelector("[data-respec]").onclick = () => act(sk.respec());
+  }
+  function renderCodex(left, right) {
+    const sk = game.skills, done = CODEX.filter((p2) => sk.pageDone(p2)).length;
+    left.innerHTML = `<h2>The Codex</h2><p class="lede">What the expedition has learned. ${done} of ${CODEX.length} pages complete; each grants a lasting gift.</p>${["Creatures", "Places", "Lore"].map(
+      (group) => `<h3>${group}</h3><div class="book-list">${CODEX.filter((p2) => p2.group === group).map((p2) => {
+        const [a2, b2] = sk.page(p2);
+        return `<div class="book-row ${state.codexPage === p2.id ? "selected" : ""}"><div><strong>${p2.name}</strong><small>${a2 >= b2 ? "\u2713 " : ""}${p2.bonusText}</small></div><div><span class="qty">${a2}/${b2}</span><button data-page="${p2.id}">READ</button></div></div>`;
+      }).join("")}</div>`
+    ).join("")}<div class="book-actions"><button class="quiet" data-beasts>\u2039 BEASTS</button></div>`;
+    const p = CODEX.find((x) => x.id === state.codexPage) ?? CODEX[0], tally = game.s.tutorial.tally, [a, b] = sk.page(p);
+    const entry = (e) => {
+      const found = (tally[p.prefix + e] ?? 0) > 0, mob = p.prefix === "kill:" && MOBS[e], name = mob ? MOBS[e].name : BIOMES.find((x) => x.id === e)?.name ?? DUNGEONS.find((d) => d.def.id === e)?.def.name ?? realmById(e)?.name ?? (ITEMS[e] ? pretty(e) : e[0].toUpperCase() + e.slice(1));
+      const pic = mob ? `<span class="icon-slot portrait"><img src="${found ? mobPortrait(e) : ""}" alt="" ${found ? "" : "hidden"}></span>` : ITEMS[e] ? icon(e) : '<span class="icon-slot"></span>';
+      return `<div class="book-row"><div class="with-icon">${pic}<div><strong>${found ? name : "???"}</strong><small>${found ? "Recorded" : "Not yet"}</small></div></div></div>`;
+    };
+    const counted = p.count ? Object.keys(tally).filter((k) => k.startsWith(p.prefix) && tally[k] > 0).map((k) => k.slice(p.prefix.length)) : [];
+    right.innerHTML = `<h2>${p.name}</h2><p class="lede">${a} of ${b} \xB7 ${a >= b ? "complete: " : "when complete: "}${p.bonusText}.</p><div class="book-list">${p.count ? counted.map(entry).join("") + (a < b ? `<p class="muted">${b - a} more to find.</p>` : "") : p.entries.map(entry).join("")}</div>`;
+    left.querySelectorAll("[data-page]").forEach(
+      (btn) => btn.onclick = () => {
+        state.codexPage = btn.dataset.page ?? "wilds";
+        renderJournal();
+      }
+    );
+    left.querySelector("[data-beasts]").onclick = () => {
+      state.beastsView = "beasts";
+      renderJournal();
+    };
   }
   function renderArmoury(left, right) {
     const arm = game.armoury, owned = (id2) => game.count(id2) > 0;
@@ -21248,6 +22325,10 @@
     $("mana-bar").style.width = clamp3(game.s.mana / maxMana * 100, 0, 100) + "%";
     $("mana-value").textContent = String(Math.round(game.s.mana));
     $("defense-value").textContent = String(game.equipment.defense());
+    const [into, need] = game.skills.progress();
+    $("renown-value").textContent = String(game.skills.level());
+    $("renown-points").textContent = game.skills.points() > 0 ? `\xB7 ${game.skills.points()} TO SPEND` : "";
+    $("renown-bar").style.width = clamp3(into / need * 100, 0, 100) + "%";
     $("buffs").innerHTML = Object.entries(game.s.buffs).map(
       ([id, left]) => `<span style="color:${BUFFS[id]?.color ?? "#fff"}">${(BUFFS[id]?.name ?? id).toUpperCase()} ${Math.ceil(left)}s</span>`
     ).join(" ");

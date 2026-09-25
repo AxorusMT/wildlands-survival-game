@@ -409,6 +409,27 @@ Object.assign(STATIC, {
 });
 // Keeping food: the cold-storage ladder, the salting barrel, the kitchen, and the water filter.
 Object.assign(STATIC, {
+  // Relics set here glow in their niches.
+  relic_shelf: () =>
+    sprite(28, 32, 14, 31, (p) => {
+      p.rect(0, 0, 28, 32, '#5a3e26');
+      p.rect(0, 0, 28, 2, '#8a6440');
+      p.rect(2, 2, 24, 28, '#2a1c12');
+      for (const y of [11, 21, 30]) {
+        p.rect(1, y, 26, 2, '#8a6440');
+        p.rect(1, y, 26, 1, '#b08a5a');
+      }
+      for (const [x, y, c] of [
+        [6, 7, '#5ac8c0'],
+        [20, 7, '#ff8a3a'],
+        [13, 17, '#e8a030'],
+      ] as const) {
+        p.rect(x - 2, y - 2, 5, 4, c);
+        p.set(x - 1, y - 2, '#ffffff');
+      }
+      p.rect(0, 0, 1, 32, '#3a2818');
+      p.rect(27, 0, 1, 32, '#3a2818');
+    }),
   cool_pit: () =>
     sprite(26, 10, 13, 9, (p) => {
       stones(p, 0, 2, 26, 8, '#6a6660');

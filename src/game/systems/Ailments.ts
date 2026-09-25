@@ -37,9 +37,17 @@ export class Ailments extends System {
    * Catching something: it incubates first (unless `now`), so the journal cannot yet name it.
    * Returns whether it took hold.
    */
-  contract(id: string, now = false) {
-    const def = DISEASES[id];
+  contract(id: string, now = false, source?: 'food' | 'spoiled' | 'water') {
+    const def = DISEASES[id],
+      sk = this.game.skills.stats();
     if (!def || this.immune(id) || this.has(id)) return false;
+    // Iron gut: food and water never sicken you; an iron stomach shrugs off spoiled food.
+    if (source && sk.ironGut >= 1) return false;
+    if (source === 'spoiled' && sk.ironGut > 0) return false;
+    if (id === 'frostbite' && sk.coldBlooded) return false;
+    // Hale bodies and a wayfarer's kit sometimes shrug a sickness off.
+    const resist = sk.disease + (this.game.equipment.has('wayfarer') ? 0.2 : 0);
+    if (!now && def.kind !== 'injury' && this.game.rng() < Math.min(0.7, resist)) return false;
     // An iron gut shrugs off half of what it eats and drinks.
     if (
       !now &&
@@ -62,6 +70,7 @@ export class Ailments extends System {
   }
   private diagnose(id: string) {
     const def = DISEASES[id];
+    this.game.progress.record('ail:' + id);
     this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
     this.game.say(
       `${def.kind === 'injury' ? 'Injury' : 'Diagnosis'}: ${def.name} · ${def.symptoms[0].toLowerCase()}. Treat with ${def.treat.toLowerCase()}.`,
@@ -73,8 +82,12 @@ export class Ailments extends System {
     const def = DISEASES[id],
       s = this.game.s;
     s.ailments = this.list().filter((a) => a.id !== id);
-    if (def?.immunity) (s.immune ??= {})[id] = s.elapsed + def.immunity;
-    if (!quiet && def) this.game.say(`${def.name} has passed.`, 'good');
+    if (def?.immunity)
+      (s.immune ??= {})[id] = s.elapsed + def.immunity * (1 + this.game.skills.get('immunity'));
+    if (!quiet && def) {
+      this.game.say(`${def.name} has passed.`, 'good');
+      this.game.progress.record('cure:' + id);
+    }
     this.sync();
   }
   /** Uses a treatment: each ailment it helps loses stages; those brought to nothing are gone. */
@@ -89,7 +102,12 @@ export class Ailments extends System {
         continue;
       }
       helped = true;
-      a.stage -= power;
+      // A field medic's hands lift a stage more, and heal as they treat.
+      const medic = this.game.skills.flag('fieldMedic');
+      a.stage -= power + (medic ? 1 : 0);
+      if (medic) this.game.equipment.heal(20);
+      if ((item === 'bandage' || item === 'splint') && this.game.skills.get('dressing'))
+        this.game.equipment.heal(this.game.skills.get('dressing'));
       a.mend = 0;
       if (a.stage <= 0) this.cure(a.id);
       else a.next = this.game.s.elapsed + def.worsen;

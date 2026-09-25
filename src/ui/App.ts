@@ -47,7 +47,13 @@ const state = {
   atlasRealm: 'orchard',
   atlasTier: 1,
   /** The Gear page: what you wear, or the Armoury's weapon hierarchy (and which weapon). */
-  gearView: 'gear' as 'gear' | 'armoury',
+  gearView: 'gear' as 'gear' | 'armoury' | 'skills',
+  skillTree: 'warfare',
+  /** The Beasts page: the Effergy and bestiary, or the Codex (and which page). */
+  beastsView: 'beasts' as 'beasts' | 'codex',
+  codexPage: 'wilds',
+  /** The relic shelf open on the Pack page. */
+  shelf: null as Structure | null,
   armourySel: 'iron_sword',
   camera: { x: 0, y: 0 },
   lastFrame: performance.now(),
@@ -318,6 +324,13 @@ function doInteract() {
       state.atlasView = 'rift';
       toggleJournal(true);
     }
+    if (result.action === 'shelf') {
+      state.shelf = result.structure ?? null;
+      state.larder = null;
+      state.tab = 'pack';
+      sound('open');
+      toggleJournal(true);
+    }
     if (result.action === 'larder') {
       state.larder = result.structure ?? null;
       state.chest = null;
@@ -488,9 +501,13 @@ function renderJournal() {
   if (tab === 'recipes') renderRecipes(left, right);
   if (tab === 'vitals') renderVitals(left, right);
   if (tab === 'notes') renderNotes(left, right);
-  if (tab === 'beasts') renderBeasts(left, right);
+  if (tab === 'beasts') {
+    if (state.beastsView === 'codex') renderCodex(left, right);
+    else renderBeasts(left, right);
+  }
   if (tab === 'gear') {
     if (state.gearView === 'armoury') renderArmoury(left, right);
+    else if (state.gearView === 'skills') renderSkills(left, right);
     else renderGear(left, right);
   }
   if (tab === 'atlas') {
@@ -605,6 +622,43 @@ function renderPack(left: HTMLElement, right: HTMLElement) {
       )
       .join('') || '<p>Only the journal remains. Gather what the meadow offers.</p>'
   }`;
+  const shelf = state.shelf;
+  if (shelf) {
+    const held = Object.keys(shelf.store).filter((id) => D.RELIC_EFFECTS[id]),
+      carried = game.s.inventory.filter((e) => D.RELIC_EFFECTS[e.id]).map((e) => e.id);
+    left.innerHTML = `<h2>Relic shelf</h2><p class="lede">Relics set here lend their gifts wherever you roam. At renown ${game.skills.level()} the shelf holds ${game.skills.shelfSlots()}.</p><h3>On the shelf · ${Math.min(held.length, game.skills.shelfSlots())} / ${game.skills.shelfSlots()}</h3><div class="book-list">${
+      held
+        .map(
+          (id) =>
+            `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${D.relicText(id)}</small></div></div><button data-unshelve="${id}">TAKE</button></div>`,
+        )
+        .join('') || '<p>Empty.</p>'
+    }</div><h3>Carried relics</h3><div class="book-list">${
+      carried
+        .map(
+          (id) =>
+            `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${D.relicText(id)}</small></div></div><button data-shelve="${id}">SET</button></div>`,
+        )
+        .join('') || '<p>Relics are won from realm bosses; great trophies rest here too.</p>'
+    }</div><div class="book-actions"><button class="quiet" data-close-shelf>CLOSE</button></div>`;
+    const act = (r: { ok: boolean; reason?: string }) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    left
+      .querySelectorAll<HTMLButtonElement>('[data-shelve]')
+      .forEach((b) => (b.onclick = () => act(game.skills.shelve(shelf, b.dataset.shelve ?? ''))));
+    left
+      .querySelectorAll<HTMLButtonElement>('[data-unshelve]')
+      .forEach(
+        (b) => (b.onclick = () => act(game.skills.unshelve(shelf, b.dataset.unshelve ?? ''))),
+      );
+    left.querySelector<HTMLButtonElement>('[data-close-shelf]')!.onclick = () => {
+      state.shelf = null;
+      renderJournal();
+    };
+  }
   const larder = state.larder;
   if (larder) {
     left.innerHTML = larderPanel(larder);
@@ -919,7 +973,11 @@ function renderBeasts(left: HTMLElement, right: HTMLElement) {
     cfg = D.BOSSES[a.level - 1],
     owned = game.s.structures.some((st) => st.type === 'effergy'),
     near = !!game.near('effergy', 135);
-  left.innerHTML = `<h2>Beasts</h2><p class="lede">The Effergy binds a hunt to the oldest shapes in the dark.</p>${sketch('beast')}<div class="folio-stamp">${owned ? 'FOLIO UNSEALED' : 'FOLIO SEALED'}</div><h3>Wolf attunement</h3><p>${owned ? 'The wolf sigil is ready. Wolf kills fill the counter after attunement. Return to the altar when the Direwolf appears.' : 'Craft the Effergy at a forge, then place it to unseal this folio.'}</p><div class="note-block">A black-glass weapon, obsidian tier or greater, is required to wound any Direwolf variant.</div><p class="muted">Future attunement capacity: ${a.level} sigil${a.level > 1 ? 's' : ''}. Only wolves are recorded in this volume.</p>`;
+  left.innerHTML = `<h2>Beasts</h2><p class="lede">The Effergy binds a hunt to the oldest shapes in the dark.</p>${sketch('beast')}<div class="folio-stamp">${owned ? 'FOLIO UNSEALED' : 'FOLIO SEALED'}</div><h3>Wolf attunement</h3><p>${owned ? 'The wolf sigil is ready. Wolf kills fill the counter after attunement. Return to the altar when the Direwolf appears.' : 'Craft the Effergy at a forge, then place it to unseal this folio.'}</p><div class="note-block">A black-glass weapon, obsidian tier or greater, is required to wound any Direwolf variant.</div><p class="muted">Future attunement capacity: ${a.level} sigil${a.level > 1 ? 's' : ''}. Only wolves are recorded in this volume.</p><div class="book-actions"><button data-codex>THE CODEX ›</button></div>`;
+  left.querySelector<HTMLButtonElement>('[data-codex]')!.onclick = () => {
+    state.beastsView = 'codex';
+    renderJournal();
+  };
   right.innerHTML = `<h2>The Hunt</h2><p class="lede">Level ${a.level} · ${cfg.name}</p><div class="book-list"><div class="book-row"><span>Attuned</span><strong>${a.attuned === 'wolf' ? 'Wolves' : 'None'}</strong></div><div class="book-row"><span>Wolf kills</span><strong>${a.kills} / ${cfg.kills}</strong></div><div class="book-row"><span>Effergy XP</span><strong>${a.xp}</strong></div><div class="book-row"><span>Direwolf health</span><strong>${cfg.hp}</strong></div><div class="book-row"><span>Bite damage</span><strong>${cfg.bite}</strong></div></div><h3>Victory spoils</h3><p>${Object.entries(
     cfg.rewards,
   )
@@ -969,7 +1027,11 @@ function renderGear(left: HTMLElement, right: HTMLElement) {
         `<div>• ${D.BUFFS[id]?.name ?? id} · ${D.BUFFS[id]?.text ?? ''} (${Math.ceil(left)}s)</div>`,
     )
     .join('');
-  left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot('Head', p.armor?.head)}${slot('Body', p.armor?.body)}${slot('Legs', p.armor?.legs)}</div><h3>Accessories · ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot('Accessory', game.s.accessories[i])).join('')}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> · Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> · Damage <strong>×${eq.damageBonus().toFixed(2)}</strong> · Speed <strong>×${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set · ${setInfo.bonusText}</div>` : ''}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ''}<div class="book-actions"><button data-armoury>THE ARMOURY ›</button></div>`;
+  left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot('Head', p.armor?.head)}${slot('Body', p.armor?.body)}${slot('Legs', p.armor?.legs)}</div><h3>Accessories · ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot('Accessory', game.s.accessories[i])).join('')}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> · Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> · Damage <strong>×${eq.damageBonus().toFixed(2)}</strong> · Speed <strong>×${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set · ${setInfo.bonusText}</div>` : ''}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ''}<div class="book-actions"><button data-armoury>THE ARMOURY ›</button><button data-skills>SKILLS ›</button></div>`;
+  left.querySelector<HTMLButtonElement>('[data-skills]')!.onclick = () => {
+    state.gearView = 'skills';
+    renderJournal();
+  };
   left.querySelector<HTMLButtonElement>('[data-armoury]')!.onclick = () => {
     state.gearView = 'armoury';
     if (D.WEAPONS[game.s.player.weapon] && game.s.player.weapon !== 'fists')
@@ -1115,6 +1177,113 @@ function renderTown(left: HTMLElement, right: HTMLElement) {
   right
     .querySelectorAll<HTMLButtonElement>('[data-sell]')
     .forEach((b) => (b.onclick = () => act(town.sell(b.dataset.sell ?? ''))));
+}
+function renderSkills(left: HTMLElement, right: HTMLElement) {
+  const sk = game.skills,
+    tree = D.TREES.find((t) => t.id === state.skillTree) ?? D.TREES[0],
+    spent = sk.spentIn(tree.id);
+  left.innerHTML = `<h2>Skills</h2><div class="farm-choice">${D.TREES.map((t) => `<button class="tiny-button ${t.id === tree.id ? 'active' : ''}" data-tree="${t.id}">${t.name.toUpperCase()} ${sk.spentIn(t.id) || ''}</button>`).join('')}</div><p class="lede">${tree.text}. ${spent} point${spent === 1 ? '' : 's'} spent here.</p>${[
+    1, 2, 3, 4, 5,
+  ]
+    .map((row) => {
+      const open = spent >= D.ROW_POINTS[row];
+      return `<h3>${row === 5 ? 'Keystones' : 'Row ' + row}${open ? '' : ` · opens at ${D.ROW_POINTS[row]} points`}</h3><div class="skill-row">${D.SKILLS.filter(
+        (n) => n.tree === tree.id && n.row === row,
+      )
+        .map((n) => {
+          const has = sk.has(n.id),
+            why = sk.blocked(n.id);
+          return `<button class="skill ${has ? 'learned' : !why ? 'ready' : ''} ${n.keystone ? 'key' : ''}" data-learn="${n.id}" title="${n.name}: ${n.text}${n.cost > 1 ? ' (' + n.cost + ' points)' : ''}${why && !has ? ' · ' + why : ''}"><strong>${n.name}</strong><small>${n.text}</small></button>`;
+        })
+        .join('')}</div>`;
+    })
+    .join('')}<div class="book-actions"><button class="quiet" data-gear>‹ GEAR</button></div>`;
+  const [into, need] = sk.progress();
+  right.innerHTML = `<h2>Renown ${sk.level()}</h2><p class="lede">Everything you do earns renown: slaying, making, finding, clearing realms. Each level is a skill point. Renown never fades.</p><div class="vital-row"><span>Next level</span><span class="mini-track"><i style="width:${clamp((into / need) * 100, 0, 100)}%"></i></span><b>${Math.round(into)}/${need}</b></div><p><strong>${sk.points()}</strong> point${sk.points() === 1 ? '' : 's'} to spend · relic shelf holds <strong>${sk.shelfSlots()}</strong></p><h3>Weapon mastery</h3><div class="book-list">${D.FAMILIES.map(
+    (f) => {
+      const lvl = sk.mastery(f.id);
+      return `<div class="book-row"><div><strong>${f.name}</strong><small>${D.masteryTitle(lvl)}</small></div><span class="qty">${lvl} / ${D.MAX_MASTERY}</span></div>`;
+    },
+  ).join(
+    '',
+  )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10%.</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL · 3 FALLEN STARS, 200 MARKS</button></div>`;
+  left.querySelectorAll<HTMLButtonElement>('[data-tree]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.skillTree = b.dataset.tree ?? 'warfare';
+        renderJournal();
+      }),
+  );
+  const act = (r: { ok: boolean; reason?: string }) => {
+    if (!r.ok) message(r.reason);
+    renderJournal();
+    updateUI(true);
+  };
+  left
+    .querySelectorAll<HTMLButtonElement>('[data-learn]')
+    .forEach((b) => (b.onclick = () => act(sk.learn(b.dataset.learn ?? ''))));
+  left.querySelector<HTMLButtonElement>('[data-gear]')!.onclick = () => {
+    state.gearView = 'gear';
+    renderJournal();
+  };
+  right.querySelector<HTMLButtonElement>('[data-respec]')!.onclick = () => act(sk.respec());
+}
+function renderCodex(left: HTMLElement, right: HTMLElement) {
+  const sk = game.skills,
+    done = D.CODEX.filter((p) => sk.pageDone(p)).length;
+  left.innerHTML = `<h2>The Codex</h2><p class="lede">What the expedition has learned. ${done} of ${D.CODEX.length} pages complete; each grants a lasting gift.</p>${(
+    ['Creatures', 'Places', 'Lore'] as const
+  )
+    .map(
+      (group) =>
+        `<h3>${group}</h3><div class="book-list">${D.CODEX.filter((p) => p.group === group)
+          .map((p) => {
+            const [a, b] = sk.page(p);
+            return `<div class="book-row ${state.codexPage === p.id ? 'selected' : ''}"><div><strong>${p.name}</strong><small>${a >= b ? '✓ ' : ''}${p.bonusText}</small></div><div><span class="qty">${a}/${b}</span><button data-page="${p.id}">READ</button></div></div>`;
+          })
+          .join('')}</div>`,
+    )
+    .join('')}<div class="book-actions"><button class="quiet" data-beasts>‹ BEASTS</button></div>`;
+  const p = D.CODEX.find((x) => x.id === state.codexPage) ?? D.CODEX[0],
+    tally = game.s.tutorial.tally,
+    [a, b] = sk.page(p);
+  const entry = (e: string) => {
+    const found = (tally[p.prefix + e] ?? 0) > 0,
+      mob = p.prefix === 'kill:' && D.MOBS[e],
+      name = mob
+        ? D.MOBS[e].name
+        : (D.BIOMES.find((x) => x.id === e)?.name ??
+          D.DUNGEONS.find((d) => d.def.id === e)?.def.name ??
+          D.realmById(e)?.name ??
+          (D.ITEMS[e] ? pretty(e) : e[0].toUpperCase() + e.slice(1)));
+    const pic = mob
+      ? `<span class="icon-slot portrait"><img src="${found ? mobPortrait(e) : ''}" alt="" ${found ? '' : 'hidden'}></span>`
+      : D.ITEMS[e]
+        ? icon(e)
+        : '<span class="icon-slot"></span>';
+    return `<div class="book-row"><div class="with-icon">${pic}<div><strong>${found ? name : '???'}</strong><small>${found ? 'Recorded' : 'Not yet'}</small></div></div></div>`;
+  };
+  const counted = p.count
+    ? Object.keys(tally)
+        .filter((k) => k.startsWith(p.prefix) && tally[k] > 0)
+        .map((k) => k.slice(p.prefix.length))
+    : [];
+  right.innerHTML = `<h2>${p.name}</h2><p class="lede">${a} of ${b} · ${a >= b ? 'complete: ' : 'when complete: '}${p.bonusText}.</p><div class="book-list">${
+    p.count
+      ? counted.map(entry).join('') + (a < b ? `<p class="muted">${b - a} more to find.</p>` : '')
+      : p.entries.map(entry).join('')
+  }</div>`;
+  left.querySelectorAll<HTMLButtonElement>('[data-page]').forEach(
+    (btn) =>
+      (btn.onclick = () => {
+        state.codexPage = btn.dataset.page ?? 'wilds';
+        renderJournal();
+      }),
+  );
+  left.querySelector<HTMLButtonElement>('[data-beasts]')!.onclick = () => {
+    state.beastsView = 'beasts';
+    renderJournal();
+  };
 }
 function renderArmoury(left: HTMLElement, right: HTMLElement) {
   const arm = game.armoury,
@@ -1304,6 +1473,11 @@ function updateUI(force = false) {
   $('mana-bar').style.width = clamp((game.s.mana / maxMana) * 100, 0, 100) + '%';
   $('mana-value').textContent = String(Math.round(game.s.mana));
   $('defense-value').textContent = String(game.equipment.defense());
+  const [into, need] = game.skills.progress();
+  $('renown-value').textContent = String(game.skills.level());
+  $('renown-points').textContent =
+    game.skills.points() > 0 ? `· ${game.skills.points()} TO SPEND` : '';
+  $('renown-bar').style.width = clamp((into / need) * 100, 0, 100) + '%';
   $('buffs').innerHTML = Object.entries(game.s.buffs)
     .map(
       ([id, left]) =>

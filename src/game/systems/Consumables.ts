@@ -61,25 +61,27 @@ export class Consumables extends System {
       v.protein = clamp(v.protein + pro * worth, 0, RULES.maxVital);
       v.vitamins = clamp(v.vitamins + vit * worth, 0, RULES.maxVital);
       v.morale = clamp(v.morale + (worth < 0.5 ? -7 : MEAL_BUFFS[id] ? 8 : 3), 0, RULES.maxVital);
-      if (state === 'rotten' && chance(0.72)) ail.contract(chance(0.5) ? 'dysentery' : 'fever');
-      if (state === 'spoiled' && chance(0.35)) ail.contract('food_poisoning');
+      if (state === 'rotten' && chance(0.72))
+        ail.contract(chance(0.5) ? 'dysentery' : 'fever', false, 'food');
+      if (state === 'spoiled' && chance(0.35)) ail.contract('food_poisoning', false, 'spoiled');
       if (RAW.has(id)) {
-        if (chance(0.48)) ail.contract('fever');
-        if (chance(0.12)) ail.contract('tapeworm');
+        if (chance(0.48)) ail.contract('fever', false, 'food');
+        if (chance(0.12)) ail.contract('tapeworm', false, 'food');
       }
+      this.game.progress.record('eat:' + id);
       const buff = MEAL_BUFFS[id];
       if (buff && worth >= 0.65) {
-        this.game.equipment.addBuff(buff[0], buff[1]);
+        this.game.equipment.addBuff(buff[0], buff[1] * (1 + this.game.skills.get('meals')));
         this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, 'good');
       }
     } else if (ITEMS[id]?.[1] === 'water') {
       v.hydration = clamp(v.hydration + (state === 'rotten' ? 15 : 27), 0, RULES.maxVital);
-      if (id === 'wild_water' && chance(0.38)) ail.contract('dysentery');
+      if (id === 'wild_water' && chance(0.38)) ail.contract('dysentery', false, 'water');
       if (id === 'brackish_water') {
-        if (chance(0.45)) ail.contract('cholera');
-        if (chance(0.3)) ail.contract('dysentery');
+        if (chance(0.45)) ail.contract('cholera', false, 'water');
+        if (chance(0.3)) ail.contract('dysentery', false, 'water');
       }
-      if (state === 'rotten' && chance(0.6)) ail.contract('dysentery');
+      if (state === 'rotten' && chance(0.6)) ail.contract('dysentery', false, 'water');
       if (id === 'boiled_water' && state !== 'rotten')
         this.game.progress.record('drink:boiled_water');
       ail.treat(id);
