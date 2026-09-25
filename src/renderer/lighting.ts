@@ -67,6 +67,9 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
     else if (n.kind.includes('starmetal')) out.push([n.x, n.y - 12, 0.95, 0.85, 0.45]);
     else if (n.kind.includes('voidsteel')) out.push([n.x, n.y - 12, 0.6, 0.3, 0.95]);
     else if (n.kind === 'burrow_amber') out.push([n.x, n.y - 12, 0.8, 0.5, 0.15]);
+    else if (n.kind === 'prism_glass') out.push([n.x, n.y - 12, 0.4, 0.7, 0.95]);
+    else if (n.kind === 'saltglass') out.push([n.x, n.y - 12, 0.8, 0.5, 0.55]);
+    else if (n.kind === 'lumen_moss') out.push([n.x, n.y - 8, 0.6, 0.65, 0.3]);
   }
   for (const a of g.s.animals) {
     if (a.deadUntil) continue;

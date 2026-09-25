@@ -138,6 +138,7 @@
     dungeonAt: () => dungeonAt,
     familyById: () => familyById,
     flatten: () => flatten,
+    hymnAt: () => hymnAt,
     inPocket: () => inPocket,
     inShaft: () => inShaft,
     infusionById: () => infusionById,
@@ -179,6 +180,7 @@
     underworldCeiling: () => underworldCeiling,
     underworldFloor: () => underworldFloor,
     upgradeCost: () => upgradeCost,
+    ventActive: () => ventActive,
     walkable: () => walkable,
     weighted: () => weighted
   });
@@ -608,6 +610,38 @@
       cures: { void_salve: 3 },
       symptoms: ["A cold, grey patch", "The grey spreads and forgets itself", "Coming unmade"]
     },
+    glass_cough: {
+      name: "Glass cough",
+      cause: "Breathing the crystal dust of the Glasswood",
+      treat: "Lumen tincture",
+      item: "lumen_tincture",
+      kind: "illness",
+      incubate: 40,
+      worsen: 220,
+      effect: { stamina: 0.6, hp: 0.02 },
+      cures: { lumen_tincture: 3, lungwort_tea: 1 },
+      immunity: 900,
+      chain: ["pneumonia", 2e-3],
+      symptoms: ["A glittering cough", "Each breath scrapes", "Coughing blood and glass"]
+    },
+    marrow_rot: {
+      name: "Marrow rot",
+      cause: "The poisoned mire and the bites of the Bone Marches",
+      treat: "Marrow purge",
+      item: "marrow_purge",
+      kind: "infection",
+      incubate: 50,
+      worsen: 260,
+      effect: { hp: 0.04, regen: 0.5, speed: 0.12 },
+      cures: { marrow_purge: 3, antibiotic: 1 },
+      lateCure: 3,
+      immunity: 900,
+      symptoms: [
+        "An ache deep in the bones",
+        "Your joints grind and swell",
+        "The rot eats you from within"
+      ]
+    },
     // ── Injuries ──
     bleeding: {
       name: "Bleeding",
@@ -924,6 +958,16 @@
     bone_bow: ["bow", 6],
     storm_bow: ["bow", 9],
     amber_repeater: ["crossbow", 4],
+    prism_wand: ["staff", 6],
+    shard_glaive: ["spear", 6],
+    bonecleaver: ["battleaxe", 7],
+    vertebra_whip: ["whip", 6],
+    brass_repeater: ["crossbow", 8],
+    piston_hammer: ["warhammer", 8],
+    mirage_blade: ["blade", 8],
+    saltglass_bow: ["bow", 8],
+    choir_stave: ["staff", 9],
+    bellhammer: ["warhammer", 9],
     ruby_staff: ["staff", 3],
     emerald_staff: ["staff", 3],
     sapphire_staff: ["staff", 4],
@@ -1206,7 +1250,16 @@
     "drowned",
     "void_wisp",
     "watcher",
-    "unmaker"
+    "unmaker",
+    "bone_hound",
+    "ossuary_knight",
+    "marsh_ghoul",
+    "bone_colossus",
+    "ossuary_hydra",
+    "salt_wraith",
+    "choir_wraith",
+    "cantor",
+    "grand_cantor"
   ]);
   var GEMS = {
     ruby: { name: "Ruby", text: "+8% damage", mods: { dmg: 0.08 } },
@@ -1292,6 +1345,56 @@
       tier: 5,
       bonus: "tremor",
       bonusText: "Sense cave-ins; falling rock does half damage; +2 defense"
+    },
+    {
+      key: "prismweave",
+      name: "Prismweave",
+      bar: "prism_glass",
+      defense: [5, 7, 5],
+      station: "forge",
+      tier: 6,
+      bonus: "shardward",
+      bonusText: "Shardfall glances off you; magic +10%"
+    },
+    {
+      key: "bonewalker",
+      name: "Bonewalker",
+      bar: "marrow_ingot",
+      defense: [6, 8, 6],
+      station: "forge",
+      tier: 6,
+      bonus: "mirewalk",
+      bonusText: "Mire neither slows nor sickens you; +3 defense"
+    },
+    {
+      key: "gearwright",
+      name: "Gearwright",
+      bar: "brass_ingot",
+      defense: [7, 10, 7],
+      station: "starforge",
+      tier: 8,
+      bonus: "trapsense",
+      bonusText: "Steam vents cannot scald you; ranged +10%"
+    },
+    {
+      key: "saltwarden",
+      name: "Saltwarden",
+      bar: "saltglass",
+      defense: [6, 9, 6],
+      station: "starforge",
+      tier: 8,
+      bonus: "shade",
+      bonusText: "The white sun cannot parch you; mirages show themselves; +10% speed"
+    },
+    {
+      key: "choirsilver",
+      name: "Choirsilver",
+      bar: "rime_silver",
+      defense: [8, 11, 8],
+      station: "starforge",
+      tier: 9,
+      bonus: "hymnward",
+      bonusText: "The hymn cannot slow or chill you; shrug off 6\xB0 of cold"
     },
     // ── Archetypes, in three bands ──
     {
@@ -1573,6 +1676,26 @@
       spread: 0.12
     },
     ember_sling: { kind: "magic", projectile: "kiln_ember", delay: 0.5, speed: 520, mana: 6 },
+    prism_wand: {
+      kind: "magic",
+      projectile: "prism_bolt",
+      delay: 0.45,
+      speed: 640,
+      mana: 9,
+      count: 3,
+      spread: 0.12
+    },
+    brass_repeater: { kind: "bow", projectile: "bolt", delay: 0.42, speed: 1e3 },
+    saltglass_bow: { kind: "bow", projectile: "arrow", delay: 0.5, speed: 1e3 },
+    choir_stave: {
+      kind: "magic",
+      projectile: "choir_note",
+      delay: 0.4,
+      speed: 560,
+      mana: 10,
+      count: 2,
+      spread: 0.2
+    },
     amber_repeater: { kind: "bow", projectile: "arrow", delay: 0.26, speed: 900 },
     sapphire_staff: { kind: "magic", projectile: "sapphire_bolt", delay: 0.4, speed: 680, mana: 6 },
     emerald_staff: {
@@ -1619,6 +1742,15 @@
     falling_rock: { color: "#8a6a44", life: 3, size: 14, gravity: 900 },
     amber_glob: { color: "#e8a030", glow: "#ffd070", life: 2.4, size: 10, gravity: 260 },
     ash_burst: { color: "#9a8a7a", glow: "#c8a080", life: 1.4, size: 16, drag: 1.2 },
+    prism_bolt: { color: "#e0f0ff", glow: "#9ad8ff", life: 1.2, size: 8, pierce: 2 },
+    lumen_orb: { color: "#fff8c0", glow: "#ffe070", life: 2.6, size: 11, homing: 2 },
+    glass_shard: { color: "#cfefff", glow: "#9ad8ff", life: 2.4, size: 9, gravity: 700 },
+    mire_glob: { color: "#6a7a4a", glow: "#8a9a5a", life: 2.4, size: 12, gravity: 300 },
+    steam_puff: { color: "#e8e8e8", glow: "#ffffff", life: 1.6, size: 16, drag: 1.4 },
+    salt_spray: { color: "#f4f0e8", glow: "#ffffff", life: 1.4, size: 8 },
+    heat_bolt: { color: "#ffb060", glow: "#fff0a0", life: 2.2, size: 11, homing: 1.6, fire: true },
+    hymn_note: { color: "#bfe0ff", glow: "#e8f4ff", life: 2.4, size: 10, homing: 1.2 },
+    choir_note: { color: "#dff0ff", glow: "#9ad0ff", life: 1.6, size: 9, homing: 3 },
     // Monster attacks.
     dart: { color: "#8a9058", life: 2.2, size: 7 },
     fireball: { color: "#ff6a2a", glow: "#ffb347", life: 2.6, size: 12, fire: true },
@@ -1657,7 +1789,17 @@
     ash_soil: 31,
     kilnrock: 32,
     warren_earth: 33,
-    amberstone: 34
+    amberstone: 34,
+    glassloam: 36,
+    prismrock: 37,
+    marrow_mud: 38,
+    bonerock: 39,
+    brass_plate: 40,
+    gearstone: 41,
+    saltcrust: 42,
+    saltglass_rock: 43,
+    rimesnow: 44,
+    choirstone: 45
   };
   var BUFFS = {
     swiftness: { name: "Swiftness", text: "+25% speed", color: "#8ad0f0" },
@@ -1710,6 +1852,17 @@
     tide_conch: { effects: ["swim", "defense2"], text: "Swim with the tide; +2 defense" },
     kiln_heart: { effects: ["ashward", "fire"], text: "Ash storms pass you by; strikes may ignite" },
     queens_mandible: { effects: ["tremor", "damage10"], text: "Sense cave-ins; +10% damage" },
+    lumen_antler: {
+      effects: ["light", "shardward"],
+      text: "Light around you; shardfall glances off"
+    },
+    hydra_tooth: {
+      effects: ["mirewalk", "regen"],
+      text: "Walk the mire unharmed; regenerate health"
+    },
+    saint_cog: { effects: ["trapsense", "speed20"], text: "Steam cannot scald you; +20% speed" },
+    tyrant_eye: { effects: ["shade", "damage10"], text: "The sun cannot parch you; +10% damage" },
+    hymnal_bell: { effects: ["hymnward", "mana40"], text: "The hymn cannot hold you; +40 mana" },
     miners_lamp: { effects: ["light"], text: "Light around you" },
     magma_stone: { effects: ["lava"], text: "Resist lava and heat" },
     watcher_eye: { effects: ["damage10", "light"], text: "+10% damage; see in the dark" },
@@ -1756,7 +1909,17 @@
     31: "dirt_wall",
     32: "stone_wall",
     33: "dirt_wall",
-    34: "stone_wall"
+    34: "stone_wall",
+    36: "dirt_wall",
+    37: "stone_wall",
+    38: "dirt_wall",
+    39: "stone_wall",
+    40: "stone_wall",
+    41: "stone_wall",
+    42: "sandstone_wall",
+    43: "stone_wall",
+    44: "stone_wall",
+    45: "stone_wall"
   });
   Object.assign(WALL_ITEM, {
     3: "sandstone_wall",
@@ -1878,7 +2041,9 @@
         ["magma_stone", 350],
         ["orchard_fragment", 45],
         ["steppe_fragment", 45],
-        ["warren_fragment", 45]
+        ["warren_fragment", 45],
+        ["glasswood_fragment", 90],
+        ["marches_fragment", 90]
       ],
       lines: [
         "A hook, a rope, a little nerve. Walls are only suggestions.",
@@ -2029,6 +2194,27 @@
     mother_heart: 250,
     kiln_core: 250,
     queen_jelly: 250,
+    prism_glass: 22,
+    lumen_moss: 8,
+    marrow_iron_ore: 20,
+    marrow_ingot: 70,
+    brass_gear: 26,
+    brass_ingot: 90,
+    saltglass: 28,
+    rime_silver_ore: 30,
+    rime_silver: 100,
+    frost_lily: 10,
+    bell_bronze: 40,
+    glasswood_fragment: 80,
+    marches_fragment: 80,
+    barrow_fragment: 120,
+    saltflats_fragment: 120,
+    choir_fragment: 120,
+    stag_heart: 400,
+    hydra_heart: 400,
+    engine_heart: 600,
+    mirage_crown: 600,
+    hymnal_core: 600,
     coin: 1
   };
 
@@ -2348,6 +2534,66 @@
     amber_pick: ["Amber pickaxe", "tool"],
     queens_mandible: ["Queen's mandible", "accessory"],
     queen_jelly: ["Royal jelly", "trophy"],
+    // ── Band II and III realms ──
+    glasswood_fragment: ["Glasswood key fragment", "key"],
+    marches_fragment: ["Marches key fragment", "key"],
+    barrow_fragment: ["Barrow key fragment", "key"],
+    saltflats_fragment: ["Salt Flats key fragment", "key"],
+    choir_fragment: ["Choir key fragment", "key"],
+    glasswood_key: ["Glasswood key", "key"],
+    marches_key: ["Bone Marches key", "key"],
+    barrow_key: ["Clockwork Barrow key", "key"],
+    saltflats_key: ["Salt Flats key", "key"],
+    choir_key: ["Frozen Choir key", "key"],
+    steam_vent: ["Steam vent", "structure"],
+    // The Glasswood.
+    prism_glass: ["Prism glass", "ore"],
+    lumen_moss: ["Lumen moss", "material"],
+    glassloam: ["Glassloam", "block"],
+    prismrock: ["Prismrock", "block"],
+    prism_wand: ["Prism wand", "weapon"],
+    shard_glaive: ["Shard glaive", "weapon"],
+    lumen_antler: ["Lumen antler", "accessory"],
+    stag_heart: ["Heart of the Lumen Stag", "trophy"],
+    lumen_tincture: ["Lumen tincture", "medicine", 6e3],
+    // The Bone Marches.
+    marrow_iron_ore: ["Marrow-iron ore", "ore"],
+    marrow_ingot: ["Marrow-iron ingot", "metal"],
+    marrow_mud: ["Marrow mud", "block"],
+    bonerock: ["Bonerock", "block"],
+    bonecleaver: ["Bonecleaver", "weapon"],
+    vertebra_whip: ["Vertebra whip", "weapon"],
+    hydra_tooth: ["Hydra tooth", "accessory"],
+    hydra_heart: ["Heart of the Hydra", "trophy"],
+    marrow_purge: ["Marrow purge", "medicine", 6e3],
+    // The Clockwork Barrow.
+    brass_gear: ["Brass gear", "ore"],
+    brass_ingot: ["Brass ingot", "metal"],
+    brass_plate: ["Brass plate", "block"],
+    gearstone: ["Gearstone", "block"],
+    brass_repeater: ["Brass repeater", "weapon"],
+    piston_hammer: ["Piston hammer", "weapon"],
+    saint_cog: ["Saint's cog", "accessory"],
+    engine_heart: ["Engine heart", "trophy"],
+    // The Salt Flats of Oru.
+    saltglass: ["Saltglass", "ore"],
+    saltcrust: ["Saltcrust", "block"],
+    saltglass_rock: ["Saltglass rock", "block"],
+    mirage_blade: ["Mirage blade", "weapon"],
+    saltglass_bow: ["Saltglass bow", "weapon"],
+    tyrant_eye: ["Tyrant's eye", "accessory"],
+    mirage_crown: ["Mirage crown", "trophy"],
+    // The Frozen Choir.
+    rime_silver_ore: ["Rime-silver ore", "ore"],
+    rime_silver: ["Rime silver", "metal"],
+    frost_lily: ["Frost lily", "food", 3600],
+    bell_bronze: ["Bell bronze", "material"],
+    rimesnow: ["Rimesnow", "block"],
+    choirstone: ["Choirstone", "block"],
+    choir_stave: ["Choir stave", "weapon"],
+    bellhammer: ["Bellhammer", "weapon"],
+    hymnal_bell: ["Hymnal bell", "accessory"],
+    hymnal_core: ["Core of the Hymnal", "trophy"],
     // ── Getting about ──
     bucket: ["Bucket", "tool"],
     water_bucket: ["Water bucket", "tool"],
@@ -2619,6 +2865,17 @@
     ["orchard_key", { orchard_fragment: 3 }, "waystone", 3],
     ["steppe_key", { steppe_fragment: 3 }, "waystone", 3],
     ["warren_key", { warren_fragment: 3 }, "waystone", 3],
+    // Band II keys are made from Band I spoils; Band III keys from Band II.
+    ["glasswood_fragment", { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, "workbench", 5],
+    ["marches_fragment", { bone: 10, kiln_ingot: 2, crab_shell: 3 }, "workbench", 5],
+    ["barrow_fragment", { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, "forge", 7],
+    ["saltflats_fragment", { salt: 10, prism_glass: 3, marrow_ingot: 2 }, "forge", 7],
+    ["choir_fragment", { frost_shard: 4, marrow_ingot: 2, prism_glass: 3 }, "forge", 7],
+    ["glasswood_key", { glasswood_fragment: 3 }, "waystone", 5],
+    ["marches_key", { marches_fragment: 3 }, "waystone", 5],
+    ["barrow_key", { barrow_fragment: 3 }, "waystone", 7],
+    ["saltflats_key", { saltflats_fragment: 3 }, "waystone", 7],
+    ["choir_key", { choir_fragment: 3 }, "waystone", 7],
     // The Drowned Orchard.
     ["tidecaller_spear", { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, "workbench", 4],
     ["brine_wand", { brinewood: 6, tide_pearl: 4, crystal: 2 }, "workbench", 4],
@@ -2631,6 +2888,26 @@
     // The Hollow Warren.
     ["amber_repeater", { burrow_amber: 10, wood: 6, silk: 4 }, "workbench", 4],
     ["amber_pick", { burrow_amber: 12, gold_ingot: 2, wood: 3 }, "workbench", 4],
+    // The Glasswood.
+    ["prism_wand", { prism_glass: 10, crystal: 4, wood: 3 }, "forge", 6],
+    ["shard_glaive", { prism_glass: 8, hellstone_ingot: 3, wood: 3 }, "forge", 6],
+    ["lumen_tincture", { lumen_moss: 3, boiled_water: 1 }, "apothecary", 5],
+    // The Bone Marches.
+    ["marrow_ingot", { marrow_iron_ore: 3, coal: 1 }, "furnace", 5],
+    ["bonecleaver", { marrow_ingot: 9, bone: 6, hide: 2 }, "forge", 6],
+    ["vertebra_whip", { bone: 14, marrow_ingot: 4, silk: 3 }, "forge", 6],
+    ["marrow_purge", { herb: 3, antibiotic: 1, grave_dust: 1 }, "apothecary", 5],
+    // The Clockwork Barrow.
+    ["brass_ingot", { brass_gear: 3, copper_ingot: 1 }, "furnace", 7],
+    ["brass_repeater", { brass_ingot: 10, wood: 4, silk: 4 }, "starforge", 8],
+    ["piston_hammer", { brass_ingot: 12, gold_ingot: 3, coal: 6 }, "starforge", 8],
+    // The Salt Flats of Oru.
+    ["mirage_blade", { saltglass: 12, gold_ingot: 3, ruby: 1 }, "starforge", 8],
+    ["saltglass_bow", { saltglass: 10, wood: 4, silk: 4 }, "starforge", 8],
+    // The Frozen Choir.
+    ["rime_silver", { rime_silver_ore: 3, coal: 1 }, "furnace", 7],
+    ["choir_stave", { rime_silver: 10, frost_lily: 4, crystal: 4 }, "starforge", 9],
+    ["bellhammer", { rime_silver: 12, bell_bronze: 4, wood: 3 }, "starforge", 9],
     // ── Armour ──
     ...ARMOR_RECIPES,
     // ── The weapon hierarchy, and infusions ──
@@ -2685,6 +2962,13 @@
     cinderflax: { yield: [2, 3], hp: 2, regen: 200 },
     kilnstone_ore: { yield: [2, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
     burrow_amber: { yield: [1, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
+    prism_glass: { yield: [2, 3], tool: "pick", req: 5, hp: 5, regen: 0 },
+    lumen_moss: { yield: [1, 3], hp: 2, regen: 220 },
+    marrow_iron_ore: { yield: [2, 3], tool: "pick", req: 5, hp: 5, regen: 0 },
+    brass_gear: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
+    saltglass: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
+    rime_silver_ore: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
+    frost_lily: { yield: [1, 2], hp: 2, regen: 240 },
     topaz: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     onyx: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     opal: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
@@ -2758,6 +3042,16 @@
     ember_sling: [4, 30, 0],
     amber_repeater: [4, 22, 0],
     amber_pick: [5, 20, 44],
+    prism_wand: [6, 52, 0],
+    shard_glaive: [6, 76, 100],
+    bonecleaver: [7, 112, 64],
+    vertebra_whip: [6, 50, 128],
+    brass_repeater: [8, 118, 0],
+    piston_hammer: [8, 158, 60],
+    mirage_blade: [8, 130, 66],
+    saltglass_bow: [8, 72, 0],
+    choir_stave: [9, 96, 0],
+    bellhammer: [9, 190, 60],
     sapphire_staff: [4, 30, 0],
     emerald_staff: [4, 22, 0],
     frostbrand: [6, 84, 72],
@@ -3315,13 +3609,479 @@
     return list[list.length - 1][0];
   }
 
+  // src/data/realms/barrow.ts
+  var BRASS_PLATE = 40;
+  var GEARSTONE = 41;
+  var VENT_CYCLE = 5;
+  var VENT_BLAST = 1.3;
+  var ventActive = (x, t) => (t + Math.floor(x / 97) % 7 * 0.71) % VENT_CYCLE < VENT_BLAST;
+  function build(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 950;
+    const terrace = (base, k) => {
+      const step = 320;
+      return (x) => {
+        const i = Math.floor(x / step);
+        return base + Math.round(noise1(i * 1.37, s(k)) * 3) * 32;
+      };
+    };
+    const upper = terrace(1150, 1), main = terrace(1700, 2), lower = terrace(2250, 3);
+    const HEIGHT = [170, 230, 170];
+    const hall = { x0: RW - 1750, x1: RW - 260, top: 1380 };
+    const ladderXs = Array.from({ length: 9 }, (_, i) => Math.round(760 + i * ((RW - 1600) / 9)));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const floors = [upper(x), main(x), lower(x)];
+      let open = floors.some((f, i) => y < f && y > f - HEIGHT[i]);
+      if (!open && x > hall.x0 && x < hall.x1 && y > hall.top && y < main(x)) open = true;
+      if (!open) {
+        for (const lx of ladderXs)
+          if (Math.abs(x - lx) < 44 && y > upper(lx) - 60 && y < lower(lx)) open = true;
+      }
+      if (!open && x > arrive - 300 && x < arrive + 300 && y > main(x) - 300 && y < main(x))
+        open = true;
+      if (open) return 0;
+      const near = floors.some((f, i) => Math.abs(y - f) < 36 || Math.abs(y - (f - HEIGHT[i])) < 36);
+      if (near) return BRASS_PLATE;
+      return fbm2(x / 200, y / 140, s(4)) > 0.55 ? BRASS_PLATE : GEARSTONE;
+    };
+    return {
+      tile,
+      surface: () => 0,
+      floors: [main, upper, lower],
+      ladders: ladderXs.map((x) => ({ x, top: upper(x) - 4, bottom: lower(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: main
+    };
+  }
+  var BARROW = {
+    id: "barrow",
+    name: "Clockwork Barrow",
+    band: 3,
+    note: "A tomb built as a machine. Brass halls step down in terraces; steam vents scald the careless, and the dead still keep time.",
+    sky: "cavern",
+    temp: 22,
+    ambient: [0.14, 0.1, 0.05],
+    daylight: 0,
+    wall: GEARSTONE,
+    hazard: {
+      id: "traps",
+      name: "Steam vents",
+      text: "Vents in the floor blast scalding steam every few seconds. Watch their rhythm and cross between blasts.",
+      ward: "trapsense"
+    },
+    fragment: "barrow_fragment",
+    key: "barrow_key",
+    material: "brass_gear",
+    relic: "saint_cog",
+    boss: "engine_saint",
+    elite: "brass_juggernaut",
+    music: "barrow",
+    ores: ["brass_gear", "gold_ore", "silver_ore"],
+    nodes: [
+      ["brass_gear", 6],
+      ["coal", 3],
+      ["gold_ore", 2],
+      ["silver_ore", 2],
+      ["stone", 2],
+      ["topaz", 1],
+      ["crystal", 1]
+    ],
+    nodeCount: 70,
+    mobs: [
+      { type: "cog_spider", weight: 4 },
+      { type: "tin_soldier", weight: 3 },
+      { type: "brass_sentry", weight: 2 },
+      { type: "clockwork_hound", weight: 3 },
+      { type: "gear_wisp", weight: 2, air: true }
+    ],
+    mobCount: 40,
+    chests: 5,
+    chestLoot: [
+      ["barrow_fragment", 1, 2, 0.6],
+      ["saltflats_fragment", 1, 1, 0.3],
+      ["brass_ingot", 3, 5, 0.8],
+      ["healing_draught", 2, 4, 1],
+      ["gold_ingot", 3, 6, 0.5],
+      ["topaz", 1, 3, 0.5],
+      ["life_fruit", 1, 1, 0.15]
+    ],
+    biome: {
+      id: "barrow",
+      name: "Clockwork Barrow",
+      x: 10,
+      y: 0,
+      color: "#8a6a3a",
+      shade: "#d8b070",
+      temp: 22,
+      note: "A tomb built as a machine.",
+      resources: ["brass_gear", "coal", "gold_ore"]
+    },
+    build,
+    extra(geo, ctx2) {
+      for (let lx = 900; lx < RW - 400; lx += 260 + Math.floor(ctx2.rng() * 200)) {
+        if (Math.abs(lx - geo.arena) < 700) continue;
+        const f = geo.floors[Math.floor(ctx2.rng() * geo.floors.length)];
+        const x = ctx2.x0 + lx;
+        ctx2.furnish("steam_vent", x, ctx2.floorAt(x, f(lx) - 30));
+      }
+    }
+  };
+
+  // src/data/realms/choir.ts
+  var RIMESNOW = 44;
+  var CHOIRSTONE = 45;
+  function hymnAt(t, seed = 0) {
+    const cycle = 90, phase = (t + seed % 83) % cycle;
+    return phase > cycle - 18 ? Math.min(1, (phase - (cycle - 18)) / 4, (cycle - phase) / 4) : 0;
+  }
+  function build2(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1050;
+    let ground = walkable((x) => {
+      const peaks = fbm1(x / 1100, s(1), 3) * 320;
+      return 1450 - peaks + 30 * noise1(x / 180, s(2));
+    }, 16);
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 520, arena + 520);
+    const floor = walkable(ground);
+    const arenaY = floor(arena);
+    const cave2 = walkable((x) => 2050 + 120 * fbm1(x / 1200, s(3)) + 24 * Math.sin(x / 200));
+    const ladderXs = [0.15, 0.38, 0.6, 0.8].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      const ax = x - arena;
+      if (Math.abs(ax) < 480 && y < g) {
+        const roof = arenaY - 360 - 60 * Math.cos(ax / 480 * Math.PI * 0.5);
+        if (y > roof - 40 && y < roof) return CHOIRSTONE;
+        if (y > roof && y < roof + 150 && Math.abs(ax) % 240 < 28 && Math.abs(ax) > 100)
+          return CHOIRSTONE;
+        return 0;
+      }
+      if (y < g) return 0;
+      const c = cave2(x);
+      if (y > c - 120 - 20 * Math.sin(x / 110) && y < c && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < c) return 0;
+      if (y < g + 60) return RIMESNOW;
+      return fbm2(x / 180, y / 140, s(4)) > 0.5 ? RIMESNOW : CHOIRSTONE;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, cave2],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: cave2(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var CHOIR = {
+    id: "choir",
+    name: "Frozen Choir",
+    band: 3,
+    note: "A cathedral lost to the ice. Food never spoils here, but you freeze; when the choir sings, the cold bites deeper and holds you back.",
+    sky: "open",
+    temp: -22,
+    ambient: [0.1, 0.12, 0.16],
+    daylight: 0.8,
+    wall: CHOIRSTONE,
+    hazard: {
+      id: "hymn",
+      name: "The hymn",
+      text: "Every minute and a half the choir sings. While it sings you move slowly and the cold deepens, unless you stand by a fire.",
+      ward: "hymnward"
+    },
+    fragment: "choir_fragment",
+    key: "choir_key",
+    material: "rime_silver_ore",
+    relic: "hymnal_bell",
+    boss: "the_hymnal",
+    elite: "grand_cantor",
+    music: "choir",
+    ores: ["rime_silver_ore", "silver_ore", "sapphire"],
+    nodes: [
+      ["rime_silver_ore", 5],
+      ["ice", 4],
+      ["frost_lily", 3],
+      ["wood", 2],
+      ["silver_ore", 2],
+      ["sapphire", 1],
+      ["crystal", 2]
+    ],
+    nodeCount: 68,
+    mobs: [
+      { type: "rime_wolf", weight: 4 },
+      { type: "bell_golem", weight: 2 },
+      { type: "cantor", weight: 3 },
+      { type: "choir_wraith", weight: 3, air: true },
+      { type: "frost_moth", weight: 2, air: true }
+    ],
+    mobCount: 38,
+    chests: 5,
+    chestLoot: [
+      ["choir_fragment", 1, 2, 0.6],
+      ["barrow_fragment", 1, 1, 0.3],
+      ["rime_silver", 3, 5, 0.8],
+      ["frost_shard", 3, 6, 0.8],
+      ["healing_draught", 2, 4, 1],
+      ["starmetal_ingot", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "choir",
+      name: "Frozen Choir",
+      x: 12,
+      y: 0,
+      color: "#a8c0d8",
+      shade: "#e8f4ff",
+      temp: -22,
+      note: "A mountain cathedral lost to the ice.",
+      resources: ["rime_silver_ore", "ice", "frost_lily"]
+    },
+    build: build2,
+    extra(geo, ctx2) {
+      for (const f of [0.22, 0.45, 0.66]) {
+        const lx = RW * f + 120, x = ctx2.x0 + lx;
+        ctx2.furnish("kiln", x, ctx2.floorAt(x, geo.floors[0](lx) - 30));
+      }
+    }
+  };
+
+  // src/data/realms/glasswood.ts
+  var GLASSLOAM = 36;
+  var PRISMROCK = 37;
+  function build3(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => 1350 + 180 * fbm1(x / 1400, s(1)) + 40 * noise1(x / 240, s(2)), 12);
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 440, arena + 440);
+    const floor = walkable(ground);
+    const hollow = walkable((x) => 1980 + 110 * fbm1(x / 1100, s(3)) + 24 * Math.sin(x / 190));
+    const spires = Array.from({ length: 22 }, (_, i) => {
+      const x = 700 + i * ((RW - 1400) / 22) + 180 * noise1(i * 2.3, s(4));
+      return {
+        x,
+        w: 30 + 26 * Math.abs(noise1(i * 1.9, s(5))),
+        h: 180 + 260 * Math.abs(noise1(i * 1.3, s(6)))
+      };
+    }).filter((sp) => Math.abs(sp.x - arrive) > 320 && Math.abs(sp.x - arena) > 560);
+    const ladderXs = [0.16, 0.4, 0.63, 0.86].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      for (const sp of spires) {
+        const dx = Math.abs(x - sp.x), top = floor(sp.x) - sp.h;
+        if (y > top && y < floor(sp.x) + 10 && dx < sp.w * (1 - (floor(sp.x) - y) / (sp.h * 1.15)))
+          return PRISMROCK;
+      }
+      if (y < g) return 0;
+      const h = hollow(x);
+      if (y > h - 120 - 16 * Math.sin(x / 80) && y < h && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < h) return 0;
+      if (y > g + 60 && fbm2(x / 190, y / 130, s(7)) > 0.68) return PRISMROCK;
+      return y < g + 90 ? GLASSLOAM : fbm2(x / 400, y / 300, s(8)) > 0.2 ? PRISMROCK : GLASSLOAM;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, hollow],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: hollow(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var GLASSWOOD = {
+    id: "glasswood",
+    name: "Glasswood",
+    band: 2,
+    note: "A forest of crystal. Prism spires refract the light; the canopy sheds shards that cut anyone caught beneath.",
+    sky: "open",
+    temp: 14,
+    ambient: [0.1, 0.1, 0.16],
+    daylight: 1,
+    wall: GLASSLOAM,
+    hazard: {
+      id: "shards",
+      name: "Shardfall",
+      text: "The canopy sheds glass every half minute or so. A glint gives a moment\u2019s warning; shards cut deep and can start bleeding.",
+      ward: "shardward"
+    },
+    fragment: "glasswood_fragment",
+    key: "glasswood_key",
+    material: "prism_glass",
+    relic: "lumen_antler",
+    boss: "lumen_stag",
+    elite: "crystal_warden",
+    music: "glasswood",
+    ores: ["prism_glass", "crystal", "sapphire"],
+    nodes: [
+      ["wood", 5],
+      ["prism_glass", 5],
+      ["lumen_moss", 4],
+      ["crystal", 3],
+      ["sapphire", 1],
+      ["herb", 2],
+      ["stone", 2],
+      ["opal", 1]
+    ],
+    nodeCount: 76,
+    mobs: [
+      { type: "shard_crawler", weight: 4 },
+      { type: "glass_golem", weight: 2 },
+      { type: "glassling", weight: 3 },
+      { type: "prism_moth", weight: 3, air: true },
+      { type: "lumen_wisp", weight: 2, air: true }
+    ],
+    mobCount: 38,
+    chests: 4,
+    chestLoot: [
+      ["glasswood_fragment", 1, 2, 0.6],
+      ["marches_fragment", 1, 1, 0.3],
+      ["prism_glass", 3, 6, 0.8],
+      ["healing_draught", 2, 3, 1],
+      ["hellstone_ingot", 2, 4, 0.4],
+      ["sapphire", 1, 3, 0.5],
+      ["life_crystal", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "glasswood",
+      name: "Glasswood",
+      x: 8,
+      y: 0,
+      color: "#8ab8c8",
+      shade: "#d0e8f0",
+      temp: 14,
+      note: "A forest of crystal that rings in the wind.",
+      resources: ["prism_glass", "lumen_moss", "crystal", "wood"]
+    },
+    build: build3
+  };
+
+  // src/data/realms/marches.ts
+  var MARROW_MUD = 38;
+  var BONEROCK = 39;
+  function build4(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3, base = 1500;
+    let ground = walkable((x) => {
+      const basin = Math.max(0, fbm1(x / 900, s(1), 2)) * 140;
+      return base - 40 * fbm1(x / 300, s(2)) + basin;
+    }, 10);
+    ground = flatten(ground, arrive - 240, arrive + 240, base - 40);
+    ground = flatten(ground, arena - 440, arena + 440, base - 30);
+    const floor = walkable(ground);
+    const mire = base + 20;
+    const crypt = walkable((x) => 2050 + 80 * fbm1(x / 1e3, s(3)) + 20 * Math.sin(x / 150));
+    const ribs = Array.from({ length: 9 }, (_, i) => ({
+      x: 900 + i * ((RW - 1800) / 9) + 200 * noise1(i * 3.7, s(4)),
+      r: 150 + 60 * Math.abs(noise1(i * 1.1, s(5)))
+    })).filter((r) => Math.abs(r.x - arrive) > 360 && Math.abs(r.x - arena) > 600);
+    const ladderXs = [0.15, 0.37, 0.6, 0.84].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) {
+        for (const r of ribs) {
+          const d = Math.hypot((x - r.x) / 1.4, y - floor(r.x) - 10);
+          if (d > r.r - 14 && d < r.r && y < floor(r.x) - 20) return BONEROCK;
+        }
+        return 0;
+      }
+      const c = crypt(x);
+      if (y > c - 110 - 12 * Math.sin(x / 70) && y < c && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < c) return 0;
+      if (y > g + 80 && fbm2(x / 170, y / 120, s(6)) > 0.7) return BONEROCK;
+      return y < g + 110 ? MARROW_MUD : BONEROCK;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, crypt],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: crypt(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor,
+      mire
+    };
+  }
+  var MARCHES = {
+    id: "marches",
+    name: "Bone Marches",
+    band: 2,
+    note: "A grey fen of giant bones. Marrow poisons the mire; wading through it slows you and festers in the blood.",
+    sky: "open",
+    temp: 9,
+    ambient: [0.08, 0.08, 0.07],
+    daylight: 0.7,
+    wall: MARROW_MUD,
+    hazard: {
+      id: "mire",
+      name: "Marrow mire",
+      text: "The basins are full of poisoned mud. Wading slows you to a crawl, soaks and chills you, and can bring on marrow rot.",
+      ward: "mirewalk"
+    },
+    fragment: "marches_fragment",
+    key: "marches_key",
+    material: "marrow_iron_ore",
+    relic: "hydra_tooth",
+    boss: "ossuary_hydra",
+    elite: "bone_colossus",
+    music: "marches",
+    ores: ["marrow_iron_ore", "iron_ore", "gold_ore"],
+    nodes: [
+      ["marrow_iron_ore", 5],
+      ["reeds", 4],
+      ["herb", 3],
+      ["wood", 2],
+      ["clay", 2],
+      ["gold_ore", 1],
+      ["onyx", 1],
+      ["water", 1]
+    ],
+    nodeCount: 72,
+    mobs: [
+      { type: "bone_hound", weight: 4 },
+      { type: "mire_leech", weight: 3 },
+      { type: "ossuary_knight", weight: 2 },
+      { type: "marsh_ghoul", weight: 3 },
+      { type: "carrion_crow", weight: 3, air: true }
+    ],
+    mobCount: 38,
+    chests: 4,
+    chestLoot: [
+      ["marches_fragment", 1, 2, 0.6],
+      ["glasswood_fragment", 1, 1, 0.3],
+      ["marrow_ingot", 2, 4, 0.7],
+      ["antibiotic", 1, 2, 0.6],
+      ["healing_draught", 2, 3, 1],
+      ["bone", 6, 12, 0.8],
+      ["life_crystal", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "marches",
+      name: "Bone Marches",
+      x: 9,
+      y: 0,
+      color: "#6a6a5a",
+      shade: "#b0aa98",
+      temp: 9,
+      note: "A grey fen where giants died.",
+      resources: ["marrow_iron_ore", "reeds", "herb", "bone"]
+    },
+    build: build4
+  };
+
   // src/data/realms/orchard.ts
   var BRINESOIL = 30;
   function tideLevel(geo, t) {
     const phase = t / 150 * Math.PI * 2;
     return geo.tideMid + Math.sin(phase) * 70 + Math.sin(phase * 2.7) * 12;
   }
-  function build(seed) {
+  function build5(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable(
@@ -3416,7 +4176,119 @@
       note: "A sunken fruit country under a restless tide.",
       resources: ["brinewood", "bog_apple", "reeds", "clay", "herb"]
     },
-    build
+    build: build5
+  };
+
+  // src/data/realms/saltflats.ts
+  var SALTCRUST = 42;
+  var SALTGLASS_ROCK = 43;
+  function build6(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => {
+      const ridge = Math.max(0, noise1(x / 420, s(1)) - 0.45) * 520;
+      return 1450 - ridge + 10 * fbm1(x / 200, s(2));
+    }, 18);
+    ground = flatten(ground, arrive - 240, arrive + 240, 1450);
+    ground = flatten(ground, arena - 460, arena + 460, 1450);
+    const floor = walkable(ground);
+    const mine = walkable((x) => 1900 + 70 * fbm1(x / 900, s(3)) + 16 * Math.sin(x / 140));
+    const deep = walkable((x) => 2350 + 90 * fbm1(x / 1100, s(4)));
+    const ladderXs = [0.13, 0.33, 0.55, 0.76, 0.9].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) return 0;
+      const m = mine(x), d = deep(x);
+      if (y > m - 110 && y < m && x > 200 && x < RW - 200) return 0;
+      if (y > d - 130 - 20 * Math.sin(x / 90) && y < d && x > 300 && x < RW - 300) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < d) return 0;
+      if (y < g + 40) return SALTCRUST;
+      return fbm2(x / 150, y / 120, s(5)) > 0.62 || y < g + 160 - (1450 - g) * 0.3 ? SALTGLASS_ROCK : SALTCRUST;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, mine, deep],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: deep(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var SALTFLATS = {
+    id: "saltflats",
+    name: "Salt Flats of Oru",
+    band: 3,
+    note: "A dead sea under a white sun. By day the heat parches the open flats and mirages walk among the monsters; the mines below are cooler.",
+    sky: "open",
+    temp: 36,
+    ambient: [0.12, 0.11, 0.1],
+    daylight: 1.15,
+    wall: SALTCRUST,
+    hazard: {
+      id: "sun",
+      name: "The white sun",
+      text: "In daylight on the open flats you overheat and thirst three times as fast. Mirages walk among the monsters. Shelter in the mines.",
+      ward: "shade"
+    },
+    fragment: "saltflats_fragment",
+    key: "saltflats_key",
+    material: "saltglass",
+    relic: "tyrant_eye",
+    boss: "mirage_tyrant",
+    elite: "salt_colossus",
+    music: "saltflats",
+    ores: ["saltglass", "salt", "gold_ore"],
+    nodes: [
+      ["saltglass", 5],
+      ["salt", 5],
+      ["cactus_fruit", 2],
+      ["sulfur", 2],
+      ["gold_ore", 2],
+      ["stone", 2],
+      ["topaz", 1],
+      ["ruby", 1]
+    ],
+    nodeCount: 70,
+    mobs: [
+      { type: "salt_strider", weight: 3 },
+      { type: "brine_scorpion", weight: 4 },
+      { type: "sand_raptor", weight: 3 },
+      { type: "salt_wraith", weight: 2 },
+      { type: "mirage_djinn", weight: 2, air: true },
+      { type: "mirage", weight: 3 }
+    ],
+    mobCount: 42,
+    chests: 5,
+    chestLoot: [
+      ["saltflats_fragment", 1, 2, 0.6],
+      ["choir_fragment", 1, 1, 0.3],
+      ["saltglass", 3, 6, 0.8],
+      ["boiled_water", 2, 4, 1],
+      ["healing_draught", 2, 4, 1],
+      ["ruby", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.15]
+    ],
+    biome: {
+      id: "saltflats",
+      name: "Salt Flats of Oru",
+      x: 11,
+      y: 0,
+      color: "#e8e0d0",
+      shade: "#fff8e8",
+      temp: 36,
+      note: "A dead sea turned to a white plain.",
+      resources: ["saltglass", "salt", "cactus_fruit"]
+    },
+    build: build6,
+    extra(geo, ctx2) {
+      for (let i = 0; i < 6 + ctx2.tier; i++) {
+        const lx = 700 + ctx2.rng() * (RW - 1400), x = ctx2.x0 + lx;
+        if (Math.abs(lx - geo.arena) > 600)
+          ctx2.mob("mirage", x, ctx2.floorAt(x, geo.floors[0](lx) - 30));
+      }
+    }
   };
 
   // src/data/realms/steppe.ts
@@ -3426,7 +4298,7 @@
     const cycle = 200, phase = (t + seed % 97) % cycle;
     return phase > cycle - 60 ? Math.min(1, (phase - (cycle - 60)) / 8, (cycle - phase) / 8) : 0;
   }
-  function build2(seed) {
+  function build7(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 1e3;
     let ground = walkable((x) => {
@@ -3522,7 +4394,7 @@
       note: "Burnt grassland where old kilns smoulder.",
       resources: ["cinderflax", "kilnstone_ore", "coal", "sulfur"]
     },
-    build: build2,
+    build: build7,
     extra(geo, ctx2) {
       for (const f of [0.26, 0.5, 0.74]) {
         const x = ctx2.x0 + RW * f + 90;
@@ -3534,7 +4406,7 @@
   // src/data/realms/warren.ts
   var WARREN_EARTH = 33;
   var AMBERSTONE = 34;
-  function build3(seed) {
+  function build8(seed) {
     const s = (k) => seedOf(seed, k);
     const arrive = 520, arena = RW - 950;
     const lane = (base, k) => walkable((x) => base + 170 * fbm1(x / 1300, s(k)) + 30 * noise1(x / 260, s(k + 1)));
@@ -3638,7 +4510,7 @@
       note: "A realm that is all burrow.",
       resources: ["burrow_amber", "mushroom", "gold_ore", "iron_ore"]
     },
-    build: build3
+    build: build8
   };
 
   // src/data/realms/modifiers.ts
@@ -3717,7 +4589,16 @@
   var TIER_NAMES = ["", "I", "II", "III", "IV", "V"];
 
   // src/data/realms/index.ts
-  var REALMS = [ORCHARD, STEPPE, WARREN];
+  var REALMS = [
+    ORCHARD,
+    STEPPE,
+    WARREN,
+    GLASSWOOD,
+    MARCHES,
+    BARROW,
+    SALTFLATS,
+    CHOIR
+  ];
   var realmById = (id) => REALMS.find((r) => r.id === id);
   var REALM_IDS = new Set(REALMS.map((r) => r.id));
   var active = null;
@@ -3856,7 +4737,17 @@
     32: 4,
     33: 0,
     34: 4,
-    35: 0
+    35: 0,
+    36: 0,
+    37: 5,
+    38: 0,
+    39: 4,
+    40: 6,
+    41: 6,
+    42: 0,
+    43: 5,
+    44: 0,
+    45: 6
   };
   var TILE_YIELD = {
     1: { item: "dirt" },
@@ -3889,7 +4780,17 @@
     31: { item: "ash_soil", bonus: ["sulfur", 0.1] },
     32: { item: "kilnrock", bonus: ["kilnstone_ore", 0.14] },
     33: { item: "warren_earth", bonus: ["burrow_amber", 0.05] },
-    34: { item: "amberstone", bonus: ["burrow_amber", 0.4] }
+    34: { item: "amberstone", bonus: ["burrow_amber", 0.4] },
+    36: { item: "glassloam", bonus: ["lumen_moss", 0.05] },
+    37: { item: "prismrock", bonus: ["prism_glass", 0.3] },
+    38: { item: "marrow_mud", bonus: ["bone", 0.12] },
+    39: { item: "bonerock", bonus: ["marrow_iron_ore", 0.14] },
+    40: { item: "brass_plate", bonus: ["brass_gear", 0.1] },
+    41: { item: "gearstone", bonus: ["brass_gear", 0.2] },
+    42: { item: "saltcrust", bonus: ["salt", 0.3] },
+    43: { item: "saltglass_rock", bonus: ["saltglass", 0.25] },
+    44: { item: "rimesnow", bonus: ["ice", 0.2] },
+    45: { item: "choirstone", bonus: ["rime_silver_ore", 0.12] }
   };
   function dimensionAt(x) {
     if (x < OVERWORLD_W) return null;
@@ -5086,6 +5987,569 @@
       respawn: 0
     }
   });
+  Object.assign(MOBS, {
+    // The Glasswood.
+    shard_crawler: {
+      name: "Shard crawler",
+      hp: 220,
+      damage: 28,
+      speed: [36, 120],
+      move: "walker",
+      sight: 300,
+      reach: 46,
+      cooldown: 1.2,
+      defense: 14,
+      loot: [L2("prism_glass", 1, 2), L2("crystal", 1, 1, 0.3)],
+      respawn: 150,
+      disease: ["bleeding", 0.2]
+    },
+    glass_golem: {
+      name: "Glass golem",
+      hp: 520,
+      damage: 36,
+      speed: [20, 60],
+      move: "walker",
+      sight: 300,
+      reach: 58,
+      cooldown: 1.7,
+      defense: 22,
+      loot: [L2("prism_glass", 2, 4), L2("sapphire", 1, 1, 0.2)],
+      respawn: 190,
+      disease: ["glass_cough", 0.12]
+    },
+    glassling: {
+      name: "Glassling",
+      hp: 180,
+      damage: 24,
+      speed: [44, 110],
+      move: "hopper",
+      sight: 260,
+      reach: 42,
+      cooldown: 1.2,
+      defense: 10,
+      loot: [L2("gel", 1, 3), L2("prism_glass", 1, 1, 0.5)],
+      respawn: 130
+    },
+    prism_moth: {
+      name: "Prism moth",
+      hp: 150,
+      damage: 22,
+      speed: [60, 160],
+      move: "flier",
+      sight: 420,
+      reach: 40,
+      cooldown: 2,
+      ranged: {
+        projectile: "prism_bolt",
+        range: 420,
+        speed: 560,
+        damage: 26,
+        count: 3,
+        spread: 0.18
+      },
+      loot: [L2("silk", 1, 2), L2("lumen_moss", 1, 1, 0.4)],
+      respawn: 140,
+      disease: ["glass_cough", 0.08]
+    },
+    lumen_wisp: {
+      name: "Lumen wisp",
+      hp: 140,
+      damage: 22,
+      speed: [50, 130],
+      move: "floater",
+      sight: 460,
+      reach: 40,
+      cooldown: 2.2,
+      ranged: { projectile: "lumen_orb", range: 480, speed: 380, damage: 28 },
+      loot: [L2("crystal", 1, 2, 0.6), L2("glasswood_fragment", 1, 1, 0.05)],
+      respawn: 150
+    },
+    crystal_warden: {
+      name: "Crystal warden",
+      hp: 1700,
+      damage: 46,
+      speed: [34, 110],
+      move: "walker",
+      sight: 700,
+      reach: 64,
+      cooldown: 1.5,
+      defense: 24,
+      ranged: {
+        projectile: "glass_shard",
+        range: 500,
+        speed: 620,
+        damage: 32,
+        count: 4,
+        spread: 0.2
+      },
+      loot: [L2("prism_glass", 4, 8), L2("glasswood_fragment", 1, 2), L2("sapphire", 1, 3)],
+      respawn: 600
+    },
+    // The Bone Marches.
+    bone_hound: {
+      name: "Bone hound",
+      hp: 240,
+      damage: 30,
+      speed: [44, 150],
+      move: "walker",
+      sight: 340,
+      reach: 48,
+      cooldown: 1.2,
+      defense: 10,
+      loot: [L2("bone", 2, 4), L2("raw_meat", 1, 1, 0.3)],
+      respawn: 140,
+      disease: ["marrow_rot", 0.08]
+    },
+    mire_leech: {
+      name: "Mire leech",
+      hp: 200,
+      damage: 26,
+      speed: [36, 110],
+      move: "floater",
+      sight: 300,
+      reach: 44,
+      cooldown: 1.3,
+      defense: 6,
+      loot: [L2("gel", 1, 2), L2("marrow_iron_ore", 1, 1, 0.3)],
+      respawn: 140,
+      disease: ["marrow_rot", 0.18]
+    },
+    ossuary_knight: {
+      name: "Ossuary knight",
+      hp: 460,
+      damage: 38,
+      speed: [26, 80],
+      move: "walker",
+      sight: 320,
+      reach: 58,
+      cooldown: 1.6,
+      defense: 22,
+      loot: [L2("marrow_ingot", 1, 2, 0.6), L2("bone", 2, 4), L2("marches_fragment", 1, 1, 0.05)],
+      respawn: 180,
+      disease: ["tetanus", 0.1]
+    },
+    marsh_ghoul: {
+      name: "Marsh ghoul",
+      hp: 280,
+      damage: 32,
+      speed: [30, 100],
+      move: "walker",
+      sight: 320,
+      reach: 50,
+      cooldown: 1.4,
+      defense: 8,
+      loot: [L2("grave_dust", 1, 2), L2("bone", 1, 3)],
+      respawn: 150,
+      disease: ["wound", 0.2]
+    },
+    carrion_crow: {
+      name: "Carrion crow",
+      hp: 150,
+      damage: 24,
+      speed: [70, 190],
+      move: "flier",
+      sight: 440,
+      reach: 42,
+      cooldown: 1.1,
+      loot: [L2("feathers", 2, 4), L2("raw_meat", 1, 1, 0.3)],
+      respawn: 120,
+      disease: ["fever", 0.1]
+    },
+    bone_colossus: {
+      name: "Bone colossus",
+      hp: 1900,
+      damage: 48,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 70,
+      cooldown: 1.7,
+      defense: 26,
+      ranged: {
+        projectile: "bone_shard",
+        range: 460,
+        speed: 600,
+        damage: 32,
+        count: 5,
+        spread: 0.24
+      },
+      loot: [L2("marrow_ingot", 4, 8), L2("marches_fragment", 1, 2), L2("bone", 8, 14)],
+      respawn: 600
+    },
+    // The Clockwork Barrow.
+    cog_spider: {
+      name: "Cog spider",
+      hp: 300,
+      damage: 34,
+      speed: [44, 150],
+      move: "walker",
+      sight: 320,
+      reach: 48,
+      cooldown: 1.1,
+      defense: 18,
+      loot: [L2("brass_gear", 1, 2), L2("silk", 1, 2, 0.4)],
+      respawn: 150
+    },
+    tin_soldier: {
+      name: "Tin soldier",
+      hp: 480,
+      damage: 42,
+      speed: [30, 90],
+      move: "walker",
+      sight: 360,
+      reach: 60,
+      cooldown: 1.4,
+      defense: 26,
+      loot: [L2("brass_ingot", 1, 2, 0.5), L2("iron_ingot", 1, 2, 0.4)],
+      respawn: 170,
+      disease: ["tetanus", 0.12]
+    },
+    brass_sentry: {
+      name: "Brass sentry",
+      hp: 420,
+      damage: 30,
+      speed: [10, 30],
+      move: "walker",
+      sight: 620,
+      reach: 44,
+      cooldown: 1.6,
+      defense: 30,
+      ranged: { projectile: "bolt", range: 620, speed: 900, damage: 40, count: 2, spread: 0.06 },
+      loot: [L2("brass_gear", 2, 3), L2("barrow_fragment", 1, 1, 0.05)],
+      respawn: 200
+    },
+    clockwork_hound: {
+      name: "Clockwork hound",
+      hp: 340,
+      damage: 38,
+      speed: [50, 170],
+      move: "walker",
+      sight: 380,
+      reach: 50,
+      cooldown: 1.1,
+      defense: 20,
+      loot: [L2("brass_gear", 1, 3), L2("coal", 1, 2, 0.5)],
+      respawn: 150
+    },
+    gear_wisp: {
+      name: "Gear wisp",
+      hp: 240,
+      damage: 30,
+      speed: [50, 140],
+      move: "floater",
+      sight: 480,
+      reach: 42,
+      cooldown: 2.2,
+      ranged: { projectile: "steam_puff", range: 440, speed: 360, damage: 34, count: 2, spread: 0.3 },
+      loot: [L2("brass_gear", 1, 2), L2("topaz", 1, 1, 0.1)],
+      respawn: 150
+    },
+    brass_juggernaut: {
+      name: "Brass juggernaut",
+      hp: 2400,
+      damage: 56,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 70,
+      cooldown: 1.6,
+      defense: 34,
+      ranged: { projectile: "steam_puff", range: 480, speed: 420, damage: 40, count: 5, spread: 0.3 },
+      loot: [L2("brass_ingot", 5, 9), L2("barrow_fragment", 1, 2), L2("gold_ingot", 2, 4)],
+      respawn: 600
+    },
+    // The Salt Flats of Oru.
+    salt_strider: {
+      name: "Salt strider",
+      hp: 360,
+      damage: 36,
+      speed: [50, 170],
+      move: "walker",
+      sight: 420,
+      reach: 54,
+      cooldown: 1.3,
+      defense: 14,
+      loot: [L2("raw_meat", 2, 3), L2("hide", 1, 2), L2("salt", 1, 3, 0.6)],
+      respawn: 150
+    },
+    brine_scorpion: {
+      name: "Brine scorpion",
+      hp: 320,
+      damage: 38,
+      speed: [36, 120],
+      move: "walker",
+      sight: 300,
+      reach: 50,
+      cooldown: 1.3,
+      defense: 22,
+      loot: [L2("venom", 1, 2), L2("saltglass", 1, 1, 0.4)],
+      respawn: 150,
+      disease: ["poisoning", 0.2]
+    },
+    sand_raptor: {
+      name: "Sand raptor",
+      hp: 300,
+      damage: 40,
+      speed: [60, 200],
+      move: "walker",
+      sight: 460,
+      reach: 50,
+      cooldown: 1,
+      defense: 10,
+      loot: [L2("raw_meat", 1, 2), L2("feathers", 1, 3)],
+      respawn: 140,
+      disease: ["wound", 0.16]
+    },
+    salt_wraith: {
+      name: "Salt wraith",
+      hp: 380,
+      damage: 36,
+      speed: [34, 110],
+      move: "floater",
+      sight: 420,
+      reach: 50,
+      cooldown: 2,
+      ranged: { projectile: "salt_spray", range: 440, speed: 520, damage: 34, count: 3, spread: 0.2 },
+      loot: [L2("salt", 2, 4), L2("saltflats_fragment", 1, 1, 0.05)],
+      respawn: 170
+    },
+    mirage_djinn: {
+      name: "Mirage djinn",
+      hp: 300,
+      damage: 34,
+      speed: [60, 160],
+      move: "flier",
+      sight: 500,
+      reach: 44,
+      cooldown: 2.2,
+      ranged: { projectile: "heat_bolt", range: 520, speed: 460, damage: 38 },
+      loot: [L2("saltglass", 1, 2), L2("ruby", 1, 1, 0.1)],
+      respawn: 160
+    },
+    mirage: {
+      name: "Mirage",
+      hp: 1,
+      damage: 0,
+      speed: [40, 150],
+      move: "walker",
+      sight: 460,
+      reach: 50,
+      cooldown: 1,
+      loot: [],
+      respawn: 90
+    },
+    salt_colossus: {
+      name: "Salt colossus",
+      hp: 2300,
+      damage: 54,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 72,
+      cooldown: 1.6,
+      defense: 30,
+      ranged: {
+        projectile: "salt_spray",
+        range: 480,
+        speed: 560,
+        damage: 40,
+        count: 5,
+        spread: 0.24
+      },
+      loot: [L2("saltglass", 5, 9), L2("saltflats_fragment", 1, 2), L2("salt", 6, 10)],
+      respawn: 600
+    },
+    // The Frozen Choir.
+    rime_wolf: {
+      name: "Rime wolf",
+      hp: 380,
+      damage: 42,
+      speed: [50, 180],
+      move: "walker",
+      sight: 400,
+      reach: 50,
+      cooldown: 1.1,
+      defense: 16,
+      loot: [L2("hide", 1, 2), L2("raw_meat", 1, 2), L2("frost_shard", 1, 1, 0.4)],
+      respawn: 150,
+      disease: ["rabies", 0.03]
+    },
+    bell_golem: {
+      name: "Bell golem",
+      hp: 700,
+      damage: 50,
+      speed: [20, 60],
+      move: "walker",
+      sight: 320,
+      reach: 64,
+      cooldown: 1.8,
+      defense: 34,
+      loot: [L2("rime_silver_ore", 2, 4), L2("bell_bronze", 1, 1, 0.4)],
+      respawn: 200
+    },
+    cantor: {
+      name: "Cantor",
+      hp: 360,
+      damage: 34,
+      speed: [26, 80],
+      move: "walker",
+      sight: 520,
+      reach: 46,
+      cooldown: 2,
+      defense: 14,
+      ranged: { projectile: "hymn_note", range: 520, speed: 420, damage: 40, count: 3, spread: 0.3 },
+      loot: [L2("frost_lily", 1, 2), L2("choir_fragment", 1, 1, 0.05), L2("silk", 1, 2, 0.4)],
+      respawn: 170
+    },
+    choir_wraith: {
+      name: "Choir wraith",
+      hp: 330,
+      damage: 38,
+      speed: [40, 130],
+      move: "floater",
+      sight: 460,
+      reach: 46,
+      cooldown: 2,
+      ranged: { projectile: "frost_bolt", range: 480, speed: 480, damage: 40 },
+      loot: [L2("frost_shard", 1, 2), L2("grave_dust", 1, 1, 0.4)],
+      respawn: 160,
+      disease: ["frostbite", 0.1]
+    },
+    frost_moth: {
+      name: "Frost moth",
+      hp: 260,
+      damage: 32,
+      speed: [60, 170],
+      move: "flier",
+      sight: 420,
+      reach: 42,
+      cooldown: 1.2,
+      loot: [L2("silk", 1, 2), L2("frost_shard", 1, 1, 0.3)],
+      respawn: 130
+    },
+    grand_cantor: {
+      name: "Grand cantor",
+      hp: 2600,
+      damage: 58,
+      speed: [30, 100],
+      move: "walker",
+      sight: 720,
+      reach: 64,
+      cooldown: 1.5,
+      defense: 30,
+      ranged: { projectile: "hymn_note", range: 560, speed: 460, damage: 44, count: 6, spread: 0.3 },
+      loot: [L2("rime_silver", 4, 8), L2("choir_fragment", 1, 2), L2("frost_shard", 4, 8)],
+      respawn: 600
+    },
+    // The Band II and III great foes.
+    lumen_stag: {
+      name: "The Lumen Stag",
+      hp: 5600,
+      damage: 48,
+      speed: [60, 190],
+      move: "walker",
+      sight: 1400,
+      reach: 96,
+      cooldown: 1.3,
+      defense: 24,
+      boss: true,
+      loot: [
+        L2("stag_heart", 1),
+        L2("prism_glass", 10, 16),
+        L2("glasswood_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    },
+    ossuary_hydra: {
+      name: "The Ossuary Hydra",
+      hp: 6200,
+      damage: 50,
+      speed: [40, 120],
+      move: "walker",
+      sight: 1400,
+      reach: 100,
+      cooldown: 1.3,
+      defense: 26,
+      boss: true,
+      loot: [
+        L2("hydra_heart", 1),
+        L2("marrow_ingot", 10, 16),
+        L2("marches_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    },
+    engine_saint: {
+      name: "The Engine Saint",
+      hp: 8200,
+      damage: 58,
+      speed: [40, 120],
+      move: "walker",
+      sight: 1400,
+      reach: 100,
+      cooldown: 1.3,
+      defense: 34,
+      boss: true,
+      loot: [
+        L2("engine_heart", 1),
+        L2("brass_ingot", 12, 18),
+        L2("barrow_fragment", 2, 3),
+        L2("life_fruit", 1)
+      ],
+      respawn: 0
+    },
+    mirage_tyrant: {
+      name: "The Mirage Tyrant",
+      hp: 7800,
+      damage: 56,
+      speed: [70, 200],
+      move: "floater",
+      sight: 1400,
+      reach: 90,
+      cooldown: 1.2,
+      defense: 30,
+      boss: true,
+      loot: [
+        L2("mirage_crown", 1),
+        L2("saltglass", 12, 18),
+        L2("saltflats_fragment", 2, 3),
+        L2("life_fruit", 1)
+      ],
+      respawn: 0
+    },
+    tyrant_mirage: {
+      name: "A mirage of the Tyrant",
+      hp: 1,
+      damage: 0,
+      speed: [70, 200],
+      move: "floater",
+      sight: 1400,
+      reach: 60,
+      cooldown: 1,
+      loot: [],
+      respawn: 99999
+    },
+    the_hymnal: {
+      name: "The Hymnal",
+      hp: 8800,
+      damage: 60,
+      speed: [30, 100],
+      move: "walker",
+      sight: 1400,
+      reach: 110,
+      cooldown: 1.4,
+      defense: 36,
+      boss: true,
+      loot: [
+        L2("hymnal_core", 1),
+        L2("rime_silver", 12, 18),
+        L2("choir_fragment", 2, 3),
+        L2("life_fruit", 1)
+      ],
+      respawn: 0
+    }
+  });
   for (const st of SETTLERS)
     MOBS[st.id] = {
       name: `${st.name} ${st.title}`,
@@ -5109,7 +6573,12 @@
     unmaker: { item: "void_seal", place: "void", music: "final_boss" },
     orchard_mother: { item: "orchard_key", place: "orchard", music: "boss" },
     kiln_beast: { item: "steppe_key", place: "steppe", music: "boss" },
-    warren_queen: { item: "warren_key", place: "warren", music: "boss" }
+    warren_queen: { item: "warren_key", place: "warren", music: "boss" },
+    lumen_stag: { item: "glasswood_key", place: "glasswood", music: "boss" },
+    ossuary_hydra: { item: "marches_key", place: "marches", music: "boss" },
+    engine_saint: { item: "barrow_key", place: "barrow", music: "boss" },
+    mirage_tyrant: { item: "saltflats_key", place: "saltflats", music: "boss" },
+    the_hymnal: { item: "choir_key", place: "choir", music: "boss" }
   };
   var isAggressive = (type) => type === "boss" || (MOBS[type]?.sight ?? 0) > 0;
   var mobName = (type) => MOBS[type]?.name ?? type;
@@ -5170,7 +6639,44 @@
     amber_colossus: "golem",
     orchard_mother: "golem",
     kiln_beast: "hellhound",
-    warren_queen: "serpent"
+    warren_queen: "serpent",
+    shard_crawler: "scorpion",
+    glass_golem: "golem",
+    glassling: "slime",
+    prism_moth: "bat",
+    lumen_wisp: "wisp",
+    crystal_warden: "golem",
+    bone_hound: "wolf",
+    mire_leech: "serpent",
+    ossuary_knight: "bones",
+    marsh_ghoul: "ghoul",
+    carrion_crow: "harpy",
+    bone_colossus: "bones",
+    cog_spider: "scorpion",
+    tin_soldier: "knight",
+    brass_sentry: "golem",
+    clockwork_hound: "hellhound",
+    gear_wisp: "wisp",
+    brass_juggernaut: "golem",
+    salt_strider: "boar",
+    brine_scorpion: "scorpion",
+    sand_raptor: "harpy",
+    salt_wraith: "wraith",
+    mirage_djinn: "wisp",
+    mirage: "wisp",
+    salt_colossus: "golem",
+    rime_wolf: "wolf",
+    bell_golem: "golem",
+    cantor: "wraith",
+    choir_wraith: "wraith",
+    frost_moth: "bat",
+    grand_cantor: "knight",
+    lumen_stag: "boar",
+    ossuary_hydra: "serpent",
+    engine_saint: "golem",
+    mirage_tyrant: "wisp",
+    tyrant_mirage: "wisp",
+    the_hymnal: "golem"
   };
 
   // src/data/food.ts
@@ -5193,6 +6699,7 @@
     bog_apple: [12, 1, 14],
     herb: [2, 0, 8],
     sunbloom: [10, 1, 12],
+    frost_lily: [6, 0, 18],
     // Preserves.
     salted_meat: [34, 28, 0],
     salted_fish: [28, 24, 1],
@@ -5652,6 +7159,81 @@
       { realmLoot: 0.05 },
       "Realm loot +5%"
     ),
+    creatures(
+      "glasswood",
+      "The Glasswood",
+      [
+        "shard_crawler",
+        "glass_golem",
+        "glassling",
+        "prism_moth",
+        "lumen_wisp",
+        "crystal_warden",
+        "lumen_stag"
+      ],
+      { magicDmg: 0.05 },
+      "+5% magic damage"
+    ),
+    creatures(
+      "marches",
+      "The Bone Marches",
+      [
+        "bone_hound",
+        "mire_leech",
+        "ossuary_knight",
+        "marsh_ghoul",
+        "carrion_crow",
+        "bone_colossus",
+        "ossuary_hydra"
+      ],
+      { disease: 0.05 },
+      "5% chance to shrug off a sickness"
+    ),
+    creatures(
+      "barrow",
+      "The Clockwork Barrow",
+      [
+        "cog_spider",
+        "tin_soldier",
+        "brass_sentry",
+        "clockwork_hound",
+        "gear_wisp",
+        "brass_juggernaut",
+        "engine_saint"
+      ],
+      { rangedDmg: 0.05 },
+      "+5% ranged damage"
+    ),
+    creatures(
+      "saltflats",
+      "The Salt Flats of Oru",
+      [
+        "salt_strider",
+        "brine_scorpion",
+        "sand_raptor",
+        "salt_wraith",
+        "mirage_djinn",
+        "salt_colossus",
+        "mirage_tyrant"
+      ],
+      { heatResist: 3 },
+      "Shrug off 3\xB0 of heat"
+    ),
+    creatures(
+      "choir",
+      "The Frozen Choir",
+      [
+        "rime_wolf",
+        "bell_golem",
+        "cantor",
+        "choir_wraith",
+        "frost_moth",
+        "grand_cantor",
+        "the_hymnal"
+      ],
+      { coldResist: 3 },
+      "Shrug off 3\xB0 of cold"
+    ),
     {
       id: "regions",
       name: "The nine regions",
@@ -5685,7 +7267,19 @@
       name: "Other worlds",
       group: "Places",
       prefix: "visit:",
-      entries: ["mycelia", "skyreach", "void", "orchard", "steppe", "warren"],
+      entries: [
+        "mycelia",
+        "skyreach",
+        "void",
+        "orchard",
+        "steppe",
+        "warren",
+        "glasswood",
+        "marches",
+        "barrow",
+        "saltflats",
+        "choir"
+      ],
       bonus: { xp: 0.1 },
       bonusText: "+10% renown"
     },
@@ -5744,7 +7338,16 @@
       name: "Relics",
       group: "Lore",
       prefix: "relic:",
-      entries: ["tide_conch", "kiln_heart", "queens_mandible"],
+      entries: [
+        "tide_conch",
+        "kiln_heart",
+        "queens_mandible",
+        "lumen_antler",
+        "hydra_tooth",
+        "saint_cog",
+        "tyrant_eye",
+        "hymnal_bell"
+      ],
       bonus: { luck: 0.1 },
       bonusText: "Loot 10% more likely"
     }
@@ -5759,7 +7362,17 @@
     spore_heart: ["regen"],
     roc_plume: ["glide"],
     eclipse_fang: ["damage10"],
-    beast_core: ["defense2"]
+    beast_core: ["defense2"],
+    lumen_antler: ["light", "shardward"],
+    hydra_tooth: ["mirewalk", "regen"],
+    saint_cog: ["trapsense", "speed20"],
+    tyrant_eye: ["shade", "damage10"],
+    hymnal_bell: ["hymnward", "mana40"],
+    stag_heart: ["magic15"],
+    hydra_heart: ["regen"],
+    engine_heart: ["stamina"],
+    mirage_crown: ["damage10"],
+    hymnal_core: ["defense3"]
   };
   var EFFECT_TEXT = {
     swim: "swim freely",
@@ -5770,7 +7383,17 @@
     damage10: "+10% damage",
     regen: "regenerate health",
     stamina: "stamina returns faster",
-    glide: "glide on the air"
+    glide: "glide on the air",
+    light: "light around you",
+    shardward: "shardfall glances off",
+    mirewalk: "walk the mire unharmed",
+    trapsense: "steam cannot scald you",
+    shade: "the white sun cannot parch you",
+    hymnward: "the hymn cannot hold you",
+    speed20: "+20% speed",
+    mana40: "+40 mana",
+    magic15: "+15% magic damage",
+    defense3: "+3 defense"
   };
   var relicText = (id) => (RELIC_EFFECTS[id] ?? []).map((k) => EFFECT_TEXT[k] ?? k).join(", ");
   var shelfSlots = (renown) => 3 + (renown >= 20 ? 1 : 0) + (renown >= 40 ? 1 : 0);
@@ -6125,9 +7748,9 @@
       return out;
     }
     stats(id) {
-      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet();
+      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet(), fx = this.game.equipment.effects();
       const melee = !f.ranged, heavy = family === "greatsword" || family === "battleaxe" || family === "warhammer", shooter = family === "bow" || family === "crossbow", magic = f.ranged === "magic";
-      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
+      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (fx.has("trapsense") ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (fx.has("shardward") ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
       const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
       const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
       return {
@@ -6671,6 +8294,143 @@
               this.minion("warren_rat", p.x + dx, this.game.floorNear(p.x + dx, p.y - 40));
           break;
         }
+        // ── Band II and III realms ──
+        case "lumen_stag": {
+          a.timers ??= {};
+          const charging = t < (a.timers.charge ?? 0);
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = charging ? a.vx ?? 0 : Math.abs(p.x - a.x) > 200 ? face * spec.speed[0] * 1.6 : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (!charging && this.due(a, "charge", rage ? 4 : 6)) {
+            a.vx = face * 560;
+            a.timers.charge = t + 0.8;
+            a.warning = 0.5;
+            this.game.sound("boss", a.x, a.y, 1.1);
+          }
+          if (this.due(a, "prism", 2.4))
+            this.game.combat.mobShoot(a, "prism_bolt", 600, 34, rage ? 7 : 5, 0.16);
+          if (this.due(a, "shardfall", rage ? 5 : 8)) {
+            for (let i = 0; i < 8; i++)
+              this.game.combat.spawn(
+                "glass_shard",
+                { x: p.x + (i - 3.5) * 60, y: p.y - 480 },
+                Math.PI / 2,
+                220,
+                30,
+                "mob"
+              );
+            this.game.sound("crystal", p.x, p.y - 200, 1.2);
+          }
+          if (rage && this.due(a, "flash", 9)) this.ring(a, "lumen_orb", 10, 260, 30, t);
+          if (rage && this.due(a, "moths", 12))
+            for (const dx of [-160, 160]) this.minion("prism_moth", a.x + dx, a.y - 180);
+          break;
+        }
+        case "ossuary_hydra": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 140 ? face * (rage ? spec.speed[1] : spec.speed[0]) : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "heads", 2.2))
+            for (const lift of [-0.35, 0, 0.35])
+              this.game.combat.spawn(
+                "bone_shard",
+                { x: a.x + face * 40, y: a.y - 70 },
+                Math.atan2(p.y - 30 - (a.y - 70), p.x - a.x) + lift,
+                560,
+                32,
+                "mob"
+              );
+          if (this.due(a, "mire", 3.6))
+            this.game.combat.mobShoot(a, "mire_glob", 420, 30, rage ? 4 : 3, 0.24);
+          if (this.due(a, "brood", rage ? 8 : 12))
+            for (const dx of [-150, 150])
+              this.minion("bone_hound", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          const burning = (a.fx?.burn?.[0] ?? 0) > t;
+          if (rage && !burning && a.hp < a.maxHp * 0.5) {
+            a.hp = Math.min(a.maxHp * 0.5, a.hp + a.maxHp * 4e-3 * dt);
+            if (!a.timers.warned) {
+              a.timers.warned = 1;
+              this.game.say("The Hydra's wounds knit as fast as you cut. Burn them!", "danger");
+            }
+          }
+          break;
+        }
+        case "engine_saint": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 220 ? face * spec.speed[0] : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "bolts", 2))
+            this.game.combat.mobShoot(a, "bolt", 900, 40, rage ? 5 : 3, 0.08);
+          if (this.due(a, "steam", rage ? 4 : 6)) {
+            this.ring(a, "steam_puff", 12, 300, 36, t);
+            this.game.sound("sizzle", a.x, a.y, 1.2);
+          }
+          if (this.due(a, "cogs", rage ? 8 : 11))
+            for (const dx of [-170, 170])
+              this.minion("cog_spider", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          if (rage && this.due(a, "overheat", 5)) {
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                340,
+                40,
+                "mob"
+              );
+            this.game.sound("slam", a.x, a.y, 1.3);
+          }
+          break;
+        }
+        case "mirage_tyrant": {
+          this.steer(
+            a,
+            p.x + Math.cos(t * 0.7) * 280,
+            p.y - 200 + Math.sin(t * 1.1) * 60,
+            spec.speed[1] * (rage ? 1.3 : 1),
+            dt,
+            1.6
+          );
+          if (this.due(a, "heat", 2))
+            this.game.combat.mobShoot(a, "heat_bolt", 460, 38, rage ? 3 : 2, 0.2);
+          if (this.due(a, "split", rage ? 8 : 12)) {
+            for (const dx of [-240, 0, 240]) this.minion("tyrant_mirage", p.x + dx, p.y - 220);
+            a.x = p.x + (this.game.rng() < 0.5 ? -1 : 1) * 300;
+            a.y = p.y - 240;
+            this.game.event("burst", a.x, a.y - 60, "#fff0c0");
+            this.game.say("The Tyrant splits into mirages!", "danger");
+          }
+          if (rage && this.due(a, "spray", 6)) this.ring(a, "salt_spray", 14, 380, 34, t);
+          break;
+        }
+        case "the_hymnal": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 240 ? face * spec.speed[0] : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "toll", 4)) {
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                300,
+                42,
+                "mob"
+              );
+            this.game.sound("boss", a.x, a.y, 1.3);
+          }
+          if (this.due(a, "notes", 2.6))
+            this.game.combat.mobShoot(a, "hymn_note", 420, 38, rage ? 7 : 5, 0.22);
+          if (rage && this.due(a, "frost", 6)) this.ring(a, "frost_bolt", 14, 380, 36, t);
+          if (this.due(a, "choir", rage ? 9 : 13))
+            for (const dx of [-200, 200]) this.minion("choir_wraith", a.x + dx, a.y - 200);
+          if (!this.game.equipment.has("hymnward") && dist(a, p) < 500)
+            s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.012, 30, 41);
+          break;
+        }
         case "unmaker": {
           this.steer(
             a,
@@ -6707,6 +8467,11 @@
   // src/game/systems/Combat.ts
   var bodyHeight = (a) => MOBS[a.type]?.boss ? 60 : 22;
   var bodyRadius = (a) => a.type === "boss" ? 60 : MOBS[a.type]?.boss ? a.type === "unmaker" || a.type === "sporemother" ? 90 : 70 : 30;
+  var SHOT_DISEASE = {
+    glass_shard: ["bleeding", 0.25],
+    mire_glob: ["marrow_rot", 0.2],
+    prism_bolt: ["glass_cough", 0.04]
+  };
   var Combat = class extends System {
     projectiles = [];
     combo = 0;
@@ -6715,7 +8480,7 @@
     /** Harms the player through armour; returns the damage actually taken. */
     hurtPlayer(amount, source, disease, how = "blow") {
       const s = this.game.s, p = s.player;
-      if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
+      if (amount <= 0 || p.invuln > 0 || s.dead || this.game.dev.god) return 0;
       const sk = this.game.skills.stats(), cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1;
       let scaled = amount * this.game.pocket.damageScale() * Math.max(0.3, 1 + sk.harm);
       if (sk.manaShield && s.mana > 0) {
@@ -6961,7 +8726,7 @@
           this.hurtPlayer(
             b.damage,
             this.shotName(b.kind),
-            void 0,
+            SHOT_DISEASE[b.kind],
             spec.fire ? "fire" : b.kind === "falling_rock" || b.kind === "shockwave" ? "crush" : "blow"
           );
           if ((spec.pierce ?? 0) < 90) spent = true;
@@ -6987,7 +8752,16 @@
         brine_spit: "Brine spit",
         amber_glob: "Burning amber",
         ash_burst: "Choking ash",
-        kiln_ember: "A kiln ember"
+        kiln_ember: "A kiln ember",
+        glass_shard: "Falling glass",
+        prism_bolt: "A prism bolt",
+        lumen_orb: "A lumen orb",
+        mire_glob: "Marrow mire",
+        steam_puff: "Scalding steam",
+        salt_spray: "Salt spray",
+        heat_bolt: "A heat bolt",
+        hymn_note: "A hymn note",
+        bolt: "A bolt"
       }[kind] ?? "A blow";
     }
   };
@@ -7710,7 +9484,7 @@
       },
       realm: {
         usage: "realm <id> [tier] | realm home | realm close",
-        help: "Open a generated realm (orchard, steppe, warren) at a tier and step in, go home, or collapse it.",
+        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir) at a tier and step in, go home, or collapse it.",
         run: ([id, tier]) => {
           const pocket = this.game.pocket;
           if (id === "home") return pocket.leave().ok ? ["Home."] : ["! No realm is open."];
@@ -8189,6 +9963,7 @@
       if (fx.has("buff:ironskin")) d += 8;
       const sk = this.game.skills.stats();
       d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has("vanguard") ? 3 : 0);
+      if (fx.has("mirewalk")) d += 3;
       d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
@@ -8205,7 +9980,7 @@
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + (fx.has("shade") ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
     /** Health from crystals and fruit alone; skills add to it. */
@@ -8943,7 +10718,7 @@
     // ─── Time passing ──────────────────────────────────────────────────────────
     /** Ages food in the pack and in every larder, burns storages' ice, and melts ice you carry. */
     advance(dt) {
-      const s = this.game.s, env2 = this.game.environment, air = this.game.temperature(), near = this.nearest(), cool = this.packCooling();
+      const s = this.game.s, env2 = this.game.environment, air = this.game.temperature(), near = this.nearest(), cool = this.game.pocket.preserves() ? 0 : this.packCooling();
       const coolFor = near ? Math.min(dt, this.coldLeft(near)) : 0, mult = near ? this.multiplier(near) : 1;
       for (const e of s.inventory)
         if (e.fresh !== void 0) e.fresh -= (coolFor * mult + (dt - coolFor)) * rotRate(air) * cool;
@@ -9048,7 +10823,7 @@
       const lava = this.game.inLava(), water = this.game.pocket.submerged();
       if (lava && !this.wasInLava) this.game.sound("sizzle", p.x, p.y, 1.3);
       this.wasInLava = lava;
-      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
+      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
       p.vx = dx * speed;
       const shaft = inShaft(p.x, p.y);
@@ -9129,6 +10904,9 @@
   var Pocket = class extends System {
     caveInAt = 0;
     caveIn = null;
+    hymnWas = false;
+    sunWas = false;
+    ventAt = 0;
     stormWas = false;
     submergedWas = false;
     /** The latest arrival, for the interface's banner. */
@@ -9409,11 +11187,61 @@
       this.game.progress.record("clear:tier" + inst.tier);
     }
     // ─── Hazards ───────────────────────────────────────────────────────────────
-    /** Height of the water in the open realm (the Orchard's tide), if it has any. */
+    /** Height of the water (the Orchard's tide) or mud (the Marches' mire) in the open realm. */
     waterLevel() {
       const r = activeRealm();
+      if (r?.tpl.hazard.id === "mire") return r.geo.mire;
       if (!r || r.tpl.hazard.id !== "tide") return null;
       return tideLevel(r.geo, this.game.s.elapsed);
+    }
+    /** What fills the low ground: water, mire, or nothing. */
+    waterKind() {
+      const id = activeRealm()?.tpl.hazard.id;
+      return id === "tide" || id === "mire" ? id : null;
+    }
+    /** Whether the player wades in the Marches' mire. */
+    inMire() {
+      const p = this.game.s.player;
+      return this.waterKind() === "mire" && this.underwater(p.x, p.y - 12);
+    }
+    /** Strength of the choir's hymn (0 when silent, warded, or warmed by a fire). */
+    hymnLevel() {
+      const r = activeRealm();
+      if (!r || r.tpl.hazard.id !== "hymn" || !this.here()) return 0;
+      return hymnAt(this.game.s.elapsed, r.inst.seed);
+    }
+    /** Whether a fire or kiln is close enough to keep the hymn's cold off. */
+    warmed() {
+      const p = this.game.s.player;
+      return this.game.s.structures.some(
+        (st) => (st.type === "campfire" && st.fuel > 0 || st.type === "kiln" || st.type === "forge") && dist(st, p) < 170
+      );
+    }
+    /** How hard the white sun beats down on the player (0 in shade, at night, or below ground). */
+    sunLevel() {
+      const r = activeRealm(), p = this.game.s.player;
+      if (!r || r.tpl.hazard.id !== "sun" || !this.here() || this.game.isNight()) return 0;
+      if (p.y > surfaceAt(p.x) + 80) return 0;
+      return 1;
+    }
+    /** Whether the realm keeps food from rotting (the Frozen Choir). */
+    preserves() {
+      return this.here() && this.inst()?.realm === "choir";
+    }
+    /** Multiplier on the player's movement from mire and hymn. */
+    moveScale() {
+      if (!this.here()) return 1;
+      const fx = this.game.equipment.effects();
+      let k = 1;
+      if (this.inMire() && !fx.has("mirewalk")) k *= 0.55;
+      if (this.hymnLevel() > 0.5 && !fx.has("hymnward") && !this.warmed()) k *= 0.6;
+      return k;
+    }
+    /** Steam vents blowing near a point. */
+    ventNear(x, y) {
+      return this.game.s.structures.find(
+        (st) => st.type === "steam_vent" && Math.abs(st.x - x) < 34 && y <= st.y + 8 && y > st.y - 130 && ventActive(st.x, this.game.s.elapsed)
+      );
     }
     /** Whether a point in the realm is under water. */
     underwater(x, y) {
@@ -9423,7 +11251,7 @@
     /** Whether the player wades below the tide and it hinders them. */
     submerged() {
       const p = this.game.s.player;
-      return this.underwater(p.x, p.y - 24) && !this.game.equipment.has("swim");
+      return this.waterKind() === "tide" && this.underwater(p.x, p.y - 24) && !this.game.equipment.has("swim");
     }
     /** Strength of the ash storm where the player stands (0 when clear, sheltered, or warded). */
     ashLevel() {
@@ -9451,6 +11279,68 @@
       }
       if (!this.here() || s.dead) return;
       const tpl = realmById(inst.realm), fx = this.game.equipment.effects(), v = s.vitals;
+      const hard = 1 - Math.min(0.8, this.game.skills.get("hazard"));
+      if (tpl.hazard.id === "mire" && this.inMire() && !fx.has("mirewalk")) {
+        v.wetness = clamp(v.wetness + dt * 5, 0, 100);
+        v.bodyTemp = clamp(v.bodyTemp - dt * 8e-3, 30, 41);
+        v.hygiene = clamp(v.hygiene - dt * 0.4, 0, 100);
+        if (!this.submergedWas) {
+          this.game.sound("splash", p.x, p.y, 0.6);
+          this.game.say("You sink into the marrow mire. Get out before it festers.", "danger");
+        }
+        if (this.game.rng() < dt * 0.012 * hard * this.diseaseScale())
+          this.game.ailments.contract("marrow_rot");
+      }
+      if (tpl.hazard.id === "mire") this.submergedWas = this.inMire();
+      if (tpl.hazard.id === "shards") {
+        if (!this.caveIn && s.elapsed > this.caveInAt && p.y < surfaceAt(p.x) + 60) {
+          const x = p.x + (this.game.rng() - 0.5) * 200;
+          this.caveIn = { x, y: p.y - 420, at: s.elapsed + 1.3, kind: "shards" };
+          this.game.sound("crystal", x, p.y - 200, 0.8);
+        }
+        if (this.caveIn && s.elapsed >= this.caveIn.at) {
+          const c = this.caveIn, ward = fx.has("shardward");
+          for (let i = 0; i < 6; i++)
+            this.game.combat.spawn(
+              "glass_shard",
+              { x: c.x + (i - 2.5) * 30 + (this.game.rng() - 0.5) * 16, y: c.y },
+              Math.PI / 2,
+              180 + this.game.rng() * 120,
+              ward ? 0 : 20 * hard,
+              "mob"
+            );
+          this.game.sound("crumble", c.x, c.y + 400, 0.9);
+          this.caveIn = null;
+          this.caveInAt = s.elapsed + 22 + this.game.rng() * 18;
+        }
+      }
+      if (tpl.hazard.id === "traps" && !fx.has("trapsense") && s.elapsed > this.ventAt) {
+        const vent = this.ventNear(p.x, p.y);
+        if (vent) {
+          this.ventAt = s.elapsed + 0.8;
+          this.game.combat.hurtPlayer(30 * hard, "Scalding steam", void 0, "fire");
+        }
+      }
+      if (tpl.hazard.id === "sun") {
+        const sun = this.sunLevel() > 0 && !fx.has("shade");
+        if (sun && !this.sunWas)
+          this.game.say("The white sun beats down. Find shade below, or cover up.", "danger");
+        this.sunWas = sun;
+        if (sun) {
+          v.hydration = clamp(v.hydration - dt * 0.3 * hard, 0, 100);
+          v.bodyTemp = clamp(v.bodyTemp + dt * 0.012 * hard, 30, 41);
+        }
+      }
+      if (tpl.hazard.id === "hymn") {
+        const hymn = this.hymnLevel() > 0.5, guarded = fx.has("hymnward") || this.warmed();
+        if (hymn && !this.hymnWas)
+          this.game.say(
+            guarded ? "The choir begins to sing; the warmth holds it off." : "The choir begins to sing! The cold deepens. Find a fire.",
+            guarded ? "good" : "danger"
+          );
+        this.hymnWas = hymn;
+        if (hymn && !guarded) v.bodyTemp = clamp(v.bodyTemp - dt * 0.025 * hard, 30, 41);
+      }
       if (tpl.hazard.id === "tide") {
         const under = this.underwater(p.x, p.y - 24);
         if (under && !fx.has("swim")) {
@@ -9469,7 +11359,6 @@
           );
         this.stormWas = storm2;
         if (storm2 && !fx.has("ashward")) {
-          const hard = 1 - Math.min(0.8, this.game.skills.get("hazard"));
           v.stamina = clamp(v.stamina - dt * 4 * hard, 0, 100);
           v.hydration = clamp(v.hydration - dt * 0.35 * hard, 0, 100);
           v.hygiene = clamp(v.hygiene - dt * 0.2, 0, 100);
@@ -10169,7 +12058,7 @@
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer, heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
+      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.has("hymnward") ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
@@ -10931,6 +12820,12 @@
       const cy = a.y - 22;
       if (Math.abs(p.x - a.x) < spec.reach * 0.6 + 10 && Math.abs(p.y - 26 - cy) < spec.reach * 0.6 + 20 && t >= a.attackAt) {
         a.attackAt = t + spec.cooldown * 0.6;
+        if (spec.damage <= 0) {
+          a.deadUntil = t + spec.respawn;
+          this.game.event("burst", a.x, a.y - 20, "#fff4e0");
+          if (a.type === "mirage") this.game.say("It was only a mirage.", "ink");
+          return;
+        }
         this.cry(a, "attack");
         const taken = this.game.combat.hurtPlayer(
           spec.damage,
@@ -11712,10 +13607,10 @@
     }
   };
   var sprites = /* @__PURE__ */ new Map();
-  function cached(key, build4) {
+  function cached(key, build9) {
     let s = sprites.get(key);
     if (!s) {
-      s = build4();
+      s = build9();
       if (sprites.size > 4e3) sprites.clear();
       sprites.set(key, s);
     }
@@ -11943,6 +13838,63 @@
       flowers: ["#ffd070"],
       alien: true
     },
+    glasswood: {
+      sky: ["#8ab0d8", "#f0f4ff"],
+      hills: ["#b8c8e0", "#98acc8", "#7890b0", "#5a7290"],
+      skyline: "shards",
+      tree: "voidtree",
+      leaves: ["#8ad0f0", "#b8e8ff", "#e8f8ff"],
+      bark: "#c8d8e8",
+      grass: ["#8aa0b8", "#a8c0d8", "#d0e4f4"],
+      cap: "grass",
+      flowers: ["#bfe8ff", "#f0c0ff", "#ffffff"]
+    },
+    marches: {
+      sky: ["#7a7a74", "#c8c4b0"],
+      hills: ["#a09a88", "#86806e", "#6a6454", "#504a3e"],
+      skyline: "rolling",
+      tree: "dead",
+      leaves: ["#5a5a4a", "#6a6a58", "#7a7a66"],
+      bark: "#4a4438",
+      grass: ["#5a5a44", "#6e6c52", "#8a8866"],
+      cap: "grass",
+      flowers: ["#e8e0c8"]
+    },
+    barrow: {
+      sky: ["#140e06", "#3a2a12"],
+      hills: ["#3a2a14", "#302210", "#281c0c", "#20160a"],
+      skyline: "spires",
+      tree: "dead",
+      leaves: ["#8a6a3a", "#a8844a", "#c8a060"],
+      bark: "#6a5030",
+      grass: ["#6a5030", "#8a6a3a", "#a8844a"],
+      cap: "none",
+      flowers: ["#f0c870"],
+      alien: true
+    },
+    saltflats: {
+      sky: ["#c8e0f0", "#fff8ec"],
+      hills: ["#f0e8dc", "#e0d4c4", "#ccbca8", "#b4a48e"],
+      skyline: "mesa",
+      tree: "cactus",
+      leaves: ["#8aa870", "#a8c088", "#c8d8a8"],
+      bark: "#8a7a5a",
+      grass: ["#d8d0c0", "#e8e0d0", "#f8f4ec"],
+      cap: "sand",
+      flowers: ["#f0a0b0"]
+    },
+    choir: {
+      sky: ["#6a88b0", "#dce8f4"],
+      hills: ["#c8d8e8", "#a8bcd4", "#889ebc", "#6a80a0"],
+      skyline: "peaks",
+      tree: "snowpine",
+      leaves: ["#3a5a6a", "#4a6a7a", "#6a8a9a"],
+      bark: "#3a3028",
+      grass: ["#c8d8e8", "#e0ecf8", "#ffffff"],
+      cap: "snow",
+      flowers: ["#bfe0ff"],
+      snowy: true
+    },
     pocket: {
       sky: ["#0a080c", "#1a1420"],
       hills: ["#1a1420", "#16121c", "#120e18", "#0e0a14"],
@@ -12006,7 +13958,17 @@
     32: { base: "#8a5a44", pattern: "strata", accent: "#e8884a", wall: "#3a2018" },
     33: { base: "#7a5a36", pattern: "soil", wall: "#2e2014" },
     34: { base: "#c8882a", pattern: "crystal", accent: "#ffd070", glow: "#e8a030", wall: "#3a2410" },
-    35: { base: "#6a7a6a", pattern: "planks", wall: "#2a322a" }
+    35: { base: "#6a7a6a", pattern: "planks", wall: "#2a322a" },
+    36: { base: "#9aa8b8", pattern: "soil", cap: "region", wall: "#2e3440" },
+    37: { base: "#a8d8f0", pattern: "crystal", accent: "#f0faff", glow: "#9ad8ff", wall: "#2a3a50" },
+    38: { base: "#5e5a4a", pattern: "mud", cap: "region", wall: "#26241c" },
+    39: { base: "#d8ceb4", pattern: "strata", accent: "#b0a484", wall: "#4a4436" },
+    40: { base: "#b8883a", pattern: "bigbrick", accent: "#f0c870", wall: "#3a2a12" },
+    41: { base: "#6a5a44", pattern: "slate", accent: "#c8a060", wall: "#241c12" },
+    42: { base: "#ece6da", pattern: "sand", cap: "region", wall: "#8a8274" },
+    43: { base: "#e8c0c8", pattern: "crystal", accent: "#fff4f6", glow: "#f0a0b0", wall: "#6a4a50" },
+    44: { base: "#e4eef6", pattern: "ice", cap: "snow", wall: "#4a5a6a" },
+    45: { base: "#a8b8cc", pattern: "bigbrick", accent: "#e8f4ff", wall: "#2a3444" }
   };
   var groundOf = (kind) => GROUND[kind] ?? GROUND[2];
   function daylight(t) {
@@ -12034,6 +13996,11 @@
     tidecaller: "#5ac8c0",
     ashwalker: "#8a7a6a",
     amberguard: "#e8a030",
+    prismweave: "#a8d8f0",
+    bonewalker: "#d8ceb4",
+    gearwright: "#b8883a",
+    saltwarden: "#ece6da",
+    choirsilver: "#a8c0e0",
     warden: "#8a9098",
     bulwark: "#c04a3a",
     aegis: "#f0e0a0",
@@ -12227,6 +14194,61 @@
     queens_mandible: ["fang", "#e8a030"],
     queen_jelly: ["bottle", "#ffe8a0"],
     topaz: ["gem", "#f0b040"],
+    // Band II and III realms.
+    glasswood_fragment: ["scroll", "#a8d8f0"],
+    marches_fragment: ["scroll", "#d8ceb4"],
+    barrow_fragment: ["scroll", "#b8883a"],
+    saltflats_fragment: ["scroll", "#ece6da"],
+    choir_fragment: ["scroll", "#a8c0e0"],
+    glasswood_key: ["key", "#9ad8ff"],
+    marches_key: ["key", "#d8ceb4"],
+    barrow_key: ["key", "#f0c870"],
+    saltflats_key: ["key", "#f0a0b0"],
+    choir_key: ["key", "#bfe0ff"],
+    steam_vent: ["crate", "#8a6a3a"],
+    prism_glass: ["crystal", "#a8e0ff"],
+    lumen_moss: ["bundle", "#e8f0a0"],
+    glassloam: ["block", "#9aa8b8"],
+    prismrock: ["block", "#a8d8f0"],
+    prism_wand: ["wand", "#9ad8ff"],
+    shard_glaive: ["spear", "#a8e0ff"],
+    lumen_antler: ["fang", "#fff8c0"],
+    stag_heart: ["heart", "#fff0a0"],
+    lumen_tincture: ["bottle", "#e8f0a0"],
+    marrow_iron_ore: ["ore", "#d8ceb4", "#5a5448"],
+    marrow_ingot: ["ingot", "#c8bca0"],
+    marrow_mud: ["block", "#5e5a4a"],
+    bonerock: ["block", "#d8ceb4"],
+    bonecleaver: ["axe", "#d8ceb4", "#4a4438"],
+    vertebra_whip: ["whip", "#e6dcc6"],
+    hydra_tooth: ["fang", "#e6dcc6"],
+    hydra_heart: ["heart", "#8a9a5a"],
+    marrow_purge: ["bottle", "#8a9a5a"],
+    brass_gear: ["ore", "#f0c870", "#5a4a34"],
+    brass_ingot: ["ingot", "#d8a048"],
+    brass_plate: ["block", "#b8883a"],
+    gearstone: ["block", "#6a5a44"],
+    brass_repeater: ["crossbow", "#d8a048"],
+    piston_hammer: ["hammer", "#d8a048", "#3a2a12"],
+    saint_cog: ["ring", "#f0c870"],
+    engine_heart: ["core", "#f0c870"],
+    saltglass: ["crystal", "#f0c0c8"],
+    saltcrust: ["block", "#ece6da"],
+    saltglass_rock: ["block", "#e8c0c8"],
+    mirage_blade: ["sword", "#f0c0c8"],
+    saltglass_bow: ["bow", "#f0c0c8"],
+    tyrant_eye: ["orb", "#ffb060"],
+    mirage_crown: ["star", "#fff0c0"],
+    rime_silver_ore: ["ore", "#e8f4ff", "#5a6a7a"],
+    rime_silver: ["ingot", "#dfeaf6"],
+    frost_lily: ["berries", "#bfe0ff"],
+    bell_bronze: ["lump", "#c8904a"],
+    rimesnow: ["block", "#e4eef6"],
+    choirstone: ["block", "#a8b8cc"],
+    choir_stave: ["staff", "#bfe0ff"],
+    bellhammer: ["hammer", "#c8904a", "#3a3028"],
+    hymnal_bell: ["ring", "#c8904a"],
+    hymnal_core: ["core", "#bfe0ff"],
     // Keeping food.
     cool_pit: ["crate", "#6a6660"],
     relic_shelf: ["crate", "#b8903a"],
@@ -13789,6 +15811,371 @@
       light: [0.8, 0.5, 0.15]
     }
   });
+  Object.assign(MOBS3, {
+    shard_crawler: {
+      tpl: "crawler",
+      body: "#8ab8d8",
+      belly: "#dff4ff",
+      eye: "#1b2a3a",
+      w: 24,
+      h: 10,
+      parts: ["claws", "shell", "stinger"],
+      top: 18,
+      light: [0.2, 0.35, 0.45]
+    },
+    glass_golem: {
+      tpl: "biped",
+      body: "#a8d8f0",
+      belly: "#5a7a98",
+      eye: "#ffffff",
+      w: 26,
+      h: 40,
+      parts: ["armor"],
+      top: 48,
+      light: [0.35, 0.55, 0.7]
+    },
+    glassling: {
+      tpl: "slime",
+      body: "#bfe8ff",
+      belly: "#8ab8d8",
+      eye: "#1b2a3a",
+      w: 16,
+      h: 12,
+      top: 18,
+      light: [0.2, 0.35, 0.45]
+    },
+    prism_moth: {
+      tpl: "flyer",
+      body: "#e8e0ff",
+      belly: "#9ad8ff",
+      eye: "#2a1a3a",
+      w: 22,
+      h: 9,
+      parts: ["ears"],
+      top: 14,
+      light: [0.4, 0.45, 0.6]
+    },
+    lumen_wisp: {
+      tpl: "floater",
+      body: "#fff8c0",
+      belly: "#ffe070",
+      eye: "#8a6a1a",
+      w: 16,
+      h: 16,
+      parts: ["glow"],
+      top: 22,
+      light: [0.8, 0.75, 0.4]
+    },
+    crystal_warden: {
+      tpl: "biped",
+      body: "#8ac0e0",
+      belly: "#2a4a6a",
+      eye: "#ffffff",
+      w: 30,
+      h: 48,
+      parts: ["armor", "horns", "sword", "shield"],
+      top: 58,
+      light: [0.45, 0.65, 0.85]
+    },
+    bone_hound: {
+      tpl: "quad",
+      body: "#d8ceb4",
+      belly: "#8a8272",
+      eye: "#ff5a3a",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "bones"],
+      top: 24
+    },
+    mire_leech: {
+      tpl: "worm",
+      body: "#5a6a4a",
+      eye: "#e8f070",
+      w: 32,
+      h: 8,
+      top: 14
+    },
+    ossuary_knight: {
+      tpl: "biped",
+      body: "#d8ceb4",
+      belly: "#4a4438",
+      eye: "#ff5a3a",
+      w: 18,
+      h: 34,
+      parts: ["armor", "bones", "sword", "shield"],
+      top: 42
+    },
+    marsh_ghoul: {
+      tpl: "biped",
+      body: "#6a7a5a",
+      belly: "#3a4430",
+      eye: "#e8f070",
+      w: 14,
+      h: 30,
+      parts: ["claws", "bandage"],
+      top: 36
+    },
+    carrion_crow: {
+      tpl: "flyer",
+      body: "#2a2a30",
+      belly: "#4a4a52",
+      eye: "#ff5a3a",
+      w: 24,
+      h: 10,
+      parts: ["beak", "tail"],
+      top: 18
+    },
+    bone_colossus: {
+      tpl: "biped",
+      body: "#e6dcc6",
+      belly: "#6a6454",
+      eye: "#ff5a3a",
+      w: 36,
+      h: 54,
+      parts: ["bones", "horns", "armor"],
+      top: 64
+    },
+    cog_spider: {
+      tpl: "crawler",
+      body: "#b8883a",
+      belly: "#6a5030",
+      eye: "#ff6a2a",
+      w: 24,
+      h: 10,
+      parts: ["claws", "longlegs"],
+      top: 18
+    },
+    tin_soldier: {
+      tpl: "biped",
+      body: "#a8a4a0",
+      belly: "#c04a3a",
+      eye: "#1b1716",
+      w: 16,
+      h: 34,
+      parts: ["armor", "sword", "shield"],
+      top: 42
+    },
+    brass_sentry: {
+      tpl: "biped",
+      body: "#d8a048",
+      belly: "#5a4028",
+      eye: "#ff3a2a",
+      w: 22,
+      h: 32,
+      parts: ["armor", "eye"],
+      top: 40,
+      light: [0.5, 0.15, 0.08]
+    },
+    clockwork_hound: {
+      tpl: "quad",
+      body: "#b8883a",
+      belly: "#5a4028",
+      eye: "#ff6a2a",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "armor"],
+      top: 24
+    },
+    gear_wisp: {
+      tpl: "floater",
+      body: "#f0c870",
+      belly: "#8a6a3a",
+      eye: "#3a2a12",
+      w: 18,
+      h: 18,
+      parts: ["glow"],
+      top: 24,
+      light: [0.6, 0.45, 0.2]
+    },
+    brass_juggernaut: {
+      tpl: "biped",
+      body: "#b8883a",
+      belly: "#3a2a12",
+      eye: "#ff6a2a",
+      w: 38,
+      h: 54,
+      parts: ["armor", "horns", "shield"],
+      top: 64,
+      light: [0.5, 0.3, 0.1]
+    },
+    salt_strider: {
+      tpl: "quad",
+      body: "#d8c8b0",
+      belly: "#f4ece0",
+      eye: "#1b1716",
+      w: 26,
+      h: 22,
+      parts: ["longlegs", "tail", "horns"],
+      top: 38
+    },
+    brine_scorpion: {
+      tpl: "crawler",
+      body: "#e8d8c8",
+      belly: "#c8a890",
+      eye: "#1b1716",
+      w: 26,
+      h: 10,
+      parts: ["stinger", "claws"],
+      top: 20
+    },
+    sand_raptor: {
+      tpl: "biped",
+      body: "#c8a070",
+      belly: "#f0dcb8",
+      eye: "#1b1716",
+      w: 18,
+      h: 28,
+      parts: ["tail", "beak", "claws"],
+      top: 34
+    },
+    salt_wraith: {
+      tpl: "floater",
+      body: "#f4f0e8",
+      belly: "#c8c0b4",
+      eye: "#5a8aff",
+      w: 18,
+      h: 30,
+      parts: ["hood", "robe", "ghost"],
+      top: 36
+    },
+    mirage_djinn: {
+      tpl: "floater",
+      body: "#ffb060",
+      belly: "#fff0a0",
+      eye: "#3a1a0a",
+      w: 18,
+      h: 26,
+      parts: ["robe", "glow"],
+      top: 32,
+      light: [0.7, 0.45, 0.2]
+    },
+    salt_colossus: {
+      tpl: "biped",
+      body: "#ece6da",
+      belly: "#b4a48e",
+      eye: "#f0a0b0",
+      w: 38,
+      h: 56,
+      parts: ["armor", "horns"],
+      top: 66
+    },
+    rime_wolf: {
+      tpl: "quad",
+      body: "#c8d8e8",
+      belly: "#f4f8ff",
+      eye: "#5ab8ff",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "mane"],
+      top: 24
+    },
+    bell_golem: {
+      tpl: "biped",
+      body: "#c8904a",
+      belly: "#5a3a1a",
+      eye: "#bfe0ff",
+      w: 30,
+      h: 42,
+      parts: ["armor", "crown"],
+      top: 52
+    },
+    cantor: {
+      tpl: "biped",
+      body: "#dfeaf6",
+      belly: "#6a88b0",
+      eye: "#bfe0ff",
+      w: 14,
+      h: 32,
+      parts: ["hood", "robe", "staff"],
+      top: 38
+    },
+    choir_wraith: {
+      tpl: "floater",
+      body: "#bfe0ff",
+      belly: "#6a88b0",
+      eye: "#ffffff",
+      w: 18,
+      h: 28,
+      parts: ["hood", "robe", "ghost"],
+      top: 34,
+      light: [0.3, 0.45, 0.6]
+    },
+    frost_moth: {
+      tpl: "flyer",
+      body: "#dff0ff",
+      belly: "#8ab8d8",
+      eye: "#1b2a3a",
+      w: 20,
+      h: 8,
+      parts: ["ears"],
+      top: 14
+    },
+    grand_cantor: {
+      tpl: "biped",
+      body: "#e8f4ff",
+      belly: "#3a5a8a",
+      eye: "#bfe0ff",
+      w: 24,
+      h: 46,
+      parts: ["hood", "robe", "staff", "crown"],
+      top: 56,
+      light: [0.35, 0.5, 0.7]
+    },
+    lumen_stag: {
+      tpl: "quad",
+      body: "#dff4ff",
+      belly: "#9ad8ff",
+      eye: "#fff0a0",
+      w: 64,
+      h: 48,
+      parts: ["antlers", "tail", "longlegs", "glow"],
+      top: 90,
+      light: [0.8, 0.85, 1]
+    },
+    ossuary_hydra: {
+      tpl: "crawler",
+      body: "#d8ceb4",
+      belly: "#5a6a4a",
+      eye: "#ff5a3a",
+      w: 96,
+      h: 38,
+      parts: ["claws", "spines", "horns", "bones"],
+      top: 66
+    },
+    engine_saint: {
+      tpl: "biped",
+      body: "#d8a048",
+      belly: "#3a2a12",
+      eye: "#ffe070",
+      w: 50,
+      h: 80,
+      parts: ["armor", "crown", "staff", "embers"],
+      top: 92,
+      light: [0.9, 0.6, 0.25]
+    },
+    mirage_tyrant: {
+      tpl: "floater",
+      body: "#ffb060",
+      belly: "#fff0c0",
+      eye: "#3a1a0a",
+      w: 56,
+      h: 64,
+      parts: ["robe", "crown", "glow"],
+      top: 76,
+      light: [0.9, 0.6, 0.3]
+    },
+    the_hymnal: {
+      tpl: "biped",
+      body: "#c8904a",
+      belly: "#dfeaf6",
+      eye: "#bfe0ff",
+      w: 58,
+      h: 84,
+      parts: ["armor", "crown", "robe"],
+      top: 96,
+      light: [0.5, 0.65, 0.9]
+    }
+  });
   var SKINS = [
     "#d8a47c",
     "#b8805a",
@@ -14255,19 +16642,29 @@
       top: 44
     };
   }
+  var MIRAGE_GUISE = {
+    mirage: "sand_raptor",
+    tyrant_mirage: "mirage_tyrant"
+  };
   function mobArt(g, a) {
     if (a.type === "boss") return bossArt(g);
+    const guise = MIRAGE_GUISE[a.type];
+    if (guise) return MOBS3[guise];
     return MOBS3[a.type] ?? MOBS3.wolf;
   }
   function drawAnimal(c, g, a, x, y, t) {
-    const m = track(a.id, a.x, a.y, a.hp, t), art2 = mobArt(g, a), facing = Math.cos(a.angle) >= 0 ? 1 : -1, hurt = t - m.hurt < 0.16, walks = art2.tpl === "quad" || art2.tpl === "biped" || art2.tpl === "crawler", frame2 = walks ? m.move > 0.3 ? Math.floor(m.walk / 6) % 6 : 0 : Math.floor(t * (art2.tpl === "flyer" ? 10 : 6) + a.phase) % 4, key = a.type === "boss" ? "boss" + g.s.altar.level : a.type;
+    const m = track(a.id, a.x, a.y, a.hp, t), art2 = mobArt(g, a), facing = Math.cos(a.angle) >= 0 ? 1 : -1, hurt = t - m.hurt < 0.16, walks = art2.tpl === "quad" || art2.tpl === "biped" || art2.tpl === "crawler", frame2 = walks ? m.move > 0.3 ? Math.floor(m.walk / 6) % 6 : 0 : Math.floor(t * (art2.tpl === "flyer" ? 10 : 6) + a.phase) % 4, key = a.type === "boss" ? "boss" + g.s.altar.level : MIRAGE_GUISE[a.type] ?? a.type;
     const sy = Math.round(y + (m.sy - a.y) / PX);
+    const mirage = !!MIRAGE_GUISE[a.type];
+    if (mirage)
+      c.globalAlpha = g.equipment.has("shade") ? 0.3 : 0.8 + 0.12 * Math.sin(t * 9 + a.phase);
     const spr = mobSprite(key, art2, frame2);
     if (walks || art2.tpl === "slime") {
       c.fillStyle = "rgba(10,8,6,0.28)";
       c.fillRect(Math.round(x - art2.w * 0.35), Math.round(y), Math.round(art2.w * 0.7), 1);
     }
     blit(c, spr, x + (hurt ? Math.floor(t * 60) % 2 ? 1 : -1 : 0), sy, facing < 0);
+    if (mirage) c.globalAlpha = 1;
     if (hurt) {
       const flash = cached(`flash:${key}:${frame2}`, () => {
         const cv = document.createElement("canvas");
@@ -14681,6 +17078,9 @@
       else if (n.kind.includes("starmetal")) out.push([n.x, n.y - 12, 0.95, 0.85, 0.45]);
       else if (n.kind.includes("voidsteel")) out.push([n.x, n.y - 12, 0.6, 0.3, 0.95]);
       else if (n.kind === "burrow_amber") out.push([n.x, n.y - 12, 0.8, 0.5, 0.15]);
+      else if (n.kind === "prism_glass") out.push([n.x, n.y - 12, 0.4, 0.7, 0.95]);
+      else if (n.kind === "saltglass") out.push([n.x, n.y - 12, 0.8, 0.5, 0.55]);
+      else if (n.kind === "lumen_moss") out.push([n.x, n.y - 8, 0.6, 0.65, 0.3]);
     }
     for (const a of g.s.animals) {
       if (a.deadUntil) continue;
@@ -15031,6 +17431,8 @@
   var PLANT_KINDS = /* @__PURE__ */ new Set([
     "bog_apple",
     "cinderflax",
+    "lumen_moss",
+    "frost_lily",
     "berry",
     "herb",
     "fiber",
@@ -15127,6 +17529,21 @@
             ].slice(0, full ? 4 : 2))
               p.rect(x, y, 2, 2, "#b8583a");
           break;
+        case "lumen_moss":
+          for (let x = 3; x < 16; x += 3) {
+            p.ellipse(x, 14, 3, 2, bare ? "#6a7a6a" : "#9ab88a");
+            if (!bare) p.set(x, 12, "#f0f8a0");
+          }
+          break;
+        case "frost_lily":
+          p.line(9, 15, 9, 8, "#5a7a8a");
+          p.ellipse(7, 13, 3, 1, "#6a8a9a");
+          if (!bare) {
+            p.ellipse(9, 6, 4, 3, "#dff0ff");
+            p.rect(8, 5, 3, 2, "#bfe0ff");
+            p.set(9, 5, "#ffffff");
+          }
+          break;
         case "cinderflax":
           for (let x = 3; x < 16; x += 2) {
             p.line(x, 15, x + x % 3 - 1, bare ? 11 : 4, x % 4 ? "#7a6a54" : "#948068");
@@ -15175,6 +17592,11 @@
     opal: { rock: "#6a7470", crystal: "#e8f0f8", glow: true },
     kilnstone_ore: { rock: "#6a4a3a", fleck: "#ff8a3a", shine: "#ffc070" },
     burrow_amber: { rock: "#5a4028", crystal: "#e8a030", glow: true },
+    prism_glass: { rock: "#6a7488", crystal: "#bfe8ff", glow: true },
+    marrow_iron_ore: { rock: "#8a8272", fleck: "#e6dcc6", shine: "#c8bca0" },
+    brass_gear: { rock: "#5a4a34", fleck: "#f0c870", shine: "#fff0a0" },
+    saltglass: { rock: "#c8c0b4", crystal: "#f0c0c8", glow: true },
+    rime_silver_ore: { rock: "#5a6a7a", fleck: "#e8f4ff", shine: "#ffffff" },
     coal: { rock: "#5a5a5e", fleck: "#1c1c20", shine: "#8a8a96" },
     ice: { rock: "#8fb8d0", crystal: "#dff4ff" },
     obsidian: { rock: "#3a3448", crystal: "#2a2433", shine: "#9a8ac0" },
@@ -15298,15 +17720,22 @@
     if (x1 <= x0) return;
     const top = Math.round(level / PX - ay);
     if (top > h) return;
-    c.fillStyle = "rgba(40, 110, 120, 0.42)";
+    const mire = g.pocket.waterKind() === "mire";
+    c.fillStyle = mire ? "rgba(74, 80, 52, 0.62)" : "rgba(40, 110, 120, 0.42)";
     c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
-    c.fillStyle = "rgba(120, 200, 200, 0.25)";
+    c.fillStyle = mire ? "rgba(130, 140, 90, 0.35)" : "rgba(120, 200, 200, 0.25)";
     c.fillRect(x0, Math.max(0, top), x1 - x0, 3);
-    c.fillStyle = "rgba(210, 245, 240, 0.7)";
+    c.fillStyle = mire ? "rgba(200, 196, 150, 0.6)" : "rgba(210, 245, 240, 0.7)";
+    const speed = mire ? 0.3 : 1;
     for (let x = x0; x < x1; x++) {
-      const wx = x + ax, wave = Math.round(Math.sin(wx / 9 + t * 2.2) + Math.sin(wx / 23 - t * 1.3));
-      if ((wx + Math.floor(t * 6)) % 7 < 5) c.fillRect(x, top + wave - 1, 1, 1);
+      const wx = x + ax, wave = Math.round(Math.sin(wx / 9 + t * 2.2 * speed) + Math.sin(wx / 23 - t * 1.3 * speed));
+      if ((wx + Math.floor(t * 6 * speed)) % 7 < 5) c.fillRect(x, top + wave - 1, 1, 1);
     }
+    if (mire)
+      for (let i = 0; i < 24; i++) {
+        const life = (t * 0.5 + hash3(i, 11)) % 1, bx = Math.floor(hash3(i, 12) * (x1 - x0)) + x0;
+        if (life < 0.3) c.fillRect(bx, top - Math.round(life * 6), 1, 1);
+      }
   }
   function drawRealmAir(c, g, ax, ay, w, h, t) {
     const ash = g.pocket.ashLevel();
@@ -15320,8 +17749,49 @@
         c.fillRect(x, y, hash3(i, 5) > 0.7 ? 2 : 1, 1);
       }
     }
+    if (g.s.pocket?.realm === "barrow" && g.pocket.here())
+      for (const st of g.s.structures) {
+        if (st.type !== "steam_vent" || !data_exports.ventActive(st.x, g.s.elapsed)) continue;
+        const sx = Math.round(st.x / PX - ax), sy = Math.round(st.y / PX - ay);
+        if (sx < -20 || sx > w + 20 || sy < -80 || sy > h + 20) continue;
+        for (let i = 0; i < 30; i++) {
+          const life = (t * 2 + hash3(i, 21)) % 1;
+          c.fillStyle = `rgba(240, 240, 240, ${(0.7 * (1 - life)).toFixed(2)})`;
+          c.fillRect(
+            sx + Math.round((hash3(i, 22) - 0.5) * 14 * (1 + life * 2)),
+            sy - Math.round(life * 60),
+            2,
+            2
+          );
+        }
+      }
+    const sun = g.pocket.sunLevel();
+    if (sun > 0) {
+      const guard = g.equipment.has("shade") ? 0.3 : 1;
+      c.fillStyle = `rgba(255, 246, 220, ${(0.22 * guard * (0.85 + 0.15 * Math.sin(t * 1.3))).toFixed(2)})`;
+      c.fillRect(0, 0, w, h);
+    }
+    const hymn = g.pocket.hymnLevel();
+    if (hymn > 0) {
+      const guard = g.equipment.has("hymnward") || g.pocket.warmed() ? 0.35 : 1;
+      c.fillStyle = `rgba(150, 190, 240, ${(hymn * 0.3 * guard).toFixed(2)})`;
+      c.fillRect(0, 0, w, h);
+      c.fillStyle = `rgba(230, 244, 255, ${(hymn * 0.8).toFixed(2)})`;
+      for (let i = 0; i < 40; i++) {
+        const x = Math.floor((hash3(i, 31) * w + t * 20 * (hash3(i, 32) - 0.5)) % w), y = Math.floor((hash3(i, 33) * h - t * (10 + hash3(i, 34) * 14)) % h + h) % h;
+        c.fillRect(x, y, 1, 3);
+        c.fillRect(x + 1, y, 2, 1);
+      }
+    }
     const fall = g.pocket.pendingCaveIn();
-    if (fall) {
+    if (fall?.kind === "shards") {
+      const sx = Math.round(fall.x / PX - ax), sy = Math.max(4, Math.round(fall.y / PX - ay));
+      c.fillStyle = "rgba(220, 245, 255, 0.9)";
+      for (let i = 0; i < 18; i++) {
+        if (Math.sin(t * 20 + i * 1.7) < 0.2) continue;
+        c.fillRect(sx + Math.round((hash3(i, 9) - 0.5) * 90), sy + Math.round(hash3(i, 10) * 30), 1, 1);
+      }
+    } else if (fall) {
       const sx = Math.round(fall.x / PX - ax), sy = Math.round(fall.y / PX - ay);
       c.fillStyle = "rgba(160, 130, 90, 0.8)";
       for (let i = 0; i < 26; i++) {
@@ -16031,6 +18501,13 @@
       p.rect(8, 12, 6, 7, "#2a2630");
       p.shadeEdges(0.2, -0.3);
     }),
+    // A brass grille over a steam pipe (the Clockwork Barrow's traps).
+    steam_vent: () => sprite(30, 6, 15, 5, (p) => {
+      p.rect(0, 1, 30, 5, "#5a4028");
+      p.rect(0, 1, 30, 1, "#d8a048");
+      for (let x = 3; x < 28; x += 4) p.rect(x, 2, 2, 3, "#1c140c");
+      p.rect(0, 5, 30, 1, "#3a2a14");
+    }),
     kiln: () => sprite(40, 34, 20, 33, (p) => {
       p.ellipse(20, 22, 18, 14, "#8a5a44");
       p.rect(2, 22, 36, 12, "#8a5a44");
@@ -16050,7 +18527,12 @@
       citadel: ["#3a2228", "#ff8a3a"],
       mycelia: ["#4a3f5e", "#58e0d0"],
       skyreach: ["#c8c0b0", "#f8e08a"],
-      void: ["#2a1c3a", "#b36cff"]
+      void: ["#2a1c3a", "#b36cff"],
+      glasswood: ["#6a88a8", "#bfe8ff"],
+      marches: ["#6a6454", "#e6dcc6"],
+      barrow: ["#5a4028", "#f0c870"],
+      saltflats: ["#b4a48e", "#f0c0c8"],
+      choir: ["#5a6a7a", "#dfeaf6"]
     };
     const [body, metal] = trim[kind] ?? ["#7a5a3c", "#d8b848"];
     return cached(
@@ -18739,7 +21221,7 @@
       this.ctx = ctx2;
       this.out = out;
       const k = kit(ctx2);
-      const bed = (name, build4) => {
+      const bed = (name, build9) => {
         const g = ctx2.createGain();
         g.gain.value = 0;
         const n = ctx2.createBufferSource();
@@ -18747,7 +21229,7 @@
         n.loop = true;
         n.playbackRate.value = 0.97 + Object.keys(this.beds).length * 0.013;
         n.start();
-        build4(n).connect(g).connect(out);
+        build9(n).connect(g).connect(out);
         this.beds[name] = g;
       };
       bed("rain", (n) => {
@@ -20779,6 +23261,245 @@
     }
   );
 
+  // src/audio/tracks/glasswood.ts
+  var glasswood = compose(
+    {
+      id: "glasswood",
+      title: "Prism Canopy",
+      mood: "The Glasswood",
+      bpm: 96,
+      bars: 24,
+      parts: {
+        musicbox: { inst: "musicbox", vol: 0.6, rev: 0.6, echo: 0.3 },
+        crystal: { inst: "crystal", vol: 0.55, rev: 0.6, echo: 0.25, pan: 0.2 },
+        harp: { inst: "harp", vol: 0.6, rev: 0.5, pan: -0.2 },
+        bell: { inst: "bell", vol: 0.35, rev: 0.7 },
+        strings: { inst: "strings", vol: 0.45, rev: 0.6 },
+        pad: { inst: "pad", vol: 0.45, rev: 0.6, cutoff: 2400 },
+        bass: { inst: "bass", vol: 0.6 },
+        shaker: { inst: "shaker", vol: 0.25, pan: 0.3 },
+        drip: { inst: "drip", vol: 0.35, rev: 0.7, echo: 0.4, pan: -0.4 }
+      },
+      echoBeats: 0.75,
+      echoFeedback: 0.35
+    },
+    (s) => {
+      const progA = "E F#/E E F#/E C#m7 F# Bmaj7 F#", progB = "C#m7 B A#m7b5 Emaj7 C#m7 D#m7 F# F#";
+      const theme = "e5:4 g#5:4 a#5:4 b5:4 | d#6:8 b5:8 | c#6:4 b5:4 a#5:4 g#5:4 | f#5:12 r:4 | e5:4 f#5:4 g#5:4 d#6:4 | c#6:8 a#5:8 | b5:4 a#5:4 f#5:4 d#5:4 | e5:16";
+      const shimmer = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.arp("harp", bar, prog, "0 1 2 3 2 1 2 3", 52, 2, { vel: 0.7 });
+        s.bass("bass", bar, prog, "R:8 5:8", 40);
+        s.pad("pad", bar, prog, 64, { vel: 0.5 });
+        s.grid("shaker", bar, "..x...x...x...x.", n, { vel: 0.6 });
+        for (let i = 0; i < n; i += 2) s.at("drip", bar + i + 0.6, i % 4 ? "b6" : "e7", 0.25, 0.6);
+      };
+      s.play("musicbox", 0, theme);
+      shimmer(0, progA);
+      s.play(
+        "crystal",
+        8,
+        "g#5:8 a#5:8 | b5:12 r:4 | c#6:8 b5:4 a#5:4 | g#5:16 | e5:8 f#5:8 | g#5:4 a#5:4 b5:8 | a#5:16 | f#5:16"
+      );
+      s.pad("strings", 8, progB, 60, { vel: 0.6 });
+      for (let b = 8; b < 16; b += 2) s.at("bell", b, b % 4 ? "g#6" : "e6", 4, 0.6);
+      shimmer(8, progB);
+      s.play("crystal", 16, theme);
+      s.play("musicbox", 16, theme, { transpose: 12, vel: 0.45 });
+      shimmer(16, progA);
+    }
+  );
+
+  // src/audio/tracks/marches.ts
+  var marches = compose(
+    {
+      id: "marches",
+      title: "Ossuary Fen",
+      mood: "The Bone Marches",
+      bpm: 76,
+      bars: 18,
+      parts: {
+        toll: { inst: "toll", vol: 0.5, rev: 0.8 },
+        chant: { inst: "chant", vol: 0.6, rev: 0.7 },
+        reed: { inst: "reed", vol: 0.6, rev: 0.6, echo: 0.2, pan: 0.2 },
+        strings: { inst: "strings", vol: 0.5, rev: 0.6, cutoff: 1600 },
+        timpani: { inst: "timpani", vol: 0.6, rev: 0.5 },
+        tom: { inst: "tom", vol: 0.4, rev: 0.4, pan: -0.2 },
+        bass: { inst: "bass", vol: 0.7 },
+        pad: { inst: "pad", vol: 0.4, rev: 0.7, cutoff: 1400 },
+        wind: { inst: "wind", vol: 0.3, rev: 0.5 }
+      }
+    },
+    (s) => {
+      const progA = "Dm Eb Dm Cm Dm Eb Bb A", progB = "Bb C Dm Dm Eb F Gm A";
+      const march = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("timpani", bar, "x.......x.......", n);
+        s.grid("tom", bar, "......x.......x.", n, { vel: 0.6 });
+        s.bass("bass", bar, prog, "R:12 5:4", 38);
+        s.pad("pad", bar, prog, 56, { vel: 0.5 });
+        for (let i = 0; i < n; i += 4) s.at("toll", bar + i, "d4", 8, 0.8);
+      };
+      s.play(
+        "chant",
+        0,
+        "d4:8 eb4:8 | f4:4 eb4:4 d4:8 | c4:8 d4:8 | a3:16 | d4:4 f4:4 g4:4 a4:4 | bb4:8 a4:8 | g4:4 f4:4 eb4:8 | d4:16"
+      );
+      s.play("wind", 0, "d5:32 | a4:32 | d5:32 | a4:32", { vel: 0.5 });
+      march(0, progA);
+      s.play(
+        "reed",
+        8,
+        "a4:4 bb4:4 c5:8 | d5:12 r:4 | f5:8 eb5:4 d5:4 | c5:16 | bb4:8 c5:8 | d5:4 eb5:4 f5:8 | g5:8 f5:4 eb5:4 | c#5:16"
+      );
+      s.pad("strings", 8, progB, 58, { vel: 0.6 });
+      march(8, progB);
+      s.pad("strings", 16, "Dm:2", 58, { vel: 0.5 });
+      s.at("toll", 16, "d4", 8, 0.9);
+      s.bass("bass", 16, "Dm:2", "R:16", 38);
+    }
+  );
+
+  // src/audio/tracks/barrow.ts
+  var barrow = compose(
+    {
+      id: "barrow",
+      title: "The Engine Hymn",
+      mood: "The Clockwork Barrow",
+      bpm: 108,
+      bars: 24,
+      parts: {
+        kick: { inst: "kick", vol: 0.6 },
+        tek: { inst: "tek", vol: 0.4, pan: 0.3 },
+        rim: { inst: "rim", vol: 0.45, rev: 0.3, pan: -0.3 },
+        marimba: { inst: "marimba", vol: 0.7, rev: 0.3 },
+        synthbass: { inst: "synthbass", vol: 0.6 },
+        organ: { inst: "organ", vol: 0.5, rev: 0.6 },
+        brass: { inst: "brass", vol: 0.5, rev: 0.4 },
+        bell: { inst: "bell", vol: 0.4, rev: 0.6, echo: 0.2 },
+        pad: { inst: "pad", vol: 0.35, rev: 0.6, cutoff: 1800 }
+      }
+    },
+    (s) => {
+      const progA = "Am Am F G Am Am E E", progB = "F G Am Am F G E E";
+      const hymn = "a4:8 c5:8 | e5:12 r:4 | d5:8 c5:4 b4:4 | c5:16 | a4:4 b4:4 c5:4 e5:4 | f5:8 e5:8 | d5:4 c5:4 b4:8 | e5:16";
+      const works = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.arp("marimba", bar, prog, "0 2 1 2 3 2 1 2", 57, 2, { vel: 0.8 });
+        s.grid("tek", bar, "x.x.x.x.x.x.x.x.", n, { vel: 0.6 });
+        s.grid("rim", bar, "....x.......x..x", n, { vel: 0.7 });
+        s.grid("kick", bar, "x.....x...x.....", n);
+        s.bass("synthbass", bar, prog, "R:4 R:2 R:2 5:4 R:4", 33);
+        s.pad("pad", bar, prog, 57, { vel: 0.5 });
+      };
+      works(0, progA);
+      s.hits("brass", 4, "Am F G E", "x.......x.....x.", 55, { vel: 0.5 });
+      s.play("organ", 8, hymn);
+      works(8, progB);
+      s.play("organ", 16, hymn, { vel: 0.8 });
+      s.play("bell", 16, hymn, { transpose: 12, vel: 0.5 });
+      works(16, progA);
+      s.hits("brass", 20, "Am F G E", "x.......x.....x.", 55, { vel: 0.6 });
+    }
+  );
+
+  // src/audio/tracks/saltflats.ts
+  var saltflats = compose(
+    {
+      id: "saltflats",
+      title: "White Sun of Oru",
+      mood: "The Salt Flats of Oru",
+      bpm: 100,
+      bars: 24,
+      parts: {
+        doum: { inst: "doum", vol: 0.75 },
+        tek: { inst: "tek", vol: 0.4, pan: 0.25 },
+        zill: { inst: "zill", vol: 0.3, pan: -0.3, rev: 0.4 },
+        oud: { inst: "oud", vol: 0.6, rev: 0.3, pan: -0.2 },
+        reed: { inst: "reed", vol: 0.65, rev: 0.5, echo: 0.2 },
+        strings: { inst: "strings", vol: 0.45, rev: 0.6 },
+        sub: { inst: "sub", vol: 0.55 },
+        pad: { inst: "pad", vol: 0.35, rev: 0.6, cutoff: 2200 },
+        wind: { inst: "wind", vol: 0.3, rev: 0.5 }
+      }
+    },
+    (s) => {
+      const progA = "A A Bb A Gm A Bb A", progB = "Dm Dm Gm A Bb A Gm A";
+      const theme = "a4:4 bb4:4 c#5:4 d5:4 | e5:12 r:4 | f5:4 e5:4 d5:4 c#5:4 | d5:8 bb4:8 | a4:4 c#5:4 e5:4 g5:4 | f5:8 e5:8 | d5:4 c#5:4 bb4:4 c#5:4 | a4:16";
+      const pulse2 = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("doum", bar, "x..x..x.x...x...", n);
+        s.grid("tek", bar, "..x.x..x..x.x.xx", n, { vel: 0.7 });
+        s.grid("zill", bar, "x.......x.......", n, { vel: 0.6 });
+        s.arp("oud", bar, prog, "0 1 2 1 0 1 2 3", 50, 2, { vel: 0.7 });
+        s.bass("sub", bar, prog, "R:16", 33);
+        s.pad("pad", bar, prog, 57, { vel: 0.45 });
+      };
+      s.play("reed", 0, theme);
+      s.play("wind", 0, "a4:32 | e5:32 | a4:32 | e5:32", { vel: 0.5 });
+      pulse2(0, progA);
+      s.play(
+        "strings",
+        8,
+        "d5:8 f5:8 | a5:12 r:4 | g5:8 f5:4 e5:4 | c#5:16 | d5:8 e5:8 | f5:4 e5:4 d5:8 | bb4:8 c#5:8 | a4:16"
+      );
+      pulse2(8, progB);
+      s.play("reed", 16, theme);
+      s.play("oud", 16, theme, { transpose: -12, vel: 0.5 });
+      pulse2(16, progA);
+    }
+  );
+
+  // src/audio/tracks/choir.ts
+  var choir2 = compose(
+    {
+      id: "choir",
+      title: "Frozen Hymnal",
+      mood: "The Frozen Choir",
+      bpm: 66,
+      bars: 16,
+      parts: {
+        choir: { inst: "choir", vol: 0.55, rev: 0.8 },
+        organ: { inst: "organ", vol: 0.4, rev: 0.7 },
+        strings: { inst: "strings", vol: 0.55, rev: 0.7 },
+        bell: { inst: "bell", vol: 0.45, rev: 0.8, echo: 0.3 },
+        toll: { inst: "toll", vol: 0.35, rev: 0.8 },
+        harp: { inst: "harp", vol: 0.45, rev: 0.6, pan: 0.2 },
+        sub: { inst: "sub", vol: 0.55 },
+        timpani: { inst: "timpani", vol: 0.45, rev: 0.6 },
+        wind: { inst: "wind", vol: 0.3, rev: 0.6 }
+      }
+    },
+    (s) => {
+      const progA = "Cm Ab Eb Bb Cm Fm G G", progB = "Ab Bb Cm Cm Ab Bb G G";
+      const nave = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.pad("choir", bar, prog, 62, { vel: 0.7 });
+        s.pad("organ", bar, prog, 50, { vel: 0.5 });
+        s.arp("harp", bar, prog, "0 1 2 3 4 3 2 1", 55, 2, { vel: 0.5 });
+        s.bass("sub", bar, prog, "R:16", 33);
+        s.grid("timpani", bar, "x...............", n, { vel: 0.6 });
+        for (let i = 0; i < n; i += 4) s.at("toll", bar + i, "c4", 8, 0.6);
+      };
+      s.play(
+        "strings",
+        0,
+        "g4:8 ab4:8 | bb4:4 ab4:4 g4:8 | eb4:8 f4:8 | d4:16 | g4:4 c5:4 d5:4 eb5:4 | f5:8 eb5:8 | d5:4 c5:4 b4:8 | b4:8 d5:8"
+      );
+      s.play("wind", 0, "c5:32 | g4:32", { vel: 0.5 });
+      nave(0, progA);
+      s.play(
+        "bell",
+        8,
+        "eb5:8 d5:8 | c5:12 r:4 | ab4:8 bb4:8 | g4:16 | eb5:8 f5:8 | g5:8 f5:4 eb5:4 | d5:16 | b4:16"
+      );
+      s.play("strings", 8, "c5:16 | d5:16 | eb5:16 | c5:16 | ab4:16 | bb4:16 | b4:16 | b4:16", {
+        vel: 0.5
+      });
+      nave(8, progB);
+    }
+  );
+
   // src/audio/tracks/town.ts
   var town = compose(
     {
@@ -20914,7 +23635,12 @@
     town,
     orchard,
     steppe,
-    warren
+    warren,
+    glasswood,
+    marches,
+    barrow,
+    saltflats,
+    choir2
   ];
   var TRACKS = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
 
@@ -21062,7 +23788,12 @@
     void: "void",
     orchard: "orchard",
     steppe: "steppe",
-    warren: "warren"
+    warren: "warren",
+    glasswood: "glasswood",
+    marches: "marches",
+    barrow: "barrow",
+    saltflats: "saltflats",
+    choir: "choir"
   };
   var DUNGEON_TRACKS = {
     crypt: "dungeon",

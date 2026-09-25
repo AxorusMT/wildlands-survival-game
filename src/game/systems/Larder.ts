@@ -123,7 +123,8 @@ export class Larder extends System {
       env = this.game.environment,
       air = this.game.temperature(),
       near = this.nearest(),
-      cool = this.packCooling();
+      // Nothing rots in the Frozen Choir.
+      cool = this.game.pocket.preserves() ? 0 : this.packCooling();
     // How long the storage beside you stays cold during this step (it may run out part way).
     const coolFor = near ? Math.min(dt, this.coldLeft(near)) : 0,
       mult = near ? this.multiplier(near) : 1;

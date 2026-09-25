@@ -426,6 +426,13 @@ export class Wildlife extends System {
       t >= a.attackAt
     ) {
       a.attackAt = t + spec.cooldown * 0.6;
+      // A mirage reaches you and is gone: only heat and light.
+      if (spec.damage <= 0) {
+        a.deadUntil = t + spec.respawn;
+        this.game.event('burst', a.x, a.y - 20, '#fff4e0');
+        if (a.type === 'mirage') this.game.say('It was only a mirage.', 'ink');
+        return;
+      }
       this.cry(a, 'attack');
       const taken = this.game.combat.hurtPlayer(
         spec.damage,

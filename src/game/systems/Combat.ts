@@ -41,6 +41,13 @@ export const bodyRadius = (a: Animal) =>
         : 70
       : 30;
 
+/** Monster shots that carry more than a blow. */
+const SHOT_DISEASE: Record<string, [string, number]> = {
+  glass_shard: ['bleeding', 0.25],
+  mire_glob: ['marrow_rot', 0.2],
+  prism_bolt: ['glass_cough', 0.04],
+};
+
 export class Combat extends System {
   projectiles: Projectile[] = [];
   private combo = 0;
@@ -56,7 +63,7 @@ export class Combat extends System {
   ) {
     const s = this.game.s,
       p = s.player;
-    if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
+    if (amount <= 0 || p.invuln > 0 || s.dead || this.game.dev.god) return 0;
     const sk = this.game.skills.stats(),
       cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1;
     let scaled = amount * this.game.pocket.damageScale() * Math.max(0.3, 1 + sk.harm);
@@ -399,7 +406,7 @@ export class Combat extends System {
         this.hurtPlayer(
           b.damage,
           this.shotName(b.kind),
-          undefined,
+          SHOT_DISEASE[b.kind],
           spec.fire
             ? 'fire'
             : b.kind === 'falling_rock' || b.kind === 'shockwave'
@@ -432,6 +439,15 @@ export class Combat extends System {
           amber_glob: 'Burning amber',
           ash_burst: 'Choking ash',
           kiln_ember: 'A kiln ember',
+          glass_shard: 'Falling glass',
+          prism_bolt: 'A prism bolt',
+          lumen_orb: 'A lumen orb',
+          mire_glob: 'Marrow mire',
+          steam_puff: 'Scalding steam',
+          salt_spray: 'Salt spray',
+          heat_bolt: 'A heat bolt',
+          hymn_note: 'A hymn note',
+          bolt: 'A bolt',
         } as Record<string, string>
       )[kind] ?? 'A blow'
     );

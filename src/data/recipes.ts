@@ -208,6 +208,17 @@ export const RECIPES: Recipe[] = (
     ['orchard_key', { orchard_fragment: 3 }, 'waystone', 3],
     ['steppe_key', { steppe_fragment: 3 }, 'waystone', 3],
     ['warren_key', { warren_fragment: 3 }, 'waystone', 3],
+    // Band II keys are made from Band I spoils; Band III keys from Band II.
+    ['glasswood_fragment', { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, 'workbench', 5],
+    ['marches_fragment', { bone: 10, kiln_ingot: 2, crab_shell: 3 }, 'workbench', 5],
+    ['barrow_fragment', { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, 'forge', 7],
+    ['saltflats_fragment', { salt: 10, prism_glass: 3, marrow_ingot: 2 }, 'forge', 7],
+    ['choir_fragment', { frost_shard: 4, marrow_ingot: 2, prism_glass: 3 }, 'forge', 7],
+    ['glasswood_key', { glasswood_fragment: 3 }, 'waystone', 5],
+    ['marches_key', { marches_fragment: 3 }, 'waystone', 5],
+    ['barrow_key', { barrow_fragment: 3 }, 'waystone', 7],
+    ['saltflats_key', { saltflats_fragment: 3 }, 'waystone', 7],
+    ['choir_key', { choir_fragment: 3 }, 'waystone', 7],
     // The Drowned Orchard.
     ['tidecaller_spear', { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, 'workbench', 4],
     ['brine_wand', { brinewood: 6, tide_pearl: 4, crystal: 2 }, 'workbench', 4],
@@ -220,6 +231,26 @@ export const RECIPES: Recipe[] = (
     // The Hollow Warren.
     ['amber_repeater', { burrow_amber: 10, wood: 6, silk: 4 }, 'workbench', 4],
     ['amber_pick', { burrow_amber: 12, gold_ingot: 2, wood: 3 }, 'workbench', 4],
+    // The Glasswood.
+    ['prism_wand', { prism_glass: 10, crystal: 4, wood: 3 }, 'forge', 6],
+    ['shard_glaive', { prism_glass: 8, hellstone_ingot: 3, wood: 3 }, 'forge', 6],
+    ['lumen_tincture', { lumen_moss: 3, boiled_water: 1 }, 'apothecary', 5],
+    // The Bone Marches.
+    ['marrow_ingot', { marrow_iron_ore: 3, coal: 1 }, 'furnace', 5],
+    ['bonecleaver', { marrow_ingot: 9, bone: 6, hide: 2 }, 'forge', 6],
+    ['vertebra_whip', { bone: 14, marrow_ingot: 4, silk: 3 }, 'forge', 6],
+    ['marrow_purge', { herb: 3, antibiotic: 1, grave_dust: 1 }, 'apothecary', 5],
+    // The Clockwork Barrow.
+    ['brass_ingot', { brass_gear: 3, copper_ingot: 1 }, 'furnace', 7],
+    ['brass_repeater', { brass_ingot: 10, wood: 4, silk: 4 }, 'starforge', 8],
+    ['piston_hammer', { brass_ingot: 12, gold_ingot: 3, coal: 6 }, 'starforge', 8],
+    // The Salt Flats of Oru.
+    ['mirage_blade', { saltglass: 12, gold_ingot: 3, ruby: 1 }, 'starforge', 8],
+    ['saltglass_bow', { saltglass: 10, wood: 4, silk: 4 }, 'starforge', 8],
+    // The Frozen Choir.
+    ['rime_silver', { rime_silver_ore: 3, coal: 1 }, 'furnace', 7],
+    ['choir_stave', { rime_silver: 10, frost_lily: 4, crystal: 4 }, 'starforge', 9],
+    ['bellhammer', { rime_silver: 12, bell_bronze: 4, wood: 3 }, 'starforge', 9],
     // ── Armour ──
     ...ARMOR_RECIPES,
     // ── The weapon hierarchy, and infusions ──

@@ -10,14 +10,17 @@ import {
   TIER_NAMES,
   TIER_SCALE,
   ashStorm,
+  hymnAt,
   modById,
   realmById,
   rollMods,
   setActiveRealm,
   activeRealm,
   tideLevel,
+  ventActive,
   weighted,
   type Loot,
+  type MarchesGeometry,
   type OrchardGeometry,
   type RealmCtx,
   type RealmInstance,
@@ -57,7 +60,10 @@ const UNSTABLE_SECONDS = 600;
  */
 export class Pocket extends System {
   private caveInAt = 0;
-  private caveIn: { x: number; y: number; at: number } | null = null;
+  private caveIn: { x: number; y: number; at: number; kind?: 'shards' } | null = null;
+  private hymnWas = false;
+  private sunWas = false;
+  private ventAt = 0;
   private stormWas = false;
   private submergedWas = false;
   /** The latest arrival, for the interface's banner. */
@@ -388,11 +394,69 @@ export class Pocket extends System {
   }
 
   // ─── Hazards ───────────────────────────────────────────────────────────────
-  /** Height of the water in the open realm (the Orchard's tide), if it has any. */
+  /** Height of the water (the Orchard's tide) or mud (the Marches' mire) in the open realm. */
   waterLevel(): number | null {
     const r = activeRealm();
+    if (r?.tpl.hazard.id === 'mire') return (r.geo as MarchesGeometry).mire;
     if (!r || r.tpl.hazard.id !== 'tide') return null;
     return tideLevel(r.geo as OrchardGeometry, this.game.s.elapsed);
+  }
+  /** What fills the low ground: water, mire, or nothing. */
+  waterKind(): 'tide' | 'mire' | null {
+    const id = activeRealm()?.tpl.hazard.id;
+    return id === 'tide' || id === 'mire' ? id : null;
+  }
+  /** Whether the player wades in the Marches' mire. */
+  inMire() {
+    const p = this.game.s.player;
+    return this.waterKind() === 'mire' && this.underwater(p.x, p.y - 12);
+  }
+  /** Strength of the choir's hymn (0 when silent, warded, or warmed by a fire). */
+  hymnLevel() {
+    const r = activeRealm();
+    if (!r || r.tpl.hazard.id !== 'hymn' || !this.here()) return 0;
+    return hymnAt(this.game.s.elapsed, r.inst.seed);
+  }
+  /** Whether a fire or kiln is close enough to keep the hymn's cold off. */
+  warmed() {
+    const p = this.game.s.player;
+    return this.game.s.structures.some(
+      (st) =>
+        ((st.type === 'campfire' && st.fuel > 0) || st.type === 'kiln' || st.type === 'forge') &&
+        dist(st, p) < 170,
+    );
+  }
+  /** How hard the white sun beats down on the player (0 in shade, at night, or below ground). */
+  sunLevel() {
+    const r = activeRealm(),
+      p = this.game.s.player;
+    if (!r || r.tpl.hazard.id !== 'sun' || !this.here() || this.game.isNight()) return 0;
+    if (p.y > surfaceAt(p.x) + 80) return 0;
+    return 1;
+  }
+  /** Whether the realm keeps food from rotting (the Frozen Choir). */
+  preserves() {
+    return this.here() && this.inst()?.realm === 'choir';
+  }
+  /** Multiplier on the player's movement from mire and hymn. */
+  moveScale() {
+    if (!this.here()) return 1;
+    const fx = this.game.equipment.effects();
+    let k = 1;
+    if (this.inMire() && !fx.has('mirewalk')) k *= 0.55;
+    if (this.hymnLevel() > 0.5 && !fx.has('hymnward') && !this.warmed()) k *= 0.6;
+    return k;
+  }
+  /** Steam vents blowing near a point. */
+  ventNear(x: number, y: number) {
+    return this.game.s.structures.find(
+      (st) =>
+        st.type === 'steam_vent' &&
+        Math.abs(st.x - x) < 34 &&
+        y <= st.y + 8 &&
+        y > st.y - 130 &&
+        ventActive(st.x, this.game.s.elapsed),
+    );
   }
   /** Whether a point in the realm is under water. */
   underwater(x: number, y: number) {
@@ -402,7 +466,11 @@ export class Pocket extends System {
   /** Whether the player wades below the tide and it hinders them. */
   submerged() {
     const p = this.game.s.player;
-    return this.underwater(p.x, p.y - 24) && !this.game.equipment.has('swim');
+    return (
+      this.waterKind() === 'tide' &&
+      this.underwater(p.x, p.y - 24) &&
+      !this.game.equipment.has('swim')
+    );
   }
   /** Strength of the ash storm where the player stands (0 when clear, sheltered, or warded). */
   ashLevel() {
@@ -437,6 +505,77 @@ export class Pocket extends System {
     const tpl = realmById(inst.realm)!,
       fx = this.game.equipment.effects(),
       v = s.vitals;
+    const hard = 1 - Math.min(0.8, this.game.skills.get('hazard'));
+    // The mire: slow, cold, and a festering in the blood.
+    if (tpl.hazard.id === 'mire' && this.inMire() && !fx.has('mirewalk')) {
+      v.wetness = clamp(v.wetness + dt * 5, 0, 100);
+      v.bodyTemp = clamp(v.bodyTemp - dt * 0.008, 30, 41);
+      v.hygiene = clamp(v.hygiene - dt * 0.4, 0, 100);
+      if (!this.submergedWas) {
+        this.game.sound('splash', p.x, p.y, 0.6);
+        this.game.say('You sink into the marrow mire. Get out before it festers.', 'danger');
+      }
+      if (this.game.rng() < dt * 0.012 * hard * this.diseaseScale())
+        this.game.ailments.contract('marrow_rot');
+    }
+    if (tpl.hazard.id === 'mire') this.submergedWas = this.inMire();
+    // Shardfall: a glint in the canopy, then glass rains down around you in the open.
+    if (tpl.hazard.id === 'shards') {
+      if (!this.caveIn && s.elapsed > this.caveInAt && p.y < surfaceAt(p.x) + 60) {
+        const x = p.x + (this.game.rng() - 0.5) * 200;
+        this.caveIn = { x, y: p.y - 420, at: s.elapsed + 1.3, kind: 'shards' };
+        this.game.sound('crystal', x, p.y - 200, 0.8);
+      }
+      if (this.caveIn && s.elapsed >= this.caveIn.at) {
+        const c = this.caveIn,
+          ward = fx.has('shardward');
+        for (let i = 0; i < 6; i++)
+          this.game.combat.spawn(
+            'glass_shard',
+            { x: c.x + (i - 2.5) * 30 + (this.game.rng() - 0.5) * 16, y: c.y },
+            Math.PI / 2,
+            180 + this.game.rng() * 120,
+            ward ? 0 : 20 * hard,
+            'mob',
+          );
+        this.game.sound('crumble', c.x, c.y + 400, 0.9);
+        this.caveIn = null;
+        this.caveInAt = s.elapsed + 22 + this.game.rng() * 18;
+      }
+    }
+    // Steam vents scald anyone standing over them as they blow.
+    if (tpl.hazard.id === 'traps' && !fx.has('trapsense') && s.elapsed > this.ventAt) {
+      const vent = this.ventNear(p.x, p.y);
+      if (vent) {
+        this.ventAt = s.elapsed + 0.8;
+        this.game.combat.hurtPlayer(30 * hard, 'Scalding steam', undefined, 'fire');
+      }
+    }
+    // The white sun: heat and thirst on the open flats by day.
+    if (tpl.hazard.id === 'sun') {
+      const sun = this.sunLevel() > 0 && !fx.has('shade');
+      if (sun && !this.sunWas)
+        this.game.say('The white sun beats down. Find shade below, or cover up.', 'danger');
+      this.sunWas = sun;
+      if (sun) {
+        v.hydration = clamp(v.hydration - dt * 0.3 * hard, 0, 100);
+        v.bodyTemp = clamp(v.bodyTemp + dt * 0.012 * hard, 30, 41);
+      }
+    }
+    // The hymn: while the choir sings, the cold deepens and holds you back.
+    if (tpl.hazard.id === 'hymn') {
+      const hymn = this.hymnLevel() > 0.5,
+        guarded = fx.has('hymnward') || this.warmed();
+      if (hymn && !this.hymnWas)
+        this.game.say(
+          guarded
+            ? 'The choir begins to sing; the warmth holds it off.'
+            : 'The choir begins to sing! The cold deepens. Find a fire.',
+          guarded ? 'good' : 'danger',
+        );
+      this.hymnWas = hymn;
+      if (hymn && !guarded) v.bodyTemp = clamp(v.bodyTemp - dt * 0.025 * hard, 30, 41);
+    }
     // The tide: wading soaks and chills you.
     if (tpl.hazard.id === 'tide') {
       const under = this.underwater(p.x, p.y - 24);
@@ -460,7 +599,6 @@ export class Pocket extends System {
         );
       this.stormWas = storm;
       if (storm && !fx.has('ashward')) {
-        const hard = 1 - Math.min(0.8, this.game.skills.get('hazard'));
         v.stamina = clamp(v.stamina - dt * 4 * hard, 0, 100);
         v.hydration = clamp(v.hydration - dt * 0.35 * hard, 0, 100);
         v.hygiene = clamp(v.hygiene - dt * 0.2, 0, 100);

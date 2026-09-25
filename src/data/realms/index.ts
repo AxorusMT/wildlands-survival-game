@@ -1,5 +1,10 @@
 // Generated realms: templates, modifiers, and which one fills the pocket strip right now.
+import { BARROW } from './barrow.ts';
+import { CHOIR } from './choir.ts';
+import { GLASSWOOD } from './glasswood.ts';
+import { MARCHES } from './marches.ts';
 import { ORCHARD } from './orchard.ts';
+import { SALTFLATS } from './saltflats.ts';
 import { STEPPE } from './steppe.ts';
 import type { RealmGeometry, RealmTemplate } from './types.ts';
 import { WARREN } from './warren.ts';
@@ -9,9 +14,21 @@ export * from './shared.ts';
 export * from './types.ts';
 export { tideLevel, type OrchardGeometry } from './orchard.ts';
 export { ashStorm } from './steppe.ts';
+export { ventActive } from './barrow.ts';
+export { hymnAt } from './choir.ts';
+export type { MarchesGeometry } from './marches.ts';
 
 /** Every realm a Waystone can open, band by band. */
-export const REALMS: RealmTemplate[] = [ORCHARD, STEPPE, WARREN];
+export const REALMS: RealmTemplate[] = [
+  ORCHARD,
+  STEPPE,
+  WARREN,
+  GLASSWOOD,
+  MARCHES,
+  BARROW,
+  SALTFLATS,
+  CHOIR,
+];
 export const realmById = (id: string) => REALMS.find((r) => r.id === id);
 export const REALM_IDS = new Set(REALMS.map((r) => r.id));
 

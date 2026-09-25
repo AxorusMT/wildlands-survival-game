@@ -531,6 +531,14 @@ Object.assign(STATIC, {
       p.rect(8, 12, 6, 7, '#2a2630');
       p.shadeEdges(0.2, -0.3);
     }),
+  // A brass grille over a steam pipe (the Clockwork Barrow's traps).
+  steam_vent: () =>
+    sprite(30, 6, 15, 5, (p) => {
+      p.rect(0, 1, 30, 5, '#5a4028');
+      p.rect(0, 1, 30, 1, '#d8a048');
+      for (let x = 3; x < 28; x += 4) p.rect(x, 2, 2, 3, '#1c140c');
+      p.rect(0, 5, 30, 1, '#3a2a14');
+    }),
   kiln: () =>
     sprite(40, 34, 20, 33, (p) => {
       p.ellipse(20, 22, 18, 14, '#8a5a44');
@@ -554,6 +562,11 @@ function chestSprite(kind: string, open: boolean): Sprite {
     mycelia: ['#4a3f5e', '#58e0d0'],
     skyreach: ['#c8c0b0', '#f8e08a'],
     void: ['#2a1c3a', '#b36cff'],
+    glasswood: ['#6a88a8', '#bfe8ff'],
+    marches: ['#6a6454', '#e6dcc6'],
+    barrow: ['#5a4028', '#f0c870'],
+    saltflats: ['#b4a48e', '#f0c0c8'],
+    choir: ['#5a6a7a', '#dfeaf6'],
   };
   const [body, metal] = trim[kind] ?? ['#7a5a3c', '#d8b848'];
   return cached(`dchest:${kind}:${open}`, () =>

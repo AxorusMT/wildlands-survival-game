@@ -434,6 +434,148 @@ export class Bosses extends System {
             this.minion('warren_rat', p.x + dx, this.game.floorNear(p.x + dx, p.y - 40));
         break;
       }
+      // ── Band II and III realms ──
+      case 'lumen_stag': {
+        a.timers ??= {};
+        const charging = t < (a.timers.charge ?? 0);
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = charging ? (a.vx ?? 0) : Math.abs(p.x - a.x) > 200 ? face * spec.speed[0] * 1.6 : 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (!charging && this.due(a, 'charge', rage ? 4 : 6)) {
+          a.vx = face * 560;
+          a.timers.charge = t + 0.8;
+          a.warning = 0.5;
+          this.game.sound('boss', a.x, a.y, 1.1);
+        }
+        if (this.due(a, 'prism', 2.4))
+          this.game.combat.mobShoot(a, 'prism_bolt', 600, 34, rage ? 7 : 5, 0.16);
+        if (this.due(a, 'shardfall', rage ? 5 : 8)) {
+          for (let i = 0; i < 8; i++)
+            this.game.combat.spawn(
+              'glass_shard',
+              { x: p.x + (i - 3.5) * 60, y: p.y - 480 },
+              Math.PI / 2,
+              220,
+              30,
+              'mob',
+            );
+          this.game.sound('crystal', p.x, p.y - 200, 1.2);
+        }
+        if (rage && this.due(a, 'flash', 9)) this.ring(a, 'lumen_orb', 10, 260, 30, t);
+        if (rage && this.due(a, 'moths', 12))
+          for (const dx of [-160, 160]) this.minion('prism_moth', a.x + dx, a.y - 180);
+        break;
+      }
+      case 'ossuary_hydra': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = Math.abs(p.x - a.x) > 140 ? face * (rage ? spec.speed[1] : spec.speed[0]) : 0;
+        this.game.wildlife.moveBody(a, dt);
+        // Three heads, three volleys, each at its own angle.
+        if (this.due(a, 'heads', 2.2))
+          for (const lift of [-0.35, 0, 0.35])
+            this.game.combat.spawn(
+              'bone_shard',
+              { x: a.x + face * 40, y: a.y - 70 },
+              Math.atan2(p.y - 30 - (a.y - 70), p.x - a.x) + lift,
+              560,
+              32,
+              'mob',
+            );
+        if (this.due(a, 'mire', 3.6))
+          this.game.combat.mobShoot(a, 'mire_glob', 420, 30, rage ? 4 : 3, 0.24);
+        if (this.due(a, 'brood', rage ? 8 : 12))
+          for (const dx of [-150, 150])
+            this.minion('bone_hound', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        // Its heads grow back: in the second half it heals, unless its wounds are burning.
+        const burning = (a.fx?.burn?.[0] ?? 0) > t;
+        if (rage && !burning && a.hp < a.maxHp * 0.5) {
+          a.hp = Math.min(a.maxHp * 0.5, a.hp + a.maxHp * 0.004 * dt);
+          if (!a.timers.warned) {
+            a.timers.warned = 1;
+            this.game.say("The Hydra's wounds knit as fast as you cut. Burn them!", 'danger');
+          }
+        }
+        break;
+      }
+      case 'engine_saint': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = Math.abs(p.x - a.x) > 220 ? face * spec.speed[0] : 0;
+        this.game.wildlife.moveBody(a, dt);
+        if (this.due(a, 'bolts', 2))
+          this.game.combat.mobShoot(a, 'bolt', 900, 40, rage ? 5 : 3, 0.08);
+        if (this.due(a, 'steam', rage ? 4 : 6)) {
+          this.ring(a, 'steam_puff', 12, 300, 36, t);
+          this.game.sound('sizzle', a.x, a.y, 1.2);
+        }
+        if (this.due(a, 'cogs', rage ? 8 : 11))
+          for (const dx of [-170, 170])
+            this.minion('cog_spider', a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+        if (rage && this.due(a, 'overheat', 5)) {
+          for (const dir of [-1, 1])
+            this.game.combat.spawn(
+              'shockwave',
+              { x: a.x, y: a.y - 14 },
+              dir > 0 ? 0 : Math.PI,
+              340,
+              40,
+              'mob',
+            );
+          this.game.sound('slam', a.x, a.y, 1.3);
+        }
+        break;
+      }
+      case 'mirage_tyrant': {
+        this.steer(
+          a,
+          p.x + Math.cos(t * 0.7) * 280,
+          p.y - 200 + Math.sin(t * 1.1) * 60,
+          spec.speed[1] * (rage ? 1.3 : 1),
+          dt,
+          1.6,
+        );
+        if (this.due(a, 'heat', 2))
+          this.game.combat.mobShoot(a, 'heat_bolt', 460, 38, rage ? 3 : 2, 0.2);
+        // It splits into shimmering copies and slips away among them.
+        if (this.due(a, 'split', rage ? 8 : 12)) {
+          for (const dx of [-240, 0, 240]) this.minion('tyrant_mirage', p.x + dx, p.y - 220);
+          a.x = p.x + (this.game.rng() < 0.5 ? -1 : 1) * 300;
+          a.y = p.y - 240;
+          this.game.event('burst', a.x, a.y - 60, '#fff0c0');
+          this.game.say('The Tyrant splits into mirages!', 'danger');
+        }
+        if (rage && this.due(a, 'spray', 6)) this.ring(a, 'salt_spray', 14, 380, 34, t);
+        break;
+      }
+      case 'the_hymnal': {
+        a.timers ??= {};
+        a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+        a.vx = Math.abs(p.x - a.x) > 240 ? face * spec.speed[0] : 0;
+        this.game.wildlife.moveBody(a, dt);
+        // The great bell tolls: a wave along the ground either way.
+        if (this.due(a, 'toll', 4)) {
+          for (const dir of [-1, 1])
+            this.game.combat.spawn(
+              'shockwave',
+              { x: a.x, y: a.y - 14 },
+              dir > 0 ? 0 : Math.PI,
+              300,
+              42,
+              'mob',
+            );
+          this.game.sound('boss', a.x, a.y, 1.3);
+        }
+        if (this.due(a, 'notes', 2.6))
+          this.game.combat.mobShoot(a, 'hymn_note', 420, 38, rage ? 7 : 5, 0.22);
+        if (rage && this.due(a, 'frost', 6)) this.ring(a, 'frost_bolt', 14, 380, 36, t);
+        if (this.due(a, 'choir', rage ? 9 : 13))
+          for (const dx of [-200, 200]) this.minion('choir_wraith', a.x + dx, a.y - 200);
+        // Its song chills whoever stands before it, fire or no fire.
+        if (!this.game.equipment.has('hymnward') && dist(a, p) < 500)
+          s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.012, 30, 41);
+        break;
+      }
       case 'unmaker': {
         this.steer(
           a,

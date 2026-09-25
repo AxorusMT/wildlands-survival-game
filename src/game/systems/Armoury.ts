@@ -129,7 +129,8 @@ export class Armoury extends System {
       base = WEAPONS[id] ?? WEAPONS.fists,
       sk = this.game.skills.stats(),
       mastery = id === 'fists' ? 0 : this.game.skills.mastery(family),
-      set = this.game.equipment.fullSet();
+      set = this.game.equipment.fullSet(),
+      fx = this.game.equipment.effects();
     // Skills and mastery lift each kind of weapon in their own way.
     const melee = !f.ranged,
       heavy = family === 'greatsword' || family === 'battleaxe' || family === 'warhammer',
@@ -139,8 +140,8 @@ export class Armoury extends System {
       1 +
       (melee ? sk.meleeDmg : 0) +
       (heavy ? sk.heavyDmg : 0) +
-      (shooter ? sk.rangedDmg : 0) +
-      (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) : 0) +
+      (shooter ? sk.rangedDmg + (fx.has('trapsense') ? 0.1 : 0) : 0) +
+      (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (fx.has('shardward') ? 0.1 : 0) : 0) +
       mastery * 0.01 +
       (mastery >= 20 ? 0.1 : 0);
     const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);

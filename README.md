@@ -213,17 +213,22 @@ Build the **Rift Gate** at a forge from obsidian, crystal, hellstone ingots and 
 Beyond the Rift lie realms that are built anew every time you enter.
 
 - **Waystones:** craft one at a workbench from stone, iron ingots and crystal, and set it down in the wildlands. Use it to open the **Atlas** page.
-- **Keys:** each realm needs its own key. Three key fragments make a key at a Waystone. You can craft fragments at a workbench, buy them from the Tinker, or find them in the realms.
+- **Keys:** each realm needs its own key. Three key fragments make a key at a Waystone. You can craft fragments, buy some from the Tinker, or find them in the realms. Band II fragments are made from Band I spoils, and Band III fragments from Band II spoils, so the realms open in order.
 - **Opening a realm:** turning a key builds the realm from a fresh seed in a strip of its own, and you arrive beside a portal home. The realm stays open until you turn another key.
 - **Tiers I–V:** each tier gives monsters more health and harm and gives more loot. Clearing a tier's boss unlocks the next one.
 - **Modifiers:** a realm rolls one modifier per tier above I. Boons include Bountiful, Rich veins, Treasure trove, Lucky and Low gravity. Banes include Fortified, Savage, Swarming, Frenzied, Hunted, Hungering, Frostbound, Scorched, Starless, Unstable, Blighted and Echoing. Every modifier adds to the loot.
 - **Inside each realm:** you'll find resources, chests, two shrines that each grant a blessing once, a roaming elite, and the boss's altar. The first boss kill in each realm wins its **relic**.
 
-| Realm           | Hazard                                                | Signature                                         | Gear                                                           | Boss and relic                                   |
-| --------------- | ----------------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------ |
-| Drowned Orchard | The tide rises and falls; wading slows and chills you | Brinewood, tide pearls, crab shell                | Tidecaller set (swim freely), tidecaller spear, brine wand     | The Orchard Mother · Tide conch                  |
-| Ashen Steppe    | Ash storms choke and blind in the open                | Cinderflax, kilnstone, old kilns that still smelt | Ashwalker set (storm-proof), kiln greataxe, ember sling        | The Kiln Beast · Kiln heart                      |
-| Hollow Warren   | Cave-ins: dust, then falling rock                     | Burrow amber, beetle carapace                     | Amberguard set (sense cave-ins), amber repeater, amber pickaxe | The Warren Queen, who burrows · Queen's mandible |
+| Realm                   | Hazard                                                                          | Signature                                         | Gear                                                                                 | Boss and relic                                               |
+| ----------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Drowned Orchard         | The tide rises and falls; wading slows and chills you                           | Brinewood, tide pearls, crab shell                | Tidecaller set (swim freely), tidecaller spear, brine wand                           | The Orchard Mother · Tide conch                              |
+| Ashen Steppe            | Ash storms choke and blind in the open                                          | Cinderflax, kilnstone, old kilns that still smelt | Ashwalker set (storm-proof), kiln greataxe, ember sling                              | The Kiln Beast · Kiln heart                                  |
+| Hollow Warren           | Cave-ins: dust, then falling rock                                               | Burrow amber, beetle carapace                     | Amberguard set (sense cave-ins), amber repeater, amber pickaxe                       | The Warren Queen, who burrows · Queen's mandible             |
+| Glasswood (II)          | Shardfall: a glint in the canopy, then falling glass that cuts                  | Prism glass, lumen moss                           | Prismweave set (shards glance off; magic +10%), prism wand, shard glaive             | The Lumen Stag · Lumen antler                                |
+| Bone Marches (II)       | The marrow mire slows, soaks and can bring on marrow rot                        | Marrow-iron, bone                                 | Bonewalker set (mire-proof; +3 defense), bonecleaver, vertebra whip                  | The Ossuary Hydra, which regrows unless burned · Hydra tooth |
+| Clockwork Barrow (III)  | Steam vents blast on a rhythm along the halls                                   | Brass gears and ingots                            | Gearwright set (vents cannot scald; ranged +10%), brass repeater, piston hammer      | The Engine Saint · Saint's cog                               |
+| Salt Flats of Oru (III) | The white sun parches the open flats by day; mirages look like real foes        | Saltglass, salt                                   | Saltwarden set (sun-proof; reveals mirages; +10% speed), mirage blade, saltglass bow | The Mirage Tyrant, who splits into copies · Tyrant's eye     |
+| Frozen Choir (III)      | The hymn: every 90 s you slow and freeze unless by a fire. Food never rots here | Rime silver, frost lilies, bell bronze            | Choirsilver set (hymn-proof; +6° cold resistance), choir stave, bellhammer           | The Hymnal · Hymnal bell                                     |
 
 ### Homes and the town
 
@@ -313,7 +318,7 @@ Nothing here resets. The world is persistent, and so is everything you learn in 
 
 ### Gear, potions, and crystals
 
-- **Armour:** twenty-nine sets (copper, iron, silver, gold, the three Band I realm sets, the twelve archetype sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
+- **Armour:** thirty-four sets (copper, iron, silver, gold, the eight realm sets, the twelve archetype sets, steel, obsidian, hellstone, the four dungeon sets, myconite, starmetal, voidsteel). Each piece adds defense, and a full set adds a bonus: extra defense or damage, heat or cold immunity, regeneration, speed, or mana.
 - **Accessories:** three can be worn at once, including double jumps, gliding, speed, regeneration, light, lava resistance and more.
 - **Ranged weapons:** bows fire arrows (plain, fire, crystal), and staves spend mana: embers, bone shards, icicles, homing sun bolts, spores and void beams.
 - **Healing:** healing draughts heal instantly and bring on a short potion sickness.
@@ -321,7 +326,7 @@ Nothing here resets. The world is persistent, and so is everything you learn in 
 - **Crystals:** life crystals raise your health up to 300, and life fruit takes it to 400. Stars fall on clear surface nights, and five make a mana crystal.
 - **Blocks:** dirt, stone, sand, ice, planks, stone, clay and sandstone bricks, glass, obsidian brick, and the stones of every dungeon and world can all be placed.
 
-There are 382 recipes and 513 items (134 weapons), and 66 kinds of creature including 10 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
+There are 422 recipes and 582 items (144 weapons), and 101 kinds of creature including 15 great bosses (plus the three Direwolves). The expedition chapters continue past the Effergy through every dungeon and world, to the Unmaker.
 
 All diseases and treatments are fictional game mechanics, not medical advice.
 

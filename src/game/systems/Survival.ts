@@ -140,7 +140,11 @@ export class Survival extends System {
     const air = this.game.temperature(),
       skills = this.game.skills.stats(),
       wayfarer = this.game.equipment.has('wayfarer') ? 4 : 0,
-      coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer,
+      coldResist =
+        skills.coldResist +
+        (skills.coldBlooded ? 8 : 0) +
+        wayfarer +
+        (this.game.equipment.has('hymnward') ? 6 : 0),
       heatResist = skills.heatResist + wayfarer,
       cold =
         air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;

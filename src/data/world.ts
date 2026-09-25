@@ -150,6 +150,16 @@ export const MINE_TIER: Record<number, number> = {
   33: 0,
   34: 4,
   35: 0,
+  36: 0,
+  37: 5,
+  38: 0,
+  39: 4,
+  40: 6,
+  41: 6,
+  42: 0,
+  43: 5,
+  44: 0,
+  45: 6,
 };
 /** What each ground kind yields, and an occasional bonus find. */
 export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number] }> = {
@@ -184,6 +194,16 @@ export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number]
   32: { item: 'kilnrock', bonus: ['kilnstone_ore', 0.14] },
   33: { item: 'warren_earth', bonus: ['burrow_amber', 0.05] },
   34: { item: 'amberstone', bonus: ['burrow_amber', 0.4] },
+  36: { item: 'glassloam', bonus: ['lumen_moss', 0.05] },
+  37: { item: 'prismrock', bonus: ['prism_glass', 0.3] },
+  38: { item: 'marrow_mud', bonus: ['bone', 0.12] },
+  39: { item: 'bonerock', bonus: ['marrow_iron_ore', 0.14] },
+  40: { item: 'brass_plate', bonus: ['brass_gear', 0.1] },
+  41: { item: 'gearstone', bonus: ['brass_gear', 0.2] },
+  42: { item: 'saltcrust', bonus: ['salt', 0.3] },
+  43: { item: 'saltglass_rock', bonus: ['saltglass', 0.25] },
+  44: { item: 'rimesnow', bonus: ['ice', 0.2] },
+  45: { item: 'choirstone', bonus: ['rime_silver_ore', 0.12] },
 };
 
 // ─── Regions ──────────────────────────────────────────────────────────────────

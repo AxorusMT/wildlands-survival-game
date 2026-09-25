@@ -149,6 +149,7 @@ export class Equipment extends System {
     if (fx.has('buff:ironskin')) d += 8;
     const sk = this.game.skills.stats();
     d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has('vanguard') ? 3 : 0);
+    if (fx.has('mirewalk')) d += 3;
     // A Phalanx spear or Juggernaut hammer guards you while it is your ready weapon.
     d += this.game.armoury.stats(this.game.s.player.weapon).defense;
     return d;
@@ -174,6 +175,7 @@ export class Equipment extends System {
       (fx.has('speed') ? 0.2 : 0) +
       (fx.has('cold') ? 0.1 : 0) +
       (fx.has('buff:sweet') ? 0.1 : 0) +
+      (fx.has('shade') ? 0.1 : 0) +
       this.game.skills.get('speed') -
       (this.game.skills.flag('juggernaut') ? 0.1 : 0) +
       (this.game.skills.flag('wanderer') ? 0.15 : 0)
