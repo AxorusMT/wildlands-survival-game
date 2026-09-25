@@ -292,7 +292,7 @@ test('records keep the hotbar, bosses, and Rift; layout-3 records gain the deep 
   storage.setItem('wildlands-save-v1', JSON.stringify(old));
   const migrated = new Game(3);
   assert.equal(migrated.load(storage), true);
-  assert.equal(migrated.s.layout, 4);
+  assert.equal(migrated.s.layout, 5);
   assert.equal(migrated.tileAt(tx, ty), 0);
   assert.ok(migrated.s.structures.some((st) => st.type === 'boss_altar'));
   assert.equal(migrated.maxHealth(), 100);

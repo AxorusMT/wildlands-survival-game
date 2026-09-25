@@ -2,6 +2,7 @@ import { clamp, dist } from '../../core/math.ts';
 import type { Interactable, ResourceNode, Structure } from '../../core/types.ts';
 import { ITEMS, itemName } from '../../data/items.ts';
 import { NODES, nodeForm } from '../../data/resources.ts';
+import { STORAGE } from '../../data/food.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -83,7 +84,11 @@ export class Interaction extends System {
       this.game.realms.socket();
       return { ok: true, action: 'rift', structure: st };
     }
-    if (st.type === 'portal') return this.game.realms.goHome();
+    if (st.type === 'portal')
+      return this.game.pocket.here(st.x) ? this.game.pocket.leave() : this.game.realms.goHome();
+    if (st.type === 'waystone') return { ok: true, action: 'atlas', structure: st };
+    if (st.type === 'shrine') return this.game.pocket.pray(st);
+    if (st.type === 'kiln') return { ok: false, reason: 'An old kiln. It still smelts ore.' };
     if (st.type === 'door') return this.game.town.toggleDoor(st);
     if (st.type === 'bed') return this.game.town.sleep(st);
     if (st.type === 'chair' || st.type === 'table') {
@@ -96,7 +101,11 @@ export class Interaction extends System {
     if (st.type === 'torch' || st.type.startsWith('trap_'))
       return { ok: false, reason: 'Nothing to do here.' };
     if (st.type === 'bedroll') {
-      this.game.s.vitals.fatigue = clamp(this.game.s.vitals.fatigue - 32, 0, RULES.maxVital);
+      this.game.s.vitals.fatigue = clamp(
+        this.game.s.vitals.fatigue - 32 * (1 + this.game.skills.get('rest')),
+        0,
+        RULES.maxVital,
+      );
       this.game.s.vitals.stamina = 100;
       this.game.s.elapsed += 90;
       this.game.sound('rest');
@@ -108,12 +117,10 @@ export class Interaction extends System {
         this.game.sound('place', st.x, st.y, 0.7);
         this.game.say('Fed the campfire with wood.', 'good');
       } else return { ok: false, reason: 'One wood refuels the campfire.' };
-    } else if (st.type === 'icebox') {
-      if (this.game.count('ice')) {
-        this.game.remove('ice');
-        st.fuel += RULES.iceboxRefuel;
-        this.game.say('Icebox cooled with fresh ice.', 'good');
-      } else return { ok: false, reason: 'One ice refuels the icebox.' };
+    } else if (st.type === 'relic_shelf') {
+      return { ok: true, action: 'shelf', structure: st };
+    } else if (STORAGE[st.type]) {
+      return { ok: true, action: 'larder', structure: st };
     } else if (st.type === 'rain_catcher') {
       if (st.water < 1) return { ok: false, reason: 'The rain catcher is empty. Wait for rain.' };
       const amount = Math.min(3, Math.floor(st.water));
@@ -213,9 +220,12 @@ export class Interaction extends System {
     v.stamina -= 7;
     v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
     v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
+    // Foragers turn up a little more; each gather earns a little renown.
     const roll = () =>
       Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) +
-      (tier >= 3 ? 1 : 0);
+      (tier >= 3 ? 1 : 0) +
+      (this.game.rng() < this.game.skills.get('gather') ? 1 : 0);
+    this.game.progress.record('gather:' + node.kind);
     const form = nodeForm(node.kind),
       s = this.game.s;
     node.hitAt = s.elapsed;
@@ -231,11 +241,13 @@ export class Interaction extends System {
       node.y - 20,
     );
     if (form === 'water') {
-      const qty = roll();
-      this.game.add('wild_water', qty);
+      // Water in the generated realms is brackish: boiling will not save you; filter it.
+      const qty = roll(),
+        id = this.game.pocket.here(node.x) ? 'brackish_water' : 'wild_water';
+      this.game.add(id, qty);
       this.game.event('chip', node.x, node.y, 'water');
-      this.game.say('Gathered ' + qty + ' wild water.', 'good');
-      return { ok: true, id: 'wild_water', qty };
+      this.game.say('Gathered ' + qty + ' ' + itemName(id).toLowerCase() + '.', 'good');
+      return { ok: true, id, qty };
     }
     this.game.event('chip', node.x, node.y - (form === 'tree' ? 26 : 10), node.kind);
     if (form === 'plant') {

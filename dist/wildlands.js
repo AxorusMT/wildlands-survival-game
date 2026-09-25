@@ -19,12 +19,14 @@
     BIOMES: () => BIOMES,
     BIOME_CENTERS: () => BIOME_CENTERS,
     BIOME_SPANS: () => BIOME_SPANS,
+    BITE_DISEASES: () => BITE_DISEASES,
     BLOCKS: () => BLOCKS,
     BOSSES: () => BOSSES,
     BOSS_SHRINES: () => BOSS_SHRINES,
     BUFFS: () => BUFFS,
     CAVE_LEVELS: () => CAVE_LEVELS,
     CHAPTERS: () => CHAPTERS,
+    CODEX: () => CODEX,
     CRYSTALS: () => CRYSTALS,
     DIMENSIONS: () => DIMENSIONS,
     DIM_GAP: () => DIM_GAP,
@@ -35,47 +37,93 @@
     DT: () => DT,
     DUNGEONS: () => DUNGEONS,
     DUNGEON_DEFS: () => DUNGEON_DEFS,
+    EDGE: () => EDGE,
+    EFFECT_TEXT: () => EFFECT_TEXT,
     ENTRANCES: () => ENTRANCES,
+    EVOLUTIONS: () => EVOLUTIONS,
+    FAMILIES: () => FAMILIES,
+    FOOD: () => FOOD,
+    GEMS: () => GEMS,
+    GEN_ITEMS: () => GEN_ITEMS,
+    GEN_PROJECTILES: () => GEN_PROJECTILES,
+    GEN_RANGED: () => GEN_RANGED,
+    GEN_RECIPES: () => GEN_RECIPES,
+    GEN_WEAPONS: () => GEN_WEAPONS,
+    GRID: () => GRID,
     Ground: () => Ground,
     HOUSE_NEEDS: () => HOUSE_NEEDS,
+    INFUSIONS: () => INFUSIONS,
     ISLANDS: () => ISLANDS,
     ITEMS: () => ITEMS,
     LAVA_Y: () => LAVA_Y,
     LAYERS: () => LAYERS,
+    LEVEL_DAMAGE: () => LEVEL_DAMAGE,
+    MASTERY_TITLES: () => MASTERY_TITLES,
+    MAX_LEVEL: () => MAX_LEVEL,
+    MAX_MASTERY: () => MAX_MASTERY,
+    MAX_RENOWN: () => MAX_RENOWN,
+    MAX_TIER: () => MAX_TIER,
+    MEAL_BUFFS: () => MEAL_BUFFS,
     MINE_TIER: () => MINE_TIER,
     MOBS: () => MOBS,
     MOBS_BY_SIGIL: () => MOBS_BY_SIGIL,
+    MODS: () => MODS,
     MYC: () => MYC,
     NATURAL: () => NATURAL,
     NODES: () => NODES,
     OVERWORLD_W: () => OVERWORLD_W,
+    PACK_COOLING: () => PACK_COOLING,
+    POCKET: () => POCKET,
     POTIONS: () => POTIONS,
     PROJECTILES: () => PROJECTILES,
+    QUALITIES: () => QUALITIES,
     RANGED: () => RANGED,
+    RAW: () => RAW,
+    REALMS: () => REALMS,
+    REALM_IDS: () => REALM_IDS,
     RECIPES: () => RECIPES,
+    RELIC_EFFECTS: () => RELIC_EFFECTS,
+    RESPEC_COST: () => RESPEC_COST,
     ROOM_SIZE: () => ROOM_SIZE,
+    ROW_POINTS: () => ROW_POINTS,
+    RW: () => RW,
     SETTLERS: () => SETTLERS,
     SETTLER_IDS: () => SETTLER_IDS,
     SHAFTS: () => SHAFTS,
     SIDE_ORDER: () => SIDE_ORDER,
+    SIGNATURE: () => SIGNATURE,
+    SKILLS: () => SKILLS,
     SKY_LADDERS: () => SKY_LADDERS,
     SKY_SEA: () => SKY_SEA,
+    STAGE_FORCE: () => STAGE_FORCE,
+    STAGE_NAMES: () => STAGE_NAMES,
+    STORAGE: () => STORAGE,
     SURFACE_BAND: () => SURFACE_BAND,
+    TIERS: () => TIERS,
+    TIER_NAMES: () => TIER_NAMES,
+    TIER_SCALE: () => TIER_SCALE,
     TILE: () => TILE,
     TILE_COLS: () => TILE_COLS,
     TILE_ROWS: () => TILE_ROWS,
     TILE_YIELD: () => TILE_YIELD,
     TOOL_TIERS: () => TOOL_TIERS,
+    TREES: () => TREES,
     TREE_NODES: () => TREE_NODES,
     TUTORIAL: () => TUTORIAL,
+    UNDEAD: () => UNDEAD,
     VOICES: () => VOICES,
     VOID: () => VOID,
     VOID_LADDERS: () => VOID_LADDERS,
     WALLS: () => WALLS,
     WALL_ITEM: () => WALL_ITEM,
     WEAPONS: () => WEAPONS,
+    WEAPON_CLASS: () => WEAPON_CLASS,
     WORLD_H: () => WORLD_H,
     WORLD_W: () => WORLD_W,
+    activeRealm: () => activeRealm,
+    allShafts: () => allShafts,
+    anvilFor: () => anvilFor,
+    ashStorm: () => ashStorm,
     baseTileAt: () => baseTileAt,
     baselineAt: () => baselineAt,
     biomeAt: () => biomeAt,
@@ -88,7 +136,12 @@
     dimensionLadders: () => dimensionLadders,
     dimensionTile: () => dimensionTile,
     dungeonAt: () => dungeonAt,
+    familyById: () => familyById,
+    flatten: () => flatten,
+    hymnAt: () => hymnAt,
+    inPocket: () => inPocket,
     inShaft: () => inShaft,
+    infusionById: () => infusionById,
     isAggressive: () => isAggressive,
     islandTop: () => islandTop,
     itemName: () => itemName,
@@ -96,15 +149,40 @@
     layerAt: () => layerAt,
     layoutTile: () => layoutTile,
     makeDimensions: () => makeDimensions,
+    masteryFor: () => masteryFor,
+    masteryLevel: () => masteryLevel,
+    masteryTitle: () => masteryTitle,
+    meltRate: () => meltRate,
     mobName: () => mobName,
+    modById: () => modById,
     naturalWallKind: () => naturalWallKind,
     nodeForm: () => nodeForm,
+    pocketShafts: () => pocketShafts,
+    realmById: () => realmById,
+    reforgeCost: () => reforgeCost,
     regionAt: () => regionAt,
     regionBounds: () => regionBounds,
+    relicText: () => relicText,
+    renownFor: () => renownFor,
+    renownLevel: () => renownLevel,
+    rollMods: () => rollMods,
+    rollQuality: () => rollQuality,
+    rotRate: () => rotRate,
+    seedOf: () => seedOf,
+    setActiveRealm: () => setActiveRealm,
     settlerById: () => settlerById,
+    shelfSlots: () => shelfSlots,
+    skillById: () => skillById,
     surfaceAt: () => surfaceAt,
+    syncPocket: () => syncPocket,
+    tideLevel: () => tideLevel,
+    tierOf: () => tierOf,
     underworldCeiling: () => underworldCeiling,
-    underworldFloor: () => underworldFloor
+    underworldFloor: () => underworldFloor,
+    upgradeCost: () => upgradeCost,
+    ventActive: () => ventActive,
+    walkable: () => walkable,
+    weighted: () => weighted
   });
 
   // src/data/biomes.ts
@@ -290,31 +368,910 @@
   ];
 
   // src/data/diseases.ts
+  var STAGE_FORCE = [0, 0.4, 1, 1.8];
+  var STAGE_NAMES = ["Incubating", "Mild", "Severe", "Critical"];
   var DISEASES = {
+    // ── Food and water ──
     dysentery: {
       name: "Dysentery",
       cause: "Untreated water or rotten food",
       treat: "Herbal rehydration tea",
-      item: "herbal_tea"
+      item: "herbal_tea",
+      kind: "illness",
+      incubate: 30,
+      worsen: 240,
+      recover: 300,
+      effect: { hydration: 0.07 },
+      cures: { herbal_tea: 3, rehydration_salts: 3, antibiotic: 3 },
+      immunity: 300,
+      symptoms: [
+        "Cramps and loose bowels",
+        "Constant thirst; water runs straight through you",
+        "Severe dehydration"
+      ]
     },
     fever: {
       name: "Fever",
       cause: "Raw meat or rotten food",
       treat: "Willow fever remedy",
-      item: "fever_remedy"
+      item: "fever_remedy",
+      kind: "illness",
+      incubate: 40,
+      worsen: 260,
+      recover: 360,
+      effect: { stamina: 0.5, hydration: 0.03 },
+      cures: { fever_remedy: 3, antibiotic: 3 },
+      immunity: 400,
+      symptoms: [
+        "Aches and a warm brow",
+        "Burning up and shivering by turns",
+        "Delirious with fever"
+      ]
     },
+    food_poisoning: {
+      name: "Food poisoning",
+      cause: "Spoiled food",
+      treat: "Herbal tea, and rest",
+      item: "herbal_tea",
+      kind: "illness",
+      incubate: 20,
+      worsen: 200,
+      recover: 180,
+      effect: { hydration: 0.05, calories: 0.04 },
+      cures: { herbal_tea: 2, rehydration_salts: 3, antibiotic: 3 },
+      chain: ["dysentery", 2e-3],
+      symptoms: ["Queasy", "Vomiting", "Retching and weak"]
+    },
+    tapeworm: {
+      name: "Tapeworm",
+      cause: "Raw meat or raw fish",
+      treat: "Vermifuge",
+      item: "vermifuge",
+      kind: "illness",
+      incubate: 240,
+      worsen: 600,
+      effect: { calories: 0.05, protein: 0.03 },
+      cures: { vermifuge: 3 },
+      symptoms: ["Always hungry", "Wasting, however much you eat", "Starving from within"]
+    },
+    cholera: {
+      name: "Cholera",
+      cause: "Brackish or foul realm water",
+      treat: "Rehydration salts",
+      item: "rehydration_salts",
+      kind: "illness",
+      incubate: 60,
+      worsen: 150,
+      effect: { hydration: 0.14, hp: 0.03 },
+      cures: { rehydration_salts: 2, antibiotic: 1 },
+      immunity: 900,
+      symptoms: ["Watery gut", "Losing water faster than you can drink", "Collapsing from thirst"]
+    },
+    scurvy: {
+      name: "Scurvy",
+      cause: "Days without fruit or greens",
+      treat: "Berries, fruit, herbs, or preserves",
+      item: "berry_preserves",
+      kind: "illness",
+      incubate: 0,
+      worsen: 900,
+      effect: { stamina: 0.4, regen: 0.5 },
+      cures: {},
+      symptoms: [
+        "Tired and bruising easily",
+        "Aching joints; wounds will not close",
+        "Bleeding gums; old scars reopen"
+      ]
+    },
+    // ── Wounds and bites ──
     wound: {
       name: "Infected wound",
       cause: "Animal bite and poor hygiene",
       treat: "Antiseptic poultice or cultured antibiotic",
-      item: "poultice"
+      item: "poultice",
+      kind: "infection",
+      incubate: 0,
+      worsen: 300,
+      effect: { hp: 0.02 },
+      cures: { poultice: 3, antibiotic: 3 },
+      chain: ["blood_poisoning", 4e-3],
+      symptoms: ["Red and swollen", "Hot, weeping, and spreading", "Streaks running up the limb"]
+    },
+    blood_poisoning: {
+      name: "Blood poisoning",
+      cause: "An infected wound left untreated",
+      treat: "Cultured antibiotic",
+      item: "antibiotic",
+      kind: "infection",
+      incubate: 0,
+      worsen: 200,
+      effect: { hp: 0.09, stamina: 0.3 },
+      cures: { antibiotic: 2 },
+      symptoms: ["Chills and a racing heart", "Confused and feverish", "Failing"]
+    },
+    tetanus: {
+      name: "Tetanus",
+      cause: "Deep cuts from old bone, rust, and tools",
+      treat: "Cultured antibiotic, or a field vaccine beforehand",
+      item: "antibiotic",
+      kind: "infection",
+      incubate: 150,
+      worsen: 300,
+      effect: { speed: 0.12, stamina: 0.3 },
+      cures: { antibiotic: 2 },
+      immunity: 3e3,
+      symptoms: ["A stiff jaw", "Muscles locking", "Spasms"]
+    },
+    rabies: {
+      name: "Rabies",
+      cause: "Bites from wolves, bats, and rats",
+      treat: "Rabies serum, before it takes hold",
+      item: "rabies_serum",
+      kind: "infection",
+      incubate: 400,
+      worsen: 500,
+      effect: { hp: 0.04, stamina: 0.3 },
+      cures: { rabies_serum: 3 },
+      lateCure: 2,
+      immunity: 99999,
+      symptoms: ["Tingling at the bite", "Restless, afraid of water", "Raving"]
     },
     poisoning: {
       name: "Venom poisoning",
-      cause: "Scorpion sting",
+      cause: "Scorpion stings and venomous bites",
       treat: "Antivenom or cultured antibiotic",
-      item: "antivenom"
+      item: "antivenom",
+      kind: "illness",
+      incubate: 0,
+      worsen: 160,
+      recover: 240,
+      effect: { hp: 0.03, stamina: 0.3 },
+      cures: { antivenom: 3, antibiotic: 3 },
+      symptoms: ["Numb around the sting", "Swelling and nausea", "Struggling to breathe"]
+    },
+    // ── Exposure ──
+    hypothermia: {
+      name: "Hypothermia",
+      cause: "A body left too cold for too long",
+      treat: "Warmth: a fire, dry clothes, a warming brew",
+      item: "warming_brew",
+      kind: "exposure",
+      incubate: 0,
+      worsen: 180,
+      effect: { speed: 0.15, stamina: 0.4 },
+      cures: { warming_brew: 2 },
+      chain: ["pneumonia", 3e-3],
+      symptoms: ["Shivering", "Clumsy and slow", "Shivering has stopped"]
+    },
+    frostbite: {
+      name: "Frostbite",
+      cause: "Fierce cold on bare skin",
+      treat: "Frost salve",
+      item: "frost_salve",
+      kind: "exposure",
+      incubate: 0,
+      worsen: 300,
+      effect: { stamina: 0.3, speed: 0.08 },
+      cures: { frost_salve: 3, poultice: 1 },
+      symptoms: ["White, numb fingertips", "Blistered and hard", "Blackening flesh"]
+    },
+    heatstroke: {
+      name: "Heatstroke",
+      cause: "A body left too hot for too long",
+      treat: "Shade, water, and rest",
+      item: "boiled_water",
+      kind: "exposure",
+      incubate: 0,
+      worsen: 160,
+      effect: { hydration: 0.08, stamina: 0.4 },
+      cures: { boiled_water: 1, filtered_water: 1, herbal_tea: 2 },
+      symptoms: ["Flushed and dizzy", "Pounding head, no more sweat", "Collapsing"]
+    },
+    pneumonia: {
+      name: "Pneumonia",
+      cause: "Cold and wet together, for too long",
+      treat: "Cultured antibiotic",
+      item: "antibiotic",
+      kind: "illness",
+      incubate: 60,
+      worsen: 260,
+      effect: { stamina: 0.6, hp: 0.02 },
+      cures: { antibiotic: 3, lungwort_tea: 1 },
+      immunity: 600,
+      symptoms: ["A wet cough", "Short of breath", "Drowning on dry land"]
+    },
+    // ── The realms ──
+    spore_lung: {
+      name: "Spore lung",
+      cause: "Breathing the spores of the Mycelial Deep",
+      treat: "Lungwort tea",
+      item: "lungwort_tea",
+      kind: "illness",
+      incubate: 45,
+      worsen: 240,
+      effect: { stamina: 0.5 },
+      cures: { lungwort_tea: 3, antibiotic: 1 },
+      immunity: 600,
+      symptoms: [
+        "A dry, dusty cough",
+        "Something growing in your chest",
+        "Coughing up glowing threads"
+      ]
+    },
+    void_rot: {
+      name: "Void rot",
+      cause: "Wounds from the things of the Void",
+      treat: "Void salve",
+      item: "void_salve",
+      kind: "infection",
+      incubate: 30,
+      worsen: 240,
+      effect: { hp: 0.05, regen: 0.6 },
+      cures: { void_salve: 3 },
+      symptoms: ["A cold, grey patch", "The grey spreads and forgets itself", "Coming unmade"]
+    },
+    glass_cough: {
+      name: "Glass cough",
+      cause: "Breathing the crystal dust of the Glasswood",
+      treat: "Lumen tincture",
+      item: "lumen_tincture",
+      kind: "illness",
+      incubate: 40,
+      worsen: 220,
+      effect: { stamina: 0.6, hp: 0.02 },
+      cures: { lumen_tincture: 3, lungwort_tea: 1 },
+      immunity: 900,
+      chain: ["pneumonia", 2e-3],
+      symptoms: ["A glittering cough", "Each breath scrapes", "Coughing blood and glass"]
+    },
+    marrow_rot: {
+      name: "Marrow rot",
+      cause: "The poisoned mire and the bites of the Bone Marches",
+      treat: "Marrow purge",
+      item: "marrow_purge",
+      kind: "infection",
+      incubate: 50,
+      worsen: 260,
+      effect: { hp: 0.04, regen: 0.5, speed: 0.12 },
+      cures: { marrow_purge: 3, antibiotic: 1 },
+      lateCure: 3,
+      immunity: 900,
+      symptoms: [
+        "An ache deep in the bones",
+        "Your joints grind and swell",
+        "The rot eats you from within"
+      ]
+    },
+    // ── Injuries ──
+    bleeding: {
+      name: "Bleeding",
+      cause: "A heavy blow",
+      treat: "A bandage",
+      item: "bandage",
+      kind: "injury",
+      incubate: 0,
+      worsen: 60,
+      recover: 45,
+      effect: { hp: 0.12 },
+      cures: { bandage: 3, poultice: 2 },
+      chain: ["wound", 4e-3],
+      symptoms: ["Bleeding", "Bleeding freely", "Bleeding out"]
+    },
+    fracture: {
+      name: "Fracture",
+      cause: "A crushing blow or a bad fall",
+      treat: "A splint, then time",
+      item: "splint",
+      kind: "injury",
+      incubate: 0,
+      worsen: 400,
+      effect: { speed: 0.25, stamina: 0.2 },
+      cures: { splint: 1 },
+      symptoms: ["A cracked bone", "A broken bone", "A shattered bone"]
+    },
+    burn: {
+      name: "Burn",
+      cause: "Fire, lava, and burning embers",
+      treat: "Burn salve",
+      item: "burn_salve",
+      kind: "injury",
+      incubate: 0,
+      worsen: 200,
+      recover: 150,
+      effect: { stamina: 0.3 },
+      cures: { burn_salve: 3, poultice: 1 },
+      chain: ["wound", 2e-3],
+      symptoms: ["Scorched skin", "Blistered and raw", "Charred"]
     }
+  };
+  var BITE_DISEASES = {
+    wolf: ["rabies", 0.03],
+    bat: ["rabies", 0.04],
+    warren_rat: ["rabies", 0.05],
+    ash_hound: ["rabies", 0.03],
+    skeleton: ["tetanus", 0.06],
+    mole_guard: ["tetanus", 0.08],
+    cinder_knight: ["tetanus", 0.05],
+    shroomling: ["spore_lung", 0.08],
+    spore_bat: ["spore_lung", 0.1],
+    spore_slime: ["spore_lung", 0.1],
+    mycelid: ["spore_lung", 0.1],
+    void_stalker: ["void_rot", 0.1],
+    void_wisp: ["void_rot", 0.08],
+    watcher: ["void_rot", 0.06]
+  };
+
+  // src/data/weapons.ts
+  var TIERS = [
+    {
+      tier: 1,
+      mat: "flint",
+      name: "Flint",
+      bar: "flint",
+      station: null,
+      base: 16,
+      color: "#8a9094",
+      glow: "#c8d0d4"
+    },
+    {
+      tier: 2,
+      mat: "copper",
+      name: "Copper",
+      bar: "copper_ingot",
+      station: "workbench",
+      base: 26,
+      color: "#d0844a",
+      glow: "#f0b070"
+    },
+    {
+      tier: 3,
+      mat: "iron",
+      name: "Iron",
+      bar: "iron_ingot",
+      station: "workbench",
+      base: 38,
+      color: "#a8a4a0",
+      glow: "#e0dcd8"
+    },
+    {
+      tier: 4,
+      mat: "steel",
+      name: "Steel",
+      bar: "steel_ingot",
+      station: "forge",
+      base: 50,
+      color: "#dfe3e6",
+      glow: "#ffffff"
+    },
+    {
+      tier: 5,
+      mat: "obsidian",
+      name: "Obsidian",
+      bar: "obsidian",
+      station: "forge",
+      base: 64,
+      color: "#4a3a64",
+      glow: "#a07fd0"
+    },
+    {
+      tier: 6,
+      mat: "hellstone",
+      name: "Hellstone",
+      bar: "hellstone_ingot",
+      station: "forge",
+      base: 80,
+      color: "#e04a2a",
+      glow: "#ff8a3a"
+    },
+    {
+      tier: 7,
+      mat: "cinder",
+      name: "Cinder",
+      bar: "cinder_core",
+      station: "forge",
+      base: 100,
+      color: "#ff8a3a",
+      glow: "#ffc070"
+    },
+    {
+      tier: 8,
+      mat: "myconite",
+      name: "Myconite",
+      bar: "myconite_ingot",
+      station: "starforge",
+      base: 126,
+      color: "#58e0d0",
+      glow: "#9ef0e0"
+    },
+    {
+      tier: 9,
+      mat: "starmetal",
+      name: "Starmetal",
+      bar: "starmetal_ingot",
+      station: "starforge",
+      base: 154,
+      color: "#f8e08a",
+      glow: "#fff4c0"
+    },
+    {
+      tier: 10,
+      mat: "voidsteel",
+      name: "Voidsteel",
+      bar: "voidsteel_ingot",
+      station: "starforge",
+      base: 192,
+      color: "#b36cff",
+      glow: "#d8a8ff"
+    },
+    {
+      tier: 11,
+      mat: "rift",
+      name: "Riftforged",
+      bar: "void_essence",
+      station: "starforge",
+      base: 240,
+      color: "#ff6ad5",
+      glow: "#ffb0ec"
+    }
+  ];
+  var tierOf = (t) => TIERS[Math.max(0, Math.min(TIERS.length - 1, t - 1))];
+  var FAMILIES = [
+    {
+      id: "blade",
+      name: "Blade",
+      text: "Every third blow in quick succession strikes for \xD71.8",
+      dmg: 1,
+      reach: 64,
+      pace: 1,
+      suffix: "sword",
+      bars: 5,
+      extra: { wood: 2 }
+    },
+    {
+      id: "greatsword",
+      name: "Greatsword",
+      text: "Slow, heavy cleaves that hit everything in a wide arc",
+      dmg: 1.42,
+      reach: 78,
+      pace: 1.45,
+      suffix: "greatsword",
+      bars: 8,
+      extra: { wood: 2, hide: 1 }
+    },
+    {
+      id: "spear",
+      name: "Spear",
+      text: "The longest reach of any melee weapon",
+      dmg: 0.92,
+      reach: 98,
+      pace: 0.95,
+      suffix: "spear",
+      bars: 4,
+      extra: { wood: 4 }
+    },
+    {
+      id: "battleaxe",
+      name: "Battleaxe",
+      text: "Blows open wounds that bleed for three seconds",
+      dmg: 1.1,
+      reach: 62,
+      pace: 1.15,
+      suffix: "battleaxe",
+      bars: 6,
+      extra: { wood: 3 }
+    },
+    {
+      id: "warhammer",
+      name: "Warhammer",
+      text: "Staggers foes and cracks their armour",
+      dmg: 1.24,
+      reach: 58,
+      pace: 1.35,
+      suffix: "warhammer",
+      bars: 8,
+      extra: { wood: 3, stone: 4 }
+    },
+    {
+      id: "whip",
+      name: "Whip",
+      text: "Long, quick lashes that mark foes to take more harm",
+      dmg: 0.6,
+      reach: 124,
+      pace: 0.8,
+      suffix: "whip",
+      bars: 3,
+      extra: { hide: 3 }
+    },
+    {
+      id: "bow",
+      name: "Bow",
+      text: "Arrows at range; the arrow adds its own damage",
+      ranged: "bow",
+      dmg: 0.55,
+      reach: 0,
+      pace: 1,
+      suffix: "bow",
+      bars: 4,
+      extra: { fiber: 4, wood: 3 }
+    },
+    {
+      id: "crossbow",
+      name: "Crossbow",
+      text: "Slow to load; its bolts hit hard and pass through",
+      ranged: "bow",
+      dmg: 0.95,
+      reach: 0,
+      pace: 1,
+      suffix: "crossbow",
+      bars: 6,
+      extra: { wood: 4, silk: 2 }
+    },
+    {
+      id: "staff",
+      name: "Staff",
+      text: "Mana shaped into bolts",
+      ranged: "magic",
+      dmg: 0.62,
+      reach: 0,
+      pace: 1,
+      suffix: "staff",
+      bars: 4,
+      extra: { crystal: 2 }
+    },
+    {
+      id: "tome",
+      name: "Tome",
+      text: "A torrent of small seeking sparks for little mana each",
+      ranged: "magic",
+      dmg: 0.27,
+      reach: 0,
+      pace: 1,
+      suffix: "tome",
+      bars: 3,
+      extra: { linen: 2, crystal: 1 }
+    }
+  ];
+  var familyById = (id) => FAMILIES.find((f) => f.id === id);
+  var CANON = {
+    iron_sword: ["blade", 3],
+    steel_sword: ["blade", 4],
+    obsidian_blade: ["blade", 5],
+    hellfire_blade: ["blade", 6],
+    myconite_sword: ["blade", 8],
+    star_saber: ["blade", 9],
+    rift_blade: ["blade", 11],
+    void_reaver: ["greatsword", 10],
+    flint_spear: ["spear", 1],
+    copper_spear: ["spear", 2],
+    wooden_bow: ["bow", 1],
+    iron_bow: ["bow", 3]
+  };
+  var SIGNATURE = {
+    silver_broadsword: ["blade", 3],
+    gold_broadsword: ["blade", 4],
+    tidecaller_spear: ["spear", 4],
+    kiln_greataxe: ["battleaxe", 5],
+    eclipse_blade: ["blade", 6],
+    frostbrand: ["blade", 6],
+    sunspear: ["spear", 7],
+    hellrazor: ["blade", 7],
+    bone_bow: ["bow", 6],
+    storm_bow: ["bow", 9],
+    amber_repeater: ["crossbow", 4],
+    prism_wand: ["staff", 6],
+    shard_glaive: ["spear", 6],
+    bonecleaver: ["battleaxe", 7],
+    vertebra_whip: ["whip", 6],
+    brass_repeater: ["crossbow", 8],
+    piston_hammer: ["warhammer", 8],
+    mirage_blade: ["blade", 8],
+    saltglass_bow: ["bow", 8],
+    choir_stave: ["staff", 9],
+    bellhammer: ["warhammer", 9],
+    ruby_staff: ["staff", 3],
+    emerald_staff: ["staff", 3],
+    sapphire_staff: ["staff", 4],
+    brine_wand: ["staff", 4],
+    ember_sling: ["staff", 4],
+    ember_wand: ["staff", 5],
+    lich_staff: ["staff", 6],
+    glacier_staff: ["staff", 6],
+    sun_staff: ["staff", 7],
+    spore_staff: ["staff", 8],
+    void_staff: ["staff", 10]
+  };
+  var GRID = TIERS.flatMap(
+    (t) => FAMILIES.map((f) => {
+      const canon = Object.entries(CANON).find(([, [fam, tier]]) => fam === f.id && tier === t.tier);
+      if (canon) return { id: canon[0], name: "", family: f.id, tier: t.tier, generated: false };
+      const FIRST = {
+        blade: "Flint knife",
+        greatsword: "Flint cleaver",
+        warhammer: "Stone maul",
+        whip: "Hide whip",
+        staff: "Gnarled staff",
+        tome: "Birchbark tome",
+        crossbow: "Sling crossbow"
+      };
+      const name = t.tier === 1 && FIRST[f.id] || `${t.name} ${f.suffix}`;
+      return { id: `${t.mat}_${f.suffix}`, name, family: f.id, tier: t.tier, generated: true };
+    })
+  );
+  var WEAPON_CLASS = {
+    ...Object.fromEntries(GRID.map((w) => [w.id, [w.family, w.tier]])),
+    ...SIGNATURE
+  };
+  var GEN_WEAPONS = {};
+  var GEN_RANGED = {};
+  var GEN_PROJECTILES = {
+    bolt: { color: "#c8b890", gravity: 160, life: 2, size: 9, pierce: 1 }
+  };
+  var GEN_ITEMS = [];
+  var GEN_RECIPES = [];
+  for (const w of GRID) {
+    if (!w.generated) continue;
+    const t = tierOf(w.tier), f = familyById(w.family);
+    GEN_WEAPONS[w.id] = [w.tier, Math.round(t.base * f.dmg), f.reach];
+    if (f.id === "bow")
+      GEN_RANGED[w.id] = { kind: "bow", projectile: "arrow", delay: 0.55, speed: 700 + w.tier * 30 };
+    if (f.id === "crossbow")
+      GEN_RANGED[w.id] = { kind: "bow", projectile: "bolt", delay: 0.95, speed: 900 + w.tier * 30 };
+    if (f.id === "staff") {
+      GEN_RANGED[w.id] = {
+        kind: "magic",
+        projectile: `${t.mat}_orb`,
+        delay: 0.45,
+        speed: 560 + w.tier * 20,
+        mana: 4 + Math.ceil(w.tier / 2)
+      };
+      GEN_PROJECTILES[`${t.mat}_orb`] = { color: t.color, glow: t.glow, life: 1.3, size: 9 };
+    }
+    if (f.id === "tome") {
+      GEN_RANGED[w.id] = {
+        kind: "magic",
+        projectile: `${t.mat}_spark`,
+        delay: 0.14,
+        speed: 520 + w.tier * 15,
+        mana: 1 + Math.floor(w.tier / 4)
+      };
+      GEN_PROJECTILES[`${t.mat}_spark`] = {
+        color: t.glow,
+        glow: t.color,
+        life: 1.1,
+        size: 6,
+        homing: 4
+      };
+    }
+    GEN_ITEMS.push([w.id, w.name]);
+    const cost = {
+      [t.bar]: Math.max(1, Math.round(f.bars * (w.tier === 11 ? 0.6 : 1)))
+    };
+    if (w.tier === 11) cost.voidsteel_ingot = f.bars;
+    for (const [k, n] of Object.entries(f.extra)) if (w.tier > 1 || k !== "silk") cost[k] = n;
+    if (w.tier === 1) {
+      delete cost.silk;
+      delete cost.linen;
+      if (f.id === "tome") cost.fiber = 4;
+    }
+    GEN_RECIPES.push([w.id, cost, t.station ?? (w.tier === 1 ? null : "workbench"), w.tier]);
+  }
+  var QUALITIES = [
+    { id: "crude", name: "Crude", mult: 0.85, sockets: 0, weight: 15, color: "#8a8070" },
+    { id: "common", name: "Common", mult: 1, sockets: 1, weight: 50, color: "#6a5a44" },
+    { id: "fine", name: "Fine", mult: 1.1, sockets: 1, weight: 22, color: "#7ac070" },
+    { id: "masterwork", name: "Masterwork", mult: 1.22, sockets: 2, weight: 10, color: "#5a9ae8" },
+    { id: "mythic", name: "Mythic", mult: 1.4, sockets: 3, weight: 3, color: "#e89a3a" }
+  ];
+  function rollQuality(rng2, luck = 1) {
+    const weights = QUALITIES.map((q, i) => q.weight * (i >= 2 ? luck : 1));
+    let r = rng2() * weights.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < weights.length; i++) if ((r -= weights[i]) <= 0) return i;
+    return 1;
+  }
+  var MAX_LEVEL = 10;
+  var LEVEL_DAMAGE = 0.07;
+  function upgradeCost(tier, level) {
+    const t = tierOf(tier);
+    return { [t.bar]: 2 + level, coin: 10 * tier * (level + 1) };
+  }
+  function reforgeCost(tier) {
+    const t = tierOf(tier);
+    return { [t.bar]: 3, coin: 40 * tier };
+  }
+  var anvilFor = (tier) => tier >= 8 ? "starforge" : tier >= 4 ? "forge" : "workbench";
+  var E = (id, name, text, mods) => ({
+    id,
+    name,
+    text,
+    mods
+  });
+  var EVOLUTIONS = {
+    blade: [
+      [
+        E("keen", "Keen", "+10% critical chance", { crit: 0.1 }),
+        E("swift", "Swift", "Swings 15% faster", { pace: -0.15 })
+      ],
+      [
+        E("duelist", "Duelist", "The third blow strikes \xD72.4", { combo: 2.4 }),
+        E("executioner", "Executioner", "+50% against foes below 30% health", { execute: 0.5 })
+      ]
+    ],
+    greatsword: [
+      [
+        E("wide", "Wide", "+20% reach", { reach: 0.2 }),
+        E("heavy", "Heavy", "+15% damage", { dmg: 0.15 })
+      ],
+      [
+        E("cleaver", "Cleaver", "Cleaves open bleeding wounds", { bleed: 0.25 }),
+        E("titan", "Titan", "Blows stagger foes", { stagger: true })
+      ]
+    ],
+    spear: [
+      [
+        E("long", "Long", "+20% reach", { reach: 0.2 }),
+        E("barbed", "Barbed", "Thrusts cause bleeding", { bleed: 0.2 })
+      ],
+      [
+        E("impaler", "Impaler", "+30% against great foes", { boss: 0.3 }),
+        E("phalanx", "Phalanx", "+4 defense while held", { defense: 4 })
+      ]
+    ],
+    battleaxe: [
+      [
+        E("serrated", "Serrated", "Bleeding doubles", { bleed: 0.3 }),
+        E("balanced", "Balanced", "Swings 15% faster", { pace: -0.15 })
+      ],
+      [
+        E("reaper", "Reaper", "Heal 3% of the damage you deal", { heal: 0.03 }),
+        E("berserk", "Berserk", "+30% while below half health", { berserk: 0.3 })
+      ]
+    ],
+    warhammer: [
+      [
+        E("crusher", "Crusher", "Armour stays cracked twice as long", { sunder: 8 }),
+        E("weighty", "Weighty", "+15% damage", { dmg: 0.15 })
+      ],
+      [
+        E("earthshaker", "Earthshaker", "Blows strike everything nearby", { reach: 0.35 }),
+        E("juggernaut", "Juggernaut", "+6 defense while held", { defense: 6 })
+      ]
+    ],
+    whip: [
+      [
+        E("lash", "Lash", "+20% reach", { reach: 0.2 }),
+        E("venomous", "Venomous", "Lashes poison", { poison: 0.25 })
+      ],
+      [
+        E("ringmaster", "Ringmaster", "Marked foes take +30% instead of +15%", { mark: 0.3 }),
+        E("flayer", "Flayer", "Lashes cause bleeding", { bleed: 0.3 })
+      ]
+    ],
+    bow: [
+      [
+        E("eagle", "Eagle", "Draw 20% faster", { pace: -0.2 }),
+        E("heavy_draw", "Heavy draw", "+20% damage", { dmg: 0.2 })
+      ],
+      [
+        E("volley", "Volley", "Loose three arrows at once", { count: 2 }),
+        E("sniper", "Sniper", "+60% damage, slower draw", { dmg: 0.6, pace: 0.3 })
+      ]
+    ],
+    crossbow: [
+      [
+        E("quickload", "Quickload", "Reload 20% faster", { pace: -0.2 }),
+        E("broadhead", "Broadhead", "Bolts cause bleeding", { bleed: 0.25 })
+      ],
+      [
+        E("repeater", "Repeater", "Two bolts at once", { count: 1 }),
+        E("ballista", "Ballista", "Bolts pass through four foes", { pierce: 3 })
+      ]
+    ],
+    staff: [
+      [
+        E("focused", "Focused", "20% less mana", { mana: -0.2 }),
+        E("charged", "Charged", "+20% damage", { dmg: 0.2 })
+      ],
+      [
+        E("split", "Split", "Two more bolts in a fan", { count: 2 }),
+        E("seeker", "Seeker", "Bolts seek their foes", { homing: 3 })
+      ]
+    ],
+    tome: [
+      [
+        E("fluent", "Fluent", "25% less mana", { mana: -0.25 }),
+        E("searing", "Searing", "+20% damage", { dmg: 0.2 })
+      ],
+      [
+        E("torrent", "Torrent", "Two streams at once", { count: 1 }),
+        E("leech", "Leech", "Heal 2% of the damage you deal", { heal: 0.02 })
+      ]
+    ]
+  };
+  var INFUSIONS = [
+    {
+      id: "fire",
+      name: "Fire",
+      text: "Sets foes burning",
+      item: "fire_infusion",
+      color: "#ff8a3a",
+      recipe: { kiln_ingot: 2, sulfur: 4 }
+    },
+    {
+      id: "frost",
+      name: "Frost",
+      text: "Slows foes by 40%",
+      item: "frost_infusion",
+      color: "#9fd8ec",
+      recipe: { frost_shard: 3, ice: 6 }
+    },
+    {
+      id: "venom",
+      name: "Venom",
+      text: "Poisons foes",
+      item: "venom_infusion",
+      color: "#7bc05a",
+      recipe: { venom: 4, crab_shell: 2 }
+    },
+    {
+      id: "void",
+      name: "Void",
+      text: "Ignores half of all armour",
+      item: "void_infusion",
+      color: "#b36cff",
+      recipe: { void_essence: 2, crystal: 2 }
+    },
+    {
+      id: "holy",
+      name: "Holy",
+      text: "+50% against the undead",
+      item: "holy_infusion",
+      color: "#fff0a0",
+      recipe: { sun_gold: 2, tide_pearl: 2 }
+    },
+    {
+      id: "storm",
+      name: "Storm",
+      text: "Lightning leaps to a second foe",
+      item: "storm_infusion",
+      color: "#bfe4ff",
+      recipe: { sky_silk: 2, fallen_star: 2 }
+    }
+  ];
+  var infusionById = (id) => INFUSIONS.find((i) => i.id === id);
+  var UNDEAD = /* @__PURE__ */ new Set([
+    "skeleton",
+    "skeleton_archer",
+    "bone_bat",
+    "crypt_ghoul",
+    "frost_wraith",
+    "mummy",
+    "hollow_king",
+    "pharaoh",
+    "drowned",
+    "void_wisp",
+    "watcher",
+    "unmaker",
+    "bone_hound",
+    "ossuary_knight",
+    "marsh_ghoul",
+    "bone_colossus",
+    "ossuary_hydra",
+    "salt_wraith",
+    "choir_wraith",
+    "cantor",
+    "grand_cantor"
+  ]);
+  var GEMS = {
+    ruby: { name: "Ruby", text: "+8% damage", mods: { dmg: 0.08 } },
+    sapphire: {
+      name: "Sapphire",
+      text: "+12% magic damage, 10% less mana",
+      mods: { magic: 0.12, mana: -0.1 }
+    },
+    emerald: { name: "Emerald", text: "+5% critical chance", mods: { crit: 0.05 } },
+    topaz: { name: "Topaz", text: "Swings and shots 8% faster", mods: { pace: -0.08 } },
+    onyx: { name: "Onyx", text: "Ignores a quarter of armour", mods: { armorPierce: 0.25 } },
+    opal: { name: "Opal", text: "Heal 2% of the damage you deal", mods: { heal: 0.02 } }
   };
 
   // src/data/gear.ts
@@ -358,6 +1315,207 @@
       tier: 4,
       bonus: "defense4",
       bonusText: "+4 defense"
+    },
+    {
+      key: "tidecaller",
+      name: "Tidecaller",
+      bar: "crab_shell",
+      defense: [3, 5, 3],
+      station: "workbench",
+      tier: 4,
+      bonus: "swim",
+      bonusText: "Wade and swim freely; tides do not chill you"
+    },
+    {
+      key: "ashwalker",
+      name: "Ashwalker",
+      bar: "ashcloth",
+      defense: [3, 4, 3],
+      station: "workbench",
+      tier: 4,
+      bonus: "ashward",
+      bonusText: "Ash storms cannot blind or choke you; +10% speed"
+    },
+    {
+      key: "amberguard",
+      name: "Amberguard",
+      bar: "burrow_amber",
+      defense: [4, 6, 4],
+      station: "workbench",
+      tier: 5,
+      bonus: "tremor",
+      bonusText: "Sense cave-ins; falling rock does half damage; +2 defense"
+    },
+    {
+      key: "prismweave",
+      name: "Prismweave",
+      bar: "prism_glass",
+      defense: [5, 7, 5],
+      station: "forge",
+      tier: 6,
+      bonus: "shardward",
+      bonusText: "Shardfall glances off you; magic +10%"
+    },
+    {
+      key: "bonewalker",
+      name: "Bonewalker",
+      bar: "marrow_ingot",
+      defense: [6, 8, 6],
+      station: "forge",
+      tier: 6,
+      bonus: "mirewalk",
+      bonusText: "Mire neither slows nor sickens you; +3 defense"
+    },
+    {
+      key: "gearwright",
+      name: "Gearwright",
+      bar: "brass_ingot",
+      defense: [7, 10, 7],
+      station: "starforge",
+      tier: 8,
+      bonus: "trapsense",
+      bonusText: "Steam vents cannot scald you; ranged +10%"
+    },
+    {
+      key: "saltwarden",
+      name: "Saltwarden",
+      bar: "saltglass",
+      defense: [6, 9, 6],
+      station: "starforge",
+      tier: 8,
+      bonus: "shade",
+      bonusText: "The white sun cannot parch you; mirages show themselves; +10% speed"
+    },
+    {
+      key: "choirsilver",
+      name: "Choirsilver",
+      bar: "rime_silver",
+      defense: [8, 11, 8],
+      station: "starforge",
+      tier: 9,
+      bonus: "hymnward",
+      bonusText: "The hymn cannot slow or chill you; shrug off 6\xB0 of cold"
+    },
+    // ── Archetypes, in three bands ──
+    {
+      key: "warden",
+      name: "Warden",
+      bar: "iron_ingot",
+      defense: [3, 5, 3],
+      station: "workbench",
+      tier: 3,
+      bonus: "vanguard",
+      bonusText: "Vanguard: +3 defense; biters take a quarter of their blow back"
+    },
+    {
+      key: "bulwark",
+      name: "Bulwark",
+      bar: "hellstone_ingot",
+      defense: [6, 9, 6],
+      station: "forge",
+      tier: 6,
+      bonus: "vanguard",
+      bonusText: "Vanguard: +3 defense; biters take a quarter of their blow back"
+    },
+    {
+      key: "aegis",
+      name: "Aegis",
+      bar: "starmetal_ingot",
+      defense: [11, 15, 11],
+      station: "starforge",
+      tier: 9,
+      bonus: "vanguard",
+      bonusText: "Vanguard: +3 defense; biters take a quarter of their blow back"
+    },
+    {
+      key: "stalker",
+      name: "Stalker",
+      bar: "iron_ingot",
+      defense: [2, 3, 2],
+      station: "workbench",
+      tier: 3,
+      bonus: "ranger",
+      bonusText: "Ranger: +10% critical chance; a quarter of arrows kept"
+    },
+    {
+      key: "farstrider",
+      name: "Farstrider",
+      bar: "hellstone_ingot",
+      defense: [4, 6, 4],
+      station: "forge",
+      tier: 6,
+      bonus: "ranger",
+      bonusText: "Ranger: +10% critical chance; a quarter of arrows kept"
+    },
+    {
+      key: "windrider",
+      name: "Windrider",
+      bar: "starmetal_ingot",
+      defense: [8, 11, 8],
+      station: "starforge",
+      tier: 9,
+      bonus: "ranger",
+      bonusText: "Ranger: +10% critical chance; a quarter of arrows kept"
+    },
+    {
+      key: "acolyte",
+      name: "Acolyte",
+      bar: "iron_ingot",
+      defense: [1, 2, 1],
+      station: "workbench",
+      tier: 3,
+      bonus: "arcanist",
+      bonusText: "Arcanist: +40 mana; spells cost 20% less"
+    },
+    {
+      key: "magus",
+      name: "Magus",
+      bar: "hellstone_ingot",
+      defense: [3, 4, 3],
+      station: "forge",
+      tier: 6,
+      bonus: "arcanist",
+      bonusText: "Arcanist: +40 mana; spells cost 20% less"
+    },
+    {
+      key: "archon",
+      name: "Archon",
+      bar: "starmetal_ingot",
+      defense: [6, 8, 6],
+      station: "starforge",
+      tier: 9,
+      bonus: "arcanist",
+      bonusText: "Arcanist: +40 mana; spells cost 20% less"
+    },
+    {
+      key: "drifter",
+      name: "Drifter",
+      bar: "iron_ingot",
+      defense: [2, 3, 2],
+      station: "workbench",
+      tier: 3,
+      bonus: "wayfarer",
+      bonusText: "Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off"
+    },
+    {
+      key: "nomad",
+      name: "Nomad",
+      bar: "hellstone_ingot",
+      defense: [4, 6, 4],
+      station: "forge",
+      tier: 6,
+      bonus: "wayfarer",
+      bonusText: "Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off"
+    },
+    {
+      key: "voyager",
+      name: "Voyager",
+      bar: "starmetal_ingot",
+      defense: [8, 11, 8],
+      station: "starforge",
+      tier: 9,
+      bonus: "wayfarer",
+      bonusText: "Wayfarer: food keeps longer, cold and heat bite less, sickness shrugged off"
     },
     {
       key: "steel",
@@ -460,6 +1618,11 @@
       bonusText: "+20% damage, +8 defense"
     }
   ];
+  var ARCHETYPE_EXTRA = {
+    3: { hide: 2, fiber: 4 },
+    6: { obsidian: 2, silk: 3 },
+    9: { sky_silk: 3, crystal: 2 }
+  };
   var SLOTS = [
     ["head", "helmet", "helmet", 10],
     ["body", "chestplate", "chestplate", 16],
@@ -481,7 +1644,7 @@
   var ARMOR_RECIPES = ARMOR_SETS.flatMap(
     (s) => SLOTS.map(([, suffix, , bars]) => {
       const n = Math.max(4, Math.round(bars * (s.bar === "obsidian" ? 1 : 0.6)));
-      const extra = s.key === "crypt" ? { bone: 6, steel_ingot: 3 } : s.key === "frost" ? { ice: 8, steel_ingot: 3 } : s.key === "sun" ? { sand: 10, steel_ingot: 3 } : s.key === "cinder" ? { obsidian: 6, hellstone_ingot: 3 } : suffix === "chestplate" ? { hide: 2 } : {};
+      const extra = s.key === "crypt" ? { bone: 6, steel_ingot: 3 } : s.key === "frost" ? { ice: 8, steel_ingot: 3 } : s.key === "sun" ? { sand: 10, steel_ingot: 3 } : s.key === "cinder" ? { obsidian: 6, hellstone_ingot: 3 } : ARCHETYPE_EXTRA[s.tier] && ["vanguard", "ranger", "arcanist", "wayfarer"].includes(s.bonus) ? ARCHETYPE_EXTRA[s.tier] : suffix === "chestplate" ? { hide: 2 } : {};
       return [`${s.key}_${suffix}`, { [s.bar]: n, ...extra }, s.station, s.tier];
     })
   );
@@ -503,6 +1666,37 @@
     glacier_staff: { kind: "magic", projectile: "icicle", delay: 0.42, speed: 760, mana: 8 },
     sun_staff: { kind: "magic", projectile: "sun_bolt", delay: 0.5, speed: 520, mana: 10 },
     ruby_staff: { kind: "magic", projectile: "ruby_bolt", delay: 0.45, speed: 620, mana: 5 },
+    brine_wand: {
+      kind: "magic",
+      projectile: "brine_bolt",
+      delay: 0.36,
+      speed: 560,
+      mana: 5,
+      count: 2,
+      spread: 0.12
+    },
+    ember_sling: { kind: "magic", projectile: "kiln_ember", delay: 0.5, speed: 520, mana: 6 },
+    prism_wand: {
+      kind: "magic",
+      projectile: "prism_bolt",
+      delay: 0.45,
+      speed: 640,
+      mana: 9,
+      count: 3,
+      spread: 0.12
+    },
+    brass_repeater: { kind: "bow", projectile: "bolt", delay: 0.42, speed: 1e3 },
+    saltglass_bow: { kind: "bow", projectile: "arrow", delay: 0.5, speed: 1e3 },
+    choir_stave: {
+      kind: "magic",
+      projectile: "choir_note",
+      delay: 0.4,
+      speed: 560,
+      mana: 10,
+      count: 2,
+      spread: 0.2
+    },
+    amber_repeater: { kind: "bow", projectile: "arrow", delay: 0.26, speed: 900 },
     sapphire_staff: { kind: "magic", projectile: "sapphire_bolt", delay: 0.4, speed: 680, mana: 6 },
     emerald_staff: {
       kind: "magic",
@@ -522,7 +1716,8 @@
       count: 2,
       spread: 0.3
     },
-    void_staff: { kind: "magic", projectile: "void_beam", delay: 0.3, speed: 1100, mana: 12 }
+    void_staff: { kind: "magic", projectile: "void_beam", delay: 0.3, speed: 1100, mana: 12 },
+    ...GEN_RANGED
   };
   var AMMO = {
     arrow: { damage: 6 },
@@ -540,6 +1735,22 @@
     ruby_bolt: { color: "#ff5a6a", glow: "#ff8a9a", life: 1.1, size: 8 },
     sapphire_bolt: { color: "#5a8aff", glow: "#9ac0ff", life: 1.1, size: 8, pierce: 1 },
     emerald_bolt: { color: "#4ae07a", glow: "#9af0b0", life: 1.1, size: 8 },
+    brine_bolt: { color: "#5ac8c0", glow: "#9af0e8", life: 1.2, size: 8, pierce: 1 },
+    kiln_ember: { color: "#ff8a3a", glow: "#ffc070", life: 1.8, size: 12, gravity: 420, fire: true },
+    // Realm monsters.
+    brine_spit: { color: "#6ac0b0", glow: "#9af0e8", life: 2, size: 10, gravity: 300 },
+    falling_rock: { color: "#8a6a44", life: 3, size: 14, gravity: 900 },
+    amber_glob: { color: "#e8a030", glow: "#ffd070", life: 2.4, size: 10, gravity: 260 },
+    ash_burst: { color: "#9a8a7a", glow: "#c8a080", life: 1.4, size: 16, drag: 1.2 },
+    prism_bolt: { color: "#e0f0ff", glow: "#9ad8ff", life: 1.2, size: 8, pierce: 2 },
+    lumen_orb: { color: "#fff8c0", glow: "#ffe070", life: 2.6, size: 11, homing: 2 },
+    glass_shard: { color: "#cfefff", glow: "#9ad8ff", life: 2.4, size: 9, gravity: 700 },
+    mire_glob: { color: "#6a7a4a", glow: "#8a9a5a", life: 2.4, size: 12, gravity: 300 },
+    steam_puff: { color: "#e8e8e8", glow: "#ffffff", life: 1.6, size: 16, drag: 1.4 },
+    salt_spray: { color: "#f4f0e8", glow: "#ffffff", life: 1.4, size: 8 },
+    heat_bolt: { color: "#ffb060", glow: "#fff0a0", life: 2.2, size: 11, homing: 1.6, fire: true },
+    hymn_note: { color: "#bfe0ff", glow: "#e8f4ff", life: 2.4, size: 10, homing: 1.2 },
+    choir_note: { color: "#dff0ff", glow: "#9ad0ff", life: 1.6, size: 9, homing: 3 },
     // Monster attacks.
     dart: { color: "#8a9058", life: 2.2, size: 7 },
     fireball: { color: "#ff6a2a", glow: "#ffb347", life: 2.6, size: 12, fire: true },
@@ -549,7 +1760,8 @@
     shockwave: { color: "#dff6ff", glow: "#9fd8ec", life: 1.6, size: 18, pierce: 99 },
     lightning: { color: "#fff8c0", glow: "#fff0a0", life: 0.5, size: 18, pierce: 99 },
     eye_beam: { color: "#ff5a8a", glow: "#ff9ac0", life: 2.4, size: 11 },
-    flame_jet: { color: "#ffb347", glow: "#ff6a2a", life: 0.7, size: 16, fire: true, pierce: 99 }
+    flame_jet: { color: "#ffb347", glow: "#ff6a2a", life: 0.7, size: 16, fire: true, pierce: 99 },
+    ...GEN_PROJECTILES
   };
   var BLOCKS = {
     dirt: 1,
@@ -572,7 +1784,22 @@
     void_crystal: 24,
     obsidian_brick: 25,
     sandstone_brick: 26,
-    glowshroom_block: 28
+    glowshroom_block: 28,
+    brinesoil: 30,
+    ash_soil: 31,
+    kilnrock: 32,
+    warren_earth: 33,
+    amberstone: 34,
+    glassloam: 36,
+    prismrock: 37,
+    marrow_mud: 38,
+    bonerock: 39,
+    brass_plate: 40,
+    gearstone: 41,
+    saltcrust: 42,
+    saltglass_rock: 43,
+    rimesnow: 44,
+    choirstone: 45
   };
   var BUFFS = {
     swiftness: { name: "Swiftness", text: "+25% speed", color: "#8ad0f0" },
@@ -583,7 +1810,19 @@
     featherfall: { name: "Featherfall", text: "Fall slowly; no fall damage", color: "#e8e8f8" },
     fireward: { name: "Fireward", text: "Immune to heat and lava", color: "#ff8a3a" },
     wrath: { name: "Wrath", text: "+15% damage", color: "#d04a4a" },
-    potion_sickness: { name: "Potion sickness", text: "Healing draughts rest", color: "#8a8070" }
+    potion_sickness: { name: "Potion sickness", text: "Healing draughts rest", color: "#8a8070" },
+    // The comfort of a good meal.
+    well_fed: { name: "Well fed", text: "Health and stamina recover faster", color: "#e8b84a" },
+    fiery: { name: "Fiery", text: "+10% damage", color: "#ff8a3a" },
+    sweet: { name: "Sugar rush", text: "+10% speed", color: "#f0a0c0" },
+    clear_mind: { name: "Clear mind", text: "Mana returns twice as fast", color: "#8ab0f0" },
+    warm_belly: { name: "Warm belly", text: "The cold bites less", color: "#e87a3a" },
+    feasted: { name: "Feasted", text: "Recover faster; +10% damage", color: "#f0c860" },
+    iron_gut: {
+      name: "Iron gut",
+      text: "Shrug off half of what you catch from food and water",
+      color: "#8a9a6a"
+    }
   };
   var POTIONS = {
     healing_draught: { heal: 60 },
@@ -604,6 +1843,26 @@
     wind_boots: { effects: ["speed20", "jump"], text: "+20% speed, higher jumps" },
     mycelial_charm: { effects: ["regen"], text: "Regenerate health" },
     cloud_jar: { effects: ["double_jump"], text: "Double jump" },
+    insulated_satchel: {
+      effects: ["cool25"],
+      text: "Food in the pack keeps 25% longer; ice melts slower"
+    },
+    frost_lined_pack: { effects: ["cool50"], text: "Food in the pack keeps twice as long" },
+    rime_lined_pack: { effects: ["cool70"], text: "Food in the pack keeps over three times as long" },
+    tide_conch: { effects: ["swim", "defense2"], text: "Swim with the tide; +2 defense" },
+    kiln_heart: { effects: ["ashward", "fire"], text: "Ash storms pass you by; strikes may ignite" },
+    queens_mandible: { effects: ["tremor", "damage10"], text: "Sense cave-ins; +10% damage" },
+    lumen_antler: {
+      effects: ["light", "shardward"],
+      text: "Light around you; shardfall glances off"
+    },
+    hydra_tooth: {
+      effects: ["mirewalk", "regen"],
+      text: "Walk the mire unharmed; regenerate health"
+    },
+    saint_cog: { effects: ["trapsense", "speed20"], text: "Steam cannot scald you; +20% speed" },
+    tyrant_eye: { effects: ["shade", "damage10"], text: "The sun cannot parch you; +10% damage" },
+    hymnal_bell: { effects: ["hymnward", "mana40"], text: "The hymn cannot hold you; +40 mana" },
     miners_lamp: { effects: ["light"], text: "Light around you" },
     magma_stone: { effects: ["lava"], text: "Resist lava and heat" },
     watcher_eye: { effects: ["damage10", "light"], text: "+10% damage; see in the dark" },
@@ -639,11 +1898,29 @@
     skystone_wall: 22,
     voidstone_wall: 23,
     obsidian_wall: 25,
-    sandstone_wall: 26
+    sandstone_wall: 26,
+    brinewood_wall: 35
   };
   var WALL_ITEM = Object.fromEntries(
     Object.entries(WALLS).map(([id, kind]) => [kind, id])
   );
+  Object.assign(WALL_ITEM, {
+    30: "dirt_wall",
+    31: "dirt_wall",
+    32: "stone_wall",
+    33: "dirt_wall",
+    34: "stone_wall",
+    36: "dirt_wall",
+    37: "stone_wall",
+    38: "dirt_wall",
+    39: "stone_wall",
+    40: "stone_wall",
+    41: "stone_wall",
+    42: "sandstone_wall",
+    43: "stone_wall",
+    44: "stone_wall",
+    45: "stone_wall"
+  });
   Object.assign(WALL_ITEM, {
     3: "sandstone_wall",
     4: "dirt_wall",
@@ -679,7 +1956,8 @@
         "Hold a pickaxe and click the ground to dig. Harder stone takes more strikes, and better picks.",
         "Five fallen stars make a mana crystal. They only fall on clear nights, out under the sky.",
         "The Mossy Crypt lies beneath the forest. Its king has kept his throne too long.",
-        "Set a sigil in the Rift Gate and it opens. Four sigils, four dungeons."
+        "Set a sigil in the Rift Gate and it opens. Four sigils, four dungeons.",
+        "A Waystone and a realm key open a whole new world. Each time, a different one; each tier, a harder one."
       ],
       colors: ["#5d7560", "#c9a24e", "#7d6444"]
     },
@@ -760,7 +2038,12 @@
         ["rope", 2],
         ["bucket", 20],
         ["cloud_jar", 400],
-        ["magma_stone", 350]
+        ["magma_stone", 350],
+        ["orchard_fragment", 45],
+        ["steppe_fragment", 45],
+        ["warren_fragment", 45],
+        ["glasswood_fragment", 90],
+        ["marches_fragment", 90]
       ],
       lines: [
         "A hook, a rope, a little nerve. Walls are only suggestions.",
@@ -895,6 +2178,43 @@
     beast_core: 150,
     life_crystal: 200,
     life_fruit: 300,
+    brinewood: 8,
+    tide_pearl: 45,
+    crab_shell: 10,
+    bog_apple: 4,
+    cinderflax: 6,
+    ashcloth: 20,
+    kilnstone_ore: 14,
+    ash_hide: 12,
+    burrow_amber: 16,
+    beetle_carapace: 12,
+    orchard_fragment: 40,
+    steppe_fragment: 40,
+    warren_fragment: 40,
+    mother_heart: 250,
+    kiln_core: 250,
+    queen_jelly: 250,
+    prism_glass: 22,
+    lumen_moss: 8,
+    marrow_iron_ore: 20,
+    marrow_ingot: 70,
+    brass_gear: 26,
+    brass_ingot: 90,
+    saltglass: 28,
+    rime_silver_ore: 30,
+    rime_silver: 100,
+    frost_lily: 10,
+    bell_bronze: 40,
+    glasswood_fragment: 80,
+    marches_fragment: 80,
+    barrow_fragment: 120,
+    saltflats_fragment: 120,
+    choir_fragment: 120,
+    stag_heart: 400,
+    hydra_heart: 400,
+    engine_heart: 600,
+    mirage_crown: 600,
+    hymnal_core: 600,
     coin: 1
   };
 
@@ -1135,6 +2455,145 @@
     ruby_staff: ["Ruby staff", "weapon"],
     sapphire_staff: ["Sapphire staff", "weapon"],
     emerald_staff: ["Emerald staff", "weapon"],
+    // ── Keeping food, and the cold-storage ladder ──
+    cool_pit: ["Cool pit", "structure"],
+    snow_cellar: ["Snow cellar", "structure"],
+    frost_chest: ["Frost chest", "structure"],
+    rime_vault: ["Rime vault", "structure"],
+    salting_barrel: ["Salting barrel", "structure"],
+    kitchen: ["Kitchen hearth", "structure"],
+    water_filter: ["Water filter", "structure"],
+    insulated_satchel: ["Insulated satchel", "accessory"],
+    frost_lined_pack: ["Frost-lined pack", "accessory"],
+    rime_lined_pack: ["Rime-lined pack", "accessory"],
+    salted_meat: ["Salted meat", "food", 7200],
+    salted_fish: ["Salted fish", "food", 7200],
+    pickled_mushrooms: ["Pickled mushrooms", "food", 9e3],
+    berry_preserves: ["Berry preserves", "food", 12e3],
+    hearty_stew: ["Hearty stew", "food", 1500],
+    fish_chowder: ["Fish chowder", "food", 1200],
+    spiced_skewers: ["Spiced skewers", "food", 1200],
+    honey_cakes: ["Honey cakes", "food", 2400],
+    mushroom_broth: ["Mushroom broth", "food", 1200],
+    orchard_pie: ["Orchard pie", "food", 2e3],
+    ember_chili: ["Ember chili", "food", 1500],
+    explorers_feast: ["Explorer's feast", "food", 1800],
+    brackish_water: ["Brackish water", "water", 1800],
+    filtered_water: ["Filtered water", "water", 2400],
+    // ── Medicine ──
+    rehydration_salts: ["Rehydration salts", "medicine", 9e3],
+    vermifuge: ["Vermifuge", "medicine", 9e3],
+    frost_salve: ["Frost salve", "medicine", 9e3],
+    burn_salve: ["Burn salve", "medicine", 9e3],
+    bandage: ["Bandage", "medicine"],
+    splint: ["Splint", "medicine"],
+    lungwort_tea: ["Lungwort tea", "medicine", 3e3],
+    void_salve: ["Void salve", "medicine", 9e3],
+    rabies_serum: ["Rabies serum", "medicine", 6e3],
+    field_vaccine: ["Field vaccine", "medicine", 6e3],
+    iron_gut_brew: ["Iron-gut brew", "medicine", 3e3],
+    // ── Realms and Waystones ──
+    waystone: ["Waystone", "structure"],
+    relic_shelf: ["Relic shelf", "structure"],
+    kiln: ["Old kiln", "structure"],
+    shrine: ["Realm shrine", "structure"],
+    orchard_fragment: ["Orchard key fragment", "key"],
+    steppe_fragment: ["Steppe key fragment", "key"],
+    warren_fragment: ["Warren key fragment", "key"],
+    orchard_key: ["Drowned Orchard key", "key"],
+    steppe_key: ["Ashen Steppe key", "key"],
+    warren_key: ["Hollow Warren key", "key"],
+    // The Drowned Orchard.
+    brinewood: ["Brinewood", "material"],
+    tide_pearl: ["Tide pearl", "material"],
+    crab_shell: ["Crab shell", "material"],
+    bog_apple: ["Bog apple", "food", 900],
+    brinesoil: ["Brinesoil", "block"],
+    tidecaller_spear: ["Tidecaller spear", "weapon"],
+    brine_wand: ["Brine wand", "weapon"],
+    tide_conch: ["Tide conch", "accessory"],
+    mother_heart: ["Heart of the Orchard", "trophy"],
+    // The Ashen Steppe.
+    cinderflax: ["Cinderflax", "material"],
+    ashcloth: ["Ashcloth", "material"],
+    kilnstone_ore: ["Kilnstone ore", "ore"],
+    kiln_ingot: ["Kiln ingot", "metal"],
+    ash_hide: ["Ash-hound hide", "material"],
+    ash_soil: ["Ash soil", "block"],
+    kilnrock: ["Kilnrock", "block"],
+    kiln_greataxe: ["Kiln greataxe", "weapon"],
+    ember_sling: ["Ember sling", "weapon"],
+    kiln_heart: ["Kiln heart", "accessory"],
+    kiln_core: ["Core of the Kiln Beast", "trophy"],
+    // The Hollow Warren.
+    burrow_amber: ["Burrow amber", "ore"],
+    beetle_carapace: ["Beetle carapace", "material"],
+    warren_earth: ["Warren earth", "block"],
+    amberstone: ["Amberstone", "block"],
+    amber_repeater: ["Amber repeater", "weapon"],
+    amber_pick: ["Amber pickaxe", "tool"],
+    queens_mandible: ["Queen's mandible", "accessory"],
+    queen_jelly: ["Royal jelly", "trophy"],
+    // ── Band II and III realms ──
+    glasswood_fragment: ["Glasswood key fragment", "key"],
+    marches_fragment: ["Marches key fragment", "key"],
+    barrow_fragment: ["Barrow key fragment", "key"],
+    saltflats_fragment: ["Salt Flats key fragment", "key"],
+    choir_fragment: ["Choir key fragment", "key"],
+    glasswood_key: ["Glasswood key", "key"],
+    marches_key: ["Bone Marches key", "key"],
+    barrow_key: ["Clockwork Barrow key", "key"],
+    saltflats_key: ["Salt Flats key", "key"],
+    choir_key: ["Frozen Choir key", "key"],
+    steam_vent: ["Steam vent", "structure"],
+    // The Glasswood.
+    prism_glass: ["Prism glass", "ore"],
+    lumen_moss: ["Lumen moss", "material"],
+    glassloam: ["Glassloam", "block"],
+    prismrock: ["Prismrock", "block"],
+    prism_wand: ["Prism wand", "weapon"],
+    shard_glaive: ["Shard glaive", "weapon"],
+    lumen_antler: ["Lumen antler", "accessory"],
+    stag_heart: ["Heart of the Lumen Stag", "trophy"],
+    lumen_tincture: ["Lumen tincture", "medicine", 6e3],
+    // The Bone Marches.
+    marrow_iron_ore: ["Marrow-iron ore", "ore"],
+    marrow_ingot: ["Marrow-iron ingot", "metal"],
+    marrow_mud: ["Marrow mud", "block"],
+    bonerock: ["Bonerock", "block"],
+    bonecleaver: ["Bonecleaver", "weapon"],
+    vertebra_whip: ["Vertebra whip", "weapon"],
+    hydra_tooth: ["Hydra tooth", "accessory"],
+    hydra_heart: ["Heart of the Hydra", "trophy"],
+    marrow_purge: ["Marrow purge", "medicine", 6e3],
+    // The Clockwork Barrow.
+    brass_gear: ["Brass gear", "ore"],
+    brass_ingot: ["Brass ingot", "metal"],
+    brass_plate: ["Brass plate", "block"],
+    gearstone: ["Gearstone", "block"],
+    brass_repeater: ["Brass repeater", "weapon"],
+    piston_hammer: ["Piston hammer", "weapon"],
+    saint_cog: ["Saint's cog", "accessory"],
+    engine_heart: ["Engine heart", "trophy"],
+    // The Salt Flats of Oru.
+    saltglass: ["Saltglass", "ore"],
+    saltcrust: ["Saltcrust", "block"],
+    saltglass_rock: ["Saltglass rock", "block"],
+    mirage_blade: ["Mirage blade", "weapon"],
+    saltglass_bow: ["Saltglass bow", "weapon"],
+    tyrant_eye: ["Tyrant's eye", "accessory"],
+    mirage_crown: ["Mirage crown", "trophy"],
+    // The Frozen Choir.
+    rime_silver_ore: ["Rime-silver ore", "ore"],
+    rime_silver: ["Rime silver", "metal"],
+    frost_lily: ["Frost lily", "food", 3600],
+    bell_bronze: ["Bell bronze", "material"],
+    rimesnow: ["Rimesnow", "block"],
+    choirstone: ["Choirstone", "block"],
+    choir_stave: ["Choir stave", "weapon"],
+    bellhammer: ["Bellhammer", "weapon"],
+    hymnal_bell: ["Hymnal bell", "accessory"],
+    hymnal_core: ["Core of the Hymnal", "trophy"],
     // ── Getting about ──
     bucket: ["Bucket", "tool"],
     water_bucket: ["Water bucket", "tool"],
@@ -1146,7 +2605,15 @@
         [id.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), "wall"]
       ])
     ),
-    ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, "armor"]]))
+    ...Object.fromEntries(ARMOR_ITEMS.map(([id, name]) => [id, [name, "armor"]])),
+    // The weapon hierarchy.
+    ...Object.fromEntries(GEN_ITEMS.map(([id, name]) => [id, [name, "weapon"]])),
+    ...Object.fromEntries(
+      INFUSIONS.map((i) => [i.item, [`${i.name} infusion`, "material"]])
+    ),
+    topaz: ["Topaz", "ore"],
+    onyx: ["Onyx", "ore"],
+    opal: ["Opal", "ore"]
   };
   var itemName = (id) => ITEMS[id]?.[0] || id;
 
@@ -1353,8 +2820,101 @@
     ["bucket", { iron_ingot: 3 }, "workbench", 3],
     ["rope", { fiber: 3 }, null, 1, 10],
     ["grappling_hook", { iron_ingot: 4, rope: 20, hide: 1 }, "workbench", 3],
+    // ── Keeping food: cold storage, preserves, meals, and clean water ──
+    ["cool_pit", { stone: 10, clay: 6, wood: 4 }, null, 1],
+    ["snow_cellar", { stone: 30, ice: 20, iron_ingot: 4, wood: 10 }, "workbench", 3],
+    ["frost_chest", { frost_shard: 6, steel_ingot: 6, ice: 10 }, "forge", 6],
+    ["rime_vault", { starmetal_ingot: 6, frost_shard: 12, crystal: 10 }, "starforge", 9],
+    ["insulated_satchel", { hide: 4, fiber: 8, resin: 2 }, "workbench", 2],
+    ["frost_lined_pack", { frost_shard: 4, hide: 4, silk: 4 }, "workbench", 6],
+    ["rime_lined_pack", { starmetal_ingot: 3, frost_shard: 8, sky_silk: 4 }, "starforge", 9],
+    ["salting_barrel", { wood: 8, iron_ingot: 2, salt: 4 }, "workbench", 2],
+    ["salted_meat", { raw_meat: 2, salt: 2 }, "salting_barrel", 2, 2],
+    ["salted_fish", { raw_fish: 2, salt: 2 }, "salting_barrel", 2, 2],
+    ["pickled_mushrooms", { mushroom: 3, salt: 1, boiled_water: 1 }, "salting_barrel", 2, 2],
+    ["berry_preserves", { berry: 4, honey: 1 }, "campfire", 2, 2],
+    ["kitchen", { stone: 20, clay: 10, iron_ingot: 6, wood: 10 }, "workbench", 3],
+    ["hearty_stew", { raw_meat: 2, potato: 2, herb: 1, boiled_water: 1 }, "kitchen", 3],
+    ["fish_chowder", { raw_fish: 2, potato: 1, boiled_water: 1 }, "kitchen", 3],
+    ["spiced_skewers", { raw_meat: 2, salt: 1, herb: 1 }, "kitchen", 3],
+    ["honey_cakes", { wheat: 3, honey: 1, berry: 2 }, "kitchen", 3],
+    ["mushroom_broth", { mushroom: 3, glowcap: 1, boiled_water: 1 }, "kitchen", 3],
+    ["orchard_pie", { bog_apple: 3, wheat: 2, honey: 1 }, "kitchen", 4],
+    ["ember_chili", { cactus_fruit: 2, raw_meat: 1, sulfur: 1 }, "kitchen", 3],
+    ["explorers_feast", { cooked_meat: 2, bread: 1, berry_preserves: 1, honey: 1 }, "kitchen", 4],
+    ["water_filter", { sand: 10, coal: 6, clay: 6, wood: 4 }, "workbench", 2],
+    ["filtered_water", { brackish_water: 1, sand: 1 }, "water_filter", 2],
+    // ── Medicine ──
+    ["rehydration_salts", { salt: 2, honey: 1, boiled_water: 1 }, "apothecary", 3],
+    ["vermifuge", { herb: 3, venom: 1 }, "apothecary", 3],
+    ["frost_salve", { honey: 1, herb: 2, resin: 1 }, "apothecary", 3],
+    ["burn_salve", { resin: 1, honey: 1, herb: 1 }, "apothecary", 3],
+    ["bandage", { fiber: 4, herb: 1 }, null, 1, 2],
+    ["splint", { wood: 3, fiber: 4 }, null, 1],
+    ["lungwort_tea", { glowcap: 2, herb: 2, boiled_water: 1 }, "apothecary", 5],
+    ["void_salve", { void_lily: 2, crystal: 1, herb: 1 }, "apothecary", 8],
+    ["rabies_serum", { antibiotic: 1, grave_dust: 2, herb: 2 }, "apothecary", 5],
+    ["field_vaccine", { antibiotic: 1, grave_dust: 1, herb: 2 }, "apothecary", 5],
+    ["iron_gut_brew", { herb: 3, venom: 1, boiled_water: 1 }, "apothecary", 3],
+    // ── Realms: Waystones, fragments, and keys ──
+    ["waystone", { stone: 40, iron_ingot: 8, crystal: 4 }, "workbench", 3],
+    ["relic_shelf", { wood: 12, gold_ingot: 4, crystal: 4 }, "workbench", 4],
+    ["orchard_fragment", { crystal: 1, reeds: 6, raw_fish: 2 }, "workbench", 3],
+    ["steppe_fragment", { crystal: 1, sulfur: 4, coal: 4 }, "workbench", 3],
+    ["warren_fragment", { crystal: 1, clay: 6, bone: 4 }, "workbench", 3],
+    ["orchard_key", { orchard_fragment: 3 }, "waystone", 3],
+    ["steppe_key", { steppe_fragment: 3 }, "waystone", 3],
+    ["warren_key", { warren_fragment: 3 }, "waystone", 3],
+    // Band II keys are made from Band I spoils; Band III keys from Band II.
+    ["glasswood_fragment", { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, "workbench", 5],
+    ["marches_fragment", { bone: 10, kiln_ingot: 2, crab_shell: 3 }, "workbench", 5],
+    ["barrow_fragment", { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, "forge", 7],
+    ["saltflats_fragment", { salt: 10, prism_glass: 3, marrow_ingot: 2 }, "forge", 7],
+    ["choir_fragment", { frost_shard: 4, marrow_ingot: 2, prism_glass: 3 }, "forge", 7],
+    ["glasswood_key", { glasswood_fragment: 3 }, "waystone", 5],
+    ["marches_key", { marches_fragment: 3 }, "waystone", 5],
+    ["barrow_key", { barrow_fragment: 3 }, "waystone", 7],
+    ["saltflats_key", { saltflats_fragment: 3 }, "waystone", 7],
+    ["choir_key", { choir_fragment: 3 }, "waystone", 7],
+    // The Drowned Orchard.
+    ["tidecaller_spear", { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, "workbench", 4],
+    ["brine_wand", { brinewood: 6, tide_pearl: 4, crystal: 2 }, "workbench", 4],
+    ["brinewood_wall", { brinewood: 1 }, "workbench", 4, 4],
+    // The Ashen Steppe.
+    ["ashcloth", { cinderflax: 3 }, "workbench", 3],
+    ["kiln_ingot", { kilnstone_ore: 3, coal: 1 }, "furnace", 4],
+    ["kiln_greataxe", { kiln_ingot: 8, ash_hide: 2, wood: 3 }, "workbench", 4],
+    ["ember_sling", { ashcloth: 4, kiln_ingot: 3, sulfur: 4 }, "workbench", 4],
+    // The Hollow Warren.
+    ["amber_repeater", { burrow_amber: 10, wood: 6, silk: 4 }, "workbench", 4],
+    ["amber_pick", { burrow_amber: 12, gold_ingot: 2, wood: 3 }, "workbench", 4],
+    // The Glasswood.
+    ["prism_wand", { prism_glass: 10, crystal: 4, wood: 3 }, "forge", 6],
+    ["shard_glaive", { prism_glass: 8, hellstone_ingot: 3, wood: 3 }, "forge", 6],
+    ["lumen_tincture", { lumen_moss: 3, boiled_water: 1 }, "apothecary", 5],
+    // The Bone Marches.
+    ["marrow_ingot", { marrow_iron_ore: 3, coal: 1 }, "furnace", 5],
+    ["bonecleaver", { marrow_ingot: 9, bone: 6, hide: 2 }, "forge", 6],
+    ["vertebra_whip", { bone: 14, marrow_ingot: 4, silk: 3 }, "forge", 6],
+    ["marrow_purge", { herb: 3, antibiotic: 1, grave_dust: 1 }, "apothecary", 5],
+    // The Clockwork Barrow.
+    ["brass_ingot", { brass_gear: 3, copper_ingot: 1 }, "furnace", 7],
+    ["brass_repeater", { brass_ingot: 10, wood: 4, silk: 4 }, "starforge", 8],
+    ["piston_hammer", { brass_ingot: 12, gold_ingot: 3, coal: 6 }, "starforge", 8],
+    // The Salt Flats of Oru.
+    ["mirage_blade", { saltglass: 12, gold_ingot: 3, ruby: 1 }, "starforge", 8],
+    ["saltglass_bow", { saltglass: 10, wood: 4, silk: 4 }, "starforge", 8],
+    // The Frozen Choir.
+    ["rime_silver", { rime_silver_ore: 3, coal: 1 }, "furnace", 7],
+    ["choir_stave", { rime_silver: 10, frost_lily: 4, crystal: 4 }, "starforge", 9],
+    ["bellhammer", { rime_silver: 12, bell_bronze: 4, wood: 3 }, "starforge", 9],
     // ── Armour ──
-    ...ARMOR_RECIPES
+    ...ARMOR_RECIPES,
+    // ── The weapon hierarchy, and infusions ──
+    ...GEN_RECIPES,
+    ...INFUSIONS.map(
+      (i) => [i.item, i.recipe, "workbench", 4]
+    )
   ].map(([id, cost, station, tier, yieldQty]) => ({
     id,
     cost,
@@ -1396,6 +2956,22 @@
     ruby: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     sapphire: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     emerald: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    // The realms.
+    brinewood: { yield: [2, 4], tool: "axe", req: 2, hp: 4, regen: 240 },
+    bog_apple: { yield: [1, 3], hp: 2, regen: 200 },
+    cinderflax: { yield: [2, 3], hp: 2, regen: 200 },
+    kilnstone_ore: { yield: [2, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
+    burrow_amber: { yield: [1, 3], tool: "pick", req: 3, hp: 4, regen: 0 },
+    prism_glass: { yield: [2, 3], tool: "pick", req: 5, hp: 5, regen: 0 },
+    lumen_moss: { yield: [1, 3], hp: 2, regen: 220 },
+    marrow_iron_ore: { yield: [2, 3], tool: "pick", req: 5, hp: 5, regen: 0 },
+    brass_gear: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
+    saltglass: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
+    rime_silver_ore: { yield: [2, 3], tool: "pick", req: 6, hp: 5, regen: 0 },
+    frost_lily: { yield: [1, 2], hp: 2, regen: 240 },
+    topaz: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    onyx: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
+    opal: { yield: [1, 2], tool: "pick", req: 3, hp: 3, regen: 0 },
     // The dimensions.
     glowcap: { yield: [1, 3], hp: 2, regen: 200 },
     sunbloom: { yield: [1, 2], hp: 2, regen: 240 },
@@ -1413,7 +2989,8 @@
     "honey",
     "shroom_wood",
     "sky_wood",
-    "void_wood"
+    "void_wood",
+    "brinewood"
   ]);
   function nodeForm(kind) {
     if (kind === "water") return "water";
@@ -1436,6 +3013,7 @@
     gold_axe: ["axe", 4],
     gold_pick: ["pick", 4],
     wooden_hammer: ["hammer", 1],
+    amber_pick: ["pick", 5],
     iron_hammer: ["hammer", 3],
     hellstone_axe: ["axe", 6],
     hellstone_pick: ["pick", 6],
@@ -1458,6 +3036,22 @@
     silver_broadsword: [3, 40, 64],
     gold_broadsword: [4, 52, 66],
     ruby_staff: [3, 24, 0],
+    tidecaller_spear: [4, 46, 96],
+    brine_wand: [4, 30, 0],
+    kiln_greataxe: [5, 62, 70],
+    ember_sling: [4, 30, 0],
+    amber_repeater: [4, 22, 0],
+    amber_pick: [5, 20, 44],
+    prism_wand: [6, 52, 0],
+    shard_glaive: [6, 76, 100],
+    bonecleaver: [7, 112, 64],
+    vertebra_whip: [6, 50, 128],
+    brass_repeater: [8, 118, 0],
+    piston_hammer: [8, 158, 60],
+    mirage_blade: [8, 130, 66],
+    saltglass_bow: [8, 72, 0],
+    choir_stave: [9, 96, 0],
+    bellhammer: [9, 190, 60],
     sapphire_staff: [4, 30, 0],
     emerald_staff: [4, 22, 0],
     frostbrand: [6, 84, 72],
@@ -1465,7 +3059,7 @@
     hellrazor: [7, 114, 76],
     myconite_sword: [8, 128, 74],
     star_saber: [9, 152, 78],
-    void_reaver: [10, 192, 82],
+    void_reaver: [10, 272, 86],
     rift_blade: [11, 245, 92],
     // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
     wooden_bow: [1, 9, 0],
@@ -1477,7 +3071,9 @@
     glacier_staff: [6, 62, 0],
     sun_staff: [7, 84, 0],
     spore_staff: [8, 76, 0],
-    void_staff: [10, 150, 0]
+    void_staff: [10, 150, 0],
+    // The rest of the hierarchy, generated from its table.
+    ...GEN_WEAPONS
   };
 
   // src/core/noise.ts
@@ -1985,6 +3581,1051 @@
     return l.grid[y * l.cols + x];
   }
 
+  // src/data/realms/shared.ts
+  var RW = DIM_WIDTH;
+  var EDGE = 64;
+  var seedOf = (seed, k) => seed % 9973 + k * 131;
+  function walkable(fn, rise = 14) {
+    const step = 16, n = Math.ceil(RW / step) + 1, h = new Float32Array(n);
+    for (let i = 0; i < n; i++) h[i] = fn(i * step);
+    for (let i = 1; i < n; i++) h[i] = Math.min(h[i], h[i - 1] + rise);
+    for (let i = n - 2; i >= 0; i--) h[i] = Math.min(h[i], h[i + 1] + rise);
+    return (x) => {
+      const f = Math.max(0, Math.min(RW, x)) / step, i = Math.min(n - 2, Math.floor(f)), t = f - i;
+      return h[i] * (1 - t) + h[i + 1] * t;
+    };
+  }
+  function flatten(fn, x0, x1, level) {
+    const mid = (x0 + x1) / 2, at = level ?? fn(mid), fade = 260;
+    return (x) => {
+      const d = x < x0 ? x0 - x : x > x1 ? x - x1 : 0, k = d >= fade ? 0 : 1 - d / fade, s = k * k * (3 - 2 * k);
+      return fn(x) * (1 - s) + at * s;
+    };
+  }
+  function weighted(rng2, list) {
+    const total = list.reduce((n, [, w]) => n + w, 0);
+    let r = rng2() * total;
+    for (const [v, w] of list) if ((r -= w) <= 0) return v;
+    return list[list.length - 1][0];
+  }
+
+  // src/data/realms/barrow.ts
+  var BRASS_PLATE = 40;
+  var GEARSTONE = 41;
+  var VENT_CYCLE = 5;
+  var VENT_BLAST = 1.3;
+  var ventActive = (x, t) => (t + Math.floor(x / 97) % 7 * 0.71) % VENT_CYCLE < VENT_BLAST;
+  function build(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 950;
+    const terrace = (base, k) => {
+      const step = 320;
+      return (x) => {
+        const i = Math.floor(x / step);
+        return base + Math.round(noise1(i * 1.37, s(k)) * 3) * 32;
+      };
+    };
+    const upper = terrace(1150, 1), main = terrace(1700, 2), lower = terrace(2250, 3);
+    const HEIGHT = [170, 230, 170];
+    const hall = { x0: RW - 1750, x1: RW - 260, top: 1380 };
+    const ladderXs = Array.from({ length: 9 }, (_, i) => Math.round(760 + i * ((RW - 1600) / 9)));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const floors = [upper(x), main(x), lower(x)];
+      let open = floors.some((f, i) => y < f && y > f - HEIGHT[i]);
+      if (!open && x > hall.x0 && x < hall.x1 && y > hall.top && y < main(x)) open = true;
+      if (!open) {
+        for (const lx of ladderXs)
+          if (Math.abs(x - lx) < 44 && y > upper(lx) - 60 && y < lower(lx)) open = true;
+      }
+      if (!open && x > arrive - 300 && x < arrive + 300 && y > main(x) - 300 && y < main(x))
+        open = true;
+      if (open) return 0;
+      const near = floors.some((f, i) => Math.abs(y - f) < 36 || Math.abs(y - (f - HEIGHT[i])) < 36);
+      if (near) return BRASS_PLATE;
+      return fbm2(x / 200, y / 140, s(4)) > 0.55 ? BRASS_PLATE : GEARSTONE;
+    };
+    return {
+      tile,
+      surface: () => 0,
+      floors: [main, upper, lower],
+      ladders: ladderXs.map((x) => ({ x, top: upper(x) - 4, bottom: lower(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: main
+    };
+  }
+  var BARROW = {
+    id: "barrow",
+    name: "Clockwork Barrow",
+    band: 3,
+    note: "A tomb built as a machine. Brass halls step down in terraces; steam vents scald the careless, and the dead still keep time.",
+    sky: "cavern",
+    temp: 22,
+    ambient: [0.14, 0.1, 0.05],
+    daylight: 0,
+    wall: GEARSTONE,
+    hazard: {
+      id: "traps",
+      name: "Steam vents",
+      text: "Vents in the floor blast scalding steam every few seconds. Watch their rhythm and cross between blasts.",
+      ward: "trapsense"
+    },
+    fragment: "barrow_fragment",
+    key: "barrow_key",
+    material: "brass_gear",
+    relic: "saint_cog",
+    boss: "engine_saint",
+    elite: "brass_juggernaut",
+    music: "barrow",
+    ores: ["brass_gear", "gold_ore", "silver_ore"],
+    nodes: [
+      ["brass_gear", 6],
+      ["coal", 3],
+      ["gold_ore", 2],
+      ["silver_ore", 2],
+      ["stone", 2],
+      ["topaz", 1],
+      ["crystal", 1]
+    ],
+    nodeCount: 70,
+    mobs: [
+      { type: "cog_spider", weight: 4 },
+      { type: "tin_soldier", weight: 3 },
+      { type: "brass_sentry", weight: 2 },
+      { type: "clockwork_hound", weight: 3 },
+      { type: "gear_wisp", weight: 2, air: true }
+    ],
+    mobCount: 40,
+    chests: 5,
+    chestLoot: [
+      ["barrow_fragment", 1, 2, 0.6],
+      ["saltflats_fragment", 1, 1, 0.3],
+      ["brass_ingot", 3, 5, 0.8],
+      ["healing_draught", 2, 4, 1],
+      ["gold_ingot", 3, 6, 0.5],
+      ["topaz", 1, 3, 0.5],
+      ["life_fruit", 1, 1, 0.15]
+    ],
+    biome: {
+      id: "barrow",
+      name: "Clockwork Barrow",
+      x: 10,
+      y: 0,
+      color: "#8a6a3a",
+      shade: "#d8b070",
+      temp: 22,
+      note: "A tomb built as a machine.",
+      resources: ["brass_gear", "coal", "gold_ore"]
+    },
+    build,
+    extra(geo, ctx2) {
+      for (let lx = 900; lx < RW - 400; lx += 260 + Math.floor(ctx2.rng() * 200)) {
+        if (Math.abs(lx - geo.arena) < 700) continue;
+        const f = geo.floors[Math.floor(ctx2.rng() * geo.floors.length)];
+        const x = ctx2.x0 + lx;
+        ctx2.furnish("steam_vent", x, ctx2.floorAt(x, f(lx) - 30));
+      }
+    }
+  };
+
+  // src/data/realms/choir.ts
+  var RIMESNOW = 44;
+  var CHOIRSTONE = 45;
+  function hymnAt(t, seed = 0) {
+    const cycle = 90, phase = (t + seed % 83) % cycle;
+    return phase > cycle - 18 ? Math.min(1, (phase - (cycle - 18)) / 4, (cycle - phase) / 4) : 0;
+  }
+  function build2(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1050;
+    let ground = walkable((x) => {
+      const peaks = fbm1(x / 1100, s(1), 3) * 320;
+      return 1450 - peaks + 30 * noise1(x / 180, s(2));
+    }, 16);
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 520, arena + 520);
+    const floor = walkable(ground);
+    const arenaY = floor(arena);
+    const cave2 = walkable((x) => 2050 + 120 * fbm1(x / 1200, s(3)) + 24 * Math.sin(x / 200));
+    const ladderXs = [0.15, 0.38, 0.6, 0.8].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      const ax = x - arena;
+      if (Math.abs(ax) < 480 && y < g) {
+        const roof = arenaY - 360 - 60 * Math.cos(ax / 480 * Math.PI * 0.5);
+        if (y > roof - 40 && y < roof) return CHOIRSTONE;
+        if (y > roof && y < roof + 150 && Math.abs(ax) % 240 < 28 && Math.abs(ax) > 100)
+          return CHOIRSTONE;
+        return 0;
+      }
+      if (y < g) return 0;
+      const c = cave2(x);
+      if (y > c - 120 - 20 * Math.sin(x / 110) && y < c && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < c) return 0;
+      if (y < g + 60) return RIMESNOW;
+      return fbm2(x / 180, y / 140, s(4)) > 0.5 ? RIMESNOW : CHOIRSTONE;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, cave2],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: cave2(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var CHOIR = {
+    id: "choir",
+    name: "Frozen Choir",
+    band: 3,
+    note: "A cathedral lost to the ice. Food never spoils here, but you freeze; when the choir sings, the cold bites deeper and holds you back.",
+    sky: "open",
+    temp: -22,
+    ambient: [0.1, 0.12, 0.16],
+    daylight: 0.8,
+    wall: CHOIRSTONE,
+    hazard: {
+      id: "hymn",
+      name: "The hymn",
+      text: "Every minute and a half the choir sings. While it sings you move slowly and the cold deepens, unless you stand by a fire.",
+      ward: "hymnward"
+    },
+    fragment: "choir_fragment",
+    key: "choir_key",
+    material: "rime_silver_ore",
+    relic: "hymnal_bell",
+    boss: "the_hymnal",
+    elite: "grand_cantor",
+    music: "choir",
+    ores: ["rime_silver_ore", "silver_ore", "sapphire"],
+    nodes: [
+      ["rime_silver_ore", 5],
+      ["ice", 4],
+      ["frost_lily", 3],
+      ["wood", 2],
+      ["silver_ore", 2],
+      ["sapphire", 1],
+      ["crystal", 2]
+    ],
+    nodeCount: 68,
+    mobs: [
+      { type: "rime_wolf", weight: 4 },
+      { type: "bell_golem", weight: 2 },
+      { type: "cantor", weight: 3 },
+      { type: "choir_wraith", weight: 3, air: true },
+      { type: "frost_moth", weight: 2, air: true }
+    ],
+    mobCount: 38,
+    chests: 5,
+    chestLoot: [
+      ["choir_fragment", 1, 2, 0.6],
+      ["barrow_fragment", 1, 1, 0.3],
+      ["rime_silver", 3, 5, 0.8],
+      ["frost_shard", 3, 6, 0.8],
+      ["healing_draught", 2, 4, 1],
+      ["starmetal_ingot", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "choir",
+      name: "Frozen Choir",
+      x: 12,
+      y: 0,
+      color: "#a8c0d8",
+      shade: "#e8f4ff",
+      temp: -22,
+      note: "A mountain cathedral lost to the ice.",
+      resources: ["rime_silver_ore", "ice", "frost_lily"]
+    },
+    build: build2,
+    extra(geo, ctx2) {
+      for (const f of [0.22, 0.45, 0.66]) {
+        const lx = RW * f + 120, x = ctx2.x0 + lx;
+        ctx2.furnish("kiln", x, ctx2.floorAt(x, geo.floors[0](lx) - 30));
+      }
+    }
+  };
+
+  // src/data/realms/glasswood.ts
+  var GLASSLOAM = 36;
+  var PRISMROCK = 37;
+  function build3(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => 1350 + 180 * fbm1(x / 1400, s(1)) + 40 * noise1(x / 240, s(2)), 12);
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 440, arena + 440);
+    const floor = walkable(ground);
+    const hollow = walkable((x) => 1980 + 110 * fbm1(x / 1100, s(3)) + 24 * Math.sin(x / 190));
+    const spires = Array.from({ length: 22 }, (_, i) => {
+      const x = 700 + i * ((RW - 1400) / 22) + 180 * noise1(i * 2.3, s(4));
+      return {
+        x,
+        w: 30 + 26 * Math.abs(noise1(i * 1.9, s(5))),
+        h: 180 + 260 * Math.abs(noise1(i * 1.3, s(6)))
+      };
+    }).filter((sp) => Math.abs(sp.x - arrive) > 320 && Math.abs(sp.x - arena) > 560);
+    const ladderXs = [0.16, 0.4, 0.63, 0.86].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      for (const sp of spires) {
+        const dx = Math.abs(x - sp.x), top = floor(sp.x) - sp.h;
+        if (y > top && y < floor(sp.x) + 10 && dx < sp.w * (1 - (floor(sp.x) - y) / (sp.h * 1.15)))
+          return PRISMROCK;
+      }
+      if (y < g) return 0;
+      const h = hollow(x);
+      if (y > h - 120 - 16 * Math.sin(x / 80) && y < h && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < h) return 0;
+      if (y > g + 60 && fbm2(x / 190, y / 130, s(7)) > 0.68) return PRISMROCK;
+      return y < g + 90 ? GLASSLOAM : fbm2(x / 400, y / 300, s(8)) > 0.2 ? PRISMROCK : GLASSLOAM;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, hollow],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: hollow(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var GLASSWOOD = {
+    id: "glasswood",
+    name: "Glasswood",
+    band: 2,
+    note: "A forest of crystal. Prism spires refract the light; the canopy sheds shards that cut anyone caught beneath.",
+    sky: "open",
+    temp: 14,
+    ambient: [0.1, 0.1, 0.16],
+    daylight: 1,
+    wall: GLASSLOAM,
+    hazard: {
+      id: "shards",
+      name: "Shardfall",
+      text: "The canopy sheds glass every half minute or so. A glint gives a moment\u2019s warning; shards cut deep and can start bleeding.",
+      ward: "shardward"
+    },
+    fragment: "glasswood_fragment",
+    key: "glasswood_key",
+    material: "prism_glass",
+    relic: "lumen_antler",
+    boss: "lumen_stag",
+    elite: "crystal_warden",
+    music: "glasswood",
+    ores: ["prism_glass", "crystal", "sapphire"],
+    nodes: [
+      ["wood", 5],
+      ["prism_glass", 5],
+      ["lumen_moss", 4],
+      ["crystal", 3],
+      ["sapphire", 1],
+      ["herb", 2],
+      ["stone", 2],
+      ["opal", 1]
+    ],
+    nodeCount: 76,
+    mobs: [
+      { type: "shard_crawler", weight: 4 },
+      { type: "glass_golem", weight: 2 },
+      { type: "glassling", weight: 3 },
+      { type: "prism_moth", weight: 3, air: true },
+      { type: "lumen_wisp", weight: 2, air: true }
+    ],
+    mobCount: 38,
+    chests: 4,
+    chestLoot: [
+      ["glasswood_fragment", 1, 2, 0.6],
+      ["marches_fragment", 1, 1, 0.3],
+      ["prism_glass", 3, 6, 0.8],
+      ["healing_draught", 2, 3, 1],
+      ["hellstone_ingot", 2, 4, 0.4],
+      ["sapphire", 1, 3, 0.5],
+      ["life_crystal", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "glasswood",
+      name: "Glasswood",
+      x: 8,
+      y: 0,
+      color: "#8ab8c8",
+      shade: "#d0e8f0",
+      temp: 14,
+      note: "A forest of crystal that rings in the wind.",
+      resources: ["prism_glass", "lumen_moss", "crystal", "wood"]
+    },
+    build: build3
+  };
+
+  // src/data/realms/marches.ts
+  var MARROW_MUD = 38;
+  var BONEROCK = 39;
+  function build4(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3, base = 1500;
+    let ground = walkable((x) => {
+      const basin = Math.max(0, fbm1(x / 900, s(1), 2)) * 140;
+      return base - 40 * fbm1(x / 300, s(2)) + basin;
+    }, 10);
+    ground = flatten(ground, arrive - 240, arrive + 240, base - 40);
+    ground = flatten(ground, arena - 440, arena + 440, base - 30);
+    const floor = walkable(ground);
+    const mire = base + 20;
+    const crypt = walkable((x) => 2050 + 80 * fbm1(x / 1e3, s(3)) + 20 * Math.sin(x / 150));
+    const ribs = Array.from({ length: 9 }, (_, i) => ({
+      x: 900 + i * ((RW - 1800) / 9) + 200 * noise1(i * 3.7, s(4)),
+      r: 150 + 60 * Math.abs(noise1(i * 1.1, s(5)))
+    })).filter((r) => Math.abs(r.x - arrive) > 360 && Math.abs(r.x - arena) > 600);
+    const ladderXs = [0.15, 0.37, 0.6, 0.84].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) {
+        for (const r of ribs) {
+          const d = Math.hypot((x - r.x) / 1.4, y - floor(r.x) - 10);
+          if (d > r.r - 14 && d < r.r && y < floor(r.x) - 20) return BONEROCK;
+        }
+        return 0;
+      }
+      const c = crypt(x);
+      if (y > c - 110 - 12 * Math.sin(x / 70) && y < c && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < c) return 0;
+      if (y > g + 80 && fbm2(x / 170, y / 120, s(6)) > 0.7) return BONEROCK;
+      return y < g + 110 ? MARROW_MUD : BONEROCK;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, crypt],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: crypt(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor,
+      mire
+    };
+  }
+  var MARCHES = {
+    id: "marches",
+    name: "Bone Marches",
+    band: 2,
+    note: "A grey fen of giant bones. Marrow poisons the mire; wading through it slows you and festers in the blood.",
+    sky: "open",
+    temp: 9,
+    ambient: [0.08, 0.08, 0.07],
+    daylight: 0.7,
+    wall: MARROW_MUD,
+    hazard: {
+      id: "mire",
+      name: "Marrow mire",
+      text: "The basins are full of poisoned mud. Wading slows you to a crawl, soaks and chills you, and can bring on marrow rot.",
+      ward: "mirewalk"
+    },
+    fragment: "marches_fragment",
+    key: "marches_key",
+    material: "marrow_iron_ore",
+    relic: "hydra_tooth",
+    boss: "ossuary_hydra",
+    elite: "bone_colossus",
+    music: "marches",
+    ores: ["marrow_iron_ore", "iron_ore", "gold_ore"],
+    nodes: [
+      ["marrow_iron_ore", 5],
+      ["reeds", 4],
+      ["herb", 3],
+      ["wood", 2],
+      ["clay", 2],
+      ["gold_ore", 1],
+      ["onyx", 1],
+      ["water", 1]
+    ],
+    nodeCount: 72,
+    mobs: [
+      { type: "bone_hound", weight: 4 },
+      { type: "mire_leech", weight: 3 },
+      { type: "ossuary_knight", weight: 2 },
+      { type: "marsh_ghoul", weight: 3 },
+      { type: "carrion_crow", weight: 3, air: true }
+    ],
+    mobCount: 38,
+    chests: 4,
+    chestLoot: [
+      ["marches_fragment", 1, 2, 0.6],
+      ["glasswood_fragment", 1, 1, 0.3],
+      ["marrow_ingot", 2, 4, 0.7],
+      ["antibiotic", 1, 2, 0.6],
+      ["healing_draught", 2, 3, 1],
+      ["bone", 6, 12, 0.8],
+      ["life_crystal", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "marches",
+      name: "Bone Marches",
+      x: 9,
+      y: 0,
+      color: "#6a6a5a",
+      shade: "#b0aa98",
+      temp: 9,
+      note: "A grey fen where giants died.",
+      resources: ["marrow_iron_ore", "reeds", "herb", "bone"]
+    },
+    build: build4
+  };
+
+  // src/data/realms/orchard.ts
+  var BRINESOIL = 30;
+  function tideLevel(geo, t) {
+    const phase = t / 150 * Math.PI * 2;
+    return geo.tideMid + Math.sin(phase) * 70 + Math.sin(phase * 2.7) * 12;
+  }
+  function build5(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable(
+      (x) => 1500 + 150 * fbm1(x / 900, s(1)) + 40 * noise1(x / 210, s(2)) + // Sunken basins where the tide pools.
+      110 * Math.max(0, noise1(x / 700, s(3)) - 0.3)
+    );
+    ground = flatten(ground, arrive - 240, arrive + 240, 1440);
+    ground = flatten(ground, arena - 420, arena + 420, 1420);
+    const floor = walkable(ground);
+    let sum = 0;
+    for (let x = 0; x < RW; x += 64) sum += floor(x);
+    const tideMid = sum / Math.ceil(RW / 64) + 30;
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) return 0;
+      if (y > g + 180 && y < 3400 && fbm2(x / 220, y / 160, s(4)) > 0.7) return 0;
+      if (y < g + 90) return BRINESOIL;
+      return y > g + 90 + 30 * noise1(x / 120, s(5)) ? 2 : BRINESOIL;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor],
+      ladders: [],
+      arrive,
+      arena,
+      arenaFloor: floor,
+      tideMid
+    };
+  }
+  var ORCHARD = {
+    id: "orchard",
+    name: "Drowned Orchard",
+    band: 1,
+    note: "A sunken fruit country under a restless tide. The low ground floods and drains; brinewood grows in the shallows.",
+    sky: "open",
+    temp: 17,
+    ambient: [0.06, 0.08, 0.1],
+    daylight: 1,
+    wall: BRINESOIL,
+    hazard: {
+      id: "tide",
+      name: "Rising tide",
+      text: "The water rises and falls every few minutes. Below it you wade slowly, soak, and chill.",
+      ward: "swim"
+    },
+    fragment: "orchard_fragment",
+    key: "orchard_key",
+    material: "brinewood",
+    relic: "tide_conch",
+    boss: "orchard_mother",
+    elite: "orchard_warden",
+    music: "orchard",
+    ores: ["iron_ore", "silver_ore"],
+    nodes: [
+      ["brinewood", 6],
+      ["bog_apple", 4],
+      ["reeds", 3],
+      ["clay", 2],
+      ["herb", 2],
+      ["iron_ore", 1],
+      ["silver_ore", 1],
+      ["water", 1],
+      ["opal", 1]
+    ],
+    nodeCount: 70,
+    mobs: [
+      { type: "bog_crab", weight: 4 },
+      { type: "drowned", weight: 3 },
+      { type: "rotfruit_slime", weight: 3 },
+      { type: "orchard_wasp", weight: 2, air: true }
+    ],
+    mobCount: 34,
+    chests: 4,
+    chestLoot: [
+      ["orchard_fragment", 1, 2, 0.6],
+      ["steppe_fragment", 1, 1, 0.3],
+      ["tide_pearl", 1, 3, 0.8],
+      ["healing_draught", 1, 3, 1],
+      ["silver_ingot", 2, 5, 0.5],
+      ["life_crystal", 1, 1, 0.15]
+    ],
+    biome: {
+      id: "orchard",
+      name: "Drowned Orchard",
+      x: 5,
+      y: 0,
+      color: "#4a7a70",
+      shade: "#8ac0a8",
+      temp: 17,
+      note: "A sunken fruit country under a restless tide.",
+      resources: ["brinewood", "bog_apple", "reeds", "clay", "herb"]
+    },
+    build: build5
+  };
+
+  // src/data/realms/saltflats.ts
+  var SALTCRUST = 42;
+  var SALTGLASS_ROCK = 43;
+  function build6(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => {
+      const ridge = Math.max(0, noise1(x / 420, s(1)) - 0.45) * 520;
+      return 1450 - ridge + 10 * fbm1(x / 200, s(2));
+    }, 18);
+    ground = flatten(ground, arrive - 240, arrive + 240, 1450);
+    ground = flatten(ground, arena - 460, arena + 460, 1450);
+    const floor = walkable(ground);
+    const mine = walkable((x) => 1900 + 70 * fbm1(x / 900, s(3)) + 16 * Math.sin(x / 140));
+    const deep = walkable((x) => 2350 + 90 * fbm1(x / 1100, s(4)));
+    const ladderXs = [0.13, 0.33, 0.55, 0.76, 0.9].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) return 0;
+      const m = mine(x), d = deep(x);
+      if (y > m - 110 && y < m && x > 200 && x < RW - 200) return 0;
+      if (y > d - 130 - 20 * Math.sin(x / 90) && y < d && x > 300 && x < RW - 300) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < d) return 0;
+      if (y < g + 40) return SALTCRUST;
+      const ridge = y < 1450 - 20;
+      return ridge || fbm2(x / 150, y / 120, s(5)) > 0.7 ? SALTGLASS_ROCK : SALTCRUST;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, mine, deep],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: deep(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var SALTFLATS = {
+    id: "saltflats",
+    name: "Salt Flats of Oru",
+    band: 3,
+    note: "A dead sea under a white sun. By day the heat parches the open flats and mirages walk among the monsters; the mines below are cooler.",
+    sky: "open",
+    temp: 36,
+    ambient: [0.12, 0.11, 0.1],
+    daylight: 1.15,
+    wall: SALTCRUST,
+    hazard: {
+      id: "sun",
+      name: "The white sun",
+      text: "In daylight on the open flats you overheat and thirst three times as fast. Mirages walk among the monsters. Shelter in the mines.",
+      ward: "shade"
+    },
+    fragment: "saltflats_fragment",
+    key: "saltflats_key",
+    material: "saltglass",
+    relic: "tyrant_eye",
+    boss: "mirage_tyrant",
+    elite: "salt_colossus",
+    music: "saltflats",
+    ores: ["saltglass", "salt", "gold_ore"],
+    nodes: [
+      ["saltglass", 5],
+      ["salt", 5],
+      ["cactus_fruit", 2],
+      ["sulfur", 2],
+      ["gold_ore", 2],
+      ["stone", 2],
+      ["topaz", 1],
+      ["ruby", 1]
+    ],
+    nodeCount: 70,
+    mobs: [
+      { type: "salt_strider", weight: 3 },
+      { type: "brine_scorpion", weight: 4 },
+      { type: "sand_raptor", weight: 3 },
+      { type: "salt_wraith", weight: 2 },
+      { type: "mirage_djinn", weight: 2, air: true },
+      { type: "mirage", weight: 3 }
+    ],
+    mobCount: 42,
+    chests: 5,
+    chestLoot: [
+      ["saltflats_fragment", 1, 2, 0.6],
+      ["choir_fragment", 1, 1, 0.3],
+      ["saltglass", 3, 6, 0.8],
+      ["boiled_water", 2, 4, 1],
+      ["healing_draught", 2, 4, 1],
+      ["ruby", 1, 3, 0.4],
+      ["life_fruit", 1, 1, 0.15]
+    ],
+    biome: {
+      id: "saltflats",
+      name: "Salt Flats of Oru",
+      x: 11,
+      y: 0,
+      color: "#e8e0d0",
+      shade: "#fff8e8",
+      temp: 36,
+      note: "A dead sea turned to a white plain.",
+      resources: ["saltglass", "salt", "cactus_fruit"]
+    },
+    build: build6,
+    extra(geo, ctx2) {
+      for (let i = 0; i < 6 + ctx2.tier; i++) {
+        const lx = 700 + ctx2.rng() * (RW - 1400), x = ctx2.x0 + lx;
+        if (Math.abs(lx - geo.arena) > 600)
+          ctx2.mob("mirage", x, ctx2.floorAt(x, geo.floors[0](lx) - 30));
+      }
+    }
+  };
+
+  // src/data/realms/steppe.ts
+  var ASHSOIL = 31;
+  var KILNROCK = 32;
+  function ashStorm(t, seed = 0) {
+    const cycle = 200, phase = (t + seed % 97) % cycle;
+    return phase > cycle - 60 ? Math.min(1, (phase - (cycle - 60)) / 8, (cycle - phase) / 8) : 0;
+  }
+  function build7(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 1e3;
+    let ground = walkable((x) => {
+      const t = fbm1(x / 800, s(1), 2) * 2.4, step = Math.round(t), edge = Math.max(-0.5, Math.min(0.5, (t - step) * 3));
+      return 1400 - (step + edge) * 55 + 12 * noise1(x / 150, s(2));
+    });
+    ground = flatten(ground, arrive - 240, arrive + 240);
+    ground = flatten(ground, arena - 420, arena + 420);
+    const floor = walkable(ground);
+    const tunnel = walkable((x) => 1980 + 80 * fbm1(x / 1e3, s(3)) + 16 * Math.sin(x / 170));
+    const ladderXs = [0.14, 0.38, 0.62, 0.84].map((f) => Math.round(RW * f));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const g = floor(x);
+      if (y < g) return 0;
+      const tt = tunnel(x);
+      if (y > tt - 110 - 10 * Math.sin(x / 90) && y < tt && x > 200 && x < RW - 200) return 0;
+      if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < tt) return 0;
+      if (y > g + 260 && y < tt - 200 && fbm2(x / 240, y / 150, s(4)) > 0.72) return 0;
+      if (y < g + 70) return ASHSOIL;
+      return KILNROCK;
+    };
+    return {
+      tile,
+      surface: floor,
+      floors: [floor, floor, tunnel],
+      ladders: ladderXs.map((x) => ({ x, top: floor(x) - 4, bottom: tunnel(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: floor
+    };
+  }
+  var STEPPE = {
+    id: "steppe",
+    name: "Ashen Steppe",
+    band: 1,
+    note: "Burnt grassland where old kilns smoulder. Ash storms choke and blind; kilnstone lies along the kiln road below.",
+    sky: "open",
+    temp: 24,
+    ambient: [0.1, 0.07, 0.06],
+    daylight: 0.85,
+    wall: KILNROCK,
+    hazard: {
+      id: "ash",
+      name: "Ash storms",
+      text: "Every few minutes an ash storm blinds you and drains stamina and water. Shelter underground or wear ashcloth.",
+      ward: "ashward"
+    },
+    fragment: "steppe_fragment",
+    key: "steppe_key",
+    material: "kilnstone_ore",
+    relic: "kiln_heart",
+    boss: "kiln_beast",
+    elite: "steppe_warlord",
+    music: "steppe",
+    ores: ["kilnstone_ore", "coal", "sulfur"],
+    nodes: [
+      ["cinderflax", 6],
+      ["kilnstone_ore", 4],
+      ["coal", 3],
+      ["sulfur", 2],
+      ["wood", 2],
+      ["stone", 2],
+      ["cactus_fruit", 1],
+      ["topaz", 1]
+    ],
+    nodeCount: 72,
+    mobs: [
+      { type: "ash_hound", weight: 4 },
+      { type: "steppe_raider", weight: 3 },
+      { type: "kiln_golem", weight: 2 },
+      { type: "cinder_vulture", weight: 3, air: true }
+    ],
+    mobCount: 34,
+    chests: 4,
+    chestLoot: [
+      ["steppe_fragment", 1, 2, 0.6],
+      ["warren_fragment", 1, 1, 0.3],
+      ["kiln_ingot", 2, 4, 0.7],
+      ["healing_draught", 1, 3, 1],
+      ["gold_ingot", 2, 4, 0.4],
+      ["fire_arrow", 10, 25, 0.6],
+      ["life_crystal", 1, 1, 0.15]
+    ],
+    biome: {
+      id: "steppe",
+      name: "Ashen Steppe",
+      x: 6,
+      y: 0,
+      color: "#7a6a5a",
+      shade: "#b8a088",
+      temp: 24,
+      note: "Burnt grassland where old kilns smoulder.",
+      resources: ["cinderflax", "kilnstone_ore", "coal", "sulfur"]
+    },
+    build: build7,
+    extra(geo, ctx2) {
+      for (const f of [0.26, 0.5, 0.74]) {
+        const x = ctx2.x0 + RW * f + 90;
+        ctx2.furnish("kiln", x, ctx2.floorAt(x, geo.floors[2](x - ctx2.x0) - 30));
+      }
+    }
+  };
+
+  // src/data/realms/warren.ts
+  var WARREN_EARTH = 33;
+  var AMBERSTONE = 34;
+  function build8(seed) {
+    const s = (k) => seedOf(seed, k);
+    const arrive = 520, arena = RW - 950;
+    const lane = (base, k) => walkable((x) => base + 170 * fbm1(x / 1300, s(k)) + 30 * noise1(x / 260, s(k + 1)));
+    const upper = lane(1150, 1), main = lane(1700, 3), lower = lane(2300, 5);
+    const HALF = [95, 120, 95];
+    const hall = { x0: RW - 1700, x1: RW - 260, top: 1450, bottom: main(RW - 950) };
+    const chambers = Array.from({ length: 8 }, (_, i) => {
+      const x = 900 + i * 1e3 + 200 * noise1(i * 3.1, s(7));
+      return { x, r: 150 + 60 * Math.abs(noise1(i * 1.7, s(8))) };
+    });
+    const ladderXs = chambers.map((c) => Math.round(c.x));
+    const tile = (x, y) => {
+      if (x < EDGE || x > RW - EDGE) return 27;
+      const floors = [upper(x), main(x), lower(x)];
+      let open = floors.some((f, i) => y < f && y > f - HALF[i] * 2 + 20 * Math.sin(x / 70 + i));
+      if (!open)
+        for (const c of chambers) {
+          const dx = (x - c.x) / (c.r * 1.3), dy = (y - (main(c.x) - 90)) / c.r;
+          if (dx * dx + dy * dy < 1 && y < main(c.x)) open = true;
+        }
+      if (!open && x > hall.x0 && x < hall.x1 && y > hall.top && y < main(x))
+        open = y > hall.top + 90 * Math.abs(Math.sin((x - hall.x0) / 520));
+      if (!open) {
+        for (const lx of ladderXs)
+          if (Math.abs(x - lx) < 44 && y > upper(lx) - 60 && y < lower(lx)) open = true;
+      }
+      if (open) return 0;
+      if (fbm2(x / 160, y / 110, s(9)) > 0.7) return AMBERSTONE;
+      return WARREN_EARTH;
+    };
+    return {
+      tile,
+      surface: () => 0,
+      floors: [main, upper, lower],
+      ladders: ladderXs.map((x) => ({ x, top: upper(x) - 4, bottom: lower(x) - 20 })),
+      arrive,
+      arena,
+      arenaFloor: main
+    };
+  }
+  var WARREN = {
+    id: "warren",
+    name: "Hollow Warren",
+    band: 1,
+    note: "A realm that is all burrow: three tunnels through amber-veined earth. The roof groans, and sometimes it falls.",
+    sky: "cavern",
+    temp: 14,
+    ambient: [0.1, 0.07, 0.03],
+    daylight: 0,
+    wall: WARREN_EARTH,
+    hazard: {
+      id: "cavein",
+      name: "Cave-ins",
+      text: "The roof collapses without warning: dust trickles, then rock falls. Keep moving.",
+      ward: "tremor"
+    },
+    fragment: "warren_fragment",
+    key: "warren_key",
+    material: "burrow_amber",
+    relic: "queens_mandible",
+    boss: "warren_queen",
+    elite: "amber_colossus",
+    music: "warren",
+    ores: ["burrow_amber", "gold_ore", "ruby"],
+    nodes: [
+      ["burrow_amber", 5],
+      ["mushroom", 3],
+      ["gold_ore", 2],
+      ["iron_ore", 2],
+      ["ruby", 1],
+      ["emerald", 1],
+      ["clay", 1],
+      ["onyx", 1]
+    ],
+    nodeCount: 66,
+    mobs: [
+      { type: "warren_rat", weight: 5 },
+      { type: "amber_beetle", weight: 3 },
+      { type: "mole_guard", weight: 2 },
+      { type: "burrower", weight: 2, air: true }
+    ],
+    mobCount: 38,
+    chests: 5,
+    chestLoot: [
+      ["warren_fragment", 1, 2, 0.6],
+      ["orchard_fragment", 1, 1, 0.3],
+      ["burrow_amber", 3, 6, 0.8],
+      ["healing_draught", 1, 3, 1],
+      ["gold_ingot", 2, 4, 0.5],
+      ["miners_lamp", 1, 1, 0.1],
+      ["life_crystal", 1, 1, 0.2]
+    ],
+    biome: {
+      id: "warren",
+      name: "Hollow Warren",
+      x: 7,
+      y: 0,
+      color: "#6a5030",
+      shade: "#c8903a",
+      temp: 14,
+      note: "A realm that is all burrow.",
+      resources: ["burrow_amber", "mushroom", "gold_ore", "iron_ore"]
+    },
+    build: build8
+  };
+
+  // src/data/realms/modifiers.ts
+  var MODS = [
+    { id: "bountiful", name: "Bountiful", text: "More to gather", kind: "boon", loot: 0.1 },
+    { id: "rich_veins", name: "Rich veins", text: "Ore lies thick", kind: "boon", loot: 0.15 },
+    { id: "treasure", name: "Treasure trove", text: "Extra chests", kind: "boon", loot: 0.15 },
+    { id: "lucky", name: "Lucky", text: "Loot +50%", kind: "boon", loot: 0.5 },
+    {
+      id: "fortified",
+      name: "Fortified",
+      text: "Monsters have +40% health",
+      kind: "bane",
+      loot: 0.2
+    },
+    { id: "savage", name: "Savage", text: "Monsters hit 30% harder", kind: "bane", loot: 0.25 },
+    {
+      id: "swarming",
+      name: "Swarming",
+      text: "Half again as many monsters",
+      kind: "bane",
+      loot: 0.2
+    },
+    { id: "frenzied", name: "Frenzied", text: "Monsters move 30% faster", kind: "bane", loot: 0.2 },
+    { id: "hunted", name: "Hunted", text: "An elite stalks you", kind: "bane", loot: 0.3 },
+    {
+      id: "hungering",
+      name: "Hungering",
+      text: "Food and water drain 50% faster",
+      kind: "bane",
+      loot: 0.2
+    },
+    { id: "frostbound", name: "Frostbound", text: "18\xB0 colder", kind: "bane", loot: 0.2 },
+    { id: "scorched", name: "Scorched", text: "18\xB0 hotter", kind: "bane", loot: 0.2 },
+    { id: "starless", name: "Starless", text: "Almost no light", kind: "bane", loot: 0.25 },
+    {
+      id: "low_gravity",
+      name: "Low gravity",
+      text: "You fall slowly and jump high",
+      kind: "boon",
+      loot: 0.05
+    },
+    {
+      id: "unstable",
+      name: "Unstable",
+      text: "The realm collapses after 10 minutes",
+      kind: "bane",
+      loot: 0.35
+    },
+    {
+      id: "blighted",
+      name: "Blighted",
+      text: "Wounds and bites sicken twice as often",
+      kind: "bane",
+      loot: 0.25
+    },
+    { id: "echoing", name: "Echoing", text: "Slain monsters split in two", kind: "bane", loot: 0.3 }
+  ];
+  var modById = (id) => MODS.find((m) => m.id === id);
+  function rollMods(tier, rng2) {
+    const pool = [...MODS], out = [];
+    const clash = { frostbound: "scorched", scorched: "frostbound" };
+    while (out.length < Math.max(0, tier - 1) && pool.length) {
+      const m = pool.splice(Math.floor(rng2() * pool.length), 1)[0];
+      if (clash[m.id] && out.includes(clash[m.id])) continue;
+      out.push(m.id);
+    }
+    return out;
+  }
+  var TIER_SCALE = {
+    hp: (t) => 1 + 0.55 * (t - 1),
+    damage: (t) => 1 + 0.3 * (t - 1),
+    loot: (t) => 1 + 0.4 * (t - 1)
+  };
+  var MAX_TIER = 5;
+  var TIER_NAMES = ["", "I", "II", "III", "IV", "V"];
+
+  // src/data/realms/index.ts
+  var REALMS = [
+    ORCHARD,
+    STEPPE,
+    WARREN,
+    GLASSWOOD,
+    MARCHES,
+    BARROW,
+    SALTFLATS,
+    CHOIR
+  ];
+  var realmById = (id) => REALMS.find((r) => r.id === id);
+  var REALM_IDS = new Set(REALMS.map((r) => r.id));
+  var active = null;
+  var built = /* @__PURE__ */ new Map();
+  function setActiveRealm(inst) {
+    if (!inst) {
+      active = null;
+      return null;
+    }
+    const tpl = realmById(inst.realm);
+    if (!tpl) {
+      active = null;
+      return null;
+    }
+    const key = inst.realm + ":" + inst.seed;
+    let geo = built.get(key);
+    if (!geo) {
+      geo = tpl.build(inst.seed);
+      if (built.size > 6) built.clear();
+      built.set(key, geo);
+    }
+    active = { inst, tpl, geo };
+    return active;
+  }
+  var activeRealm = () => active;
+
   // src/data/world.ts
   var SIDE_ORDER = [
     "coast",
@@ -2022,8 +4663,31 @@
   );
   var OVERWORLD_W = BIOME_SPANS[BIOME_SPANS.length - 1].end;
   var DIMENSIONS = makeDimensions(OVERWORLD_W);
+  var POCKET = (() => {
+    const last = DIMENSIONS[DIMENSIONS.length - 1], start2 = last.end + DIM_GAP;
+    return {
+      id: "pocket",
+      name: "The Between",
+      start: start2,
+      end: start2 + (last.end - last.start),
+      arrive: 520,
+      temp: 12
+    };
+  })();
+  function syncPocket() {
+    const r = activeRealm();
+    POCKET.id = r ? r.tpl.id : "pocket";
+    POCKET.name = r ? r.tpl.name : "The Between";
+    POCKET.arrive = r ? r.geo.arrive : 520;
+    POCKET.temp = r ? r.tpl.temp + (r.inst.mods.includes("frostbound") ? -18 : 0) + (r.inst.mods.includes("scorched") ? 18 : 0) : 12;
+  }
+  var inPocket = (x) => x >= POCKET.start - DIM_GAP / 2;
+  function pocketShafts() {
+    const r = activeRealm();
+    return r ? r.geo.ladders.map((l) => ({ x: POCKET.start + l.x, top: l.top, bottom: l.bottom })) : [];
+  }
   var TILE = 32;
-  var WORLD_W = DIMENSIONS[DIMENSIONS.length - 1].end + DIM_GAP;
+  var WORLD_W = POCKET.end + DIM_GAP;
   var WORLD_H = 4480;
   var TILE_COLS = Math.ceil(WORLD_W / TILE);
   var TILE_ROWS = Math.ceil(WORLD_H / TILE);
@@ -2067,7 +4731,24 @@
     25: 5,
     26: 1,
     27: 99,
-    28: 0
+    28: 0,
+    29: 0,
+    30: 0,
+    31: 0,
+    32: 4,
+    33: 0,
+    34: 4,
+    35: 0,
+    36: 0,
+    37: 5,
+    38: 0,
+    39: 4,
+    40: 6,
+    41: 6,
+    42: 0,
+    43: 5,
+    44: 0,
+    45: 6
   };
   var TILE_YIELD = {
     1: { item: "dirt" },
@@ -2095,10 +4776,26 @@
     24: { item: "void_crystal" },
     25: { item: "obsidian_brick" },
     26: { item: "sandstone_brick" },
-    28: { item: "glowshroom_block" }
+    28: { item: "glowshroom_block" },
+    30: { item: "brinesoil", bonus: ["clay", 0.15] },
+    31: { item: "ash_soil", bonus: ["sulfur", 0.1] },
+    32: { item: "kilnrock", bonus: ["kilnstone_ore", 0.14] },
+    33: { item: "warren_earth", bonus: ["burrow_amber", 0.05] },
+    34: { item: "amberstone", bonus: ["burrow_amber", 0.4] },
+    36: { item: "glassloam", bonus: ["lumen_moss", 0.05] },
+    37: { item: "prismrock", bonus: ["prism_glass", 0.3] },
+    38: { item: "marrow_mud", bonus: ["bone", 0.12] },
+    39: { item: "bonerock", bonus: ["marrow_iron_ore", 0.14] },
+    40: { item: "brass_plate", bonus: ["brass_gear", 0.1] },
+    41: { item: "gearstone", bonus: ["brass_gear", 0.2] },
+    42: { item: "saltcrust", bonus: ["salt", 0.3] },
+    43: { item: "saltglass_rock", bonus: ["saltglass", 0.25] },
+    44: { item: "rimesnow", bonus: ["ice", 0.2] },
+    45: { item: "choirstone", bonus: ["rime_silver_ore", 0.12] }
   };
   function dimensionAt(x) {
     if (x < OVERWORLD_W) return null;
+    if (inPocket(x)) return POCKET;
     for (const d of DIMENSIONS) if (x < d.end + DIM_GAP / 2) return d;
     return DIMENSIONS[DIMENSIONS.length - 1];
   }
@@ -2120,7 +4817,7 @@
   );
   function layerAt(x, y) {
     const dim = dimensionAt(x);
-    if (dim) return DIM_LAYERS[dim.id];
+    if (dim) return DIM_LAYERS[dim.id] ?? { id: dim.id, name: dim.name, top: 0, temp: dim.temp };
     if (y < surfaceAt(x) + SURFACE_BAND) return LAYERS[0];
     for (let i = LAYERS.length - 1; i > 1; i--) if (y >= LAYERS[i].top) return LAYERS[i];
     return LAYERS[1];
@@ -2198,6 +4895,10 @@
   })();
   function surfaceAt(x) {
     const dim = dimensionAt(x);
+    if (dim === POCKET) {
+      const r = activeRealm();
+      return r ? r.geo.surface(x - POCKET.start) : 0;
+    }
     if (dim) return dim.id === "mycelia" ? 0 : WORLD_H;
     const f = Math.max(0, Math.min(OVERWORLD_W, x)) / SURFACE_STEP, i = Math.min(SURFACE.length - 2, Math.floor(f)), t = f - i;
     return SURFACE[i] * (1 - t) + SURFACE[i + 1] * t;
@@ -2306,10 +5007,10 @@
     )
   ];
   var SHAFT_HALF = 47;
+  var allShafts = () => activeRealm() ? [...SHAFTS, ...pocketShafts()] : SHAFTS;
   function inShaft(x, y, slack = 0) {
-    return SHAFTS.some(
-      (s) => Math.abs(x - s.x) < SHAFT_HALF - 4 + slack && y > s.top - 12 && y < s.bottom + 58
-    );
+    const near = (s) => Math.abs(x - s.x) < SHAFT_HALF - 4 + slack && y > s.top - 12 && y < s.bottom + 58;
+    return SHAFTS.some(near) || inPocket(x) && pocketShafts().some(near);
   }
   function inUnderworld(x, y) {
     const ceil = underworldCeiling(x), floor = underworldFloor(x);
@@ -2343,12 +5044,24 @@
     }
     return false;
   }
+  var BETWEEN = {
+    id: "pocket",
+    name: "The Between",
+    x: 9,
+    y: 0,
+    color: "#2a2230",
+    shade: "#4a3a50",
+    temp: 12,
+    note: "Nothing is here until a Waystone opens a realm.",
+    resources: []
+  };
   function spanIndex(x) {
     for (let i = 0; i < BIOME_SPANS.length; i++) if (x < BIOME_SPANS[i].end) return i;
     return BIOME_SPANS.length - 1;
   }
   function biomeAt(x, y) {
     const dim = dimensionAt(x);
+    if (dim === POCKET) return activeRealm()?.tpl.biome ?? BETWEEN;
     if (dim) return BIOMES.find((b) => b.id === dim.id);
     const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
     const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;
@@ -2372,6 +5085,11 @@
     const x = tx * TILE + TILE / 2, y = ty * TILE + TILE / 2;
     if (x >= OVERWORLD_W) {
       const dim = dimensionAt(x);
+      if (dim === POCKET) {
+        const r = activeRealm();
+        if (!r || x < POCKET.start || x >= POCKET.end) return Ground.bedrock;
+        return r.geo.tile(x - POCKET.start, y);
+      }
       if (x < dim.start || x >= dim.end) return Ground.bedrock;
       return dimensionTile(dim.id, x - dim.start, y);
     }
@@ -2398,6 +5116,7 @@
     if (dungeon2) return dungeon2.def.brick;
     if (y <= surfaceAt(x)) return 0;
     if (regionAt(x) === "mycelia") return 20;
+    if (inPocket(x)) return activeRealm()?.tpl.wall ?? 0;
     const depth = y - surfaceAt(x), biome = biomeAt(x, y).id;
     if (depth < 76)
       return biome === "desert" ? Ground.sand : biome === "marsh" || biome === "coast" ? Ground.mud : biome === "tundra" ? Ground.frost : biome === "badlands" ? Ground.redrock : Ground.soil;
@@ -2997,6 +5716,841 @@
       respawn: 0
     }
   };
+  Object.assign(MOBS, {
+    // The Drowned Orchard.
+    bog_crab: {
+      name: "Bog crab",
+      hp: 150,
+      damage: 18,
+      speed: [34, 95],
+      move: "walker",
+      sight: 260,
+      reach: 46,
+      cooldown: 1.3,
+      defense: 8,
+      loot: [L2("crab_shell", 1, 2), L2("raw_fish", 1, 1, 0.5), L2("tide_pearl", 1, 1, 0.08)],
+      respawn: 150
+    },
+    drowned: {
+      name: "The drowned",
+      hp: 170,
+      damage: 22,
+      speed: [26, 80],
+      move: "walker",
+      sight: 300,
+      reach: 48,
+      cooldown: 1.5,
+      defense: 3,
+      loot: [L2("bone", 1, 3), L2("tide_pearl", 1, 1, 0.12), L2("orchard_fragment", 1, 1, 0.05)],
+      respawn: 150,
+      disease: ["wound", 0.2]
+    },
+    rotfruit_slime: {
+      name: "Rotfruit slime",
+      hp: 110,
+      damage: 16,
+      speed: [40, 100],
+      move: "hopper",
+      sight: 240,
+      reach: 42,
+      cooldown: 1.2,
+      loot: [L2("gel", 1, 3), L2("bog_apple", 1, 2, 0.6)],
+      respawn: 120,
+      disease: ["dysentery", 0.12]
+    },
+    orchard_wasp: {
+      name: "Orchard wasp",
+      hp: 80,
+      damage: 16,
+      speed: [60, 170],
+      move: "flier",
+      sight: 320,
+      reach: 40,
+      cooldown: 1.1,
+      loot: [L2("venom", 1, 1, 0.6), L2("honey", 1, 1, 0.3)],
+      respawn: 130,
+      disease: ["poisoning", 0.18]
+    },
+    orchard_warden: {
+      name: "Orchard warden",
+      hp: 900,
+      damage: 34,
+      speed: [40, 120],
+      move: "walker",
+      sight: 700,
+      reach: 60,
+      cooldown: 1.4,
+      defense: 12,
+      loot: [L2("tide_pearl", 2, 4), L2("orchard_fragment", 1, 2), L2("crab_shell", 3, 6)],
+      respawn: 600
+    },
+    // The Ashen Steppe.
+    ash_hound: {
+      name: "Ash hound",
+      hp: 150,
+      damage: 20,
+      speed: [40, 140],
+      move: "walker",
+      sight: 320,
+      reach: 46,
+      cooldown: 1.3,
+      defense: 4,
+      loot: [L2("ash_hide", 1, 2), L2("raw_meat", 1, 2), L2("bone", 1, 1, 0.5)],
+      respawn: 140,
+      disease: ["wound", 0.14]
+    },
+    steppe_raider: {
+      name: "Steppe raider",
+      hp: 140,
+      damage: 18,
+      speed: [30, 80],
+      move: "walker",
+      sight: 520,
+      reach: 44,
+      cooldown: 2.2,
+      defense: 4,
+      ranged: { projectile: "arrow", range: 480, speed: 660, damage: 20 },
+      loot: [L2("arrow", 3, 8), L2("ashcloth", 1, 1, 0.3), L2("steppe_fragment", 1, 1, 0.05)],
+      respawn: 150
+    },
+    kiln_golem: {
+      name: "Kiln golem",
+      hp: 380,
+      damage: 30,
+      speed: [20, 55],
+      move: "walker",
+      sight: 300,
+      reach: 56,
+      cooldown: 1.8,
+      defense: 14,
+      loot: [L2("kilnstone_ore", 2, 4), L2("coal", 1, 3)],
+      respawn: 180
+    },
+    cinder_vulture: {
+      name: "Cinder vulture",
+      hp: 110,
+      damage: 18,
+      speed: [60, 180],
+      move: "flier",
+      sight: 420,
+      reach: 44,
+      cooldown: 1.2,
+      loot: [L2("feathers", 2, 4), L2("raw_meat", 1, 1, 0.5)],
+      respawn: 130
+    },
+    steppe_warlord: {
+      name: "Steppe warlord",
+      hp: 1e3,
+      damage: 38,
+      speed: [34, 110],
+      move: "walker",
+      sight: 700,
+      reach: 60,
+      cooldown: 1.6,
+      defense: 12,
+      ranged: { projectile: "kiln_ember", range: 520, speed: 520, damage: 30, count: 3, spread: 0.2 },
+      loot: [L2("kiln_ingot", 3, 5), L2("steppe_fragment", 1, 2), L2("ashcloth", 2, 4)],
+      respawn: 600
+    },
+    // The Hollow Warren.
+    warren_rat: {
+      name: "Warren rat",
+      hp: 70,
+      damage: 14,
+      speed: [50, 150],
+      move: "walker",
+      sight: 280,
+      reach: 40,
+      cooldown: 1,
+      loot: [L2("hide", 1, 1, 0.6), L2("raw_meat", 1, 1, 0.5)],
+      respawn: 90,
+      disease: ["fever", 0.14]
+    },
+    amber_beetle: {
+      name: "Amber beetle",
+      hp: 210,
+      damage: 20,
+      speed: [26, 70],
+      move: "walker",
+      sight: 240,
+      reach: 44,
+      cooldown: 1.5,
+      defense: 16,
+      loot: [L2("beetle_carapace", 1, 2), L2("burrow_amber", 1, 2, 0.5)],
+      respawn: 150
+    },
+    mole_guard: {
+      name: "Mole guard",
+      hp: 230,
+      damage: 26,
+      speed: [30, 90],
+      move: "walker",
+      sight: 300,
+      reach: 52,
+      cooldown: 1.5,
+      defense: 8,
+      loot: [L2("burrow_amber", 1, 3), L2("gold_ore", 1, 2, 0.4), L2("warren_fragment", 1, 1, 0.05)],
+      respawn: 160
+    },
+    burrower: {
+      name: "Burrower",
+      hp: 170,
+      damage: 24,
+      speed: [40, 120],
+      move: "floater",
+      sight: 360,
+      reach: 46,
+      cooldown: 1.4,
+      defense: 6,
+      loot: [L2("burrow_amber", 1, 2), L2("clay", 1, 3)],
+      respawn: 150
+    },
+    amber_colossus: {
+      name: "Amber colossus",
+      hp: 1100,
+      damage: 36,
+      speed: [24, 80],
+      move: "walker",
+      sight: 700,
+      reach: 60,
+      cooldown: 1.6,
+      defense: 18,
+      ranged: {
+        projectile: "amber_glob",
+        range: 460,
+        speed: 480,
+        damage: 28,
+        count: 2,
+        spread: 0.25
+      },
+      loot: [L2("burrow_amber", 4, 8), L2("warren_fragment", 1, 2), L2("beetle_carapace", 2, 4)],
+      respawn: 600
+    },
+    // The Band I great foes.
+    orchard_mother: {
+      name: "The Orchard Mother",
+      hp: 3200,
+      damage: 36,
+      speed: [40, 130],
+      move: "walker",
+      sight: 1400,
+      reach: 90,
+      cooldown: 1.3,
+      defense: 16,
+      boss: true,
+      loot: [
+        L2("mother_heart", 1),
+        L2("tide_pearl", 6, 10),
+        L2("brinewood", 10, 16),
+        L2("orchard_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    },
+    kiln_beast: {
+      name: "The Kiln Beast",
+      hp: 3500,
+      damage: 40,
+      speed: [50, 160],
+      move: "walker",
+      sight: 1400,
+      reach: 90,
+      cooldown: 1.3,
+      defense: 18,
+      boss: true,
+      loot: [
+        L2("kiln_core", 1),
+        L2("kiln_ingot", 8, 12),
+        L2("ashcloth", 4, 8),
+        L2("steppe_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    },
+    warren_queen: {
+      name: "The Warren Queen",
+      hp: 3600,
+      damage: 38,
+      speed: [60, 170],
+      move: "floater",
+      sight: 1400,
+      reach: 90,
+      cooldown: 1.2,
+      defense: 18,
+      boss: true,
+      loot: [
+        L2("queen_jelly", 1),
+        L2("burrow_amber", 10, 16),
+        L2("gold_ingot", 4, 8),
+        L2("warren_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    }
+  });
+  Object.assign(MOBS, {
+    // The Glasswood.
+    shard_crawler: {
+      name: "Shard crawler",
+      hp: 220,
+      damage: 28,
+      speed: [36, 120],
+      move: "walker",
+      sight: 300,
+      reach: 46,
+      cooldown: 1.2,
+      defense: 14,
+      loot: [L2("prism_glass", 1, 2), L2("crystal", 1, 1, 0.3)],
+      respawn: 150,
+      disease: ["bleeding", 0.2]
+    },
+    glass_golem: {
+      name: "Glass golem",
+      hp: 520,
+      damage: 36,
+      speed: [20, 60],
+      move: "walker",
+      sight: 300,
+      reach: 58,
+      cooldown: 1.7,
+      defense: 22,
+      loot: [L2("prism_glass", 2, 4), L2("sapphire", 1, 1, 0.2)],
+      respawn: 190,
+      disease: ["glass_cough", 0.12]
+    },
+    glassling: {
+      name: "Glassling",
+      hp: 180,
+      damage: 24,
+      speed: [44, 110],
+      move: "hopper",
+      sight: 260,
+      reach: 42,
+      cooldown: 1.2,
+      defense: 10,
+      loot: [L2("gel", 1, 3), L2("prism_glass", 1, 1, 0.5)],
+      respawn: 130
+    },
+    prism_moth: {
+      name: "Prism moth",
+      hp: 150,
+      damage: 22,
+      speed: [60, 160],
+      move: "flier",
+      sight: 420,
+      reach: 40,
+      cooldown: 2,
+      ranged: {
+        projectile: "prism_bolt",
+        range: 420,
+        speed: 560,
+        damage: 26,
+        count: 3,
+        spread: 0.18
+      },
+      loot: [L2("silk", 1, 2), L2("lumen_moss", 1, 1, 0.4)],
+      respawn: 140,
+      disease: ["glass_cough", 0.08]
+    },
+    lumen_wisp: {
+      name: "Lumen wisp",
+      hp: 140,
+      damage: 22,
+      speed: [50, 130],
+      move: "floater",
+      sight: 460,
+      reach: 40,
+      cooldown: 2.2,
+      ranged: { projectile: "lumen_orb", range: 480, speed: 380, damage: 28 },
+      loot: [L2("crystal", 1, 2, 0.6), L2("glasswood_fragment", 1, 1, 0.05)],
+      respawn: 150
+    },
+    crystal_warden: {
+      name: "Crystal warden",
+      hp: 1700,
+      damage: 46,
+      speed: [34, 110],
+      move: "walker",
+      sight: 700,
+      reach: 64,
+      cooldown: 1.5,
+      defense: 24,
+      ranged: {
+        projectile: "glass_shard",
+        range: 500,
+        speed: 620,
+        damage: 32,
+        count: 4,
+        spread: 0.2
+      },
+      loot: [L2("prism_glass", 4, 8), L2("glasswood_fragment", 1, 2), L2("sapphire", 1, 3)],
+      respawn: 600
+    },
+    // The Bone Marches.
+    bone_hound: {
+      name: "Bone hound",
+      hp: 240,
+      damage: 30,
+      speed: [44, 150],
+      move: "walker",
+      sight: 340,
+      reach: 48,
+      cooldown: 1.2,
+      defense: 10,
+      loot: [L2("bone", 2, 4), L2("raw_meat", 1, 1, 0.3)],
+      respawn: 140,
+      disease: ["marrow_rot", 0.08]
+    },
+    mire_leech: {
+      name: "Mire leech",
+      hp: 200,
+      damage: 26,
+      speed: [36, 110],
+      move: "floater",
+      sight: 300,
+      reach: 44,
+      cooldown: 1.3,
+      defense: 6,
+      loot: [L2("gel", 1, 2), L2("marrow_iron_ore", 1, 1, 0.3)],
+      respawn: 140,
+      disease: ["marrow_rot", 0.18]
+    },
+    ossuary_knight: {
+      name: "Ossuary knight",
+      hp: 460,
+      damage: 38,
+      speed: [26, 80],
+      move: "walker",
+      sight: 320,
+      reach: 58,
+      cooldown: 1.6,
+      defense: 22,
+      loot: [L2("marrow_ingot", 1, 2, 0.6), L2("bone", 2, 4), L2("marches_fragment", 1, 1, 0.05)],
+      respawn: 180,
+      disease: ["tetanus", 0.1]
+    },
+    marsh_ghoul: {
+      name: "Marsh ghoul",
+      hp: 280,
+      damage: 32,
+      speed: [30, 100],
+      move: "walker",
+      sight: 320,
+      reach: 50,
+      cooldown: 1.4,
+      defense: 8,
+      loot: [L2("grave_dust", 1, 2), L2("bone", 1, 3)],
+      respawn: 150,
+      disease: ["wound", 0.2]
+    },
+    carrion_crow: {
+      name: "Carrion crow",
+      hp: 150,
+      damage: 24,
+      speed: [70, 190],
+      move: "flier",
+      sight: 440,
+      reach: 42,
+      cooldown: 1.1,
+      loot: [L2("feathers", 2, 4), L2("raw_meat", 1, 1, 0.3)],
+      respawn: 120,
+      disease: ["fever", 0.1]
+    },
+    bone_colossus: {
+      name: "Bone colossus",
+      hp: 1900,
+      damage: 48,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 70,
+      cooldown: 1.7,
+      defense: 26,
+      ranged: {
+        projectile: "bone_shard",
+        range: 460,
+        speed: 600,
+        damage: 32,
+        count: 5,
+        spread: 0.24
+      },
+      loot: [L2("marrow_ingot", 4, 8), L2("marches_fragment", 1, 2), L2("bone", 8, 14)],
+      respawn: 600
+    },
+    // The Clockwork Barrow.
+    cog_spider: {
+      name: "Cog spider",
+      hp: 300,
+      damage: 34,
+      speed: [44, 150],
+      move: "walker",
+      sight: 320,
+      reach: 48,
+      cooldown: 1.1,
+      defense: 18,
+      loot: [L2("brass_gear", 1, 2), L2("silk", 1, 2, 0.4)],
+      respawn: 150
+    },
+    tin_soldier: {
+      name: "Tin soldier",
+      hp: 480,
+      damage: 42,
+      speed: [30, 90],
+      move: "walker",
+      sight: 360,
+      reach: 60,
+      cooldown: 1.4,
+      defense: 26,
+      loot: [L2("brass_ingot", 1, 2, 0.5), L2("iron_ingot", 1, 2, 0.4)],
+      respawn: 170,
+      disease: ["tetanus", 0.12]
+    },
+    brass_sentry: {
+      name: "Brass sentry",
+      hp: 420,
+      damage: 30,
+      speed: [10, 30],
+      move: "walker",
+      sight: 620,
+      reach: 44,
+      cooldown: 1.6,
+      defense: 30,
+      ranged: { projectile: "bolt", range: 620, speed: 900, damage: 40, count: 2, spread: 0.06 },
+      loot: [L2("brass_gear", 2, 3), L2("barrow_fragment", 1, 1, 0.05)],
+      respawn: 200
+    },
+    clockwork_hound: {
+      name: "Clockwork hound",
+      hp: 340,
+      damage: 38,
+      speed: [50, 170],
+      move: "walker",
+      sight: 380,
+      reach: 50,
+      cooldown: 1.1,
+      defense: 20,
+      loot: [L2("brass_gear", 1, 3), L2("coal", 1, 2, 0.5)],
+      respawn: 150
+    },
+    gear_wisp: {
+      name: "Gear wisp",
+      hp: 240,
+      damage: 30,
+      speed: [50, 140],
+      move: "floater",
+      sight: 480,
+      reach: 42,
+      cooldown: 2.2,
+      ranged: { projectile: "steam_puff", range: 440, speed: 360, damage: 34, count: 2, spread: 0.3 },
+      loot: [L2("brass_gear", 1, 2), L2("topaz", 1, 1, 0.1)],
+      respawn: 150
+    },
+    brass_juggernaut: {
+      name: "Brass juggernaut",
+      hp: 2400,
+      damage: 56,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 70,
+      cooldown: 1.6,
+      defense: 34,
+      ranged: { projectile: "steam_puff", range: 480, speed: 420, damage: 40, count: 5, spread: 0.3 },
+      loot: [L2("brass_ingot", 5, 9), L2("barrow_fragment", 1, 2), L2("gold_ingot", 2, 4)],
+      respawn: 600
+    },
+    // The Salt Flats of Oru.
+    salt_strider: {
+      name: "Salt strider",
+      hp: 360,
+      damage: 36,
+      speed: [50, 170],
+      move: "walker",
+      sight: 420,
+      reach: 54,
+      cooldown: 1.3,
+      defense: 14,
+      loot: [L2("raw_meat", 2, 3), L2("hide", 1, 2), L2("salt", 1, 3, 0.6)],
+      respawn: 150
+    },
+    brine_scorpion: {
+      name: "Brine scorpion",
+      hp: 320,
+      damage: 38,
+      speed: [36, 120],
+      move: "walker",
+      sight: 300,
+      reach: 50,
+      cooldown: 1.3,
+      defense: 22,
+      loot: [L2("venom", 1, 2), L2("saltglass", 1, 1, 0.4)],
+      respawn: 150,
+      disease: ["poisoning", 0.2]
+    },
+    sand_raptor: {
+      name: "Sand raptor",
+      hp: 300,
+      damage: 40,
+      speed: [60, 200],
+      move: "walker",
+      sight: 460,
+      reach: 50,
+      cooldown: 1,
+      defense: 10,
+      loot: [L2("raw_meat", 1, 2), L2("feathers", 1, 3)],
+      respawn: 140,
+      disease: ["wound", 0.16]
+    },
+    salt_wraith: {
+      name: "Salt wraith",
+      hp: 380,
+      damage: 36,
+      speed: [34, 110],
+      move: "floater",
+      sight: 420,
+      reach: 50,
+      cooldown: 2,
+      ranged: { projectile: "salt_spray", range: 440, speed: 520, damage: 34, count: 3, spread: 0.2 },
+      loot: [L2("salt", 2, 4), L2("saltflats_fragment", 1, 1, 0.05)],
+      respawn: 170
+    },
+    mirage_djinn: {
+      name: "Mirage djinn",
+      hp: 300,
+      damage: 34,
+      speed: [60, 160],
+      move: "flier",
+      sight: 500,
+      reach: 44,
+      cooldown: 2.2,
+      ranged: { projectile: "heat_bolt", range: 520, speed: 460, damage: 38 },
+      loot: [L2("saltglass", 1, 2), L2("ruby", 1, 1, 0.1)],
+      respawn: 160
+    },
+    mirage: {
+      name: "Mirage",
+      hp: 1,
+      damage: 0,
+      speed: [40, 150],
+      move: "walker",
+      sight: 460,
+      reach: 50,
+      cooldown: 1,
+      loot: [],
+      respawn: 90
+    },
+    salt_colossus: {
+      name: "Salt colossus",
+      hp: 2300,
+      damage: 54,
+      speed: [26, 90],
+      move: "walker",
+      sight: 700,
+      reach: 72,
+      cooldown: 1.6,
+      defense: 30,
+      ranged: {
+        projectile: "salt_spray",
+        range: 480,
+        speed: 560,
+        damage: 40,
+        count: 5,
+        spread: 0.24
+      },
+      loot: [L2("saltglass", 5, 9), L2("saltflats_fragment", 1, 2), L2("salt", 6, 10)],
+      respawn: 600
+    },
+    // The Frozen Choir.
+    rime_wolf: {
+      name: "Rime wolf",
+      hp: 380,
+      damage: 42,
+      speed: [50, 180],
+      move: "walker",
+      sight: 400,
+      reach: 50,
+      cooldown: 1.1,
+      defense: 16,
+      loot: [L2("hide", 1, 2), L2("raw_meat", 1, 2), L2("frost_shard", 1, 1, 0.4)],
+      respawn: 150,
+      disease: ["rabies", 0.03]
+    },
+    bell_golem: {
+      name: "Bell golem",
+      hp: 700,
+      damage: 50,
+      speed: [20, 60],
+      move: "walker",
+      sight: 320,
+      reach: 64,
+      cooldown: 1.8,
+      defense: 34,
+      loot: [L2("rime_silver_ore", 2, 4), L2("bell_bronze", 1, 1, 0.4)],
+      respawn: 200
+    },
+    cantor: {
+      name: "Cantor",
+      hp: 360,
+      damage: 34,
+      speed: [26, 80],
+      move: "walker",
+      sight: 520,
+      reach: 46,
+      cooldown: 2,
+      defense: 14,
+      ranged: { projectile: "hymn_note", range: 520, speed: 420, damage: 40, count: 3, spread: 0.3 },
+      loot: [L2("frost_lily", 1, 2), L2("choir_fragment", 1, 1, 0.05), L2("silk", 1, 2, 0.4)],
+      respawn: 170
+    },
+    choir_wraith: {
+      name: "Choir wraith",
+      hp: 330,
+      damage: 38,
+      speed: [40, 130],
+      move: "floater",
+      sight: 460,
+      reach: 46,
+      cooldown: 2,
+      ranged: { projectile: "frost_bolt", range: 480, speed: 480, damage: 40 },
+      loot: [L2("frost_shard", 1, 2), L2("grave_dust", 1, 1, 0.4)],
+      respawn: 160,
+      disease: ["frostbite", 0.1]
+    },
+    frost_moth: {
+      name: "Frost moth",
+      hp: 260,
+      damage: 32,
+      speed: [60, 170],
+      move: "flier",
+      sight: 420,
+      reach: 42,
+      cooldown: 1.2,
+      loot: [L2("silk", 1, 2), L2("frost_shard", 1, 1, 0.3)],
+      respawn: 130
+    },
+    grand_cantor: {
+      name: "Grand cantor",
+      hp: 2600,
+      damage: 58,
+      speed: [30, 100],
+      move: "walker",
+      sight: 720,
+      reach: 64,
+      cooldown: 1.5,
+      defense: 30,
+      ranged: { projectile: "hymn_note", range: 560, speed: 460, damage: 44, count: 6, spread: 0.3 },
+      loot: [L2("rime_silver", 4, 8), L2("choir_fragment", 1, 2), L2("frost_shard", 4, 8)],
+      respawn: 600
+    },
+    // The Band II and III great foes.
+    lumen_stag: {
+      name: "The Lumen Stag",
+      hp: 5600,
+      damage: 48,
+      speed: [60, 190],
+      move: "walker",
+      sight: 1400,
+      reach: 96,
+      cooldown: 1.3,
+      defense: 24,
+      boss: true,
+      loot: [
+        L2("stag_heart", 1),
+        L2("prism_glass", 10, 16),
+        L2("glasswood_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    },
+    ossuary_hydra: {
+      name: "The Ossuary Hydra",
+      hp: 6200,
+      damage: 50,
+      speed: [40, 120],
+      move: "walker",
+      sight: 1400,
+      reach: 100,
+      cooldown: 1.3,
+      defense: 26,
+      boss: true,
+      loot: [
+        L2("hydra_heart", 1),
+        L2("marrow_ingot", 10, 16),
+        L2("marches_fragment", 2, 3),
+        L2("life_crystal", 1)
+      ],
+      respawn: 0
+    },
+    engine_saint: {
+      name: "The Engine Saint",
+      hp: 8200,
+      damage: 58,
+      speed: [40, 120],
+      move: "walker",
+      sight: 1400,
+      reach: 100,
+      cooldown: 1.3,
+      defense: 34,
+      boss: true,
+      loot: [
+        L2("engine_heart", 1),
+        L2("brass_ingot", 12, 18),
+        L2("barrow_fragment", 2, 3),
+        L2("life_fruit", 1)
+      ],
+      respawn: 0
+    },
+    mirage_tyrant: {
+      name: "The Mirage Tyrant",
+      hp: 7800,
+      damage: 56,
+      speed: [70, 200],
+      move: "floater",
+      sight: 1400,
+      reach: 90,
+      cooldown: 1.2,
+      defense: 30,
+      boss: true,
+      loot: [
+        L2("mirage_crown", 1),
+        L2("saltglass", 12, 18),
+        L2("saltflats_fragment", 2, 3),
+        L2("life_fruit", 1)
+      ],
+      respawn: 0
+    },
+    tyrant_mirage: {
+      name: "A mirage of the Tyrant",
+      hp: 1,
+      damage: 0,
+      speed: [70, 200],
+      move: "floater",
+      sight: 1400,
+      reach: 60,
+      cooldown: 1,
+      loot: [],
+      respawn: 99999
+    },
+    the_hymnal: {
+      name: "The Hymnal",
+      hp: 8800,
+      damage: 60,
+      speed: [30, 100],
+      move: "walker",
+      sight: 1400,
+      reach: 110,
+      cooldown: 1.4,
+      defense: 36,
+      boss: true,
+      loot: [
+        L2("hymnal_core", 1),
+        L2("rime_silver", 12, 18),
+        L2("choir_fragment", 2, 3),
+        L2("life_fruit", 1)
+      ],
+      respawn: 0
+    }
+  });
   for (const st of SETTLERS)
     MOBS[st.id] = {
       name: `${st.name} ${st.title}`,
@@ -3017,7 +6571,15 @@
     archdemon: { item: "cinder_key", place: "citadel", music: "boss_hell" },
     sporemother: { item: "spore_lure", place: "mycelia", music: "boss" },
     tempest_roc: { item: "storm_totem", place: "skyreach", music: "boss" },
-    unmaker: { item: "void_seal", place: "void", music: "final_boss" }
+    unmaker: { item: "void_seal", place: "void", music: "final_boss" },
+    orchard_mother: { item: "orchard_key", place: "orchard", music: "boss" },
+    kiln_beast: { item: "steppe_key", place: "steppe", music: "boss" },
+    warren_queen: { item: "warren_key", place: "warren", music: "boss" },
+    lumen_stag: { item: "glasswood_key", place: "glasswood", music: "boss" },
+    ossuary_hydra: { item: "marches_key", place: "marches", music: "boss" },
+    engine_saint: { item: "barrow_key", place: "barrow", music: "boss" },
+    mirage_tyrant: { item: "saltflats_key", place: "saltflats", music: "boss" },
+    the_hymnal: { item: "choir_key", place: "choir", music: "boss" }
   };
   var isAggressive = (type) => type === "boss" || (MOBS[type]?.sight ?? 0) > 0;
   var mobName = (type) => MOBS[type]?.name ?? type;
@@ -3060,8 +6622,782 @@
     archdemon: "hellhound",
     sporemother: "slime",
     tempest_roc: "harpy",
-    unmaker: "wisp"
+    unmaker: "wisp",
+    bog_crab: "scorpion",
+    drowned: "ghoul",
+    rotfruit_slime: "slime",
+    orchard_wasp: "bat",
+    orchard_warden: "golem",
+    ash_hound: "wolf",
+    steppe_raider: "bones",
+    kiln_golem: "golem",
+    cinder_vulture: "harpy",
+    steppe_warlord: "knight",
+    warren_rat: "bat",
+    amber_beetle: "scorpion",
+    mole_guard: "ghoul",
+    burrower: "serpent",
+    amber_colossus: "golem",
+    orchard_mother: "golem",
+    kiln_beast: "hellhound",
+    warren_queen: "serpent",
+    shard_crawler: "scorpion",
+    glass_golem: "golem",
+    glassling: "slime",
+    prism_moth: "bat",
+    lumen_wisp: "wisp",
+    crystal_warden: "golem",
+    bone_hound: "wolf",
+    mire_leech: "serpent",
+    ossuary_knight: "bones",
+    marsh_ghoul: "ghoul",
+    carrion_crow: "harpy",
+    bone_colossus: "bones",
+    cog_spider: "scorpion",
+    tin_soldier: "knight",
+    brass_sentry: "golem",
+    clockwork_hound: "hellhound",
+    gear_wisp: "wisp",
+    brass_juggernaut: "golem",
+    salt_strider: "boar",
+    brine_scorpion: "scorpion",
+    sand_raptor: "harpy",
+    salt_wraith: "wraith",
+    mirage_djinn: "wisp",
+    mirage: "wisp",
+    salt_colossus: "golem",
+    rime_wolf: "wolf",
+    bell_golem: "golem",
+    cantor: "wraith",
+    choir_wraith: "wraith",
+    frost_moth: "bat",
+    grand_cantor: "knight",
+    lumen_stag: "boar",
+    ossuary_hydra: "serpent",
+    engine_saint: "golem",
+    mirage_tyrant: "wisp",
+    tyrant_mirage: "wisp",
+    the_hymnal: "golem"
   };
+
+  // src/data/food.ts
+  var FOOD = {
+    glowcap: [10, 3, 6],
+    berry: [8, 0, 14],
+    mushroom: [9, 2, 4],
+    honey: [13, 0, 4],
+    wheat: [4, 2, 0],
+    potato: [14, 3, 5],
+    raw_meat: [21, 21, 0],
+    cooked_meat: [29, 25, 0],
+    bread: [27, 6, 0],
+    cactus_fruit: [11, 1, 16],
+    raw_fish: [16, 18, 2],
+    cooked_fish: [25, 22, 3],
+    smoked_meat: [38, 32, 0],
+    trail_ration: [48, 28, 6],
+    potato_stew: [41, 20, 10],
+    bog_apple: [12, 1, 14],
+    herb: [2, 0, 8],
+    sunbloom: [10, 1, 12],
+    frost_lily: [6, 0, 18],
+    // Preserves.
+    salted_meat: [34, 28, 0],
+    salted_fish: [28, 24, 1],
+    pickled_mushrooms: [14, 3, 12],
+    berry_preserves: [26, 0, 20],
+    // Meals.
+    hearty_stew: [55, 30, 14],
+    fish_chowder: [46, 30, 10],
+    spiced_skewers: [42, 32, 4],
+    honey_cakes: [44, 6, 12],
+    mushroom_broth: [30, 6, 16],
+    orchard_pie: [50, 4, 22],
+    ember_chili: [42, 18, 12],
+    explorers_feast: [70, 36, 24]
+  };
+  var RAW = /* @__PURE__ */ new Set(["raw_meat", "raw_fish"]);
+  var MEAL_BUFFS = {
+    hearty_stew: ["well_fed", 480],
+    fish_chowder: ["well_fed", 420],
+    spiced_skewers: ["fiery", 360],
+    honey_cakes: ["sweet", 360],
+    mushroom_broth: ["clear_mind", 420],
+    orchard_pie: ["warm_belly", 480],
+    ember_chili: ["warm_belly", 420],
+    explorers_feast: ["feasted", 600],
+    iron_gut_brew: ["iron_gut", 600]
+  };
+  function rotRate(temp) {
+    if (temp <= -10) return 0.3;
+    if (temp < 8) return 0.3 + (temp + 10) / 18 * 0.7;
+    if (temp <= 20) return 1;
+    return Math.min(2.6, 1 + (temp - 20) / 18);
+  }
+  function meltRate(temp) {
+    return temp <= 0 ? 0 : temp <= 20 ? 1 : Math.min(3, 1 + (temp - 20) / 12);
+  }
+  var STORAGE = {
+    cool_pit: {
+      name: "Cool pit",
+      tier: 1,
+      mult: 0.6,
+      capacity: 8,
+      text: "Dug into the earth: food keeps a little longer, better still underground."
+    },
+    icebox: {
+      name: "Icebox",
+      tier: 2,
+      mult: 0.18,
+      capacity: 12,
+      fuel: "ice",
+      per: 900,
+      text: "Cold while it has ice; ice melts faster in the heat."
+    },
+    snow_cellar: {
+      name: "Snow cellar",
+      tier: 3,
+      mult: 0.14,
+      capacity: 20,
+      fuel: "ice",
+      per: 2400,
+      text: "Packed snow keeps ice for a long time, and needs none below freezing."
+    },
+    frost_chest: {
+      name: "Frost chest",
+      tier: 4,
+      mult: 0.06,
+      capacity: 16,
+      fuel: "frost_shard",
+      per: 3600,
+      text: "Frost shards from the Frost Keep hold it near frozen whatever the weather."
+    },
+    rime_vault: {
+      name: "Rime vault",
+      tier: 5,
+      mult: 0.02,
+      capacity: 24,
+      text: "Starmetal and frost: food all but stops ageing, and it needs nothing."
+    }
+  };
+  var PACK_COOLING = {
+    insulated_satchel: 0.75,
+    frost_lined_pack: 0.5,
+    rime_lined_pack: 0.3
+  };
+
+  // src/data/skills.ts
+  var TREES = [
+    {
+      id: "warfare",
+      name: "Warfare",
+      text: "Blades, axes, hammers, and the nerve to stand close",
+      color: "#c0584a"
+    },
+    { id: "marksman", name: "Marksman", text: "Bows, crossbows, and patience", color: "#6a9a4a" },
+    { id: "arcana", name: "Arcana", text: "Staves, tomes, mana, and infusions", color: "#6a6ac8" },
+    {
+      id: "survival",
+      name: "Survival",
+      text: "Food, cold, sickness, and the long haul",
+      color: "#b8904a"
+    },
+    {
+      id: "wayfinding",
+      name: "Wayfinding",
+      text: "Realms, keys, loot, and the road",
+      color: "#4a9ab0"
+    }
+  ];
+  var ROW_POINTS = [0, 0, 3, 6, 10, 14];
+  var tree = (id, rows) => rows.flatMap(
+    (row, i) => row.map(([nid, name, text, stats]) => ({
+      id: nid,
+      tree: id,
+      row: i + 1,
+      name,
+      text,
+      cost: i === 4 ? 2 : 1,
+      stats,
+      ...i === 4 ? { keystone: true } : {}
+    }))
+  );
+  var SKILLS = [
+    ...tree("warfare", [
+      [
+        ["edge", "Edge", "+6% melee damage", { meleeDmg: 0.06 }],
+        ["grit", "Grit", "+10 health", { maxHp: 10 }],
+        ["footwork", "Footwork", "+4% speed", { speed: 0.04 }],
+        ["second_wind", "Second wind", "Stamina returns 15% faster", { staminaRegen: 0.15 }],
+        ["hardy", "Hardy", "+1 defense", { defense: 1 }],
+        [
+          "cleave",
+          "Cleave",
+          "+8% damage with greatswords, battleaxes, and warhammers",
+          { heavyDmg: 0.08 }
+        ]
+      ],
+      [
+        ["bloodletter", "Bloodletter", "Bleeding hurts 30% more", { bleedDmg: 0.3 }],
+        ["duelists_eye", "Duelist's eye", "+4% critical chance", { crit: 0.04 }],
+        ["tough", "Tough", "+20 health", { maxHp: 20 }],
+        ["long_arm", "Long arm", "+10% melee reach", { reach: 0.1 }],
+        ["rhythm", "Rhythm", "Melee blows 6% faster", { meleeSpeed: 0.06 }],
+        ["savagery", "Savagery", "+8% melee damage", { meleeDmg: 0.08 }]
+      ],
+      [
+        ["iron_skin", "Iron skin", "+3 defense", { defense: 3 }],
+        ["relentless", "Relentless", "Blade combos strike \xD70.3 harder", { combo: 0.3 }],
+        ["war_cry", "War cry", "Each kill restores 6 stamina", { killStamina: 6 }],
+        ["bulwark", "Bulwark", "Take 8% less harm", { harm: -0.08 }],
+        ["brutal", "Brutal", "+25% critical damage", { critDmg: 0.25 }],
+        ["titan_grip", "Titan grip", "+12% damage with heavy weapons", { heavyDmg: 0.12 }]
+      ],
+      [
+        ["vampiric", "Vampiric", "Heal 2% of melee damage dealt", { lifesteal: 0.02 }],
+        ["unbroken", "Unbroken", "+40 health", { maxHp: 40 }],
+        ["riposte", "Riposte", "Foes that strike you take 15% back", { thorns: 0.15 }],
+        ["giantslayer", "Giantslayer", "+15% against great foes", { bossDmg: 0.15 }],
+        ["warpath", "Warpath", "+6% speed", { speed: 0.06 }],
+        ["whirl", "Whirl", "Melee blows 8% faster", { meleeSpeed: 0.08 }]
+      ],
+      [
+        ["berserker", "Berserker", "Up to +40% damage as your health falls", { berserker: 1 }],
+        ["juggernaut", "Juggernaut", "+15 defense, but 10% slower", { juggernaut: 1 }],
+        ["bladestorm", "Bladestorm", "Blade combos land every second blow", { bladestorm: 1 }]
+      ]
+    ]),
+    ...tree("marksman", [
+      [
+        ["steady", "Steady hand", "+6% ranged damage", { rangedDmg: 0.06 }],
+        ["quick_draw", "Quick draw", "Shoot 6% faster", { rangedSpeed: 0.06 }],
+        ["eagle_eye", "Eagle eye", "+3% critical chance", { crit: 0.03 }],
+        ["light_step", "Light step", "+4% speed", { speed: 0.04 }],
+        ["salvage", "Salvage", "15% chance to keep the arrow", { ammoSave: 0.15 }],
+        ["fletching", "Fletching", "Seeking shots turn a little", { homing: 0.6 }]
+      ],
+      [
+        ["piercing", "Piercing", "Shots pass through one more foe", { pierce: 1 }],
+        ["broadheads", "Broadheads", "Arrows and bolts cause bleeding", { rangedBleed: 0.1 }],
+        ["marksman", "Marksman", "+6% critical chance", { crit: 0.06 }],
+        ["deadly", "Deadly", "+25% critical damage", { critDmg: 0.25 }],
+        ["quiver", "Quiver", "15% more chance to keep the arrow", { ammoSave: 0.15 }],
+        ["focus", "Focus", "+8% ranged damage", { rangedDmg: 0.08 }]
+      ],
+      [
+        ["volley", "Volley", "20% chance of an extra shot", { extraShot: 0.2 }],
+        ["hunters_mark", "Hunter's mark", "Shots mark foes to take more harm", { rangedMark: 0.12 }],
+        ["windrunner", "Windrunner", "+6% speed", { speed: 0.06 }],
+        ["lethal", "Lethal", "+8% ranged damage", { rangedDmg: 0.08 }],
+        ["sharpshooter", "Sharpshooter", "+6% critical chance", { crit: 0.06 }],
+        ["swift_hands", "Swift hands", "Shoot 8% faster", { rangedSpeed: 0.08 }]
+      ],
+      [
+        ["seeking", "Seeking", "Shots seek their foes", { homing: 1.5 }],
+        ["rain", "Rain of arrows", "25% more chance of an extra shot", { extraShot: 0.25 }],
+        ["camouflage", "Camouflage", "+3 defense", { defense: 3 }],
+        ["predator", "Predator", "+15% against great foes", { bossDmg: 0.15 }],
+        ["hawkeye", "Hawkeye", "+30% critical damage", { critDmg: 0.3 }],
+        ["trueshot", "Trueshot", "+10% ranged damage", { rangedDmg: 0.1 }]
+      ],
+      [
+        ["deadeye", "Deadeye", "A shot at a foe at full health always strikes \xD72.5", { deadeye: 1 }],
+        [
+          "quiver_master",
+          "Quiver master",
+          "Always one more arrow, and 30% kept",
+          { quiverMaster: 1 }
+        ],
+        ["skirmisher", "Skirmisher", "+20% ranged damage while moving", { skirmisher: 1 }]
+      ]
+    ]),
+    ...tree("arcana", [
+      [
+        ["spark", "Spark", "+6% magic damage", { magicDmg: 0.06 }],
+        ["wellspring", "Wellspring", "+20 mana", { maxMana: 20 }],
+        ["flow", "Flow", "Mana returns 20% faster", { manaRegen: 0.2 }],
+        ["thrift", "Thrift", "Spells cost 8% less", { manaCost: -0.08 }],
+        ["arcane_ward", "Arcane ward", "+1 defense", { defense: 1 }],
+        ["study", "Study", "+10% renown", { xp: 0.1 }]
+      ],
+      [
+        ["amplify", "Amplify", "+8% magic damage", { magicDmg: 0.08 }],
+        ["deep_well", "Deep well", "+30 mana", { maxMana: 30 }],
+        ["channel", "Channel", "Cast 8% faster", { castSpeed: 0.08 }],
+        [
+          "elemental_touch",
+          "Elemental touch",
+          "Infusions burn, poison, and slow 25% harder",
+          { infusion: 0.25 }
+        ],
+        ["seeker_bolts", "Seeker bolts", "Spells seek their foes", { homing: 1 }],
+        ["insight", "Insight", "+4% critical chance", { crit: 0.04 }]
+      ],
+      [
+        ["overflow", "Overflow", "Mana returns 30% faster", { manaRegen: 0.3 }],
+        ["efficiency", "Efficiency", "Spells cost 12% less", { manaCost: -0.12 }],
+        ["potency", "Potency", "+10% magic damage", { magicDmg: 0.1 }],
+        ["kindling", "Kindling", "Burning hurts 40% more", { burnDmg: 0.4 }],
+        ["resonance", "Resonance", "+50 mana", { maxMana: 50 }],
+        ["quickening", "Quickening", "Cast 8% faster", { castSpeed: 0.08 }]
+      ],
+      [
+        ["archmage", "Archmage", "+12% magic damage", { magicDmg: 0.12 }],
+        ["barrier", "Barrier", "+4 defense", { defense: 4 }],
+        ["meditation", "Meditation", "Mana returns 40% faster", { manaRegen: 0.4 }],
+        ["split_cast", "Split cast", "25% chance of an extra bolt", { extraShot: 0.25 }],
+        ["lich_touch", "Lich touch", "Heal 2% of magic damage dealt", { magicLifesteal: 0.02 }],
+        ["arcane_crit", "Arcane fury", "+30% critical damage", { critDmg: 0.3 }]
+      ],
+      [
+        ["overchannel", "Overchannel", "Out of mana, spells cost health instead", { overchannel: 1 }],
+        ["mana_shield", "Mana shield", "A quarter of all harm drains mana first", { manaShield: 1 }],
+        ["elementalist", "Elementalist", "Infusions \xD71.5 and +15% magic damage", { elementalist: 1 }]
+      ]
+    ]),
+    ...tree("survival", [
+      [
+        ["forager", "Forager", "20% chance of an extra find when gathering", { gather: 0.2 }],
+        ["hearty", "Hearty", "+10 health", { maxHp: 10 }],
+        ["small_appetite", "Small appetite", "Hunger 10% slower", { calories: -0.1 }],
+        ["camel", "Camel", "Thirst 10% slower", { thirst: -0.1 }],
+        ["thick_skin", "Thick skin", "Shrug off 2\xB0 of cold", { coldResist: 2 }],
+        ["sun_hardened", "Sun-hardened", "Shrug off 2\xB0 of heat", { heatResist: 2 }]
+      ],
+      [
+        ["preserver", "Preserver", "Food in your pack keeps 15% longer", { packRot: 0.15 }],
+        ["iceman", "Iceman", "Ice lasts 50% longer in storage", { ice: 0.5 }],
+        ["medic", "Medic", "Healing draughts heal 30% more", { heal: 0.3 }],
+        ["resistant", "Resistant", "15% chance to shrug off a sickness", { disease: 0.15 }],
+        ["gatherer", "Gatherer", "20% more chance of an extra find", { gather: 0.2 }],
+        ["cook", "Cook", "Meal comforts last 50% longer", { meals: 0.5 }]
+      ],
+      [
+        ["iron_stomach", "Iron stomach", "Spoiled food no longer sickens you", { ironGut: 0.5 }],
+        ["antibodies", "Antibodies", "Immunities last twice as long", { immunity: 1 }],
+        ["layers", "Layers", "Shrug off 3\xB0 of cold", { coldResist: 3 }],
+        ["desert_born", "Desert-born", "Shrug off 3\xB0 of heat", { heatResist: 3 }],
+        [
+          "provisioner",
+          "Provisioner",
+          "Hunger and thirst 12% slower",
+          { calories: -0.12, thirst: -0.12 }
+        ],
+        ["tough_hide", "Tough hide", "+2 defense", { defense: 2 }]
+      ],
+      [
+        ["survivalist", "Survivalist", "+25 health", { maxHp: 25 }],
+        ["rot_ward", "Rot ward", "Food in your pack keeps 25% longer", { packRot: 0.25 }],
+        ["immune_system", "Hale", "25% chance to shrug off a sickness", { disease: 0.25 }],
+        ["field_dressing", "Field dressing", "Bandages and splints also heal 15", { dressing: 15 }],
+        ["deep_sleep", "Deep sleep", "Rest restores twice as much", { rest: 1 }],
+        ["hunter_gatherer", "Hunter-gatherer", "25% more chance of an extra find", { gather: 0.25 }]
+      ],
+      [
+        ["iron_gut", "Iron gut", "Food and water never make you ill", { ironGut: 1 }],
+        [
+          "cold_blooded",
+          "Cold-blooded",
+          "Shrug off 8\xB0 of cold; frostbite never takes",
+          { coldBlooded: 1 }
+        ],
+        [
+          "field_medic",
+          "Field medic",
+          "Treatments lift a stage more, and heal 20",
+          { fieldMedic: 1 }
+        ]
+      ]
+    ]),
+    ...tree("wayfinding", [
+      [
+        ["swift", "Swift", "+5% speed", { speed: 0.05 }],
+        ["climber", "Climber", "Climb 25% faster", { climb: 0.25 }],
+        ["lucky", "Lucky", "Loot 8% more likely", { luck: 0.08 }],
+        ["coin_sense", "Coin sense", "15% more silver marks", { coins: 0.15 }],
+        ["endurance", "Endurance", "Stamina returns 10% faster", { staminaRegen: 0.1 }],
+        ["springheel", "Springheel", "Jump 8% higher", { jump: 0.08 }]
+      ],
+      [
+        ["rift_sense", "Rift sense", "Realm loot +10%", { realmLoot: 0.1 }],
+        ["tunnel_rat", "Tunnel rat", "Realm hazards 20% gentler", { hazard: 0.2 }],
+        ["scavenger", "Scavenger", "Loot 10% more likely", { luck: 0.1 }],
+        ["pathfinder", "Pathfinder", "+6% speed", { speed: 0.06 }],
+        ["haggler", "Haggler", "Settlers sell 15% cheaper", { haggle: 0.15 }],
+        ["surefoot", "Surefoot", "Jump 8% higher", { jump: 0.08 }]
+      ],
+      [
+        ["treasure_hunter", "Treasure hunter", "Realm loot +10%", { realmLoot: 0.1 }],
+        ["keywise", "Keywise", "10% chance a key is not spent", { keySave: 0.1 }],
+        ["weathered", "Weathered", "Realm hazards 25% gentler", { hazard: 0.25 }],
+        ["fortune", "Fortune", "Loot 10% more likely", { luck: 0.1 }],
+        ["strider", "Strider", "+6% speed", { speed: 0.06 }],
+        ["salvager", "Salvager", "25% more silver marks", { coins: 0.25 }]
+      ],
+      [
+        ["realm_walker", "Realm walker", "Realm loot +15%", { realmLoot: 0.15 }],
+        ["tier_climber", "Tier climber", "Realm tiers hurt 10% less", { tierHarm: 0.1 }],
+        ["keymaster", "Keymaster", "10% more chance a key is not spent", { keySave: 0.1 }],
+        ["gilded", "Gilded", "40% more silver marks", { coins: 0.4 }],
+        ["explorer", "Explorer", "+8% speed", { speed: 0.08 }],
+        ["cartographer", "Cartographer", "+15% renown", { xp: 0.15 }]
+      ],
+      [
+        ["riftborn", "Riftborn", "30% chance a key is not spent", { riftborn: 1 }],
+        [
+          "treasure_sense",
+          "Treasure sense",
+          "Two more chests in every realm; realm loot +20%",
+          { treasureSense: 1 }
+        ],
+        ["wanderer", "Wanderer", "+15% speed; stamina returns 30% faster", { wanderer: 1 }]
+      ]
+    ])
+  ];
+  var skillById = (id) => SKILLS.find((n) => n.id === id);
+  var MAX_RENOWN = 60;
+  var renownFor = (level) => Math.round(60 * Math.pow(level - 1, 1.6));
+  function renownLevel(xp) {
+    let l = 1;
+    while (l < MAX_RENOWN && xp >= renownFor(l + 1)) l++;
+    return l;
+  }
+  var RESPEC_COST = { fallen_star: 3, coin: 200 };
+  var MAX_MASTERY = 20;
+  var masteryFor = (level) => Math.round(400 * Math.pow(level, 1.7));
+  function masteryLevel(xp) {
+    let l = 0;
+    while (l < MAX_MASTERY && xp >= masteryFor(l + 1)) l++;
+    return l;
+  }
+  var MASTERY_TITLES = ["Untried", "Novice", "Adept", "Expert", "Master", "Grandmaster"];
+  var masteryTitle = (level) => MASTERY_TITLES[Math.min(MASTERY_TITLES.length - 1, Math.floor(level / 5) + (level > 0 ? 1 : 0))];
+
+  // src/data/codex.ts
+  var creatures = (id, name, entries, bonus, bonusText) => ({ id, name, group: "Creatures", prefix: "kill:", entries, bonus, bonusText });
+  var CODEX = [
+    creatures(
+      "wilds",
+      "Beasts of the wilds",
+      ["deer", "wolf", "boar", "slime", "scorpion"],
+      { maxHp: 10 },
+      "+10 health"
+    ),
+    creatures(
+      "deeps",
+      "Things of the deep",
+      ["bat", "cave_spider", "ember_bat", "hellhound"],
+      { meleeDmg: 0.03, rangedDmg: 0.03, magicDmg: 0.03 },
+      "+3% damage"
+    ),
+    creatures(
+      "crypt",
+      "The Mossy Crypt",
+      ["skeleton", "skeleton_archer", "bone_bat", "crypt_ghoul", "hollow_king"],
+      { defense: 1 },
+      "+1 defense"
+    ),
+    creatures(
+      "frost_keep",
+      "The Frost Keep",
+      ["frost_wraith", "ice_golem", "snow_slime", "rime_colossus"],
+      { coldResist: 2 },
+      "Shrug off 2\xB0 of cold"
+    ),
+    creatures(
+      "tomb",
+      "The Sunken Tomb",
+      ["mummy", "scarab", "tomb_serpent", "pharaoh"],
+      { heatResist: 2 },
+      "Shrug off 2\xB0 of heat"
+    ),
+    creatures(
+      "citadel",
+      "The Cinder Citadel",
+      ["imp", "cinder_knight", "magma_slime", "archdemon"],
+      { defense: 1 },
+      "+1 defense"
+    ),
+    creatures(
+      "mycelia",
+      "The Mycelial Deep",
+      ["shroomling", "spore_bat", "spore_slime", "mycelid", "sporemother"],
+      { disease: 0.05 },
+      "5% chance to shrug off a sickness"
+    ),
+    creatures(
+      "skyreach",
+      "Skyreach",
+      ["harpy", "cloud_slime", "wind_wisp", "sky_ram", "tempest_roc"],
+      { speed: 0.03 },
+      "+3% speed"
+    ),
+    creatures(
+      "void",
+      "The Hollow Void",
+      ["void_wisp", "void_stalker", "watcher", "unmaker"],
+      { maxMana: 20 },
+      "+20 mana"
+    ),
+    creatures(
+      "orchard",
+      "The Drowned Orchard",
+      ["bog_crab", "drowned", "rotfruit_slime", "orchard_wasp", "orchard_warden", "orchard_mother"],
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    creatures(
+      "steppe",
+      "The Ashen Steppe",
+      ["ash_hound", "steppe_raider", "kiln_golem", "cinder_vulture", "steppe_warlord", "kiln_beast"],
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    creatures(
+      "warren",
+      "The Hollow Warren",
+      ["warren_rat", "amber_beetle", "mole_guard", "burrower", "amber_colossus", "warren_queen"],
+      { realmLoot: 0.05 },
+      "Realm loot +5%"
+    ),
+    creatures(
+      "glasswood",
+      "The Glasswood",
+      [
+        "shard_crawler",
+        "glass_golem",
+        "glassling",
+        "prism_moth",
+        "lumen_wisp",
+        "crystal_warden",
+        "lumen_stag"
+      ],
+      { magicDmg: 0.05 },
+      "+5% magic damage"
+    ),
+    creatures(
+      "marches",
+      "The Bone Marches",
+      [
+        "bone_hound",
+        "mire_leech",
+        "ossuary_knight",
+        "marsh_ghoul",
+        "carrion_crow",
+        "bone_colossus",
+        "ossuary_hydra"
+      ],
+      { disease: 0.05 },
+      "5% chance to shrug off a sickness"
+    ),
+    creatures(
+      "barrow",
+      "The Clockwork Barrow",
+      [
+        "cog_spider",
+        "tin_soldier",
+        "brass_sentry",
+        "clockwork_hound",
+        "gear_wisp",
+        "brass_juggernaut",
+        "engine_saint"
+      ],
+      { rangedDmg: 0.05 },
+      "+5% ranged damage"
+    ),
+    creatures(
+      "saltflats",
+      "The Salt Flats of Oru",
+      [
+        "salt_strider",
+        "brine_scorpion",
+        "sand_raptor",
+        "salt_wraith",
+        "mirage_djinn",
+        "salt_colossus",
+        "mirage_tyrant"
+      ],
+      { heatResist: 3 },
+      "Shrug off 3\xB0 of heat"
+    ),
+    creatures(
+      "choir",
+      "The Frozen Choir",
+      [
+        "rime_wolf",
+        "bell_golem",
+        "cantor",
+        "choir_wraith",
+        "frost_moth",
+        "grand_cantor",
+        "the_hymnal"
+      ],
+      { coldResist: 3 },
+      "Shrug off 3\xB0 of cold"
+    ),
+    {
+      id: "regions",
+      name: "The nine regions",
+      group: "Places",
+      prefix: "visit:",
+      entries: [
+        "coast",
+        "marsh",
+        "forest",
+        "meadow",
+        "taiga",
+        "tundra",
+        "alpine",
+        "desert",
+        "badlands"
+      ],
+      bonus: { speed: 0.03 },
+      bonusText: "+3% speed"
+    },
+    {
+      id: "dungeons",
+      name: "The four dungeons",
+      group: "Places",
+      prefix: "visit:",
+      entries: ["crypt", "frost_keep", "tomb", "citadel"],
+      bonus: { defense: 2 },
+      bonusText: "+2 defense"
+    },
+    {
+      id: "worlds",
+      name: "Other worlds",
+      group: "Places",
+      prefix: "visit:",
+      entries: [
+        "mycelia",
+        "skyreach",
+        "void",
+        "orchard",
+        "steppe",
+        "warren",
+        "glasswood",
+        "marches",
+        "barrow",
+        "saltflats",
+        "choir"
+      ],
+      bonus: { xp: 0.1 },
+      bonusText: "+10% renown"
+    },
+    {
+      id: "maladies",
+      name: "Maladies",
+      group: "Lore",
+      prefix: "ail:",
+      entries: [],
+      count: 8,
+      bonus: { disease: 0.1 },
+      bonusText: "10% chance to shrug off a sickness"
+    },
+    {
+      id: "palate",
+      name: "The palate",
+      group: "Lore",
+      prefix: "eat:",
+      entries: [],
+      count: 15,
+      bonus: { calories: -0.1 },
+      bonusText: "Hunger 10% slower"
+    },
+    {
+      id: "arms",
+      name: "Every family of arms",
+      group: "Lore",
+      prefix: "family:",
+      entries: [
+        "blade",
+        "greatsword",
+        "spear",
+        "battleaxe",
+        "warhammer",
+        "whip",
+        "bow",
+        "crossbow",
+        "staff",
+        "tome"
+      ],
+      bonus: { crit: 0.03 },
+      bonusText: "+3% critical chance"
+    },
+    {
+      id: "hoard",
+      name: "The hoard",
+      group: "Lore",
+      prefix: "weapon:",
+      entries: [],
+      count: 30,
+      bonus: { meleeDmg: 0.04, rangedDmg: 0.04, magicDmg: 0.04 },
+      bonusText: "+4% damage"
+    },
+    {
+      id: "relics",
+      name: "Relics",
+      group: "Lore",
+      prefix: "relic:",
+      entries: [
+        "tide_conch",
+        "kiln_heart",
+        "queens_mandible",
+        "lumen_antler",
+        "hydra_tooth",
+        "saint_cog",
+        "tyrant_eye",
+        "hymnal_bell"
+      ],
+      bonus: { luck: 0.1 },
+      bonusText: "Loot 10% more likely"
+    }
+  ];
+  var RELIC_EFFECTS = {
+    tide_conch: ["swim", "defense2"],
+    kiln_heart: ["ashward", "fire"],
+    queens_mandible: ["tremor", "damage10"],
+    mother_heart: ["regen"],
+    kiln_core: ["stamina"],
+    queen_jelly: ["stamina"],
+    spore_heart: ["regen"],
+    roc_plume: ["glide"],
+    eclipse_fang: ["damage10"],
+    beast_core: ["defense2"],
+    lumen_antler: ["light", "shardward"],
+    hydra_tooth: ["mirewalk", "regen"],
+    saint_cog: ["trapsense", "speed20"],
+    tyrant_eye: ["shade", "damage10"],
+    hymnal_bell: ["hymnward", "mana40"],
+    stag_heart: ["magic15"],
+    hydra_heart: ["regen"],
+    engine_heart: ["stamina"],
+    mirage_crown: ["damage10"],
+    hymnal_core: ["defense3"]
+  };
+  var EFFECT_TEXT = {
+    swim: "swim freely",
+    defense2: "+2 defense",
+    ashward: "ash storms pass you by",
+    fire: "some blows set foes alight",
+    tremor: "sense cave-ins",
+    damage10: "+10% damage",
+    regen: "regenerate health",
+    stamina: "stamina returns faster",
+    glide: "glide on the air",
+    light: "light around you",
+    shardward: "shardfall glances off",
+    mirewalk: "walk the mire unharmed",
+    trapsense: "steam cannot scald you",
+    shade: "the white sun cannot parch you",
+    hymnward: "the hymn cannot hold you",
+    speed20: "+20% speed",
+    mana40: "+40 mana",
+    magic15: "+15% magic damage",
+    defense3: "+3 defense"
+  };
+  var relicText = (id) => (RELIC_EFFECTS[id] ?? []).map((k) => EFFECT_TEXT[k] ?? k).join(", ");
+  var shelfSlots = (renown) => 3 + (renown >= 20 ? 1 : 0) + (renown >= 40 ? 1 : 0);
 
   // src/core/math.ts
   var clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -3151,13 +7487,6 @@
     saveKey: "wildlands-save-v1"
   };
 
-  // src/game/ids.ts
-  var nextId = 0;
-  var uniqueId = () => ++nextId;
-  function reserveIds(highest) {
-    nextId = Math.max(nextId, highest);
-  }
-
   // src/game/systems/System.ts
   var System = class {
     game;
@@ -3165,6 +7494,413 @@
       this.game = game2;
     }
   };
+
+  // src/game/systems/Ailments.ts
+  var VACCINE = { seconds: 1800, against: ["tetanus", "rabies", "cholera"] };
+  var Ailments = class extends System {
+    /** Seconds each exposure condition has held (cold, heat, wet cold, scurvy). */
+    exposure = {};
+    warned = /* @__PURE__ */ new Set();
+    list() {
+      return this.game.s.ailments ??= [];
+    }
+    has(id) {
+      return this.list().some((a) => a.id === id);
+    }
+    /** The ailments showing symptoms, worst first. */
+    showing() {
+      return this.list().filter((a) => a.stage > 0).sort((a, b) => b.stage - a.stage);
+    }
+    immune(id) {
+      return (this.game.s.immune?.[id] ?? 0) > this.game.s.elapsed;
+    }
+    /**
+     * Catching something: it incubates first (unless `now`), so the journal cannot yet name it.
+     * Returns whether it took hold.
+     */
+    contract(id, now = false, source) {
+      const def = DISEASES[id], sk = this.game.skills.stats();
+      if (!def || this.immune(id) || this.has(id)) return false;
+      if (source && sk.ironGut >= 1) return false;
+      if (source === "spoiled" && sk.ironGut > 0) return false;
+      if (id === "frostbite" && sk.coldBlooded) return false;
+      const resist = sk.disease + (this.game.equipment.has("wayfarer") ? 0.2 : 0);
+      if (!now && def.kind !== "injury" && this.game.rng() < Math.min(0.7, resist)) return false;
+      if (!now && def.kind === "illness" && (this.game.s.buffs.iron_gut ?? 0) > 0 && this.game.rng() < 0.5)
+        return false;
+      const t = this.game.s.elapsed, hidden = !now && def.incubate > 0;
+      this.list().push({
+        id,
+        stage: hidden ? 0 : 1,
+        next: t + (hidden ? def.incubate : def.worsen),
+        since: t
+      });
+      if (!hidden) this.diagnose(id);
+      this.sync();
+      return true;
+    }
+    diagnose(id) {
+      const def = DISEASES[id];
+      this.game.progress.record("ail:" + id);
+      this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
+      this.game.say(
+        `${def.kind === "injury" ? "Injury" : "Diagnosis"}: ${def.name} \xB7 ${def.symptoms[0].toLowerCase()}. Treat with ${def.treat.toLowerCase()}.`,
+        "danger"
+      );
+    }
+    /** Rids you of an ailment, with whatever immunity it leaves. */
+    cure(id, quiet = false) {
+      const def = DISEASES[id], s = this.game.s;
+      s.ailments = this.list().filter((a) => a.id !== id);
+      if (def?.immunity)
+        (s.immune ??= {})[id] = s.elapsed + def.immunity * (1 + this.game.skills.get("immunity"));
+      if (!quiet && def) {
+        this.game.say(`${def.name} has passed.`, "good");
+        this.game.progress.record("cure:" + id);
+      }
+      this.sync();
+    }
+    /** Uses a treatment: each ailment it helps loses stages; those brought to nothing are gone. */
+    treat(item) {
+      let helped = false;
+      for (const a of [...this.list()]) {
+        const def = DISEASES[a.id], power = def.cures[item];
+        if (!power) continue;
+        if (def.lateCure && a.stage >= def.lateCure) {
+          this.game.say(`${def.name} has gone too far for ${item.replace(/_/g, " ")}.`, "danger");
+          continue;
+        }
+        helped = true;
+        const medic = this.game.skills.flag("fieldMedic");
+        a.stage -= power + (medic ? 1 : 0);
+        if (medic) this.game.equipment.heal(20);
+        if ((item === "bandage" || item === "splint") && this.game.skills.get("dressing"))
+          this.game.equipment.heal(this.game.skills.get("dressing"));
+        a.mend = 0;
+        if (a.stage <= 0) this.cure(a.id);
+        else a.next = this.game.s.elapsed + def.worsen;
+      }
+      this.sync();
+      return helped;
+    }
+    /** Field vaccine: immunity to the worst of the bites and the water. */
+    vaccinate() {
+      const s = this.game.s;
+      for (const id of VACCINE.against)
+        (s.immune ??= {})[id] = Math.max(s.immune[id] ?? 0, s.elapsed + VACCINE.seconds);
+      this.game.say("Vaccinated against tetanus, rabies, and cholera for a good while.", "good");
+    }
+    // ─── Their effects ─────────────────────────────────────────────────────────
+    /** The strongest pull of one effect across every showing ailment. */
+    worst(key) {
+      let out = 0;
+      for (const a of this.list())
+        out = Math.max(out, (DISEASES[a.id]?.effect[key] ?? 0) * STAGE_FORCE[a.stage]);
+      return Math.min(0.8, out);
+    }
+    /** Multiplier on movement speed. */
+    speedScale() {
+      return 1 - this.worst("speed");
+    }
+    /** Multiplier on health regeneration. */
+    regenScale() {
+      return 1 - this.worst("regen");
+    }
+    /** Keeps `disease` (the worst showing) and the illness and infection gauges in step. */
+    sync() {
+      const s = this.game.s, shown = this.showing();
+      s.disease = shown[0]?.id ?? null;
+    }
+    update(dt) {
+      const s = this.game.s, v = s.vitals, t = s.elapsed;
+      this.watchExposure(dt);
+      let illness = 0, infection = 0;
+      for (const a of [...this.list()]) {
+        const def = DISEASES[a.id];
+        if (!def) {
+          s.ailments = this.list().filter((x) => x !== a);
+          continue;
+        }
+        if (a.stage === 0) {
+          const key = a.id + ":" + a.since;
+          if (t > a.next - def.incubate / 2 && !this.warned.has(key)) {
+            this.warned.add(key);
+            this.game.say("You feel a little off.", "ink");
+          }
+          if (t >= a.next) {
+            a.stage = 1;
+            a.next = t + def.worsen;
+            this.diagnose(a.id);
+          }
+          continue;
+        }
+        const well = v.hydration > 35 && v.calories > 30 && v.bodyTemp > 35.5 && v.bodyTemp < 38.8;
+        if (this.causeGone(a.id)) a.mend = (a.mend ?? 0) + dt * 4;
+        else if (def.recover && a.stage === 1 && well) a.mend = (a.mend ?? 0) + dt;
+        if (a.mend && a.mend >= (def.recover ?? 60)) {
+          if (a.stage > 1) {
+            a.stage--;
+            a.mend = 0;
+            a.next = t + def.worsen;
+          } else {
+            this.cure(a.id);
+            continue;
+          }
+        }
+        if (t >= a.next && a.stage < 3 && !this.causeGone(a.id)) {
+          a.stage++;
+          a.next = t + def.worsen;
+          this.game.say(
+            `${def.name} worsens: ${STAGE_NAMES[a.stage].toLowerCase()}. ${def.symptoms[a.stage - 1]}.`,
+            "danger"
+          );
+        }
+        if (a.stage === 3 && def.chain && this.game.rng() < def.chain[1] * dt)
+          this.contract(def.chain[0]);
+        const f = STAGE_FORCE[a.stage], e = def.effect;
+        if (e.hp) v.health = clamp(v.health - e.hp * f * dt, 0, this.game.maxHealth());
+        if (e.hydration) v.hydration = clamp(v.hydration - e.hydration * f * dt, 0, 100);
+        if (e.calories) v.calories = clamp(v.calories - e.calories * f * dt, 0, RULES.maxVital);
+        if (e.protein) v.protein = clamp(v.protein - e.protein * f * dt, 0, RULES.maxVital);
+        if (e.stamina) v.stamina = clamp(v.stamina - e.stamina * f * dt, 0, 100);
+        const gauge = [0, 30, 58, 82][a.stage];
+        if (def.kind === "infection") infection = Math.max(infection, gauge);
+        else if (def.kind === "illness") illness = Math.max(illness, gauge);
+      }
+      if (illness > v.illness) v.illness = Math.min(illness, v.illness + dt * 2);
+      if (infection > v.infection) v.infection = Math.min(infection, v.infection + dt * 2);
+      this.sync();
+    }
+    /** Exposure ailments ease as soon as their cause is gone. */
+    causeGone(id) {
+      const v = this.game.s.vitals;
+      if (id === "hypothermia") return v.bodyTemp > 36.2;
+      if (id === "heatstroke") return v.bodyTemp < 38.2;
+      if (id === "scurvy") return v.vitamins > 45;
+      return false;
+    }
+    /** Cold, heat, wet cold, and a diet without greens bring on ailments of their own. */
+    watchExposure(dt) {
+      const v = this.game.s.vitals, hold = (key, on, secs, id) => {
+        this.exposure[key] = on ? (this.exposure[key] ?? 0) + dt : 0;
+        if (this.exposure[key] >= secs && !this.has(id)) {
+          this.exposure[key] = 0;
+          this.contract(id, id !== "pneumonia");
+        }
+      };
+      hold("cold", v.bodyTemp < 34.6, 60, "hypothermia");
+      hold("freeze", v.bodyTemp < 33.4, 45, "frostbite");
+      hold("heat", v.bodyTemp > 39.2, 60, "heatstroke");
+      hold("wetcold", v.wetness > 60 && v.bodyTemp < 35.8, 120, "pneumonia");
+      hold("greens", v.vitamins < 10, 240, "scurvy");
+    }
+  };
+
+  // src/game/systems/Armoury.ts
+  var DEFAULT = { q: 1, lvl: 0, gems: [], evo: [] };
+  var Armoury = class extends System {
+    get all() {
+      return this.game.s.armoury ??= {};
+    }
+    entry(id) {
+      return this.all[id] ?? DEFAULT;
+    }
+    known(id) {
+      return !!this.all[id];
+    }
+    /** Family and tier of a weapon; older or odd weapons are classed by what they do. */
+    classOf(id) {
+      const c = WEAPON_CLASS[id];
+      if (c) return c;
+      const tier = WEAPONS[id]?.[0] ?? 1, r = RANGED[id];
+      return [r ? r.kind === "bow" ? "bow" : "staff" : "blade", tier];
+    }
+    /** First time a weapon comes into the pack: roll its quality. */
+    acquire(id, luck = 1) {
+      if (!WEAPONS[id] || id === "fists" || this.all[id]) return;
+      const q = rollQuality(this.game.rng, luck);
+      this.all[id] = { q, lvl: 0, gems: [], evo: [] };
+      this.game.progress.record("weapon:" + id);
+      this.game.progress.record("family:" + this.classOf(id)[0]);
+      if (q >= 2)
+        this.game.say(
+          `${QUALITIES[q].name} ${itemName(id).toLowerCase()}!`,
+          q >= 3 ? "victory" : "good"
+        );
+    }
+    /** The weapon's full name: quality, name, and level. */
+    title(id) {
+      const e = this.entry(id);
+      return `${e.q !== 1 ? QUALITIES[e.q].name + " " : ""}${itemName(id)}${e.lvl ? " +" + e.lvl : ""}`;
+    }
+    /** The weapon's mods from evolutions and gems, summed. */
+    mods(id) {
+      const e = this.entry(id), [family] = this.classOf(id), evos = EVOLUTIONS[family].flat(), out = {};
+      const add = (m) => {
+        for (const [k, v] of Object.entries(m))
+          if (typeof v === "boolean") out[k] = v || !!out[k];
+          else out[k] = (out[k] ?? 0) + v;
+      };
+      for (const id2 of e.evo) {
+        const evo = evos.find((x) => x.id === id2);
+        if (evo) add(evo.mods);
+      }
+      for (const g of e.gems) if (GEMS[g]) add(GEMS[g].mods);
+      return out;
+    }
+    stats(id) {
+      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet();
+      const melee = !f.ranged, heavy = family === "greatsword" || family === "battleaxe" || family === "warhammer", shooter = family === "bow" || family === "crossbow", magic = f.ranged === "magic";
+      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (set === "gearwright" ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === "prismweave" ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
+      const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
+      const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
+      return {
+        id,
+        family,
+        tier,
+        damage,
+        reach: base[2] * (1 + (m.reach ?? 0) + (melee ? sk.reach : 0)),
+        pace: Math.max(0.35, (f.pace + (m.pace ?? 0)) / quick) * (mastery >= 15 ? 0.95 : 1),
+        crit: 0.05 + (m.crit ?? 0) + sk.crit + (mastery >= 10 ? 0.05 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.1 : 0),
+        count: m.count ?? 0,
+        pierce: (m.pierce ?? 0) + (shooter ? sk.pierce : 0),
+        bleed: ((family === "battleaxe" ? 0.15 : 0) + (m.bleed ?? 0) + (shooter ? sk.rangedBleed : 0)) * (1 + sk.bleedDmg),
+        poison: m.poison ?? 0,
+        heal: (m.heal ?? 0) + (melee ? sk.lifesteal : magic ? sk.magicLifesteal : 0),
+        execute: m.execute ?? 0,
+        berserk: m.berserk ?? 0,
+        boss: (m.boss ?? 0) + sk.bossDmg,
+        homing: (m.homing ?? 0) + (f.ranged ? sk.homing : 0),
+        mana: Math.max(
+          0.3,
+          (1 + (m.mana ?? 0) + sk.manaCost) * (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "arcanist" ? 0.8 : 1)
+        ),
+        defense: m.defense ?? 0,
+        stagger: family === "warhammer" || !!m.stagger,
+        sunder: family === "warhammer" ? 4 + (m.sunder ?? 0) : 0,
+        mark: family === "whip" ? 0.15 + (m.mark ?? 0) : shooter ? sk.rangedMark : 0,
+        combo: family === "blade" ? (m.combo ?? 1.8) + sk.combo + (mastery >= 5 ? 0.1 : 0) : 1,
+        magic: m.magic ?? 0,
+        armorPierce: Math.min(0.9, m.armorPierce ?? 0),
+        infusion: e.inf
+      };
+    }
+    // ─── The anvil ─────────────────────────────────────────────────────────────
+    atAnvil(id) {
+      const [, tier] = this.classOf(id), station = anvilFor(tier);
+      if (this.game.dev.god || this.game.near(station, 140)) return null;
+      return `Stand at a ${itemName(station).toLowerCase()} to work a tier ${tier} weapon.`;
+    }
+    owned(id) {
+      if (!WEAPONS[id] || id === "fists") return "That is not a weapon.";
+      if (!this.game.count(id)) return "You do not carry that weapon.";
+      return null;
+    }
+    pay(cost) {
+      if (this.game.dev.god) return true;
+      if (!this.game.canAfford(cost)) return false;
+      for (const [k, n] of Object.entries(cost)) this.game.remove(k, n);
+      return true;
+    }
+    record(id) {
+      return this.all[id] ??= { ...DEFAULT, gems: [], evo: [] };
+    }
+    /** Whether the weapon waits on a choice of evolution before it can climb further. */
+    pendingEvolution(id) {
+      const e = this.entry(id);
+      if (e.lvl >= 5 && e.evo.length < 1) return 0;
+      if (e.lvl >= 10 && e.evo.length < 2) return 1;
+      return -1;
+    }
+    upgrade(id) {
+      const why = this.owned(id) ?? this.atAnvil(id);
+      if (why) return { ok: false, reason: why };
+      const e = this.record(id), [, tier] = this.classOf(id);
+      if (e.lvl >= MAX_LEVEL) return { ok: false, reason: "It can be improved no further." };
+      if (this.pendingEvolution(id) >= 0)
+        return { ok: false, reason: "Choose how it evolves first." };
+      const cost = upgradeCost(tier, e.lvl);
+      if (!this.pay(cost))
+        return {
+          ok: false,
+          reason: "The anvil wants " + Object.entries(cost).map(([k, n]) => `${n} ${itemName(k).toLowerCase()}`).join(" and ") + "."
+        };
+      e.lvl++;
+      this.game.sound("craft_anvil");
+      this.game.say(`${this.title(id)}.`, e.lvl === 5 || e.lvl === 10 ? "victory" : "good");
+      this.game.progress.record("upgrade:" + e.lvl);
+      if (e.lvl === 5 || e.lvl === 10)
+        this.game.say("It can evolve: choose its path in the Armoury.", "good");
+      return { ok: true };
+    }
+    evolve(id, choice) {
+      const why = this.owned(id);
+      if (why) return { ok: false, reason: why };
+      const stage = this.pendingEvolution(id);
+      if (stage < 0) return { ok: false, reason: "Nothing to choose yet." };
+      const [family] = this.classOf(id), evo = EVOLUTIONS[family][stage === 1 ? 1 : 0][choice];
+      this.record(id).evo.push(evo.id);
+      this.game.sound("crystal");
+      this.game.say(`${itemName(id)} becomes ${evo.name}: ${evo.text.toLowerCase()}.`, "victory");
+      return { ok: true };
+    }
+    /** Rerolls quality at the anvil. */
+    reforge(id) {
+      const why = this.owned(id) ?? this.atAnvil(id);
+      if (why) return { ok: false, reason: why };
+      const [, tier] = this.classOf(id), cost = reforgeCost(tier);
+      if (!this.pay(cost)) return { ok: false, reason: "Reforging needs more materials and marks." };
+      const e = this.record(id);
+      e.q = rollQuality(this.game.rng, 1.2);
+      e.gems = e.gems.slice(0, QUALITIES[e.q].sockets);
+      this.game.sound("craft_anvil");
+      this.game.say(`Reforged: ${this.title(id)}.`, e.q >= 3 ? "victory" : "good");
+      return { ok: true };
+    }
+    infuse(id, infusion) {
+      const why = this.owned(id);
+      if (why) return { ok: false, reason: why };
+      const inf = infusionById(infusion);
+      if (!inf) return { ok: false, reason: "No such infusion." };
+      if (!this.game.dev.god && !this.game.count(inf.item))
+        return { ok: false, reason: `You need a ${itemName(inf.item).toLowerCase()}.` };
+      if (!this.game.dev.god) this.game.remove(inf.item);
+      this.record(id).inf = inf.id;
+      this.game.sound("potion");
+      this.game.say(
+        `${itemName(id)} is infused with ${inf.name.toLowerCase()}: ${inf.text.toLowerCase()}.`,
+        "good"
+      );
+      return { ok: true };
+    }
+    socket(id, gem) {
+      const why = this.owned(id);
+      if (why) return { ok: false, reason: why };
+      if (!GEMS[gem]) return { ok: false, reason: "That will not fit a socket." };
+      const e = this.record(id);
+      if (e.gems.length >= QUALITIES[e.q].sockets)
+        return {
+          ok: false,
+          reason: `A ${QUALITIES[e.q].name.toLowerCase()} weapon has no free socket.`
+        };
+      if (!this.game.dev.god && !this.game.count(gem)) return { ok: false, reason: "You have none." };
+      if (!this.game.dev.god) this.game.remove(gem);
+      e.gems.push(gem);
+      this.game.sound("crystal");
+      this.game.say(
+        `${GEMS[gem].name} set into ${itemName(id).toLowerCase()}: ${GEMS[gem].text}.`,
+        "good"
+      );
+      return { ok: true };
+    }
+  };
+
+  // src/game/ids.ts
+  var nextId = 0;
+  var uniqueId = () => ++nextId;
+  function reserveIds(highest) {
+    nextId = Math.max(nextId, highest);
+  }
 
   // src/game/systems/Bosses.ts
   var LEASH = 2200;
@@ -3180,6 +7916,12 @@
       if (!spec || !shrine) return { ok: false, reason: "The altar is silent." };
       if (this.active()) return { ok: false, reason: "A great foe is already abroad." };
       const beaten = s.bosses[boss2] ?? 0;
+      const realm = this.game.pocket.here(altar.x);
+      if (realm) {
+        if (this.game.pocket.bossDown())
+          return { ok: false, reason: "Its master is gone. Open a new expedition to face it again." };
+        free = true;
+      }
       if (!free && (beaten > 0 || shrine.item === "void_seal" || shrine.item === "spore_lure" || shrine.item === "storm_totem")) {
         if (!this.game.count(shrine.item))
           return {
@@ -3188,7 +7930,7 @@
           };
         this.game.remove(shrine.item);
       }
-      const flying = spec.move !== "walker" && spec.move !== "hopper";
+      const flying = spec.move !== "walker" && spec.move !== "hopper" && boss2 !== "warren_queen";
       const x = altar.x + (s.player.x < altar.x ? 260 : -260), y = flying ? altar.y - 260 : altar.y;
       const a = {
         id: uniqueId(),
@@ -3210,6 +7952,7 @@
         vy: 0,
         timers: { start: s.elapsed }
       };
+      if (realm) a.maxHp = a.hp = Math.round(spec.hp * this.game.pocket.hpScale());
       s.animals.push(a);
       this.game.event("burst", x, y - 60, "#ffffff");
       this.game.sound("boss", x, y - 40, 1.6);
@@ -3222,6 +7965,7 @@
       for (const m of s.animals) if (m.minion && !m.deadUntil) m.deadUntil = s.elapsed + 999999;
       s.animals = s.animals.filter((m) => !(m.minion && m.deadUntil) && !(m === a));
       this.game.progress.record("boss:" + a.type);
+      this.game.pocket.cleared(a);
       s.vitals.morale = clamp(s.vitals.morale + 30, 0, RULES.maxVital);
       this.game.say(MOBS[a.type].name + " is defeated!", "victory");
       this.game.sound("victory", a.x, a.y);
@@ -3449,6 +8193,245 @@
           }
           break;
         }
+        // ── Band I realms ──
+        case "orchard_mother": {
+          a.timers ??= {};
+          const charging = t < (a.timers.charge ?? 0);
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = charging ? a.vx ?? 0 : Math.abs(p.x - a.x) > 90 ? face * (rage ? spec.speed[1] : spec.speed[0] * 1.6) : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (!charging && this.due(a, "charge", rage ? 5 : 7)) {
+            a.vx = face * 420;
+            a.timers.charge = t + 1;
+            a.warning = 0.5;
+            this.game.sound("boss", a.x, a.y, 1);
+          }
+          if (this.due(a, "spit", 2.6))
+            this.game.combat.mobShoot(a, "brine_spit", 380, 30, rage ? 4 : 3, 0.22);
+          if (rage && this.due(a, "wave", 6)) {
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                300,
+                30,
+                "mob"
+              );
+            this.game.sound("splash", a.x, a.y, 1.4);
+          }
+          if (this.due(a, "brood", rage ? 9 : 13))
+            for (const dx of [-130, 130])
+              this.minion("bog_crab", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          break;
+        }
+        case "kiln_beast": {
+          a.timers ??= {};
+          const charging = t < (a.timers.charge ?? 0);
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = charging ? a.vx ?? 0 : Math.abs(p.x - a.x) > 160 ? face * spec.speed[0] * 1.4 : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (!charging && this.due(a, "charge", rage ? 4 : 6)) {
+            a.vx = face * 520;
+            a.timers.charge = t + 0.9;
+            a.warning = 0.5;
+            this.game.sound("boss", a.x, a.y, 1.2);
+          }
+          if (this.due(a, "breath", 3))
+            this.game.combat.mobShoot(a, "kiln_ember", 470, 30, rage ? 6 : 4, 0.16);
+          if (rage && this.due(a, "ash", 6)) this.ring(a, "ash_burst", 10, 220, 26, t);
+          if (this.due(a, "rain", rage ? 6 : 9))
+            for (let i = 0; i < 6; i++)
+              this.game.combat.spawn(
+                "kiln_ember",
+                { x: p.x + (i - 3) * 90, y: p.y - 460 },
+                Math.PI / 2,
+                200,
+                28,
+                "mob"
+              );
+          break;
+        }
+        case "warren_queen": {
+          a.timers ??= {};
+          const hidden = t < (a.timers.hide ?? 0);
+          if (hidden) {
+            a.y += 160 * dt;
+            if (t + dt >= a.timers.hide) {
+              a.x = p.x + (this.game.rng() - 0.5) * 60;
+              a.y = p.y + 30;
+              a.vy = -300;
+              for (const dir of [-1, 1])
+                this.game.combat.spawn(
+                  "shockwave",
+                  { x: a.x, y: p.y - 14 },
+                  dir > 0 ? 0 : Math.PI,
+                  320,
+                  30,
+                  "mob"
+                );
+              for (let i = 0; i < 6; i++)
+                this.game.combat.spawn(
+                  "amber_glob",
+                  { x: a.x, y: p.y - 30 },
+                  -Math.PI / 2 + (i - 2.5) * 0.28,
+                  420,
+                  24,
+                  "mob"
+                );
+              this.game.sound("slam", a.x, a.y, 1.4);
+              this.game.event("dig", a.x, p.y, "33");
+            }
+          } else this.steer(a, p.x - face * 190, p.y - 30, spec.speed[1], dt, 1.8);
+          if (!hidden && this.due(a, "burrow", rage ? 6 : 8)) {
+            a.timers.hide = t + 1.6;
+            a.warning = 1.6;
+            this.game.say("The Queen burrows into the earth!", "danger");
+          }
+          if (!hidden && this.due(a, "glob", 2.4))
+            this.game.combat.mobShoot(a, "amber_glob", 420, 26, rage ? 4 : 3, 0.2);
+          if (this.due(a, "brood", rage ? 8 : 12))
+            for (const dx of [-140, 140])
+              this.minion("warren_rat", p.x + dx, this.game.floorNear(p.x + dx, p.y - 40));
+          break;
+        }
+        // ── Band II and III realms ──
+        case "lumen_stag": {
+          a.timers ??= {};
+          const charging = t < (a.timers.charge ?? 0);
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = charging ? a.vx ?? 0 : Math.abs(p.x - a.x) > 200 ? face * spec.speed[0] * 1.6 : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (!charging && this.due(a, "charge", rage ? 4 : 6)) {
+            a.vx = face * 560;
+            a.timers.charge = t + 0.8;
+            a.warning = 0.5;
+            this.game.sound("boss", a.x, a.y, 1.1);
+          }
+          if (this.due(a, "prism", 2.4))
+            this.game.combat.mobShoot(a, "prism_bolt", 600, 34, rage ? 7 : 5, 0.16);
+          if (this.due(a, "shardfall", rage ? 5 : 8)) {
+            for (let i = 0; i < 8; i++)
+              this.game.combat.spawn(
+                "glass_shard",
+                { x: p.x + (i - 3.5) * 60, y: p.y - 480 },
+                Math.PI / 2,
+                220,
+                30,
+                "mob"
+              );
+            this.game.sound("crystal", p.x, p.y - 200, 1.2);
+          }
+          if (rage && this.due(a, "flash", 9)) this.ring(a, "lumen_orb", 10, 260, 30, t);
+          if (rage && this.due(a, "moths", 12))
+            for (const dx of [-160, 160]) this.minion("prism_moth", a.x + dx, a.y - 180);
+          break;
+        }
+        case "ossuary_hydra": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 140 ? face * (rage ? spec.speed[1] : spec.speed[0]) : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "heads", 2.2))
+            for (const lift of [-0.35, 0, 0.35])
+              this.game.combat.spawn(
+                "bone_shard",
+                { x: a.x + face * 40, y: a.y - 70 },
+                Math.atan2(p.y - 30 - (a.y - 70), p.x - a.x) + lift,
+                560,
+                32,
+                "mob"
+              );
+          if (this.due(a, "mire", 3.6))
+            this.game.combat.mobShoot(a, "mire_glob", 420, 30, rage ? 4 : 3, 0.24);
+          if (this.due(a, "brood", rage ? 8 : 12))
+            for (const dx of [-150, 150])
+              this.minion("bone_hound", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          const burning = (a.fx?.burn?.[0] ?? 0) > t;
+          if (rage && !burning && a.hp < a.maxHp * 0.5) {
+            a.hp = Math.min(a.maxHp * 0.5, a.hp + a.maxHp * 4e-3 * dt);
+            if (!a.timers.warned) {
+              a.timers.warned = 1;
+              this.game.say("The Hydra's wounds knit as fast as you cut. Burn them!", "danger");
+            }
+          }
+          break;
+        }
+        case "engine_saint": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 220 ? face * spec.speed[0] : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "bolts", 2))
+            this.game.combat.mobShoot(a, "bolt", 900, 40, rage ? 5 : 3, 0.08);
+          if (this.due(a, "steam", rage ? 4 : 6)) {
+            this.ring(a, "steam_puff", 12, 300, 36, t);
+            this.game.sound("sizzle", a.x, a.y, 1.2);
+          }
+          if (this.due(a, "cogs", rage ? 8 : 11))
+            for (const dx of [-170, 170])
+              this.minion("cog_spider", a.x + dx, this.game.floorNear(a.x + dx, a.y - 40));
+          if (rage && this.due(a, "overheat", 5)) {
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                340,
+                40,
+                "mob"
+              );
+            this.game.sound("slam", a.x, a.y, 1.3);
+          }
+          break;
+        }
+        case "mirage_tyrant": {
+          this.steer(
+            a,
+            p.x + Math.cos(t * 0.7) * 280,
+            p.y - 200 + Math.sin(t * 1.1) * 60,
+            spec.speed[1] * (rage ? 1.3 : 1),
+            dt,
+            1.6
+          );
+          if (this.due(a, "heat", 2))
+            this.game.combat.mobShoot(a, "heat_bolt", 460, 38, rage ? 3 : 2, 0.2);
+          if (this.due(a, "split", rage ? 8 : 12)) {
+            for (const dx of [-240, 0, 240]) this.minion("tyrant_mirage", p.x + dx, p.y - 220);
+            a.x = p.x + (this.game.rng() < 0.5 ? -1 : 1) * 300;
+            a.y = p.y - 240;
+            this.game.event("burst", a.x, a.y - 60, "#fff0c0");
+            this.game.say("The Tyrant splits into mirages!", "danger");
+          }
+          if (rage && this.due(a, "spray", 6)) this.ring(a, "salt_spray", 14, 380, 34, t);
+          break;
+        }
+        case "the_hymnal": {
+          a.timers ??= {};
+          a.vy = Math.min((a.vy ?? 0) + RULES.gravity * dt, RULES.terminalVelocity);
+          a.vx = Math.abs(p.x - a.x) > 240 ? face * spec.speed[0] : 0;
+          this.game.wildlife.moveBody(a, dt);
+          if (this.due(a, "toll", 4)) {
+            for (const dir of [-1, 1])
+              this.game.combat.spawn(
+                "shockwave",
+                { x: a.x, y: a.y - 14 },
+                dir > 0 ? 0 : Math.PI,
+                300,
+                42,
+                "mob"
+              );
+            this.game.sound("boss", a.x, a.y, 1.3);
+          }
+          if (this.due(a, "notes", 2.6))
+            this.game.combat.mobShoot(a, "hymn_note", 420, 38, rage ? 7 : 5, 0.22);
+          if (rage && this.due(a, "frost", 6)) this.ring(a, "frost_bolt", 14, 380, 36, t);
+          if (this.due(a, "choir", rage ? 9 : 13))
+            for (const dx of [-200, 200]) this.minion("choir_wraith", a.x + dx, a.y - 200);
+          if (!this.game.equipment.has("hymnward") && dist(a, p) < 500)
+            s.vitals.bodyTemp = clamp(s.vitals.bodyTemp - dt * 0.012, 30, 41);
+          break;
+        }
         case "unmaker": {
           this.steer(
             a,
@@ -3477,7 +8460,7 @@
         a.attackAt = t + spec.cooldown;
         this.game.combat.hurtPlayer(spec.damage, spec.name);
       }
-      if (spec.move !== "walker" && spec.move !== "hopper" && this.game.tileAt(Math.floor(a.x / TILE), Math.floor((a.y - 40) / TILE)))
+      if (spec.move !== "walker" && spec.move !== "hopper" && !(a.timers?.hide && t < a.timers.hide) && this.game.tileAt(Math.floor(a.x / TILE), Math.floor((a.y - 40) / TILE)))
         a.y -= 120 * dt;
     }
   };
@@ -3485,35 +8468,69 @@
   // src/game/systems/Combat.ts
   var bodyHeight = (a) => MOBS[a.type]?.boss ? 60 : 22;
   var bodyRadius = (a) => a.type === "boss" ? 60 : MOBS[a.type]?.boss ? a.type === "unmaker" || a.type === "sporemother" ? 90 : 70 : 30;
+  var SHOT_DISEASE = {
+    glass_shard: ["bleeding", 0.25],
+    mire_glob: ["marrow_rot", 0.2],
+    prism_bolt: ["glass_cough", 0.04]
+  };
   var Combat = class extends System {
     projectiles = [];
+    combo = 0;
+    lastSwing = -9;
     // ─── Taking and dealing damage ─────────────────────────────────────────────
     /** Harms the player through armour; returns the damage actually taken. */
-    hurtPlayer(amount, source, disease) {
+    hurtPlayer(amount, source, disease, how = "blow") {
       const s = this.game.s, p = s.player;
-      if (p.invuln > 0 || s.dead || this.game.dev.god) return 0;
-      const cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1, taken = Math.max(1, Math.round(amount * cloth - this.game.equipment.defense() * 0.5));
+      if (amount <= 0 || p.invuln > 0 || s.dead || this.game.dev.god) return 0;
+      const sk = this.game.skills.stats(), cloth = p.cloak ? 0.68 : p.coat ? 0.82 : 1;
+      let scaled = amount * this.game.pocket.damageScale() * Math.max(0.3, 1 + sk.harm);
+      if (sk.manaShield && s.mana > 0) {
+        const soak = Math.min(s.mana, scaled * 0.25);
+        s.mana -= soak;
+        scaled -= soak;
+      }
+      const taken = Math.max(1, Math.round(scaled * cloth - this.game.equipment.defense() * 0.5));
       s.vitals.health -= taken;
       s.vitals.morale = clamp(s.vitals.morale - 4, 0, RULES.maxVital);
       p.invuln = 0.7;
       p.vy = Math.min(p.vy, -160);
       this.game.sound("hurt");
       this.game.event("damage", p.x, p.y - 50, String(taken), 1);
-      if (disease && this.game.rng() < disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0))
-        this.game.contract(disease[0]);
+      const ail = this.game.ailments, blight = this.game.pocket.diseaseScale();
+      if (disease && this.game.rng() < (disease[1] + (s.vitals.hygiene < 30 ? 0.1 : 0)) * blight)
+        ail.contract(disease[0], disease[0] === "wound" || disease[0] === "poisoning");
+      if (how === "fire" ? this.game.rng() < 0.3 : false) ail.contract("burn", true);
+      else if (taken >= 22 && this.game.rng() < 0.18) ail.contract("bleeding", true);
+      if ((how === "crush" || taken >= 45) && this.game.rng() < 0.12) ail.contract("fracture", true);
       this.game.say(source + " \xB7 " + taken + " damage.", "danger");
       if (s.vitals.health <= 0) this.game.survival.update(0);
       return taken;
     }
     /** Harms a creature through its defense, knocks it back, and kills it at zero. */
-    hurtMob(a, amount, from, magic = false) {
+    hurtMob(a, amount, from, magic = false, w) {
       if (a.deadUntil || a.settler) return 0;
       if (a.type === "boss" && (WEAPONS[this.game.s.player.weapon]?.[0] ?? 0) < RULES.bossWeaponTier) {
         this.game.say("Ordinary steel glances off the Direwolf. Obsidian is required.", "danger");
         return 0;
       }
-      const spec = MOBS[a.type], crit = this.game.rng() < 0.05, raw = amount * this.game.equipment.damageBonus(magic) * (crit ? 2 : 1), taken = Math.max(1, Math.round(raw - (spec?.defense ?? 0) * 0.5));
+      const spec = MOBS[a.type], t = this.game.s.elapsed, v = this.game.s.vitals, sk = this.game.skills.stats(), shooter = w?.family === "bow" || w?.family === "crossbow", deadeye = !!(sk.deadeye && shooter && a.hp >= a.maxHp), crit = deadeye || this.game.rng() < (w?.crit ?? 0.05);
+      let k = crit ? deadeye ? 2.5 : 2 + sk.critDmg : 1;
+      if (sk.berserker) k *= 1 + 0.4 * (1 - v.health / this.game.maxHealth());
+      if (sk.skirmisher && shooter && this.game.s.player.moving) k *= 1.2;
+      if (w) {
+        if (w.execute && a.hp < a.maxHp * 0.3) k *= 1 + w.execute;
+        if (w.berserk && v.health < this.game.maxHealth() / 2) k *= 1 + w.berserk;
+        if (w.boss && (spec?.boss || a.type === "boss")) k *= 1 + w.boss;
+        if (w.infusion === "holy" && UNDEAD.has(a.type)) k *= 1.5;
+        if (magic && w.magic) k *= 1 + w.magic;
+      }
+      if (a.fx?.mark && a.fx.mark[0] > t) k *= 1 + a.fx.mark[1];
+      const cracked = (a.fx?.sunder ?? 0) > t ? 0.5 : 1, pierce = Math.min(0.9, (w?.armorPierce ?? 0) + (w?.infusion === "void" ? 0.5 : 0)), armour = (spec?.defense ?? 0) * cracked * (1 - pierce), raw = amount * this.game.equipment.damageBonus(magic) * k, taken = Math.max(1, Math.round(raw - armour * 0.5));
       a.hp -= taken;
+      if (w) {
+        this.afflict(a, w, taken);
+        if (w.id !== "fists") this.game.skills.train(w.family, taken);
+      }
       a.warning = 0;
       const dir = Math.sign(a.x - from.x) || 1;
       if (!spec?.boss && a.type !== "boss") {
@@ -3528,18 +8545,48 @@
       else this.game.wildlife.cry(a, "hurt");
       return taken;
     }
+    /** What a weapon leaves behind on a blow: wounds, poison, fire, frost, stagger, cracks, marks. */
+    afflict(a, w, taken) {
+      const t = this.game.s.elapsed, great = !!MOBS[a.type]?.boss || a.type === "boss", fx = a.fx ??= {};
+      const sk = this.game.skills.stats(), elemental = (1 + sk.infusion) * (sk.elementalist ? 1.5 : 1);
+      const dot = (key, frac, secs) => {
+        const dps = taken * frac * (key === "bleed" ? 1 : elemental) * (key === "burn" ? 1 + sk.burnDmg : 1);
+        if (!fx[key] || fx[key][1] < dps || fx[key][0] < t) fx[key] = [t + secs, dps];
+      };
+      if (w.bleed) dot("bleed", w.bleed, 3);
+      if (w.poison) dot("poison", w.poison, 4);
+      if (w.infusion === "fire") dot("burn", 0.2, 3);
+      else if (this.game.equipment.has("fire") && this.game.rng() < 0.3) dot("burn", 0.12, 3);
+      if (w.infusion === "venom") dot("poison", 0.22, 4);
+      if (w.infusion === "frost") fx.slow = t + 3;
+      if (w.stagger && !great) fx.stun = t + 0.5;
+      if (w.sunder) fx.sunder = t + w.sunder;
+      if (w.mark) fx.mark = [t + (w.mark > 0.2 ? 8 : 4), w.mark];
+      if (w.heal) this.game.equipment.heal(taken * w.heal);
+      if (w.infusion === "storm" && this.game.rng() < 0.3) {
+        const next = this.game.s.animals.filter((b) => b !== a && !b.deadUntil && !b.settler && dist(a, b) < 220).sort((m, n) => dist(a, m) - dist(a, n))[0];
+        if (next) {
+          this.game.event("burst", next.x, next.y - 20, infusionById("storm").color);
+          this.hurtMob(next, taken * 0.6, a);
+        }
+      }
+      if (w.infusion) this.game.event("burst", a.x, a.y - 20, infusionById(w.infusion).color);
+    }
     // ─── The player's weapons ──────────────────────────────────────────────────
     /** A melee swing in the facing direction: hits every creature within the arc. */
     swing(weaponId = this.game.s.player.weapon) {
-      const s = this.game.s, p = s.player, weapon = WEAPONS[weaponId] || WEAPONS.fists, face = Math.cos(p.face) >= 0 ? 1 : -1;
-      const reach = weapon[2] * 1.15, centre = { x: p.x, y: p.y - 26 };
+      const s = this.game.s, p = s.player, w = this.game.armoury.stats(WEAPONS[weaponId] ? weaponId : "fists"), face = Math.cos(p.face) >= 0 ? 1 : -1;
+      const reach = w.reach * 1.15, wide = w.family === "greatsword" ? 1.5 : 1, centre = { x: p.x, y: p.y - 26 };
       const targets = s.animals.filter((a) => {
         if (a.deadUntil || a.settler) return false;
         const cy = a.y - bodyHeight(a), dx = a.x - centre.x;
-        return Math.abs(dx) < reach + bodyRadius(a) * 0.6 && Math.abs(cy - centre.y) < 70 + bodyRadius(a) * 0.5 && dx * face > -24;
+        return Math.abs(dx) < reach + bodyRadius(a) * 0.6 && Math.abs(cy - centre.y) < (70 + bodyRadius(a) * 0.5) * wide && dx * face > -24 * wide;
       });
-      const damage = weapon[1] * (s.vitals.stamina < 15 ? 0.72 : 1);
-      for (const a of targets) this.hurtMob(a, damage, p);
+      this.combo = s.elapsed - this.lastSwing < 1.3 ? this.combo + 1 : 1;
+      this.lastSwing = s.elapsed;
+      const combo = w.family === "blade" && this.combo % 3 === 0 ? w.combo : 1, damage = w.damage * combo * (s.vitals.stamina < 15 ? 0.72 : 1);
+      if (combo > 1 && targets.length) this.game.event("burst", p.x + face * 30, p.y - 30, "#fff0a0");
+      for (const a of targets) this.hurtMob(a, damage, p, false, w);
       if (targets.length === 1) {
         const a = targets[0];
         this.game.say(
@@ -3557,25 +8604,34 @@
     fire(weaponId, target) {
       const s = this.game.s, p = s.player, spec = RANGED[weaponId];
       if (!spec) return { ok: false, reason: "That is not a ranged weapon." };
-      let damage = WEAPONS[weaponId]?.[1] ?? 10, kind = spec.projectile, extra = {};
+      const w = this.game.armoury.stats(weaponId);
+      let damage = w.damage || 10, kind = spec.projectile, extra = { weapon: w };
       if (spec.kind === "bow") {
         const arrow = this.ammo();
         if (!arrow)
           return { ok: false, reason: "No arrows. Make them at a workbench from wood and flint." };
-        this.game.remove(arrow);
+        const sk = this.game.skills.stats(), set = this.game.equipment.fullSet(), save = sk.ammoSave + (sk.quiverMaster ? 0.3 : 0) + (set && ARMOR_SETS.find((x) => x.key === set)?.bonus === "ranger" ? 0.25 : 0);
+        if (this.game.rng() >= Math.min(0.8, save)) this.game.remove(arrow);
         damage += AMMO[arrow].damage;
-        if (AMMO[arrow].effect === "fire") extra = { fire: true };
-        if (AMMO[arrow].effect === "pierce") extra = { pierce: 3 };
-        kind = arrow === "arrow" ? "arrow" : arrow;
+        if (AMMO[arrow].effect === "fire") extra.fire = true;
+        if (AMMO[arrow].effect === "pierce") extra.pierce = 3;
+        kind = spec.projectile === "bolt" ? "bolt" : arrow === "arrow" ? "arrow" : arrow;
         this.game.sound("bow");
       } else {
-        if (!this.game.equipment.spendMana(spec.mana ?? 5))
-          return { ok: false, reason: "Not enough mana." };
+        const cost = Math.max(1, Math.round((spec.mana ?? 5) * w.mana));
+        if (!this.game.equipment.spendMana(cost)) {
+          if (!this.game.skills.flag("overchannel") || s.vitals.health <= cost * 0.6 + 5)
+            return { ok: false, reason: "Not enough mana." };
+          s.vitals.health -= cost * 0.6;
+          this.game.event("burst", p.x, p.y - 30, "#c04a6a");
+        }
         this.game.sound("cast");
       }
-      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), count = spec.count ?? 1;
+      const origin = { x: p.x + (Math.cos(p.face) >= 0 ? 10 : -10), y: p.y - 30 }, angle = Math.atan2(target.y - origin.y, target.x - origin.x), bonusShots = (this.game.rng() < this.game.skills.get("extraShot") ? 1 : 0) + (spec.kind === "bow" && this.game.skills.flag("quiverMaster") ? 1 : 0), count = (spec.count ?? 1) + w.count + bonusShots, spread = spec.spread ?? (w.count || bonusShots ? 0.1 : 0), pierce = (extra.pierce ?? PROJECTILES[kind]?.pierce ?? 0) + w.pierce;
+      if (w.homing) extra.homing = w.homing;
+      extra.pierce = pierce;
       for (let i = 0; i < count; i++) {
-        const a = angle + (i - (count - 1) / 2) * (spec.spread ?? 0);
+        const a = angle + (i - (count - 1) / 2) * spread;
         this.spawn(
           kind === "fire_arrow" || kind === "crystal_arrow" ? "arrow" : kind,
           origin,
@@ -3621,14 +8677,15 @@
           this.projectiles.splice(i, 1);
           continue;
         }
-        if (spec.homing) {
+        const homing = b.homing ?? spec.homing;
+        if (homing) {
           const target = b.from === "player" ? s.animals.filter((a) => !a.deadUntil && dist(a, b) < 520).sort((m, n) => dist(m, b) - dist(n, b))[0] : p;
           if (target) {
             const ty = target === p ? p.y - 26 : target.y - bodyHeight(target), want = Math.atan2(ty - b.y, target.x - b.x), have = Math.atan2(b.vy, b.vx), speed = Math.hypot(b.vx, b.vy);
             let turn = want - have;
             while (turn > Math.PI) turn -= Math.PI * 2;
             while (turn < -Math.PI) turn += Math.PI * 2;
-            const next = have + clamp(turn, -spec.homing * dt, spec.homing * dt);
+            const next = have + clamp(turn, -homing * dt, homing * dt);
             b.vx = Math.cos(next) * speed;
             b.vy = Math.sin(next) * speed;
           }
@@ -3653,7 +8710,13 @@
             if (Math.hypot(a.x - b.x, a.y - bodyHeight(a) - b.y) > bodyRadius(a) + spec.size)
               continue;
             b.hit.add(a.id);
-            this.hurtMob(a, b.damage, b, !!RANGED[p.weapon] && RANGED[p.weapon].kind === "magic");
+            this.hurtMob(
+              a,
+              b.damage,
+              b,
+              !!RANGED[p.weapon] && RANGED[p.weapon].kind === "magic",
+              b.weapon
+            );
             if (b.fire) this.game.event("burst", a.x, a.y - 20, "#ff8a3a");
             if (b.pierce-- <= 0) {
               spent = true;
@@ -3661,7 +8724,12 @@
             }
           }
         } else if (Math.hypot(p.x - b.x, p.y - 26 - b.y) < 20 + spec.size) {
-          this.hurtPlayer(b.damage, this.shotName(b.kind));
+          this.hurtPlayer(
+            b.damage,
+            this.shotName(b.kind),
+            SHOT_DISEASE[b.kind],
+            spec.fire ? "fire" : b.kind === "falling_rock" || b.kind === "shockwave" ? "crush" : "blow"
+          );
           if ((spec.pierce ?? 0) < 90) spent = true;
         }
         if (spent) this.projectiles.splice(i, 1);
@@ -3680,7 +8748,21 @@
         eye_beam: "A burning gaze",
         flame_jet: "Flames",
         bone_shard: "Bone shards",
-        sun_bolt: "A sun bolt"
+        sun_bolt: "A sun bolt",
+        falling_rock: "Falling rock",
+        brine_spit: "Brine spit",
+        amber_glob: "Burning amber",
+        ash_burst: "Choking ash",
+        kiln_ember: "A kiln ember",
+        glass_shard: "Falling glass",
+        prism_bolt: "A prism bolt",
+        lumen_orb: "A lumen orb",
+        mire_glob: "Marrow mire",
+        steam_puff: "Scalding steam",
+        salt_spray: "Salt spray",
+        heat_bolt: "A heat bolt",
+        hymn_note: "A hymn note",
+        bolt: "A bolt"
       }[kind] ?? "A blow";
     }
   };
@@ -3690,7 +8772,7 @@
     use(id) {
       const entry = this.game.s.inventory.filter((e) => e.id === id).sort((a, b) => (a.fresh ?? Infinity) - (b.fresh ?? Infinity))[0];
       if (!entry) return { ok: false, reason: "Not in your pack." };
-      const v = this.game.s.vitals, rotten = this.game.itemState(entry) === "rotten";
+      const v = this.game.s.vitals;
       if (WEAPONS[id]) {
         this.game.s.player.weapon = id;
         this.game.sound("equip");
@@ -3725,79 +8807,77 @@
         this.game.say("Choose a nearby place for " + itemName(id) + ".");
         return { ok: true };
       }
-      const food = {
-        glowcap: [10, 3],
-        berry: [8, 0],
-        mushroom: [9, 2],
-        honey: [13, 0],
-        wheat: [4, 2],
-        potato: [14, 3],
-        raw_meat: [21, 21],
-        cooked_meat: [29, 25],
-        bread: [27, 6],
-        cactus_fruit: [11, 1],
-        raw_fish: [16, 18],
-        cooked_fish: [25, 22],
-        smoked_meat: [38, 32],
-        trail_ration: [48, 28],
-        potato_stew: [41, 20]
-      };
-      if (food[id]) {
-        v.calories = clamp(v.calories + (rotten ? 3 : food[id][0]), 0, RULES.maxVital);
-        v.protein = clamp(v.protein + (rotten ? 0 : food[id][1]), 0, RULES.maxVital);
-        v.morale = clamp(v.morale + (rotten ? -7 : 3), 0, RULES.maxVital);
-        if (rotten && this.game.rng() < 0.72)
-          this.game.contract(this.game.rng() < 0.5 ? "dysentery" : "fever");
-        if ((id === "raw_meat" || id === "raw_fish") && this.game.rng() < 0.48)
-          this.game.contract("fever");
-      } else if (id === "wild_water" || id === "boiled_water") {
-        v.hydration = clamp(v.hydration + (rotten ? 15 : 27), 0, RULES.maxVital);
-        if (id === "wild_water" && this.game.rng() < 0.38 || rotten && this.game.rng() < 0.6)
-          this.game.contract("dysentery");
-        if (id === "boiled_water" && !rotten) this.game.progress.record("drink:boiled_water");
-      } else if ([
-        "herbal_tea",
-        "poultice",
-        "fever_remedy",
-        "antibiotic",
-        "antivenom",
-        "warming_brew"
-      ].includes(id)) {
-        if (id === "herbal_tea") {
-          v.hydration = clamp(v.hydration + 22, 0, RULES.maxVital);
-          v.illness = clamp(v.illness - (rotten ? 8 : 45), 0, RULES.maxVital);
-          if (this.game.s.disease === "dysentery" && v.illness < 15) this.game.s.disease = null;
+      const state2 = this.game.itemState(entry), worth = state2 === "rotten" ? 0.1 : state2 === "spoiled" ? 0.4 : state2 === "stale" ? 0.65 : 1;
+      const ail = this.game.ailments, chance = (p) => this.game.rng() < p;
+      if (FOOD[id]) {
+        const [cal, pro, vit] = FOOD[id];
+        v.calories = clamp(v.calories + Math.max(3, cal * worth), 0, RULES.maxVital);
+        v.protein = clamp(v.protein + pro * worth, 0, RULES.maxVital);
+        v.vitamins = clamp(v.vitamins + vit * worth, 0, RULES.maxVital);
+        v.morale = clamp(v.morale + (worth < 0.5 ? -7 : MEAL_BUFFS[id] ? 8 : 3), 0, RULES.maxVital);
+        if (state2 === "rotten" && chance(0.72))
+          ail.contract(chance(0.5) ? "dysentery" : "fever", false, "food");
+        if (state2 === "spoiled" && chance(0.35)) ail.contract("food_poisoning", false, "spoiled");
+        if (RAW.has(id)) {
+          if (chance(0.48)) ail.contract("fever", false, "food");
+          if (chance(0.12)) ail.contract("tapeworm", false, "food");
         }
-        if (id === "fever_remedy") {
-          v.illness = clamp(v.illness - (rotten ? 7 : 48), 0, RULES.maxVital);
-          if (this.game.s.disease === "fever" && v.illness < 15) this.game.s.disease = null;
+        this.game.progress.record("eat:" + id);
+        const buff = MEAL_BUFFS[id];
+        if (buff && worth >= 0.65) {
+          this.game.equipment.addBuff(buff[0], buff[1] * (1 + this.game.skills.get("meals")));
+          this.game.say(`${BUFFS[buff[0]].name}: ${BUFFS[buff[0]].text.toLowerCase()}.`, "good");
         }
-        if (id === "poultice") {
-          v.infection = clamp(v.infection - (rotten ? 7 : 42), 0, RULES.maxVital);
-          if (this.game.s.disease === "wound" && v.infection < 15) this.game.s.disease = null;
+      } else if (ITEMS[id]?.[1] === "water") {
+        v.hydration = clamp(v.hydration + (state2 === "rotten" ? 15 : 27), 0, RULES.maxVital);
+        if (id === "wild_water" && chance(0.38)) ail.contract("dysentery", false, "water");
+        if (id === "brackish_water") {
+          if (chance(0.45)) ail.contract("cholera", false, "water");
+          if (chance(0.3)) ail.contract("dysentery", false, "water");
         }
-        if (id === "antibiotic") {
-          v.infection = clamp(v.infection - 70, 0, RULES.maxVital);
-          v.illness = clamp(v.illness - 55, 0, RULES.maxVital);
-          this.game.s.disease = null;
-        }
-        if (id === "antivenom") {
-          v.illness = clamp(v.illness - 65, 0, RULES.maxVital);
-          if (this.game.s.disease === "poisoning") this.game.s.disease = null;
-        }
+        if (state2 === "rotten" && chance(0.6)) ail.contract("dysentery", false, "water");
+        if (id === "boiled_water" && state2 !== "rotten")
+          this.game.progress.record("drink:boiled_water");
+        ail.treat(id);
+      } else if (ITEMS[id]?.[1] === "medicine") {
+        const weak = state2 === "rotten";
+        if (id === "herbal_tea") v.hydration = clamp(v.hydration + 22, 0, RULES.maxVital);
+        if (id === "rehydration_salts") v.hydration = clamp(v.hydration + 40, 0, RULES.maxVital);
         if (id === "warming_brew") {
           v.hydration = clamp(v.hydration + 16, 0, RULES.maxVital);
           v.bodyTemp = clamp(v.bodyTemp + 1.8, 30, 41);
           v.morale = clamp(v.morale + 8, 0, RULES.maxVital);
         }
+        if (id === "antibiotic") {
+          v.infection = clamp(v.infection - 70, 0, RULES.maxVital);
+          v.illness = clamp(v.illness - 55, 0, RULES.maxVital);
+        }
+        if (id === "poultice") v.infection = clamp(v.infection - (weak ? 7 : 42), 0, RULES.maxVital);
+        if (["herbal_tea", "fever_remedy", "antivenom"].includes(id))
+          v.illness = clamp(v.illness - (weak ? 8 : 45), 0, RULES.maxVital);
+        if (id === "field_vaccine") ail.vaccinate();
+        if (id === "iron_gut_brew") {
+          this.game.equipment.addBuff("iron_gut", MEAL_BUFFS.iron_gut_brew[1]);
+          this.game.say(`${BUFFS.iron_gut.name}: ${BUFFS.iron_gut.text.toLowerCase()}.`, "good");
+        }
+        const helped = weak ? false : ail.treat(id);
+        if (!helped && ![
+          "herbal_tea",
+          "warming_brew",
+          "antibiotic",
+          "field_vaccine",
+          "iron_gut_brew",
+          "poultice"
+        ].includes(id)) {
+          if (weak) return { ok: false, reason: "It has spoiled and lost its strength." };
+          return { ok: false, reason: "Nothing it treats ails you." };
+        }
       } else return { ok: false, reason: "This item is a crafting material." };
       this.game.remove(id);
-      this.game.sound(
-        food[id] ? "eat" : id === "wild_water" || id === "boiled_water" ? "drink" : "medicine"
-      );
+      this.game.sound(FOOD[id] ? "eat" : ITEMS[id]?.[1] === "water" ? "drink" : "medicine");
       this.game.say(
-        (rotten ? "Consumed spoiled " : "Used ") + itemName(id).toLowerCase() + ".",
-        rotten ? "danger" : "good"
+        (state2 === "rotten" || state2 === "spoiled" ? "Consumed spoiled " : "Used ") + itemName(id).toLowerCase() + ".",
+        state2 === "rotten" || state2 === "spoiled" ? "danger" : "good"
       );
       return { ok: true };
     }
@@ -3854,6 +8934,8 @@
         return { ok: false, reason: "That structure is not in your pack." };
       if ((id === "effergy" || id === "rift_gate") && this.game.s.structures.some((st2) => st2.type === id))
         return { ok: false, reason: "Only one " + itemName(id) + " may stand." };
+      if (id === "waystone" && dimensionAt(x))
+        return { ok: false, reason: "A Waystone must stand in the wildlands." };
       if (dist({ x, y }, this.game.s.player) > RULES.placeReach)
         return { ok: false, reason: "Place it within reach." };
       const [lo, hi] = regionBounds(x);
@@ -4168,8 +9250,8 @@
     }
     // Resources keep a readable footprint: trees space from trees, small finds from each other.
     nodeFits(kind, x, y) {
-      const tree = (k) => TREE_NODES.has(k);
-      const width = (k) => tree(k) ? 92 : k === "water" ? 74 : k === "cache" ? 44 : NODES[k]?.tool ? 38 : 30;
+      const tree2 = (k) => TREE_NODES.has(k);
+      const width = (k) => tree2(k) ? 92 : k === "water" ? 74 : k === "cache" ? 44 : NODES[k]?.tool ? 38 : 30;
       const key = Math.floor(x / 200);
       const others = [key - 1, key, key + 1].flatMap((k) => this.buckets.get(k) ?? []);
       if (!this.buckets.size)
@@ -4180,7 +9262,7 @@
       return others.every((n) => {
         if (Math.abs(n.y - y) > 60) return true;
         const gap = Math.abs(n.x - x);
-        if (tree(kind) !== tree(n.kind))
+        if (tree2(kind) !== tree2(n.kind))
           return gap > (kind === "water" || n.kind === "water" ? 64 : 26);
         return gap > (width(kind) + width(n.kind)) / 2;
       });
@@ -4401,6 +9483,28 @@
           return [`Weather: ${w}.`];
         }
       },
+      realm: {
+        usage: "realm <id> [tier] | realm home | realm close",
+        help: "Open a generated realm (orchard, steppe, warren, glasswood, marches, barrow, saltflats, choir) at a tier and step in, go home, or collapse it.",
+        run: ([id, tier]) => {
+          const pocket = this.game.pocket;
+          if (id === "home") return pocket.leave().ok ? ["Home."] : ["! No realm is open."];
+          if (id === "close") {
+            pocket.close();
+            return ["The realm collapses."];
+          }
+          const tpl = REALMS.find((r2) => r2.id === id);
+          if (!tpl) return ["! Usage: realm <" + REALMS.map((r2) => r2.id).join("|") + "> [1-5]"];
+          const t = Math.max(1, Math.min(5, Number(tier) || 1)), rec = pocket.record(tpl.id), god = this.game.dev.god;
+          rec.best = Math.max(rec.best, t - 1);
+          this.game.dev.god = true;
+          const r = pocket.open(tpl.id, t);
+          this.game.dev.god = god;
+          return r.ok ? [
+            `Opened the ${tpl.name}, tier ${t}${this.game.s.pocket?.mods.length ? " \xB7 " + this.game.s.pocket.mods.join(", ") : ""}.`
+          ] : ["! " + r.reason];
+        }
+      },
       pos: {
         usage: "pos",
         help: "Show where you are.",
@@ -4424,7 +9528,7 @@
     complete(line) {
       const words = line.split(/\s+/), last = (words[words.length - 1] ?? "").toLowerCase();
       if (words.length <= 1) return Object.keys(this.commands).filter((c) => c.startsWith(last));
-      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
+      const cmd = words[0].toLowerCase(), pool = cmd === "give" ? Object.keys(ITEMS) : cmd === "unlock" || cmd === "lock" ? ["all", ...RECIPES.map((r) => r.id)] : cmd === "summon" ? MOBS2 : cmd === "realm" ? [...REALMS.map((r) => r.id), "home", "close"] : cmd === "tp" ? [...BIOME_SPANS.map((b) => b.id), ...LAYERS.map((l) => l.id), ...PLACES] : cmd === "time" ? Object.keys(TIMES) : cmd === "weather" ? WEATHERS : cmd === "help" ? Object.keys(this.commands) : [];
       return words.length === 2 ? pool.filter((id) => id.startsWith(last)) : [];
     }
     /** Godmode keeps every need met; called each tick. */
@@ -4706,7 +9810,12 @@
       return t < RULES.nightEndsAt || t > RULES.nightStartsAt;
     }
     temperature() {
-      const b = this.game.biome(), layer = this.game.layer();
+      const p = this.game.s.player;
+      return this.temperatureAt(p.x, p.y);
+    }
+    /** Air temperature at a place: the region by day and night, or the rock below ground. */
+    temperatureAt(x, y) {
+      const b = biomeAt(x, y), layer = layerAt(x, y);
       if (layer.id === "upper_mines") return layer.temp + b.temp * 0.25;
       if (layer.id !== "surface") return layer.temp;
       return b.temp + (this.isNight() ? -8 : 0) + (this.game.s.weather === "rain" ? -4 : this.game.s.weather === "storm" ? -7 : 0);
@@ -4835,6 +9944,7 @@
       if (set) out.add(ARMOR_SETS.find((x) => x.key === set).bonus);
       for (const id of this.worn().accessories) for (const e of ACCESSORIES[id].effects) out.add(e);
       for (const [id, left] of Object.entries(this.game.s.buffs)) if (left > 0) out.add("buff:" + id);
+      for (const id of this.game.shelvedRelics()) for (const e of RELIC_EFFECTS[id] ?? []) out.add(e);
       if (this.townCache.at !== Math.floor(this.game.s.elapsed)) {
         this.townCache = { at: Math.floor(this.game.s.elapsed), near: this.game.town.townNear() };
       }
@@ -4852,6 +9962,11 @@
       if (fx.has("defense4")) d += 4;
       if (fx.has("void")) d += 8;
       if (fx.has("buff:ironskin")) d += 8;
+      const sk = this.game.skills.stats();
+      d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has("vanguard") ? 3 : 0);
+      if (this.fullSet() === "bonewalker") d += 3;
+      if (this.fullSet() === "amberguard") d += 2;
+      d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
     /** Multiplier on damage dealt, from sets, accessories, and buffs. */
@@ -4861,20 +9976,25 @@
       if (fx.has("damage10")) k += 0.1;
       if (fx.has("void")) k += 0.2;
       if (fx.has("buff:wrath")) k += 0.15;
+      if (fx.has("buff:fiery") || fx.has("buff:feasted")) k += 0.1;
       if (magic && (fx.has("mana40") || fx.has("magic15"))) k += 0.15;
       return k;
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + (this.fullSet() === "saltwarden" || this.fullSet() === "ashwalker" ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
-    maxHealth() {
+    /** Health from crystals and fruit alone; skills add to it. */
+    heart() {
       return this.game.s.maxHealth || CRYSTALS.baseHealth;
+    }
+    maxHealth() {
+      return this.heart() + this.game.skills.get("maxHp");
     }
     maxMana() {
       const fx = this.effects();
-      return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has("mana40") ? 40 : 0);
+      return (this.game.s.maxMana || CRYSTALS.baseMana) + (fx.has("mana40") || fx.has("arcanist") ? 40 : 0) + this.game.skills.get("maxMana");
     }
     heal(amount) {
       const v = this.game.s.vitals;
@@ -4888,10 +10008,10 @@
       const s = this.game.s;
       if (id === "life_crystal" || id === "life_fruit") {
         const cap = CRYSTALS.baseHealth + CRYSTALS.lifeMax + (id === "life_fruit" ? 100 : 0);
-        if (this.maxHealth() >= cap) return { ok: false, reason: "Your heart can hold no more." };
-        if (id === "life_fruit" && this.maxHealth() < CRYSTALS.baseHealth + CRYSTALS.lifeMax)
+        if (this.heart() >= cap) return { ok: false, reason: "Your heart can hold no more." };
+        if (id === "life_fruit" && this.heart() < CRYSTALS.baseHealth + CRYSTALS.lifeMax)
           return { ok: false, reason: "Life crystals must fill your heart first." };
-        s.maxHealth = this.maxHealth() + CRYSTALS.lifePer;
+        s.maxHealth = this.heart() + CRYSTALS.lifePer;
         this.heal(CRYSTALS.lifePer);
         this.game.remove(id);
         this.game.sound("crystal");
@@ -4913,7 +10033,7 @@
       if (potion.heal) {
         if ((s.buffs.potion_sickness ?? 0) > 0)
           return { ok: false, reason: "Your body needs a moment before another draught." };
-        this.heal(potion.heal);
+        this.heal(potion.heal * (1 + this.game.skills.get("heal")));
         this.addBuff("potion_sickness", 45);
       }
       if (potion.mana) s.mana = clamp(s.mana + potion.mana, 0, this.maxMana());
@@ -4937,12 +10057,18 @@
         }
       }
       const sinceCast = s.elapsed - (this.lastCast ?? -9);
-      s.mana = clamp(s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5), 0, this.maxMana());
+      s.mana = clamp(
+        s.mana + dt * (sinceCast > 1.2 ? 7 : 1.5) * (fx.has("buff:clear_mind") ? 2 : 1) * (1 + this.game.skills.get("manaRegen")),
+        0,
+        this.maxMana()
+      );
       let regen = 0;
       if (fx.has("regen")) regen += 0.6;
       if (fx.has("buff:regeneration")) regen += 1.2;
       if (fx.has("spores")) regen += 0.5;
       if (fx.has("home")) regen += 0.35;
+      if (fx.has("buff:well_fed") || fx.has("buff:feasted")) regen += 0.4;
+      regen *= this.game.ailments.regenScale();
       if (regen && !s.dead) this.heal(regen * dt);
       if (fx.has("stamina")) s.vitals.stamina = clamp(s.vitals.stamina + dt * 2, 0, 100);
     }
@@ -5000,7 +10126,7 @@
       if (s.dead) return { ok: false, reason: "You must recover first." };
       const held = this.game.equipment.held(), kind = this.game.equipment.useKind(held), t = s.elapsed;
       this.aim(target);
-      const pace = RANGED[held ?? ""] ? RANGED[held].delay : held && WEAPONS[held] ? Math.max(0.3, RULES.attackCooldownSeconds * 0.75) : PACE[kind] ?? 0.3;
+      const pace = RANGED[held ?? ""] ? RANGED[held].delay * this.game.armoury.stats(held).pace : held && WEAPONS[held] ? Math.max(0.3, RULES.attackCooldownSeconds * 0.75 * this.game.armoury.stats(held).pace) : PACE[kind] ?? 0.3;
       if (t < (p.usedAt ?? -9) + pace * (this.game.equipment.has("buff:mining") && (kind === "pick" || kind === "axe") ? 0.7 : 1))
         return { ok: false, reason: "" };
       if (Math.abs(target.x - p.x) > 4) p.face = target.x >= p.x ? 0 : Math.PI;
@@ -5023,7 +10149,7 @@
         const r = this.game.combat.fire(held, target);
         if (r.ok) {
           p.usedAt = t;
-          p.attackAt = t + RANGED[held].delay;
+          p.attackAt = t + RANGED[held].delay * this.game.armoury.stats(held).pace;
         }
         return r;
       }
@@ -5149,20 +10275,20 @@
       if (!this.reachable({ x: tx * TILE + 16, y: ty * TILE + 16 }, RULES.placeReach))
         return { ok: false, reason: "Too far to reach." };
       s.player.usedAt = s.elapsed;
-      const built = s.structures.filter(
+      const built2 = s.structures.filter(
         (st) => !st.fixed && Math.abs(st.x - target.x) < 22 && target.y < st.y + 6 && target.y > st.y - 60
       ).sort((a, b) => Math.abs(a.x - target.x) - Math.abs(b.x - target.x))[0];
-      if (built) {
-        if (Object.keys(built.store).length) return { ok: false, reason: "Empty it first." };
-        if (built.type === "door") this.game.town.removeDoor(built);
-        else s.structures = s.structures.filter((x) => x !== built);
+      if (built2) {
+        if (Object.keys(built2.store).length) return { ok: false, reason: "Empty it first." };
+        if (built2.type === "door") this.game.town.removeDoor(built2);
+        else s.structures = s.structures.filter((x) => x !== built2);
         this.game.drops.spawn(
-          built.type === "torch" ? "torch" : built.type,
+          built2.type === "torch" ? "torch" : built2.type,
           1,
-          built.x,
-          built.y - 16
+          built2.x,
+          built2.y - 16
         );
-        this.game.sound("crumble", built.x, built.y - 10, 0.6);
+        this.game.sound("crumble", built2.x, built2.y - 10, 0.6);
         return { ok: true };
       }
       const wall = this.game.wallAt(tx, ty);
@@ -5284,7 +10410,11 @@
         this.game.realms.socket();
         return { ok: true, action: "rift", structure: st };
       }
-      if (st.type === "portal") return this.game.realms.goHome();
+      if (st.type === "portal")
+        return this.game.pocket.here(st.x) ? this.game.pocket.leave() : this.game.realms.goHome();
+      if (st.type === "waystone") return { ok: true, action: "atlas", structure: st };
+      if (st.type === "shrine") return this.game.pocket.pray(st);
+      if (st.type === "kiln") return { ok: false, reason: "An old kiln. It still smelts ore." };
       if (st.type === "door") return this.game.town.toggleDoor(st);
       if (st.type === "bed") return this.game.town.sleep(st);
       if (st.type === "chair" || st.type === "table") {
@@ -5294,7 +10424,11 @@
       if (st.type === "torch" || st.type.startsWith("trap_"))
         return { ok: false, reason: "Nothing to do here." };
       if (st.type === "bedroll") {
-        this.game.s.vitals.fatigue = clamp(this.game.s.vitals.fatigue - 32, 0, RULES.maxVital);
+        this.game.s.vitals.fatigue = clamp(
+          this.game.s.vitals.fatigue - 32 * (1 + this.game.skills.get("rest")),
+          0,
+          RULES.maxVital
+        );
         this.game.s.vitals.stamina = 100;
         this.game.s.elapsed += 90;
         this.game.sound("rest");
@@ -5306,12 +10440,10 @@
           this.game.sound("place", st.x, st.y, 0.7);
           this.game.say("Fed the campfire with wood.", "good");
         } else return { ok: false, reason: "One wood refuels the campfire." };
-      } else if (st.type === "icebox") {
-        if (this.game.count("ice")) {
-          this.game.remove("ice");
-          st.fuel += RULES.iceboxRefuel;
-          this.game.say("Icebox cooled with fresh ice.", "good");
-        } else return { ok: false, reason: "One ice refuels the icebox." };
+      } else if (st.type === "relic_shelf") {
+        return { ok: true, action: "shelf", structure: st };
+      } else if (STORAGE[st.type]) {
+        return { ok: true, action: "larder", structure: st };
       } else if (st.type === "rain_catcher") {
         if (st.water < 1) return { ok: false, reason: "The rain catcher is empty. Wait for rain." };
         const amount = Math.min(3, Math.floor(st.water));
@@ -5406,7 +10538,8 @@
       v.stamina -= 7;
       v.hydration = clamp(v.hydration - 0.4, 0, RULES.maxVital);
       v.hygiene = clamp(v.hygiene - 0.3, 0, RULES.maxVital);
-      const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0);
+      const roll = () => Math.floor(spec.yield[0] + this.game.rng() * (spec.yield[1] - spec.yield[0] + 1)) + (tier >= 3 ? 1 : 0) + (this.game.rng() < this.game.skills.get("gather") ? 1 : 0);
+      this.game.progress.record("gather:" + node.kind);
       const form = nodeForm(node.kind), s = this.game.s;
       node.hitAt = s.elapsed;
       this.game.sound(
@@ -5415,11 +10548,11 @@
         node.y - 20
       );
       if (form === "water") {
-        const qty2 = roll();
-        this.game.add("wild_water", qty2);
+        const qty2 = roll(), id = this.game.pocket.here(node.x) ? "brackish_water" : "wild_water";
+        this.game.add(id, qty2);
         this.game.event("chip", node.x, node.y, "water");
-        this.game.say("Gathered " + qty2 + " wild water.", "good");
-        return { ok: true, id: "wild_water", qty: qty2 };
+        this.game.say("Gathered " + qty2 + " " + itemName(id).toLowerCase() + ".", "good");
+        return { ok: true, id, qty: qty2 };
       }
       this.game.event("chip", node.x, node.y - (form === "tree" ? 26 : 10), node.kind);
       if (form === "plant") {
@@ -5459,8 +10592,10 @@
     count(id) {
       return this.game.s.inventory.reduce((n, entry) => n + (entry.id === id ? entry.qty : 0), 0);
     }
+    /** Fresh, then stale (less nourishing), spoiled (may sicken), and at last rotten. */
     itemState(entry) {
-      return entry.fresh === void 0 ? "stable" : entry.fresh <= 0 ? "rotten" : entry.fresh < (ITEMS[entry.id]?.[2] || 1) * RULES.staleAtFraction ? "stale" : "fresh";
+      const life = ITEMS[entry.id]?.[2] || 1;
+      return entry.fresh === void 0 ? "stable" : entry.fresh <= 0 ? "rotten" : entry.fresh < life * 0.08 ? "spoiled" : entry.fresh < life * RULES.staleAtFraction ? "stale" : "fresh";
     }
     add(id, qty = 1, options = {}) {
       const perish = ITEMS[id]?.[2];
@@ -5474,6 +10609,8 @@
       }
       this.game.progress.record(id, qty);
       this.game.equipment.offer(id);
+      const realm = this.game.s.pocket;
+      this.game.armoury.acquire(id, realm && this.game.pocket.here() ? 1 + realm.tier * 0.25 : 1);
     }
     remove(id, qty = 1) {
       if (this.count(id) < qty) return false;
@@ -5496,6 +10633,119 @@
         (best, [id, [tool, tier]]) => tool === kind && this.count(id) ? Math.max(best, tier) : best,
         0
       );
+    }
+  };
+
+  // src/game/systems/Larder.ts
+  var ICE_IN_PACK = 700;
+  var Larder = class extends System {
+    melt = 0;
+    warned = /* @__PURE__ */ new Set();
+    spec(st) {
+      return STORAGE[st.type];
+    }
+    /** Whether a storage is cold right now. */
+    cold(st) {
+      const spec = this.spec(st);
+      if (!spec) return false;
+      if (!spec.fuel) return true;
+      if (st.type === "snow_cellar" && this.game.environment.temperatureAt(st.x, st.y - 20) <= 0)
+        return true;
+      return st.fuel > 0;
+    }
+    /** The rot multiplier inside a storage. */
+    multiplier(st) {
+      const spec = this.spec(st);
+      if (!this.cold(st)) return 1;
+      if (st.type === "cool_pit" && st.y > surfaceAt(st.x) + 60) return 0.45;
+      return spec.mult;
+    }
+    /** Seconds of cold a storage has left (Infinity if it needs none). */
+    coldLeft(st) {
+      const spec = this.spec(st);
+      if (!spec?.fuel) return Infinity;
+      const rate = st.type === "frost_chest" ? 1 : meltRate(this.game.environment.temperatureAt(st.x, st.y - 20));
+      return rate ? st.fuel / rate : Infinity;
+    }
+    /** The best cold storage close enough to cool what you carry. */
+    nearest() {
+      const p = this.game.s.player;
+      return this.game.s.structures.filter((st) => STORAGE[st.type] && dist(st, p) <= 135 && this.cold(st)).sort((a, b) => this.multiplier(a) - this.multiplier(b))[0];
+    }
+    /** Multiplier on rot in the pack from worn cooling charms. */
+    packCooling() {
+      const charm = this.game.equipment.worn().accessories.reduce((k, id) => Math.min(k, PACK_COOLING[id] ?? 1), 1);
+      return charm * Math.max(0.2, 1 - this.game.skills.get("packRot")) * (this.game.equipment.has("wayfarer") ? 0.6 : 1);
+    }
+    // ─── Stowing and taking ────────────────────────────────────────────────────
+    stow(st, id, qty = 1) {
+      const spec = this.spec(st);
+      if (!spec) return { ok: false, reason: "That is not cold storage." };
+      if (!ITEMS[id]?.[2])
+        return { ok: false, reason: "Only food, water, and medicine need the cold." };
+      const larder = st.larder ??= [];
+      const entries = this.game.s.inventory.filter((e) => e.id === id).sort((a, b) => (a.fresh ?? 0) - (b.fresh ?? 0)).slice(0, qty);
+      if (!entries.length) return { ok: false, reason: "You have none." };
+      if (larder.length + entries.length > spec.capacity)
+        return { ok: false, reason: `The ${spec.name.toLowerCase()} is full (${spec.capacity}).` };
+      for (const e of entries) larder.push({ ...e });
+      this.game.s.inventory = this.game.s.inventory.filter((e) => !entries.includes(e));
+      this.game.equipment.tidy();
+      this.game.sound("place", st.x, st.y, 0.5);
+      return { ok: true };
+    }
+    take(st, id, qty = 1) {
+      const larder = st.larder ?? [];
+      const entries = larder.filter((e) => e.id === id).sort((a, b) => (a.fresh ?? 0) - (b.fresh ?? 0)).slice(0, qty);
+      if (!entries.length) return { ok: false, reason: "None stored here." };
+      st.larder = larder.filter((e) => !entries.includes(e));
+      for (const e of entries) this.game.s.inventory.push({ ...e });
+      this.game.equipment.offer(id);
+      this.game.sound("pickup", st.x, st.y, 0.5);
+      return { ok: true };
+    }
+    /** Feeds a storage its cold: ice for iceboxes and cellars, frost shards for frost chests. */
+    refuel(st) {
+      const spec = this.spec(st);
+      if (!spec?.fuel) return { ok: false, reason: "It needs nothing to stay cold." };
+      if (!this.game.count(spec.fuel))
+        return { ok: false, reason: `It needs ${itemName(spec.fuel).toLowerCase()}.` };
+      this.game.remove(spec.fuel);
+      st.fuel += (spec.per ?? 900) * (1 + this.game.skills.get("ice"));
+      this.warned.delete(st.id);
+      this.game.sound("place", st.x, st.y, 0.6);
+      this.game.say(`${spec.name} cooled with ${itemName(spec.fuel).toLowerCase()}.`, "good");
+      return { ok: true };
+    }
+    // ─── Time passing ──────────────────────────────────────────────────────────
+    /** Ages food in the pack and in every larder, burns storages' ice, and melts ice you carry. */
+    advance(dt) {
+      const s = this.game.s, env2 = this.game.environment, air = this.game.temperature(), near = this.nearest(), cool = this.game.pocket.preserves() ? 0 : this.packCooling();
+      const coolFor = near ? Math.min(dt, this.coldLeft(near)) : 0, mult = near ? this.multiplier(near) : 1;
+      for (const e of s.inventory)
+        if (e.fresh !== void 0) e.fresh -= (coolFor * mult + (dt - coolFor)) * rotRate(air) * cool;
+      for (const st of s.structures) {
+        const spec = STORAGE[st.type];
+        if (!spec) continue;
+        const temp = env2.temperatureAt(st.x, st.y - 20), k = this.multiplier(st) * rotRate(temp);
+        for (const e of st.larder ?? []) if (e.fresh !== void 0) e.fresh -= dt * k;
+        if (spec.fuel && st.fuel > 0 && !(st.type === "snow_cellar" && temp <= 0)) {
+          st.fuel = Math.max(0, st.fuel - dt * (st.type === "frost_chest" ? 1 : meltRate(temp)));
+          if (st.fuel < 120 && st.larder?.length && !this.warned.has(st.id) && dt < 5) {
+            this.warned.add(st.id);
+            this.game.say(`Your ${spec.name.toLowerCase()} is running out of cold.`, "danger");
+          }
+        }
+      }
+      if (this.game.count("ice") && !near && air > 0) {
+        this.melt += dt * meltRate(air) * cool;
+        while (this.melt >= ICE_IN_PACK && this.game.count("ice")) {
+          this.melt -= ICE_IN_PACK;
+          this.game.remove("ice");
+          this.game.add("wild_water");
+          if (dt < 5) this.game.say("Some of your ice has melted.", "ink");
+        }
+      }
     }
   };
 
@@ -5541,7 +10791,7 @@
         return true;
       }
       const boost = fx.has("jump") || fx.has("speed") ? 1.18 : 1;
-      p.vy = -RULES.jumpVelocity * boost;
+      p.vy = -RULES.jumpVelocity * boost * (1 + this.game.skills.get("jump"));
       p.grounded = false;
       this.airJumps = 1;
       this.game.s.vitals.stamina -= RULES.jumpStamina;
@@ -5572,18 +10822,21 @@
         }
       }
       const tired = v.stamina < 12 || v.fatigue > 80;
-      const lava = this.game.inLava();
+      const lava = this.game.inLava(), water = this.game.pocket.submerged();
       if (lava && !this.wasInLava) this.game.sound("sizzle", p.x, p.y, 1.3);
       this.wasInLava = lava;
-      const speed = (lava ? 0.45 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
+      const speed = (lava ? 0.45 : water ? 0.6 : 1) * (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) * (v.illness > 60 ? 0.82 : 1) * this.game.ailments.speedScale() * this.game.pocket.moveScale() * (p.boots ? 1.12 : 1) * this.game.equipment.speedBonus() * this.game.dev.speed;
       if (dx) p.face = dx > 0 ? 0 : Math.PI;
       p.vx = dx * speed;
       const shaft = inShaft(p.x, p.y);
       if (lava) p.vy = dy < 0 ? -150 : Math.min(p.vy + 240 * dt, 60);
-      else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
+      else if (water) {
+        p.vy = dy < 0 ? Math.max(p.vy - 900 * dt, -170) : Math.min(p.vy + 260 * dt, 90);
+        if (dy < 0) v.stamina = clamp(v.stamina - dt * 3, 0, RULES.maxVital);
+      } else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
         if (p.grounded) this.jump();
         else {
-          p.vy = -RULES.climbVelocity;
+          p.vy = -RULES.climbVelocity * (1 + this.game.skills.get("climb"));
           v.stamina = clamp(v.stamina - dt * 5, 0, RULES.maxVital);
         }
       } else if (shaft && dy > 0) p.vy = Math.min(p.vy + 160 * dt, 170);
@@ -5648,10 +10901,521 @@
     }
   };
 
+  // src/game/systems/Pocket.ts
+  var UNSTABLE_SECONDS = 600;
+  var Pocket = class extends System {
+    caveInAt = 0;
+    caveIn = null;
+    hymnWas = false;
+    sunWas = false;
+    ventAt = 0;
+    stormWas = false;
+    submergedWas = false;
+    /** The latest arrival, for the interface's banner. */
+    banner = null;
+    inst() {
+      return this.game.s.pocket ?? null;
+    }
+    record(id) {
+      const all = this.game.s.realms ??= {};
+      return all[id] ??= { visits: 0, best: 0, kills: 0, relic: false };
+    }
+    /** Highest tier a realm can be opened at: one above the best cleared. */
+    maxTier(id) {
+      return Math.min(MAX_TIER, this.record(id).best + 1);
+    }
+    /** Whether the player (or a point) is inside the open realm. */
+    here(x = this.game.s.player.x) {
+      return !!this.game.s.pocket && inPocket(x);
+    }
+    has(mod) {
+      return !!this.game.s.pocket?.mods.includes(mod);
+    }
+    // ─── Scaling ───────────────────────────────────────────────────────────────
+    hpScale() {
+      const i = this.inst();
+      return i ? TIER_SCALE.hp(i.tier) * (i.mods.includes("fortified") ? 1.4 : 1) : 1;
+    }
+    /** Multiplier on harm the player takes inside the realm. */
+    damageScale() {
+      const i = this.inst();
+      if (!i || !this.here()) return 1;
+      return TIER_SCALE.damage(i.tier) * (i.mods.includes("savage") ? 1.3 : 1) * Math.max(0.5, 1 - this.game.skills.get("tierHarm"));
+    }
+    lootScale(x) {
+      const i = this.inst();
+      if (!i || !inPocket(x)) return 1;
+      const sk = this.game.skills.stats();
+      return TIER_SCALE.loot(i.tier) + i.mods.reduce((n, m) => n + (modById(m)?.loot ?? 0), 0) + sk.realmLoot + (sk.treasureSense ? 0.2 : 0);
+    }
+    speedScale(a) {
+      return this.has("frenzied") && inPocket(a.x) ? 1.3 : 1;
+    }
+    /** Multiplier on food and water drain. */
+    drainScale() {
+      return this.has("hungering") && this.here() ? 1.5 : 1;
+    }
+    gravityScale() {
+      return this.has("low_gravity") && this.here() ? 0.55 : 1;
+    }
+    diseaseScale() {
+      return this.has("blighted") && this.here() ? 2 : 1;
+    }
+    // ─── Opening, entering, and leaving ────────────────────────────────────────
+    waystoneNear() {
+      const p = this.game.s.player;
+      return this.game.s.structures.find((st) => st.type === "waystone" && dist(st, p) < 170);
+    }
+    /** Turns a realm key in a Waystone: builds a fresh realm of the chosen tier and steps in. */
+    open(realmId, tier) {
+      const tpl = realmById(realmId);
+      if (!tpl) return { ok: false, reason: "No such realm." };
+      const stone = this.waystoneNear(), god = this.game.dev.god;
+      if (!stone && !god) return { ok: false, reason: "Stand at a Waystone." };
+      if (tier < 1 || tier > this.maxTier(realmId))
+        return { ok: false, reason: `Clear tier ${TIER_NAMES[tier - 1] ?? "I"} first.` };
+      if (!god && !this.game.count(tpl.key))
+        return { ok: false, reason: `You need a ${itemName(tpl.key).toLowerCase()}.` };
+      const keep = this.game.skills.get("keySave") + (this.game.skills.flag("riftborn") ? 0.3 : 0);
+      if (!god) {
+        if (this.game.rng() < keep)
+          this.game.say("The key turns, but stays whole in your hand.", "good");
+        else this.game.remove(tpl.key);
+      }
+      const seed = Math.floor(this.game.rng() * 2 ** 31);
+      const inst = {
+        realm: realmId,
+        tier,
+        seed,
+        mods: rollMods(tier, seededRandom(seed ^ 24301)),
+        opened: this.game.s.elapsed,
+        home: stone ? { x: stone.x + 70, y: stone.y } : { x: this.game.s.player.x, y: this.game.s.player.y }
+      };
+      if (this.game.s.pocket && this.game.s.pocket.realm !== realmId)
+        this.game.say("The last realm you opened folds shut behind you.", "ink");
+      this.load(inst, true);
+      this.enter();
+      return { ok: true };
+    }
+    /** Steps back into the open realm from a Waystone. */
+    resume() {
+      if (!this.game.s.pocket) return { ok: false, reason: "No realm is open." };
+      const stone = this.waystoneNear();
+      if (!stone && !this.game.dev.god) return { ok: false, reason: "Stand at a Waystone." };
+      if (stone) this.game.s.pocket.home = { x: stone.x + 70, y: stone.y };
+      this.enter();
+      return { ok: true };
+    }
+    enter() {
+      const inst = this.game.s.pocket, tpl = realmById(inst.realm), x = POCKET.start + POCKET.arrive + 70;
+      this.game.realms.teleport(x, this.game.groundTopAt(x) + 1);
+      const rec = this.record(inst.realm);
+      rec.visits++;
+      this.game.progress.record("realm:" + inst.realm);
+      this.banner = { name: tpl.name, tier: inst.tier, mods: inst.mods, at: this.game.s.elapsed };
+      this.game.say(`You step into the ${tpl.name} \xB7 Tier ${TIER_NAMES[inst.tier]}.`, "victory");
+      this.caveInAt = this.game.s.elapsed + 20;
+    }
+    /** Leaves the realm for the Waystone you came from (it stays open behind you). */
+    leave() {
+      const inst = this.game.s.pocket, home = inst?.home ?? (() => {
+        const gate = this.game.s.structures.find((st) => st.type === "rift_gate");
+        return gate ? { x: gate.x + 80, y: gate.y } : { x: RULES.spawnX, y: 0 };
+      })();
+      this.game.realms.teleport(home.x, this.game.groundTopAt(home.x) + 1);
+      this.game.say("The Waystone draws you home.", "good");
+      return { ok: true };
+    }
+    // ─── Building the realm ────────────────────────────────────────────────────
+    /** Fills the pocket strip with a realm (clearing whatever was there), furnished if fresh. */
+    load(inst, fresh) {
+      const s = this.game.s, inside = (o) => inPocket(o.x);
+      s.nodes = s.nodes.filter((n) => !inside(n));
+      s.animals = s.animals.filter((a) => !inside(a));
+      s.structures = s.structures.filter((st) => !inside(st));
+      s.drops = s.drops.filter((d) => !inside(d));
+      s.caches = s.caches.filter((c) => !inside(c));
+      for (const edits of [s.tileEdits, s.wallEdits])
+        for (const key of Object.keys(edits))
+          if (inPocket(+key % TILE_COLS * TILE + TILE / 2)) delete edits[+key];
+      s.pocket = inst;
+      setActiveRealm(inst);
+      syncPocket();
+      this.rebuildTiles();
+      if (fresh) this.populate(inst);
+    }
+    /** Regenerates the pocket strip's tiles from the open realm, then replays its edits. */
+    rebuildTiles() {
+      const s = this.game.s, tx0 = Math.floor((POCKET.start - DIM_GAP / 2) / TILE);
+      for (let ty = 0; ty < TILE_ROWS; ty++)
+        for (let tx = tx0; tx < TILE_COLS; tx++) s.tiles[ty * TILE_COLS + tx] = baseTileAt(tx, ty);
+      for (const [key, kind] of Object.entries(s.tileEdits))
+        if (+key % TILE_COLS >= tx0) s.tiles[+key] = kind;
+    }
+    /** Empties the pocket strip (the realm collapses). */
+    close() {
+      const s = this.game.s;
+      if (!s.pocket) return;
+      const home = s.pocket.home;
+      if (this.here()) this.game.realms.teleport(home.x, this.game.groundTopAt(home.x) + 1);
+      const inside = (o) => inPocket(o.x);
+      s.nodes = s.nodes.filter((n) => !inside(n));
+      s.animals = s.animals.filter((a) => !inside(a));
+      s.structures = s.structures.filter((st) => !inside(st));
+      s.drops = s.drops.filter((d) => !inside(d));
+      for (const edits of [s.tileEdits, s.wallEdits])
+        for (const key of Object.keys(edits))
+          if (inPocket(+key % TILE_COLS * TILE + TILE / 2)) delete edits[+key];
+      s.pocket = null;
+      setActiveRealm(null);
+      syncPocket();
+      this.rebuildTiles();
+    }
+    populate(inst) {
+      const g = this.game, tpl = realmById(inst.realm), geo = activeRealm().geo, rng2 = seededRandom(inst.seed), mods = new Set(inst.mods), x0 = POCKET.start;
+      const ctx2 = {
+        rng: rng2,
+        tier: inst.tier,
+        mods,
+        x0,
+        floorAt: (x, y) => g.floorNear(x, y),
+        node: (kind, x, y) => void g.world.placeNode(kind, x, y),
+        mob: (type, x, y) => this.spawnMob(type, x, y),
+        chest: (x, y, loot) => this.chest(x, y, loot, rng2),
+        furnish: (type, x, y, kind) => void g.realms.furnish(type, x, y, kind ? { kind } : {})
+      };
+      const clear = (lx) => Math.abs(lx - geo.arrive) > 260 && Math.abs(lx - geo.arena) > 520 && lx > 160 && lx < RW - 160;
+      const spot = (lx) => {
+        const floors = geo.floors, f = floors[Math.floor(rng2() * floors.length)];
+        return ctx2.floorAt(x0 + lx, f(lx) - 30);
+      };
+      const nodes = tpl.nodes.map(([k, w]) => [
+        k,
+        mods.has("rich_veins") && tpl.ores.includes(k) ? w * 3 : w
+      ]);
+      const nNodes = Math.round(tpl.nodeCount * (mods.has("bountiful") ? 1.6 : 1));
+      for (let i = 0; i < nNodes; i++)
+        for (let attempt = 0; attempt < 6; attempt++) {
+          const lx = 200 + rng2() * (RW - 400);
+          if (!clear(lx)) continue;
+          if (g.world.placeNode(weighted(rng2, nodes), x0 + lx, spot(lx))) break;
+        }
+      const mobs = tpl.mobs.map((m) => [m, m.weight]);
+      const nMobs = Math.round(tpl.mobCount * (mods.has("swarming") ? 1.5 : 1));
+      for (let i = 0; i < nMobs; i++) {
+        const lx = 300 + (i + 0.2 + rng2() * 0.6) / nMobs * (RW - 600);
+        if (!clear(lx)) continue;
+        const m = weighted(rng2, mobs), y = spot(lx);
+        ctx2.mob(m.type, x0 + lx, m.air ? y - 140 - rng2() * 80 : y);
+      }
+      const nChests = tpl.chests + (mods.has("treasure") ? 3 : 0) + (this.game.skills.flag("treasureSense") ? 2 : 0);
+      for (let i = 0; i < nChests; i++) {
+        const lx = (i + 0.5) / nChests * (RW - 1400) + 400 + (rng2() - 0.5) * 300;
+        if (clear(lx)) ctx2.chest(x0 + lx, spot(lx), tpl.chestLoot);
+      }
+      const ax = x0 + geo.arrive;
+      g.realms.furnish("portal", ax, g.floorNear(ax, geo.floors[0](geo.arrive) - 40), {
+        kind: "home",
+        store: { [tpl.id]: 1 }
+      });
+      const bx = x0 + geo.arena;
+      g.realms.furnish("boss_altar", bx, g.floorNear(bx, geo.arenaFloor(geo.arena) - 40), {
+        kind: tpl.boss
+      });
+      const ex = x0 + RW * (0.55 + rng2() * 0.2);
+      this.spawnMob(tpl.elite, ex, g.floorNear(ex, geo.floors[0](ex - x0) - 30), {
+        ...mods.has("hunted") ? { hunter: true } : {}
+      });
+      for (const f of [0.3, 0.68]) {
+        const lx = RW * f + (rng2() - 0.5) * 400;
+        if (clear(lx)) g.realms.furnish("shrine", x0 + lx, spot(lx));
+      }
+      tpl.extra?.(geo, ctx2);
+    }
+    /** A realm shrine: a blessing for a few minutes, once. */
+    pray(st) {
+      if (st.crop === "spent") return { ok: false, reason: "The shrine is quiet now." };
+      const boons = ["swiftness", "ironskin", "regeneration", "wrath", "shine", "mining"], id = boons[Math.floor(this.game.rng() * boons.length)];
+      this.game.equipment.addBuff(id, 240);
+      st.crop = "spent";
+      this.game.sound("crystal", st.x, st.y);
+      this.game.event("burst", st.x, st.y - 30, "#fff0a0");
+      this.game.say(`The shrine blesses you: ${BUFFS[id].name} \xB7 ${BUFFS[id].text}.`, "victory");
+      return { ok: true };
+    }
+    spawnMob(type, x, y, extra = {}) {
+      const g = this.game;
+      g.world.addAnimal(type, x, y, { body: true, vx: 0, vy: 0, ...extra });
+      const a = g.s.animals[g.s.animals.length - 1];
+      a.maxHp = a.hp = Math.round(a.hp * this.hpScale());
+      return a;
+    }
+    chest(x, y, loot, rng2) {
+      const k = this.lootScale(x), store = {};
+      for (const [id, min, max, chance] of loot)
+        if (rng2() < Math.min(1, chance * (0.8 + k * 0.2)))
+          store[id] = Math.round((min + Math.floor(rng2() * (max - min + 1))) * k);
+      if (!Object.keys(store).length) store.healing_draught = 1;
+      this.game.realms.furnish("dungeon_chest", x, y, {
+        kind: this.game.s.pocket?.realm ?? "realm",
+        store
+      });
+    }
+    // ─── The great foe ─────────────────────────────────────────────────────────
+    /** Whether this expedition's boss has already fallen. */
+    bossDown() {
+      return !!this.game.s.pocket?.cleared;
+    }
+    /** The realm's boss has fallen: the tier is cleared, and the first victory yields its relic. */
+    cleared(a) {
+      const inst = this.inst(), tpl = inst && realmById(inst.realm);
+      if (!inst || !tpl || tpl.boss !== a.type) return;
+      inst.cleared = true;
+      const rec = this.record(inst.realm), first = inst.tier > rec.best;
+      rec.kills++;
+      rec.best = Math.max(rec.best, inst.tier);
+      if (!rec.relic) {
+        rec.relic = true;
+        this.game.add(tpl.relic);
+        this.game.progress.record("relic:" + tpl.relic);
+        this.game.say(`The ${itemName(tpl.relic)} is yours: a relic of the ${tpl.name}.`, "victory");
+      }
+      if (first && inst.tier < MAX_TIER)
+        this.game.say(
+          `Tier ${TIER_NAMES[inst.tier + 1]} of the ${tpl.name} can now be opened.`,
+          "good"
+        );
+      this.game.progress.record("clear:" + inst.realm);
+      this.game.progress.record("clear:tier" + inst.tier);
+    }
+    // ─── Hazards ───────────────────────────────────────────────────────────────
+    /** Height of the water (the Orchard's tide) or mud (the Marches' mire) in the open realm. */
+    waterLevel() {
+      const r = activeRealm();
+      if (r?.tpl.hazard.id === "mire") return r.geo.mire;
+      if (!r || r.tpl.hazard.id !== "tide") return null;
+      return tideLevel(r.geo, this.game.s.elapsed);
+    }
+    /** What fills the low ground: water, mire, or nothing. */
+    waterKind() {
+      const id = activeRealm()?.tpl.hazard.id;
+      return id === "tide" || id === "mire" ? id : null;
+    }
+    /** Whether the player wades in the Marches' mire. */
+    inMire() {
+      const p = this.game.s.player;
+      return this.waterKind() === "mire" && this.underwater(p.x, p.y - 12);
+    }
+    /** Strength of the choir's hymn (0 when silent, warded, or warmed by a fire). */
+    hymnLevel() {
+      const r = activeRealm();
+      if (!r || r.tpl.hazard.id !== "hymn" || !this.here()) return 0;
+      return hymnAt(this.game.s.elapsed, r.inst.seed);
+    }
+    /** Whether a fire or kiln is close enough to keep the hymn's cold off. */
+    warmed() {
+      const p = this.game.s.player;
+      return this.game.s.structures.some(
+        (st) => (st.type === "campfire" && st.fuel > 0 || st.type === "kiln" || st.type === "forge") && dist(st, p) < 170
+      );
+    }
+    /** How hard the white sun beats down on the player (0 in shade, at night, or below ground). */
+    sunLevel() {
+      const r = activeRealm(), p = this.game.s.player;
+      if (!r || r.tpl.hazard.id !== "sun" || !this.here() || this.game.isNight()) return 0;
+      if (p.y > surfaceAt(p.x) + 80) return 0;
+      return 1;
+    }
+    /** Whether the realm keeps food from rotting (the Frozen Choir). */
+    preserves() {
+      return this.here() && this.inst()?.realm === "choir";
+    }
+    /** Multiplier on the player's movement from mire and hymn. */
+    moveScale() {
+      if (!this.here()) return 1;
+      const fx = this.game.equipment.effects();
+      let k = 1;
+      if (this.inMire() && !fx.has("mirewalk")) k *= 0.55;
+      if (this.hymnLevel() > 0.5 && !fx.has("hymnward") && !this.warmed()) k *= 0.6;
+      return k;
+    }
+    /** Steam vents blowing near a point. */
+    ventNear(x, y) {
+      return this.game.s.structures.find(
+        (st) => st.type === "steam_vent" && Math.abs(st.x - x) < 34 && y <= st.y + 8 && y > st.y - 130 && ventActive(st.x, this.game.s.elapsed)
+      );
+    }
+    /** Whether a point in the realm is under water. */
+    underwater(x, y) {
+      const level = this.waterLevel();
+      if (level === null || !inPocket(x) || y <= level) return false;
+      return this.waterKind() !== "mire" || y < surfaceAt(x) + 40;
+    }
+    /** Whether the player wades below the tide and it hinders them. */
+    submerged() {
+      const p = this.game.s.player;
+      return this.waterKind() === "tide" && this.underwater(p.x, p.y - 24) && !this.game.equipment.has("swim");
+    }
+    /** Strength of the ash storm where the player stands (0 when clear, sheltered, or warded). */
+    ashLevel() {
+      const r = activeRealm(), p = this.game.s.player;
+      if (!r || r.tpl.hazard.id !== "ash" || !this.here()) return 0;
+      if (p.y > surfaceAt(p.x) + 120) return 0;
+      return ashStorm(this.game.s.elapsed, r.inst.seed);
+    }
+    /** A cave-in about to fall (for the renderer's dust). */
+    pendingCaveIn() {
+      return this.caveIn;
+    }
+    update(dt) {
+      const s = this.game.s, inst = s.pocket, p = s.player;
+      if (!inst) return;
+      if (inst.mods.includes("unstable")) {
+        const left = UNSTABLE_SECONDS - (s.elapsed - inst.opened);
+        if (left < 60 && left + dt >= 60 && this.here())
+          this.game.say("The realm shudders: one minute until it collapses!", "danger");
+        if (left <= 0) {
+          this.game.say("The unstable realm collapses around you.", "danger");
+          this.close();
+          return;
+        }
+      }
+      if (!this.here() || s.dead) return;
+      const tpl = realmById(inst.realm), fx = this.game.equipment.effects(), v = s.vitals;
+      const hard = 1 - Math.min(0.8, this.game.skills.get("hazard"));
+      if (tpl.hazard.id === "mire" && this.inMire() && !fx.has("mirewalk")) {
+        v.wetness = clamp(v.wetness + dt * 5, 0, 100);
+        v.bodyTemp = clamp(v.bodyTemp - dt * 8e-3, 30, 41);
+        v.hygiene = clamp(v.hygiene - dt * 0.4, 0, 100);
+        if (!this.submergedWas) {
+          this.game.sound("splash", p.x, p.y, 0.6);
+          this.game.say("You sink into the marrow mire. Get out before it festers.", "danger");
+        }
+        if (this.game.rng() < dt * 0.012 * hard * this.diseaseScale())
+          this.game.ailments.contract("marrow_rot");
+      }
+      if (tpl.hazard.id === "mire") this.submergedWas = this.inMire();
+      if (tpl.hazard.id === "shards") {
+        if (!this.caveIn && s.elapsed > this.caveInAt && p.y < surfaceAt(p.x) + 60) {
+          const x = p.x + (this.game.rng() - 0.5) * 200;
+          this.caveIn = { x, y: p.y - 420, at: s.elapsed + 1.3, kind: "shards" };
+          this.game.sound("crystal", x, p.y - 200, 0.8);
+        }
+        if (this.caveIn && s.elapsed >= this.caveIn.at) {
+          const c = this.caveIn, ward = fx.has("shardward");
+          for (let i = 0; i < 6; i++)
+            this.game.combat.spawn(
+              "glass_shard",
+              { x: c.x + (i - 2.5) * 30 + (this.game.rng() - 0.5) * 16, y: c.y },
+              Math.PI / 2,
+              180 + this.game.rng() * 120,
+              ward ? 0 : 20 * hard,
+              "mob"
+            );
+          this.game.sound("crumble", c.x, c.y + 400, 0.9);
+          this.caveIn = null;
+          this.caveInAt = s.elapsed + 22 + this.game.rng() * 18;
+        }
+      }
+      if (tpl.hazard.id === "traps" && !fx.has("trapsense") && s.elapsed > this.ventAt) {
+        const vent = this.ventNear(p.x, p.y);
+        if (vent) {
+          this.ventAt = s.elapsed + 0.8;
+          this.game.combat.hurtPlayer(30 * hard, "Scalding steam", void 0, "fire");
+        }
+      }
+      if (tpl.hazard.id === "sun") {
+        const sun = this.sunLevel() > 0 && !fx.has("shade");
+        if (sun && !this.sunWas)
+          this.game.say("The white sun beats down. Find shade below, or cover up.", "danger");
+        this.sunWas = sun;
+        if (sun) {
+          v.hydration = clamp(v.hydration - dt * 0.3 * hard, 0, 100);
+          v.bodyTemp = clamp(v.bodyTemp + dt * 0.012 * hard, 30, 41);
+        }
+      }
+      if (tpl.hazard.id === "hymn") {
+        const hymn = this.hymnLevel() > 0.5, guarded = fx.has("hymnward") || this.warmed();
+        if (hymn && !this.hymnWas)
+          this.game.say(
+            guarded ? "The choir begins to sing; the warmth holds it off." : "The choir begins to sing! The cold deepens. Find a fire.",
+            guarded ? "good" : "danger"
+          );
+        this.hymnWas = hymn;
+        if (hymn && !guarded) v.bodyTemp = clamp(v.bodyTemp - dt * 0.025 * hard, 30, 41);
+      }
+      if (tpl.hazard.id === "tide") {
+        const under = this.underwater(p.x, p.y - 24);
+        if (under && !fx.has("swim")) {
+          v.wetness = clamp(v.wetness + dt * 6, 0, 100);
+          v.bodyTemp = clamp(v.bodyTemp - dt * 0.012, 30, 41);
+        }
+        if (under && !this.submergedWas) this.game.sound("splash", p.x, p.y, 0.9);
+        this.submergedWas = under;
+      }
+      if (tpl.hazard.id === "ash") {
+        const ash = this.ashLevel(), storm2 = ash > 0.5;
+        if (storm2 && !this.stormWas)
+          this.game.say(
+            fx.has("ashward") ? "An ash storm rolls in; your ashcloth keeps it out." : "An ash storm rolls in! Get below ground or cover up.",
+            fx.has("ashward") ? "good" : "danger"
+          );
+        this.stormWas = storm2;
+        if (storm2 && !fx.has("ashward")) {
+          v.stamina = clamp(v.stamina - dt * 4 * hard, 0, 100);
+          v.hydration = clamp(v.hydration - dt * 0.35 * hard, 0, 100);
+          v.hygiene = clamp(v.hygiene - dt * 0.2, 0, 100);
+        }
+      }
+      if (tpl.hazard.id === "cavein") {
+        const warned = fx.has("tremor");
+        if (!this.caveIn && s.elapsed > this.caveInAt) {
+          const x = p.x + (this.game.rng() - 0.5) * 360;
+          let ty = Math.floor((p.y - 60) / TILE);
+          while (ty > 0 && !this.game.tileAt(Math.floor(x / TILE), ty)) ty--;
+          this.caveIn = { x, y: (ty + 1) * TILE, at: s.elapsed + (warned ? 2.4 : 1.1) };
+          if (warned) this.game.say("The ground trembles: rock is about to fall!", "danger");
+          this.game.sound("crumble", x, (ty + 1) * TILE, 0.7);
+        }
+        if (this.caveIn && s.elapsed >= this.caveIn.at) {
+          const c = this.caveIn;
+          for (let i = 0; i < 5; i++)
+            this.game.combat.spawn(
+              "falling_rock",
+              { x: c.x + (i - 2) * 34 + (this.game.rng() - 0.5) * 14, y: c.y + 8 },
+              Math.PI / 2,
+              60 + this.game.rng() * 80,
+              (warned ? 13 : 26) * (1 - Math.min(0.8, this.game.skills.get("hazard"))),
+              "mob"
+            );
+          this.game.sound("slam", c.x, c.y, 1);
+          this.caveIn = null;
+          this.caveInAt = s.elapsed + 16 + this.game.rng() * 16;
+        }
+      }
+      for (const a of s.animals)
+        if (a.hunter && !a.deadUntil && dist(a, p) > 500) {
+          a.homeX = p.x;
+          a.homeY = p.y;
+        }
+    }
+    /** Echoing realms: a slain monster splits into two lesser copies (once). */
+    echo(a) {
+      if (!this.has("echoing") || !inPocket(a.x) || a.echo || MOBS[a.type]?.boss || a.minion) return;
+      for (const dx of [-24, 24]) {
+        const c = this.spawnMob(a.type, a.x + dx, a.y - 10, { echo: true });
+        c.maxHp = c.hp = Math.max(10, Math.round(c.maxHp * 0.4));
+        c.id = uniqueId();
+      }
+      this.game.event("burst", a.x, a.y - 20, "#c8b0ff");
+    }
+  };
+
   // src/game/systems/Progress.ts
   var Progress = class extends System {
     record(key, qty = 1) {
       this.game.s.tutorial.tally[key] = (this.game.s.tutorial.tally[key] || 0) + qty;
+      this.game.skills.noted(key, qty);
       this.advanceTutorial();
       this.advanceChapter();
     }
@@ -5992,6 +11756,202 @@
     }
   };
 
+  // src/game/systems/Skills.ts
+  var ZERO = () => Object.fromEntries(
+    [
+      ...new Set(SKILLS.flatMap((n) => Object.keys(n.stats))),
+      ...CODEX.flatMap((p) => Object.keys(p.bonus))
+    ].map((k) => [k, 0])
+  );
+  var Skills = class extends System {
+    cache = null;
+    get meta() {
+      return this.game.s.meta ??= { renown: 0, skills: [], mastery: {} };
+    }
+    // ─── Renown ────────────────────────────────────────────────────────────────
+    renown() {
+      return this.meta.renown;
+    }
+    level() {
+      return renownLevel(this.meta.renown);
+    }
+    /** Renown into the current level, and what the level needs, for the bar. */
+    progress() {
+      const l = this.level();
+      if (l >= MAX_RENOWN) return [1, 1];
+      return [this.meta.renown - renownFor(l), renownFor(l + 1) - renownFor(l)];
+    }
+    points() {
+      const spent = this.meta.skills.reduce((n, id) => n + (skillById(id)?.cost ?? 0), 0);
+      return this.level() - 1 - spent;
+    }
+    gain(amount) {
+      if (amount <= 0) return;
+      const before = this.level();
+      this.meta.renown += amount * (1 + this.get("xp"));
+      const after = this.level();
+      if (after > before) {
+        this.game.sound("victory");
+        this.game.say(
+          `Renown ${after}! A skill point to spend (${this.points()} unspent) \xB7 Gear \u203A Skills.`,
+          "victory"
+        );
+      }
+    }
+    /** Renown for what the record notes: kills, crafts, places, bosses, and firsts. */
+    noted(key, qty) {
+      const [kind, what] = key.split(":"), first = (this.game.s.tutorial.tally[key] ?? 0) === qty ? 3 : 1;
+      if (!what) return;
+      let xp = 0;
+      if (kind === "kill") {
+        const spec = MOBS[what];
+        xp = Math.max(2, Math.round((spec?.hp ?? 40) / (spec?.boss ? 4 : 6))) * first;
+      } else if (kind === "boss") xp = 250;
+      else if (kind === "craft")
+        xp = (3 + 2 * (RECIPES.find((r) => r.id === what)?.tier ?? 1)) * first;
+      else if (kind === "place") xp = 4 * first;
+      else if (kind === "visit") xp = 40;
+      else if (kind === "realm") xp = 15;
+      else if (kind === "clear" && what.startsWith("tier")) xp = 120 * Number(what.slice(4));
+      else if (kind === "upgrade") xp = 5 * Number(what);
+      else if (kind === "settler") xp = 60;
+      else if (kind === "cure") xp = 15;
+      else if (kind === "gather") xp = 1;
+      else if (kind === "eat" && first > 1) xp = 6;
+      this.gain(xp * qty);
+    }
+    // ─── The trees ─────────────────────────────────────────────────────────────
+    has(id) {
+      return this.meta.skills.includes(id);
+    }
+    spentIn(tree2) {
+      return this.meta.skills.map((id) => skillById(id)).filter((n) => n?.tree === tree2).reduce((k, n) => k + (n?.cost ?? 0), 0);
+    }
+    /** Why a skill cannot be learned, or null. */
+    blocked(id) {
+      const n = skillById(id);
+      if (!n) return "No such skill.";
+      if (this.has(id)) return "Already learned.";
+      if (this.spentIn(n.tree) < ROW_POINTS[n.row])
+        return `Spend ${ROW_POINTS[n.row]} points in ${TREES.find((t) => t.id === n.tree)?.name} first.`;
+      if (this.points() < n.cost) return `It needs ${n.cost} skill point${n.cost > 1 ? "s" : ""}.`;
+      return null;
+    }
+    learn(id) {
+      const why = this.blocked(id);
+      if (why) return { ok: false, reason: why };
+      this.meta.skills.push(id);
+      this.cache = null;
+      const n = skillById(id);
+      this.game.sound(n.keystone ? "crystal" : "page");
+      this.game.say(`Learned ${n.name}: ${n.text}.`, n.keystone ? "victory" : "good");
+      return { ok: true };
+    }
+    respec() {
+      if (!this.meta.skills.length) return { ok: false, reason: "No skills to unlearn." };
+      if (!this.game.dev.god) {
+        if (!this.game.canAfford(RESPEC_COST))
+          return {
+            ok: false,
+            reason: "Unlearning costs " + Object.entries(RESPEC_COST).map(([k, n]) => `${n} ${itemName(k).toLowerCase()}`).join(" and ") + "."
+          };
+        for (const [k, n] of Object.entries(RESPEC_COST)) this.game.remove(k, n);
+      }
+      this.meta.skills = [];
+      this.cache = null;
+      this.game.say("Your skills are unlearned; every point is yours to spend again.", "good");
+      return { ok: true };
+    }
+    // ─── The Codex ─────────────────────────────────────────────────────────────
+    /** How far a page has come: entries found, and needed. */
+    page(p) {
+      const tally = this.game.s.tutorial.tally;
+      if (p.count) {
+        const n = Object.keys(tally).filter((k) => k.startsWith(p.prefix) && tally[k] > 0).length;
+        return [Math.min(n, p.count), p.count];
+      }
+      return [p.entries.filter((e) => (tally[p.prefix + e] ?? 0) > 0).length, p.entries.length];
+    }
+    pageDone(p) {
+      const [a, b] = this.page(p);
+      return a >= b;
+    }
+    // ─── Everything added up ───────────────────────────────────────────────────
+    stats() {
+      const key = this.meta.skills.join(",") + "|" + Math.floor(this.game.s.elapsed / 2);
+      if (this.cache?.key === key) return this.cache.stats;
+      const out = ZERO();
+      const add = (st) => {
+        for (const [k, v] of Object.entries(st)) out[k] = (out[k] ?? 0) + v;
+      };
+      for (const id of this.meta.skills) {
+        const n = skillById(id);
+        if (n) add(n.stats);
+      }
+      for (const p of CODEX) if (this.pageDone(p)) add(p.bonus);
+      this.cache = { key, stats: out };
+      return out;
+    }
+    get(k) {
+      return this.stats()[k] ?? 0;
+    }
+    flag(k) {
+      return this.get(k) > 0;
+    }
+    // ─── The relic shelf ───────────────────────────────────────────────────────
+    shelfSlots() {
+      return shelfSlots(this.level());
+    }
+    /** Relics on every shelf, as many as renown allows. */
+    shelved() {
+      const out = [];
+      for (const st of this.game.s.structures)
+        if (st.type === "relic_shelf") {
+          for (const id of Object.keys(st.store))
+            if (RELIC_EFFECTS[id] && !out.includes(id)) out.push(id);
+        }
+      return out.slice(0, this.shelfSlots());
+    }
+    shelve(st, id) {
+      if (!RELIC_EFFECTS[id])
+        return { ok: false, reason: "Only relics and great trophies rest on the shelf." };
+      if (!this.game.count(id)) return { ok: false, reason: "You do not carry it." };
+      if (this.shelved().length >= this.shelfSlots())
+        return { ok: false, reason: `The shelf holds ${this.shelfSlots()} relics at your renown.` };
+      this.game.remove(id);
+      st.store[id] = 1;
+      this.game.sound("crystal", st.x, st.y);
+      this.game.say(`${itemName(id)} set on the shelf: its gift is yours wherever you roam.`, "good");
+      return { ok: true };
+    }
+    unshelve(st, id) {
+      if (!st.store[id]) return { ok: false, reason: "It is not on this shelf." };
+      delete st.store[id];
+      this.game.add(id);
+      return { ok: true };
+    }
+    // ─── Weapon mastery ────────────────────────────────────────────────────────
+    masteryXp(family) {
+      return this.meta.mastery[family] ?? 0;
+    }
+    mastery(family) {
+      return masteryLevel(this.masteryXp(family));
+    }
+    /** Damage dealt trains the family that dealt it. */
+    train(family, damage) {
+      const before = this.mastery(family);
+      this.meta.mastery[family] = this.masteryXp(family) + damage;
+      const after = this.mastery(family);
+      if (after > before) {
+        const title = masteryTitle(after);
+        this.game.say(
+          `${family[0].toUpperCase() + family.slice(1)} mastery ${after}${after % 5 === 0 ? " \xB7 " + title : ""}.`,
+          after % 5 === 0 ? "victory" : "good"
+        );
+      }
+    }
+  };
+
   // src/game/systems/Survival.ts
   var Survival = class extends System {
     wash() {
@@ -6007,24 +11967,19 @@
       this.game.say("Washed with water. Infection risk eases, but your clothes are damp.", "good");
       return { ok: true };
     }
+    /** A diagnosis that shows at once (the incubating path is Ailments.contract). */
     contract(disease) {
-      this.game.s.disease = disease;
-      if (disease === "wound")
-        this.game.s.vitals.infection = Math.max(this.game.s.vitals.infection, 22);
-      else this.game.s.vitals.illness = Math.max(this.game.s.vitals.illness, 24);
-      this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
-      this.game.say(
-        "Diagnosis: " + DISEASES[disease].name + ". See Field Notes for treatment.",
-        "danger"
-      );
+      if (!DISEASES[disease]) return;
+      this.game.ailments.cure(disease, true);
+      this.game.ailments.contract(disease, true);
+      const v = this.game.s.vitals;
+      if (DISEASES[disease].kind === "infection") v.infection = Math.max(v.infection, 22);
+      else v.illness = Math.max(v.illness, 24);
     }
     advanceDecay(dt) {
-      const icebox = this.game.near("icebox", 135);
-      const cooledFor = icebox ? Math.min(dt, icebox.fuel) : 0;
-      for (const e of this.game.s.inventory)
-        if (e.fresh !== void 0) e.fresh -= cooledFor * RULES.cooledSpoilageRate + (dt - cooledFor);
+      this.game.larder.advance(dt);
       for (const st of this.game.s.structures)
-        if (st.fuel > 0 && ["campfire", "icebox", "lantern"].includes(st.type))
+        if (st.fuel > 0 && ["campfire", "lantern"].includes(st.type))
           st.fuel = Math.max(0, st.fuel - dt);
       for (const n of this.game.s.nodes)
         if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) {
@@ -6079,6 +12034,7 @@
         morale: 30
       });
       this.game.s.disease = null;
+      this.game.s.ailments = [];
       this.game.s.elapsed += 600;
       for (const e of this.game.s.inventory)
         if (ITEMS[e.id]?.[1] === "material" || ITEMS[e.id]?.[1] === "ore")
@@ -6105,7 +12061,7 @@
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const cold2 = this.game.temperature();
+      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
@@ -6117,15 +12073,18 @@
       );
       let target = 37 + (cold2 - (underground ? 6 : 15)) * 0.19 - v.wetness * 0.022 + (fire ? 4.5 : 0) + (shelter ? 1.8 : 0) + (p.cloak && cold2 < 15 ? 2.7 : 0) + (p.coat && cold2 < 15 ? 1.4 : 0);
       if (this.game.equipment.has("cold")) target = Math.max(target, 36.8);
+      if ((this.game.s.buffs.warm_belly ?? 0) > 0 && cold2 < 15) target += 2.2;
       target = clamp(target, 30, 41);
       v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
+      const drain = this.game.pocket.drainScale(), sk = this.game.skills.stats(), thirst = drain * Math.max(0.3, 1 + sk.thirst), hunger = drain * Math.max(0.3, 1 + sk.calories);
       v.hydration = clamp(
-        v.hydration - dt * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0) + (this.game.s.disease === "dysentery" ? 0.055 : 0)),
+        v.hydration - dt * thirst * (0.045 + (cold2 > 26 ? 0.045 : 0) + (cold2 > 40 ? p.ward ? 0.05 : 0.14 : 0)),
         0,
         100
       );
-      v.calories = clamp(v.calories - dt * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
+      v.calories = clamp(v.calories - dt * hunger * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
       v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
+      v.vitamins = clamp(v.vitamins - dt * hunger * 0.012, 0, RULES.maxVital);
       v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
       v.hygiene = clamp(
         v.hygiene - dt * (this.game.biome().id === "marsh" ? 0.025 : 0.011),
@@ -6133,20 +12092,12 @@
         RULES.maxVital
       );
       v.stamina = clamp(
-        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2),
+        v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) * ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0 ? 1.4 : 1) * (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)),
         0,
         100
       );
-      if (this.game.s.disease && ["dysentery", "fever", "poisoning"].includes(this.game.s.disease))
-        v.illness = clamp(
-          v.illness + dt * (this.game.s.disease === "poisoning" ? 0.07 : 0.025),
-          0,
-          RULES.maxVital
-        );
-      else v.illness = clamp(v.illness - dt * 0.015, 0, RULES.maxVital);
-      if (this.game.s.disease === "wound")
-        v.infection = clamp(v.infection + dt * (v.hygiene < 35 ? 0.045 : 0.02), 0, RULES.maxVital);
-      else v.infection = clamp(v.infection - dt * 0.013, 0, RULES.maxVital);
+      v.illness = clamp(v.illness - dt * 0.015, 0, RULES.maxVital);
+      v.infection = clamp(v.infection - dt * 0.013, 0, RULES.maxVital);
       if (v.hygiene < 20 && v.infection > 0)
         v.infection = clamp(v.infection + dt * 0.024, 0, RULES.maxVital);
       const threats = this.game.s.animals.some(
@@ -6158,6 +12109,7 @@
         100
       );
       const burning = this.lavaBurn();
+      if (burning && this.game.rng() < dt * 0.08) this.game.ailments.contract("burn", true);
       const harm = burning + this.heat() + (v.hydration <= 0 ? 0.15 : 0) + (v.calories <= 0 ? 0.11 : 0) + (v.protein <= 0 ? 0.04 : 0) + (v.bodyTemp < 35 || v.bodyTemp > 39 ? 0.09 : 0) + (v.illness > 70 ? 0.08 : 0) + (v.infection > 65 ? 0.1 : 0);
       const most = this.game.maxHealth();
       if (harm) v.health = clamp(v.health - harm * dt, 0, most);
@@ -6211,7 +12163,8 @@
     }
     groundTopAt(x) {
       const tx = clamp(Math.floor(x / TILE), 0, TILE_COLS - 1), dim = dimensionAt(x);
-      const from = dim?.id === "mycelia" ? Math.max(0, Math.floor((MYC.floor(x - dim.start) - 96) / TILE)) : 0;
+      const realm = dim === POCKET ? activeRealm() : null;
+      const from = dim?.id === "mycelia" ? Math.max(0, Math.floor((MYC.floor(x - dim.start) - 96) / TILE)) : realm?.tpl.sky === "cavern" ? Math.max(0, Math.floor((realm.geo.floors[0](x - POCKET.start) - 96) / TILE)) : 0;
       for (let ty = from; ty < TILE_ROWS; ty++) if (this.tileAt(tx, ty)) return ty * TILE;
       return WORLD_H - TILE;
     }
@@ -6487,7 +12440,7 @@
       const who = settlerById(settlerId), offer = who?.stock.find(([id]) => id === item);
       if (!who || !offer) return { ok: false, reason: "That is not for sale." };
       if (!this.nearSettler(settlerId)) return { ok: false, reason: `Stand beside ${who.name}.` };
-      const cost = offer[1] * qty;
+      const cost = Math.max(1, Math.round(offer[1] * qty * (1 - this.game.skills.get("haggle"))));
       if (this.game.count("coin") < cost)
         return { ok: false, reason: `That costs ${cost} silver marks.` };
       this.game.remove("coin", cost);
@@ -6512,7 +12465,7 @@
     sleep(bed) {
       const s = this.game.s;
       s.spawn = { x: bed.x, y: bed.y };
-      s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45);
+      s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45 * (1 + this.game.skills.get("rest")));
       s.vitals.stamina = 100;
       if (this.game.isNight()) {
         const now = this.game.timeOfDay(), until = (6 * 60 - now + 24 * 60) % (24 * 60);
@@ -6561,13 +12514,13 @@
         const face = Math.cos(p.face) >= 0 ? 1 : -1;
         const r = this.game.combat.fire(p.weapon, { x: p.x + face * 400, y: p.y - 30 });
         if (r.ok) {
-          p.attackAt = this.game.s.elapsed + RANGED[p.weapon].delay;
+          p.attackAt = this.game.s.elapsed + RANGED[p.weapon].delay * this.game.armoury.stats(p.weapon).pace;
           p.usedAt = this.game.s.elapsed;
         }
         return { ...r, hit: false };
       }
       if (v.stamina < RULES.attackStamina) return { ok: false, reason: "Too exhausted to strike." };
-      p.attackAt = this.game.s.elapsed + RULES.attackCooldownSeconds;
+      p.attackAt = this.game.s.elapsed + RULES.attackCooldownSeconds * this.game.armoury.stats(p.weapon).pace;
       p.usedAt = this.game.s.elapsed;
       v.stamina -= RULES.attackStamina;
       v.hydration = clamp(v.hydration - 0.25, 0, RULES.maxVital);
@@ -6598,7 +12551,13 @@
         this.cry(animal, "hurt");
       }
       const spec = MOBS[animal.type];
-      animal.deadUntil = this.game.s.elapsed + (animal.type === "boss" || spec?.boss || animal.minion ? 999999 : spec?.respawn ?? 120);
+      if (spec && spec.damage <= 0 && spec.sight > 0) {
+        animal.deadUntil = this.game.s.elapsed + (animal.minion ? 999999 : spec.respawn);
+        this.game.event("burst", animal.x, animal.y - 20, "#fff4e0");
+        return;
+      }
+      animal.deadUntil = this.game.s.elapsed + (animal.type === "boss" || spec?.boss || animal.minion || animal.echo ? 999999 : spec?.respawn ?? 120);
+      this.game.pocket.echo(animal);
       if (animal.type === "boss") {
         const cfg = BOSSES[this.game.s.altar.level - 1];
         for (const [id, qty] of Object.entries(cfg.rewards)) this.game.add(id, qty);
@@ -6614,19 +12573,24 @@
         return;
       }
       const at = animal.x === void 0 ? this.game.s.player : animal;
+      const breath = this.game.skills.get("killStamina");
+      if (breath) this.game.s.vitals.stamina = clamp(this.game.s.vitals.stamina + breath, 0, 100);
+      const more = this.game.pocket.lootScale(at.x);
       if (spec && !animal.minion && animal.type !== "deer") {
         const coins = Math.max(
           1,
-          Math.round(spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1))
+          Math.round(
+            spec.hp / 20 * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1) * more * (1 + this.game.skills.get("coins"))
+          )
         );
         this.game.drops.spawn("coin", coins, at.x, at.y - 20);
       }
       if (spec) {
         for (const [id, min, max, chance] of spec.loot)
-          if (this.game.rng() < chance)
+          if (this.game.rng() < chance * (1 + this.game.skills.get("luck")))
             this.game.drops.spawn(
               id,
-              min + Math.floor(this.game.rng() * (max - min + 1)),
+              Math.max(1, Math.round((min + Math.floor(this.game.rng() * (max - min + 1))) * more)),
               at.x,
               at.y - 20
             );
@@ -6653,11 +12617,46 @@
         }
         return;
       }
+      this.afflict(a, dt);
+      if (a.deadUntil) return;
       const p = s.player;
       if (Math.abs(a.x - p.x) > 2600 && !MOBS[a.type]?.boss && a.type !== "boss") return;
       if (MOBS[a.type]?.boss) return this.game.bosses.step(a, dt);
       if (a.body) return this.stepBody(a, dt);
       this.stepLegacy(a, dt);
+    }
+    /** Some bites carry worse than a wound: rabies from wolves and rats, spores, void rot. */
+    bite(a) {
+      const carried = BITE_DISEASES[a.type];
+      if (carried && this.game.rng() < carried[1] * this.game.pocket.diseaseScale())
+        this.game.ailments.contract(carried[0]);
+    }
+    /** Bleeding, burning, and poison wear a creature down; stuns and slows run out. */
+    afflict(a, dt) {
+      const fx = a.fx, t = this.game.s.elapsed;
+      if (!fx) return;
+      let harm = 0;
+      for (const k of ["bleed", "burn", "poison"]) {
+        const d = fx[k];
+        if (!d) continue;
+        if (t >= d[0]) delete fx[k];
+        else harm += d[1] * dt;
+      }
+      if (fx.mark && t >= fx.mark[0]) delete fx.mark;
+      if (!harm) return;
+      a.hp -= harm;
+      a.dotShown = (a.dotShown ?? 0) + harm;
+      if (a.dotShown >= 12) {
+        this.game.event(
+          "damage",
+          a.x,
+          a.y - 44,
+          String(Math.round(a.dotShown)),
+          fx.burn ? 3 : fx.poison ? 4 : 5
+        );
+        a.dotShown = 0;
+      }
+      if (a.hp <= 0) this.kill(a);
     }
     /** Surface animals, tunnel bats, hellhounds, and the Direwolf: kept to their floor lines. */
     stepLegacy(a, dt) {
@@ -6702,6 +12701,7 @@
             (boss2 ? "Direwolf" : mobName(a.type)) + " attack!",
             boss2 ? ["wound", 0.4] : spec?.disease
           );
+          this.bite(a);
         }
       }
       if (a.howlCue && s.elapsed >= a.howlCue) {
@@ -6769,7 +12769,7 @@
     stepBody(a, dt) {
       const s = this.game.s, p = s.player, spec = MOBS[a.type];
       if (!spec) return;
-      const d = dist(a, p), hunting = spec.sight > 0 && d < spec.sight && !s.dead, face = Math.sign(p.x - a.x) || 1, [walk, run] = spec.speed, t = s.elapsed;
+      const t = s.elapsed, d = dist(a, p), hunting = spec.sight > 0 && d < spec.sight && !s.dead, face = Math.sign(p.x - a.x) || 1, stunned = (a.fx?.stun ?? 0) > t, pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1), [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace];
       a.timers ??= {};
       if (d < 900 && Math.random() < dt * 0.04) this.cry(a, "call");
       if (spec.move === "walker" || spec.move === "hopper") {
@@ -6824,12 +12824,25 @@
         this.moveBody(a, dt, true);
       }
       if (Math.abs(a.vx ?? 0) > 5) a.angle = (a.vx ?? 0) > 0 ? 0 : Math.PI;
-      if (!hunting) return;
+      if (!hunting || stunned) return;
       const cy = a.y - 22;
       if (Math.abs(p.x - a.x) < spec.reach * 0.6 + 10 && Math.abs(p.y - 26 - cy) < spec.reach * 0.6 + 20 && t >= a.attackAt) {
         a.attackAt = t + spec.cooldown * 0.6;
+        if (spec.damage <= 0) {
+          a.deadUntil = t + spec.respawn;
+          this.game.event("burst", a.x, a.y - 20, "#fff4e0");
+          if (a.type === "mirage") this.game.say("It was only a mirage.", "ink");
+          return;
+        }
         this.cry(a, "attack");
-        this.game.combat.hurtPlayer(spec.damage, mobName(a.type) + " attack!", spec.disease);
+        const taken = this.game.combat.hurtPlayer(
+          spec.damage,
+          mobName(a.type) + " attack!",
+          spec.disease
+        );
+        const thorns = this.game.skills.get("thorns") + (this.game.equipment.has("vanguard") ? 0.25 : 0);
+        if (taken && thorns) this.game.combat.hurtMob(a, taken * thorns, p);
+        this.bite(a);
       }
       if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {
         a.timers.shoot = t + spec.cooldown + this.game.rng() * 0.6;
@@ -6849,7 +12862,8 @@
   };
 
   // src/game/SaveSystem.ts
-  var LAYOUT = 4;
+  var LAYOUT = 5;
+  var LAYOUT4_COLS = 1918;
   var LAYOUT3_COLS = 938;
   var OLD_REGION_WIDTH = 1200;
   var SaveSystem = class extends System {
@@ -6916,6 +12930,9 @@
         this.game.rng = seededRandom(parsed.seed + Math.floor(parsed.elapsed));
         this.game.messages = [];
         this.fillDefaults();
+        setActiveRealm(this.game.s.pocket ?? null);
+        syncPocket();
+        if ((parsed.layout ?? 1) === 4) this.widenForPocket();
         if ((parsed.layout ?? 1) === 3) this.addDeepPlaces();
         else if ((parsed.layout ?? 1) < LAYOUT) this.migrateLayout();
         else {
@@ -6956,9 +12973,30 @@
       s.wallEdits ??= {};
       s.town ??= { homes: {} };
       s.spawn ??= null;
+      s.pocket ??= null;
+      s.realms ??= {};
+      s.armoury ??= {};
+      s.meta ??= { renown: 0, skills: [], mastery: {} };
+      s.vitals.vitamins ??= 70;
+      s.immune ??= {};
+      s.ailments ??= s.disease ? [{ id: s.disease, stage: 1, next: s.elapsed + 240, since: s.elapsed }] : [];
       this.game.combat.projectiles = [];
       if (s.hotbar.every((x) => x === null))
         for (const e of s.inventory) this.game.equipment.offer(e.id);
+    }
+    /** Layout-4 records keep every change: tile and wall edits move to the wider grid. */
+    widenForPocket() {
+      const s = this.game.s, move = (edits) => {
+        const out = {};
+        for (const [index, kind] of Object.entries(edits ?? {})) {
+          const i = +index;
+          out[Math.floor(i / LAYOUT4_COLS) * TILE_COLS + i % LAYOUT4_COLS] = kind;
+        }
+        return out;
+      };
+      s.tileEdits = move(s.tileEdits);
+      s.wallEdits = move(s.wallEdits);
+      s.layout = LAYOUT;
     }
     /**
      * Layout-3 records keep their land exactly: changed tiles move to the wider grid, and the
@@ -7036,14 +13074,19 @@
     interaction = new Interaction(this);
     consumables = new Consumables(this);
     survival = new Survival(this);
+    ailments = new Ailments(this);
+    larder = new Larder(this);
     physics = new Physics(this);
     wildlife = new Wildlife(this);
     effergy = new Effergy(this);
     drops = new Drops(this);
     equipment = new Equipment(this);
     combat = new Combat(this);
+    armoury = new Armoury(this);
+    skills = new Skills(this);
     bosses = new Bosses(this);
     realms = new Realms(this);
+    pocket = new Pocket(this);
     hands = new Hands(this);
     town = new Town(this);
     devtools = new Dev(this);
@@ -7055,9 +13098,11 @@
     /** Starts a fresh expedition from a seed. */
     newGame(seed = RULES.defaultSeed) {
       this.rng = seededRandom(seed);
+      setActiveRealm(null);
+      syncPocket();
       this.s = {
         version: 3,
-        layout: 4,
+        layout: LAYOUT,
         seed,
         elapsed: 0,
         day: 1,
@@ -7090,9 +13135,12 @@
           illness: 0,
           infection: 0,
           hygiene: 80,
-          morale: 73
+          morale: 73,
+          vitamins: 70
         },
         disease: null,
+        ailments: [],
+        immune: {},
         inventory: [],
         nodes: [],
         animals: [],
@@ -7118,6 +13166,10 @@
         wallEdits: {},
         spawn: null,
         town: { homes: {} },
+        pocket: null,
+        realms: {},
+        armoury: {},
+        meta: { renown: 0, skills: [], mastery: {} },
         placing: null,
         dead: false,
         lastSave: Date.now()
@@ -7144,7 +13196,9 @@
       this.drops.step(dt);
       this.equipment.update(dt);
       this.realms.update(dt);
+      this.pocket.update(dt);
       this.town.update(dt);
+      this.ailments.update(dt);
       this.survival.update(dt);
       this.devtools.sustain();
     }
@@ -7178,7 +13232,8 @@
       return lavaAt(p.x, p.y - 8);
     }
     near(type, radius = 110) {
-      return this.s.structures.find((st) => st.type === type && dist(st, this.s.player) <= radius);
+      const ok = (t) => t === type || type === "furnace" && t === "kiln";
+      return this.s.structures.find((st) => ok(st.type) && dist(st, this.s.player) <= radius);
     }
     nearLitFire() {
       const f = this.near("campfire", 155);
@@ -7187,9 +13242,12 @@
     sheltered() {
       return !!this.near("shelter", 130);
     }
+    /** Relics set on a shelf at camp (as many as renown allows). */
+    shelvedRelics() {
+      return this.skills.shelved();
+    }
     cooled() {
-      const ice = this.near("icebox", 135);
-      return !!(ice && ice.fuel > 0);
+      return !!this.larder.nearest();
     }
     /** The item in the player's hand: the active quick slot, else the ready weapon. */
     heldItem() {
@@ -7557,10 +13615,10 @@
     }
   };
   var sprites = /* @__PURE__ */ new Map();
-  function cached(key, build) {
+  function cached(key, build9) {
     let s = sprites.get(key);
     if (!s) {
-      s = build();
+      s = build9();
       if (sprites.size > 4e3) sprites.clear();
       sprites.set(key, s);
     }
@@ -7753,6 +13811,110 @@
       cap: "grass",
       flowers: ["#ffffff", "#ffd86a", "#8ad0ff"]
     },
+    // ── Generated realms ──
+    orchard: {
+      sky: ["#7fb0b8", "#ece6c8"],
+      hills: ["#9ab8b0", "#7c9e94", "#5e8478", "#46685e"],
+      skyline: "rolling",
+      tree: "willow",
+      leaves: ["#3e6a5a", "#5a8a6a", "#8ab88a"],
+      bark: "#5a4a3a",
+      grass: ["#4a7a60", "#6a9a70", "#94c088"],
+      cap: "grass",
+      flowers: ["#f0a0b0", "#f8e0a0", "#e86a5a"]
+    },
+    steppe: {
+      sky: ["#a88a7a", "#e8c8a0"],
+      hills: ["#b8a090", "#9a8070", "#7a6254", "#5a463a"],
+      skyline: "mesa",
+      tree: "dead",
+      leaves: ["#6a6254", "#86806a", "#a09a84"],
+      bark: "#4a3a30",
+      grass: ["#7a6a54", "#948068", "#b09a80"],
+      cap: "dust",
+      flowers: ["#ff8a3a"]
+    },
+    warren: {
+      sky: ["#140d06", "#3a2612"],
+      hills: ["#3a2a18", "#302214", "#281c10", "#20160c"],
+      skyline: "spires",
+      tree: "shroom",
+      leaves: ["#c8882a", "#e8a840", "#ffd070"],
+      bark: "#8a6a4a",
+      grass: ["#8a6a3a", "#a8844a", "#c8a060"],
+      cap: "none",
+      flowers: ["#ffd070"],
+      alien: true
+    },
+    glasswood: {
+      sky: ["#8ab0d8", "#f0f4ff"],
+      hills: ["#b8c8e0", "#98acc8", "#7890b0", "#5a7290"],
+      skyline: "shards",
+      tree: "voidtree",
+      leaves: ["#8ad0f0", "#b8e8ff", "#e8f8ff"],
+      bark: "#c8d8e8",
+      grass: ["#8aa0b8", "#a8c0d8", "#d0e4f4"],
+      cap: "grass",
+      flowers: ["#bfe8ff", "#f0c0ff", "#ffffff"]
+    },
+    marches: {
+      sky: ["#7a7a74", "#c8c4b0"],
+      hills: ["#a09a88", "#86806e", "#6a6454", "#504a3e"],
+      skyline: "rolling",
+      tree: "dead",
+      leaves: ["#5a5a4a", "#6a6a58", "#7a7a66"],
+      bark: "#4a4438",
+      grass: ["#5a5a44", "#6e6c52", "#8a8866"],
+      cap: "grass",
+      flowers: ["#e8e0c8"]
+    },
+    barrow: {
+      sky: ["#140e06", "#3a2a12"],
+      hills: ["#3a2a14", "#302210", "#281c0c", "#20160a"],
+      skyline: "spires",
+      tree: "dead",
+      leaves: ["#8a6a3a", "#a8844a", "#c8a060"],
+      bark: "#6a5030",
+      grass: ["#6a5030", "#8a6a3a", "#a8844a"],
+      cap: "none",
+      flowers: ["#f0c870"],
+      alien: true
+    },
+    saltflats: {
+      sky: ["#c8e0f0", "#fff8ec"],
+      hills: ["#f0e8dc", "#e0d4c4", "#ccbca8", "#b4a48e"],
+      skyline: "mesa",
+      tree: "cactus",
+      leaves: ["#8aa870", "#a8c088", "#c8d8a8"],
+      bark: "#8a7a5a",
+      grass: ["#d8d0c0", "#e8e0d0", "#f8f4ec"],
+      cap: "sand",
+      flowers: ["#f0a0b0"]
+    },
+    choir: {
+      sky: ["#6a88b0", "#dce8f4"],
+      hills: ["#c8d8e8", "#a8bcd4", "#889ebc", "#6a80a0"],
+      skyline: "peaks",
+      tree: "snowpine",
+      leaves: ["#3a5a6a", "#4a6a7a", "#6a8a9a"],
+      bark: "#3a3028",
+      grass: ["#c8d8e8", "#e0ecf8", "#ffffff"],
+      cap: "snow",
+      flowers: ["#bfe0ff"],
+      snowy: true
+    },
+    pocket: {
+      sky: ["#0a080c", "#1a1420"],
+      hills: ["#1a1420", "#16121c", "#120e18", "#0e0a14"],
+      skyline: "spires",
+      tree: "dead",
+      leaves: ["#3a3040", "#4a4050", "#5a5060"],
+      bark: "#2a2230",
+      grass: ["#2a2230", "#3a3040", "#4a4050"],
+      cap: "none",
+      flowers: [],
+      alien: true
+    },
     void: {
       sky: ["#07040f", "#2a1440"],
       hills: ["#22123a", "#1c0f30", "#160c26", "#10081c"],
@@ -7797,7 +13959,24 @@
     25: { base: "#262030", pattern: "obsidian", accent: "#7a6aa0", wall: "#0e0a14" },
     26: { base: "#e0c890", pattern: "bigbrick", accent: "#fff0c0", wall: "#6a5a3a" },
     27: { base: "#1e1a22", pattern: "obsidian", accent: "#3a3440", wall: "#0a080c" },
-    28: { base: "#2f7a72", pattern: "crystal", accent: "#c0fff4", glow: "#58e0d0", wall: "#10302c" }
+    28: { base: "#2f7a72", pattern: "crystal", accent: "#c0fff4", glow: "#58e0d0", wall: "#10302c" },
+    // Generated realms.
+    30: { base: "#5a6a58", pattern: "mud", cap: "region", wall: "#26302a" },
+    31: { base: "#6e6258", pattern: "soil", cap: "region", wall: "#2a2420" },
+    32: { base: "#8a5a44", pattern: "strata", accent: "#e8884a", wall: "#3a2018" },
+    33: { base: "#7a5a36", pattern: "soil", wall: "#2e2014" },
+    34: { base: "#c8882a", pattern: "crystal", accent: "#ffd070", glow: "#e8a030", wall: "#3a2410" },
+    35: { base: "#6a7a6a", pattern: "planks", wall: "#2a322a" },
+    36: { base: "#9aa8b8", pattern: "soil", cap: "region", wall: "#2e3440" },
+    37: { base: "#a8d8f0", pattern: "crystal", accent: "#f0faff", glow: "#9ad8ff", wall: "#2a3a50" },
+    38: { base: "#5e5a4a", pattern: "mud", cap: "region", wall: "#26241c" },
+    39: { base: "#d8ceb4", pattern: "strata", accent: "#b0a484", wall: "#4a4436" },
+    40: { base: "#b8883a", pattern: "bigbrick", accent: "#f0c870", wall: "#3a2a12" },
+    41: { base: "#6a5a44", pattern: "slate", accent: "#c8a060", wall: "#241c12" },
+    42: { base: "#e2dccf", pattern: "sand", cap: "region", wall: "#7a7266" },
+    43: { base: "#d8b8b8", pattern: "crystal", accent: "#fff4f6", glow: "#e8a0a8", wall: "#5a4448" },
+    44: { base: "#e4eef6", pattern: "ice", cap: "snow", wall: "#4a5a6a" },
+    45: { base: "#a8b8cc", pattern: "bigbrick", accent: "#e8f4ff", wall: "#2a3444" }
   };
   var groundOf = (kind) => GROUND[kind] ?? GROUND[2];
   function daylight(t) {
@@ -7821,6 +14000,27 @@
     flint: "#6a7074",
     bone: "#e6dcc6",
     copper: "#d0844a",
+    rift: "#ff6ad5",
+    tidecaller: "#5ac8c0",
+    ashwalker: "#8a7a6a",
+    amberguard: "#e8a030",
+    prismweave: "#a8d8f0",
+    bonewalker: "#d8ceb4",
+    gearwright: "#b8883a",
+    saltwarden: "#ece6da",
+    choirsilver: "#a8c0e0",
+    warden: "#8a9098",
+    bulwark: "#c04a3a",
+    aegis: "#f0e0a0",
+    stalker: "#4a6a3a",
+    farstrider: "#7a9a4a",
+    windrider: "#bfe0d8",
+    acolyte: "#6a4a8a",
+    magus: "#8a4ac8",
+    archon: "#e0a0ff",
+    drifter: "#9a7a58",
+    nomad: "#c8a070",
+    voyager: "#5ac8e8",
     silver: "#dfe4ea",
     gold: "#f0c850",
     ruby: "#e8304a",
@@ -7965,6 +14165,143 @@
     frostbrand: ["sword", "#bfe8f8", "#4a6a8a"],
     hellrazor: ["sword", "#ff6a2a", "#2a0a0a"],
     sunspear: ["spear", "#f0c860"],
+    // Realms.
+    waystone: ["sigil", "#6a6a74"],
+    orchard_fragment: ["scroll", "#5a9a8a"],
+    steppe_fragment: ["scroll", "#b8845a"],
+    warren_fragment: ["scroll", "#c8882a"],
+    orchard_key: ["key", "#5ac8c0"],
+    steppe_key: ["key", "#ff8a3a"],
+    warren_key: ["key", "#e8a030"],
+    brinewood: ["log", "#6a7a6a"],
+    tide_pearl: ["orb", "#e8f4f0"],
+    crab_shell: ["pelt", "#c86a4a"],
+    bog_apple: ["berries", "#b8583a"],
+    brinesoil: ["block", "#5a6a58"],
+    tidecaller_spear: ["spear", "#5ac8c0"],
+    brine_wand: ["wand", "#5ac8c0"],
+    tide_conch: ["core", "#f0d8c8"],
+    mother_heart: ["heart", "#5a8a6a"],
+    cinderflax: ["bundle", "#a08a70"],
+    ashcloth: ["bundle", "#6a5e56"],
+    kilnstone_ore: ["ore", "#ff8a3a", "#6a4a3a"],
+    kiln_ingot: ["ingot", "#c8704a"],
+    ash_hide: ["pelt", "#5a5450"],
+    ash_soil: ["block", "#6a5e56"],
+    kilnrock: ["block", "#8a5a44"],
+    kiln_greataxe: ["axe", "#c8704a", "#3a2018"],
+    ember_sling: ["wand", "#ff8a3a"],
+    kiln_heart: ["core", "#ff8a3a"],
+    kiln_core: ["core", "#ffc070"],
+    burrow_amber: ["gem", "#e8a030"],
+    beetle_carapace: ["pelt", "#8a5a1a"],
+    warren_earth: ["block", "#7a5a36"],
+    amberstone: ["block", "#c8882a"],
+    amber_repeater: ["bow", "#e8a030"],
+    amber_pick: ["pick", "#e8a030"],
+    queens_mandible: ["fang", "#e8a030"],
+    queen_jelly: ["bottle", "#ffe8a0"],
+    topaz: ["gem", "#f0b040"],
+    // Band II and III realms.
+    glasswood_fragment: ["scroll", "#a8d8f0"],
+    marches_fragment: ["scroll", "#d8ceb4"],
+    barrow_fragment: ["scroll", "#b8883a"],
+    saltflats_fragment: ["scroll", "#ece6da"],
+    choir_fragment: ["scroll", "#a8c0e0"],
+    glasswood_key: ["key", "#9ad8ff"],
+    marches_key: ["key", "#d8ceb4"],
+    barrow_key: ["key", "#f0c870"],
+    saltflats_key: ["key", "#f0a0b0"],
+    choir_key: ["key", "#bfe0ff"],
+    steam_vent: ["crate", "#8a6a3a"],
+    prism_glass: ["crystal", "#a8e0ff"],
+    lumen_moss: ["bundle", "#e8f0a0"],
+    glassloam: ["block", "#9aa8b8"],
+    prismrock: ["block", "#a8d8f0"],
+    prism_wand: ["wand", "#9ad8ff"],
+    shard_glaive: ["spear", "#a8e0ff"],
+    lumen_antler: ["fang", "#fff8c0"],
+    stag_heart: ["heart", "#fff0a0"],
+    lumen_tincture: ["bottle", "#e8f0a0"],
+    marrow_iron_ore: ["ore", "#d8ceb4", "#5a5448"],
+    marrow_ingot: ["ingot", "#c8bca0"],
+    marrow_mud: ["block", "#5e5a4a"],
+    bonerock: ["block", "#d8ceb4"],
+    bonecleaver: ["axe", "#d8ceb4", "#4a4438"],
+    vertebra_whip: ["whip", "#e6dcc6"],
+    hydra_tooth: ["fang", "#e6dcc6"],
+    hydra_heart: ["heart", "#8a9a5a"],
+    marrow_purge: ["bottle", "#8a9a5a"],
+    brass_gear: ["ore", "#f0c870", "#5a4a34"],
+    brass_ingot: ["ingot", "#d8a048"],
+    brass_plate: ["block", "#b8883a"],
+    gearstone: ["block", "#6a5a44"],
+    brass_repeater: ["crossbow", "#d8a048"],
+    piston_hammer: ["hammer", "#d8a048", "#3a2a12"],
+    saint_cog: ["ring", "#f0c870"],
+    engine_heart: ["core", "#f0c870"],
+    saltglass: ["crystal", "#f0c0c8"],
+    saltcrust: ["block", "#ece6da"],
+    saltglass_rock: ["block", "#e8c0c8"],
+    mirage_blade: ["sword", "#f0c0c8"],
+    saltglass_bow: ["bow", "#f0c0c8"],
+    tyrant_eye: ["orb", "#ffb060"],
+    mirage_crown: ["star", "#fff0c0"],
+    rime_silver_ore: ["ore", "#e8f4ff", "#5a6a7a"],
+    rime_silver: ["ingot", "#dfeaf6"],
+    frost_lily: ["berries", "#bfe0ff"],
+    bell_bronze: ["lump", "#c8904a"],
+    rimesnow: ["block", "#e4eef6"],
+    choirstone: ["block", "#a8b8cc"],
+    choir_stave: ["staff", "#bfe0ff"],
+    bellhammer: ["hammer", "#c8904a", "#3a3028"],
+    hymnal_bell: ["ring", "#c8904a"],
+    hymnal_core: ["core", "#bfe0ff"],
+    // Keeping food.
+    cool_pit: ["crate", "#6a6660"],
+    relic_shelf: ["crate", "#b8903a"],
+    snow_cellar: ["crate", "#dfeaf2"],
+    frost_chest: ["crate", "#8fc0d8"],
+    rime_vault: ["crate", "#6a7a98"],
+    salting_barrel: ["crate", "#8a6440"],
+    kitchen: ["crate", "#8a7a6a"],
+    water_filter: ["bottle", "#dcc38e"],
+    insulated_satchel: ["pelt", "#a47c55"],
+    frost_lined_pack: ["pelt", "#8fc0d8"],
+    rime_lined_pack: ["pelt", "#f8e08a"],
+    salted_meat: ["meat", "#a8584a"],
+    salted_fish: ["fish", "#a0a8a8"],
+    pickled_mushrooms: ["bottle", "#b89068"],
+    berry_preserves: ["bottle", "#c8324a"],
+    hearty_stew: ["bowl", "#8a5a3a"],
+    fish_chowder: ["bowl", "#e8dcc0"],
+    spiced_skewers: ["meat", "#c8583a"],
+    honey_cakes: ["bread", "#e0b060"],
+    mushroom_broth: ["bowl", "#b89068"],
+    orchard_pie: ["bread", "#b8583a"],
+    ember_chili: ["bowl", "#e04a2a"],
+    explorers_feast: ["bowl", "#f0c860"],
+    brackish_water: ["bottle", "#6a8a70"],
+    filtered_water: ["bottle", "#cfeef8"],
+    rehydration_salts: ["bundle", "#ece8de"],
+    vermifuge: ["potion", "#8a9a4a"],
+    frost_salve: ["bowl", "#bfe8f8"],
+    burn_salve: ["bowl", "#e8b060"],
+    bandage: ["bundle", "#f0ece0"],
+    splint: ["log", "#b89468"],
+    lungwort_tea: ["potion", "#58e0d0"],
+    void_salve: ["bowl", "#b36cff"],
+    rabies_serum: ["potion", "#e8e0c0"],
+    field_vaccine: ["potion", "#9ae8c0"],
+    iron_gut_brew: ["potion", "#8a9a6a"],
+    onyx: ["gem", "#3a3440"],
+    opal: ["gem", "#e8f0f8"],
+    fire_infusion: ["potion", "#ff8a3a"],
+    frost_infusion: ["potion", "#9fd8ec"],
+    venom_infusion: ["potion", "#7bc05a"],
+    void_infusion: ["potion", "#b36cff"],
+    holy_infusion: ["potion", "#fff0a0"],
+    storm_infusion: ["potion", "#bfe4ff"],
     // Homes and trade.
     coin: ["coin", "#dfe4ea"],
     chair: ["chair", "#8a6440"],
@@ -8436,6 +14773,28 @@
         p.line(8, 1, 6, 3, l);
         p.rect(9, 3, 3, 3, d);
         break;
+      case "crossbow":
+        p.line(2, 13, 13, 2, handle);
+        p.line(3, 13, 14, 2, handleD);
+        p.line(3, 5, 11, 13, m);
+        p.line(4, 4, 12, 12, l);
+        p.line(3, 5, 7, 9, "#e8e0d0");
+        break;
+      case "tome":
+        p.rect(3, 2, 10, 12, m);
+        p.rect(3, 2, 10, 1, l);
+        p.rect(3, 2, 1, 12, d);
+        p.rect(12, 3, 1, 10, "#e8dcb8");
+        p.rect(6, 6, 4, 4, col2 ?? ll);
+        p.set(7, 7, "#ffffff");
+        break;
+      case "whip":
+        diag(1, 15, 5, handle, 2);
+        p.line(6, 10, 10, 4, m);
+        p.line(10, 4, 14, 3, m);
+        p.line(14, 3, 15, 6, l);
+        p.set(15, 7, l);
+        break;
       case "crate":
         p.rect(2, 4, 12, 10, m);
         p.rect(2, 4, 12, 1, l);
@@ -8536,6 +14895,21 @@
       sword: "sword",
       blade: "sword",
       broadsword: "sword",
+      greatsword: "sword",
+      saber: "sword",
+      reaver: "sword",
+      razor: "sword",
+      brand: "sword",
+      knife: "sword",
+      cleaver: "sword",
+      battleaxe: "axe",
+      greataxe: "axe",
+      warhammer: "hammer",
+      maul: "hammer",
+      whip: "whip",
+      crossbow: "crossbow",
+      tome: "tome",
+      infusion: "bottle",
       spear: "spear",
       bow: "bow",
       staff: "staff",
@@ -8581,8 +14955,7 @@
       shard: "gem",
       dust: "seed",
       blaster: "gun",
-      repeater: "bow",
-      tome: "scroll",
+      repeater: "crossbow",
       brick: "block",
       bricks: "block",
       block: "block",
@@ -8634,8 +15007,8 @@
     if (!id || id === "fists") return "none";
     const [tpl] = guess(id);
     if (tpl === "spear") return "thrust";
-    if (tpl === "bow" || tpl === "staff" || tpl === "wand" || tpl === "gun") return "aim";
-    if (["axe", "pick", "sword", "hammer"].includes(tpl)) return "swing";
+    if (["bow", "staff", "wand", "gun", "crossbow", "tome"].includes(tpl)) return "aim";
+    if (["axe", "pick", "sword", "hammer", "whip"].includes(tpl)) return "swing";
     return "hold";
   }
 
@@ -9260,6 +15633,557 @@
       light: [0.7, 0.25, 0.6]
     }
   });
+  Object.assign(MOBS3, {
+    bog_crab: {
+      tpl: "crawler",
+      body: "#5a7a6a",
+      belly: "#c86a4a",
+      eye: "#1b1716",
+      w: 22,
+      h: 10,
+      parts: ["claws", "shell"],
+      top: 18
+    },
+    drowned: {
+      tpl: "biped",
+      body: "#5a7a78",
+      belly: "#2e4a4a",
+      eye: "#9af0e8",
+      w: 14,
+      h: 30,
+      parts: ["claws", "hood"],
+      top: 36
+    },
+    rotfruit_slime: {
+      tpl: "slime",
+      body: "#b86a4a",
+      belly: "#6a8a3a",
+      eye: "#2a1a10",
+      w: 16,
+      h: 12,
+      parts: ["cap"],
+      top: 18
+    },
+    orchard_wasp: {
+      tpl: "flyer",
+      body: "#e8b84a",
+      belly: "#2a2418",
+      eye: "#1b1716",
+      w: 14,
+      h: 8,
+      parts: ["stinger"],
+      top: 14
+    },
+    orchard_warden: {
+      tpl: "crawler",
+      body: "#3e5a4a",
+      belly: "#8a6a3a",
+      eye: "#e8f070",
+      w: 40,
+      h: 18,
+      parts: ["claws", "shell", "spines"],
+      top: 30
+    },
+    ash_hound: {
+      tpl: "quad",
+      body: "#5a5450",
+      belly: "#e8884a",
+      eye: "#ffb060",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "mane", "embers"],
+      top: 24,
+      light: [0.45, 0.22, 0.08]
+    },
+    steppe_raider: {
+      tpl: "biped",
+      body: "#7a5a44",
+      belly: "#b8a080",
+      eye: "#1b1716",
+      w: 12,
+      h: 28,
+      parts: ["hood"],
+      skin: "#b8805a",
+      top: 34
+    },
+    kiln_golem: {
+      tpl: "biped",
+      body: "#8a5a44",
+      belly: "#3a2018",
+      eye: "#ffb060",
+      w: 24,
+      h: 38,
+      parts: ["armor", "embers"],
+      top: 46,
+      light: [0.6, 0.3, 0.1]
+    },
+    cinder_vulture: {
+      tpl: "flyer",
+      body: "#4a3a34",
+      belly: "#e8c8a8",
+      eye: "#ff8a3a",
+      w: 28,
+      h: 12,
+      parts: ["beak", "tail"],
+      top: 20
+    },
+    steppe_warlord: {
+      tpl: "biped",
+      body: "#6a3a2a",
+      belly: "#c8a060",
+      eye: "#ff8a3a",
+      w: 20,
+      h: 40,
+      parts: ["armor", "horns", "sword", "shield"],
+      top: 48
+    },
+    warren_rat: {
+      tpl: "quad",
+      body: "#6a5a4a",
+      belly: "#b8a088",
+      eye: "#ff4a4a",
+      w: 16,
+      h: 9,
+      parts: ["ears", "tail", "snout"],
+      top: 16
+    },
+    amber_beetle: {
+      tpl: "crawler",
+      body: "#8a5a1a",
+      belly: "#ffc850",
+      eye: "#1b1716",
+      w: 22,
+      h: 11,
+      parts: ["shell", "horns"],
+      top: 18,
+      light: [0.3, 0.2, 0.05]
+    },
+    mole_guard: {
+      tpl: "biped",
+      body: "#4a3a30",
+      belly: "#c89a7a",
+      eye: "#1b1716",
+      w: 16,
+      h: 30,
+      parts: ["claws", "armor"],
+      top: 36
+    },
+    burrower: {
+      tpl: "worm",
+      body: "#b8844a",
+      eye: "#1b1716",
+      w: 36,
+      h: 9,
+      top: 16,
+      light: [0.35, 0.22, 0.06]
+    },
+    amber_colossus: {
+      tpl: "biped",
+      body: "#c8882a",
+      belly: "#5a3a14",
+      eye: "#fff0a0",
+      w: 34,
+      h: 50,
+      parts: ["armor", "horns"],
+      top: 60,
+      light: [0.7, 0.45, 0.12]
+    },
+    orchard_mother: {
+      tpl: "crawler",
+      body: "#c8583a",
+      belly: "#5a7a44",
+      eye: "#f0f070",
+      w: 90,
+      h: 34,
+      parts: ["claws", "shell", "spines"],
+      top: 60
+    },
+    kiln_beast: {
+      tpl: "quad",
+      body: "#5a3228",
+      belly: "#ff8a3a",
+      eye: "#ffe070",
+      w: 72,
+      h: 44,
+      parts: ["horns", "mane", "tail", "snout", "embers"],
+      top: 70,
+      light: [0.9, 0.45, 0.15]
+    },
+    warren_queen: {
+      tpl: "worm",
+      body: "#c8882a",
+      eye: "#2a1a0a",
+      w: 110,
+      h: 22,
+      top: 40,
+      light: [0.8, 0.5, 0.15]
+    }
+  });
+  Object.assign(MOBS3, {
+    shard_crawler: {
+      tpl: "crawler",
+      body: "#8ab8d8",
+      belly: "#dff4ff",
+      eye: "#1b2a3a",
+      w: 24,
+      h: 10,
+      parts: ["claws", "shell", "stinger"],
+      top: 18,
+      light: [0.2, 0.35, 0.45]
+    },
+    glass_golem: {
+      tpl: "biped",
+      body: "#a8d8f0",
+      belly: "#5a7a98",
+      eye: "#ffffff",
+      w: 26,
+      h: 40,
+      parts: ["armor"],
+      top: 48,
+      light: [0.35, 0.55, 0.7]
+    },
+    glassling: {
+      tpl: "slime",
+      body: "#bfe8ff",
+      belly: "#8ab8d8",
+      eye: "#1b2a3a",
+      w: 16,
+      h: 12,
+      top: 18,
+      light: [0.2, 0.35, 0.45]
+    },
+    prism_moth: {
+      tpl: "flyer",
+      body: "#e8e0ff",
+      belly: "#9ad8ff",
+      eye: "#2a1a3a",
+      w: 22,
+      h: 9,
+      parts: ["ears"],
+      top: 14,
+      light: [0.4, 0.45, 0.6]
+    },
+    lumen_wisp: {
+      tpl: "floater",
+      body: "#fff8c0",
+      belly: "#ffe070",
+      eye: "#8a6a1a",
+      w: 16,
+      h: 16,
+      parts: ["glow"],
+      top: 22,
+      light: [0.8, 0.75, 0.4]
+    },
+    crystal_warden: {
+      tpl: "biped",
+      body: "#8ac0e0",
+      belly: "#2a4a6a",
+      eye: "#ffffff",
+      w: 30,
+      h: 48,
+      parts: ["armor", "horns", "sword", "shield"],
+      top: 58,
+      light: [0.45, 0.65, 0.85]
+    },
+    bone_hound: {
+      tpl: "quad",
+      body: "#d8ceb4",
+      belly: "#8a8272",
+      eye: "#ff5a3a",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "bones"],
+      top: 24
+    },
+    mire_leech: {
+      tpl: "worm",
+      body: "#5a6a4a",
+      eye: "#e8f070",
+      w: 32,
+      h: 8,
+      top: 14
+    },
+    ossuary_knight: {
+      tpl: "biped",
+      body: "#d8ceb4",
+      belly: "#4a4438",
+      eye: "#ff5a3a",
+      w: 18,
+      h: 34,
+      parts: ["armor", "bones", "sword", "shield"],
+      top: 42
+    },
+    marsh_ghoul: {
+      tpl: "biped",
+      body: "#6a7a5a",
+      belly: "#3a4430",
+      eye: "#e8f070",
+      w: 14,
+      h: 30,
+      parts: ["claws", "bandage"],
+      top: 36
+    },
+    carrion_crow: {
+      tpl: "flyer",
+      body: "#2a2a30",
+      belly: "#4a4a52",
+      eye: "#ff5a3a",
+      w: 24,
+      h: 10,
+      parts: ["beak", "tail"],
+      top: 18
+    },
+    bone_colossus: {
+      tpl: "biped",
+      body: "#e6dcc6",
+      belly: "#6a6454",
+      eye: "#ff5a3a",
+      w: 36,
+      h: 54,
+      parts: ["bones", "horns", "armor"],
+      top: 64
+    },
+    cog_spider: {
+      tpl: "crawler",
+      body: "#b8883a",
+      belly: "#6a5030",
+      eye: "#ff6a2a",
+      w: 24,
+      h: 10,
+      parts: ["claws", "longlegs"],
+      top: 18
+    },
+    tin_soldier: {
+      tpl: "biped",
+      body: "#a8a4a0",
+      belly: "#c04a3a",
+      eye: "#1b1716",
+      w: 16,
+      h: 34,
+      parts: ["armor", "sword", "shield"],
+      top: 42
+    },
+    brass_sentry: {
+      tpl: "biped",
+      body: "#d8a048",
+      belly: "#5a4028",
+      eye: "#ff3a2a",
+      w: 22,
+      h: 32,
+      parts: ["armor", "eye"],
+      top: 40,
+      light: [0.5, 0.15, 0.08]
+    },
+    clockwork_hound: {
+      tpl: "quad",
+      body: "#b8883a",
+      belly: "#5a4028",
+      eye: "#ff6a2a",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "armor"],
+      top: 24
+    },
+    gear_wisp: {
+      tpl: "floater",
+      body: "#f0c870",
+      belly: "#8a6a3a",
+      eye: "#3a2a12",
+      w: 18,
+      h: 18,
+      parts: ["glow"],
+      top: 24,
+      light: [0.6, 0.45, 0.2]
+    },
+    brass_juggernaut: {
+      tpl: "biped",
+      body: "#b8883a",
+      belly: "#3a2a12",
+      eye: "#ff6a2a",
+      w: 38,
+      h: 54,
+      parts: ["armor", "horns", "shield"],
+      top: 64,
+      light: [0.5, 0.3, 0.1]
+    },
+    salt_strider: {
+      tpl: "quad",
+      body: "#d8c8b0",
+      belly: "#f4ece0",
+      eye: "#1b1716",
+      w: 26,
+      h: 22,
+      parts: ["longlegs", "tail", "horns"],
+      top: 38
+    },
+    brine_scorpion: {
+      tpl: "crawler",
+      body: "#e8d8c8",
+      belly: "#c8a890",
+      eye: "#1b1716",
+      w: 26,
+      h: 10,
+      parts: ["stinger", "claws"],
+      top: 20
+    },
+    sand_raptor: {
+      tpl: "biped",
+      body: "#c8a070",
+      belly: "#f0dcb8",
+      eye: "#1b1716",
+      w: 18,
+      h: 28,
+      parts: ["tail", "beak", "claws"],
+      top: 34
+    },
+    salt_wraith: {
+      tpl: "floater",
+      body: "#f4f0e8",
+      belly: "#c8c0b4",
+      eye: "#5a8aff",
+      w: 18,
+      h: 30,
+      parts: ["hood", "robe", "ghost"],
+      top: 36
+    },
+    mirage_djinn: {
+      tpl: "floater",
+      body: "#ffb060",
+      belly: "#fff0a0",
+      eye: "#3a1a0a",
+      w: 18,
+      h: 26,
+      parts: ["robe", "glow"],
+      top: 32,
+      light: [0.7, 0.45, 0.2]
+    },
+    salt_colossus: {
+      tpl: "biped",
+      body: "#ece6da",
+      belly: "#b4a48e",
+      eye: "#f0a0b0",
+      w: 38,
+      h: 56,
+      parts: ["armor", "horns"],
+      top: 66
+    },
+    rime_wolf: {
+      tpl: "quad",
+      body: "#c8d8e8",
+      belly: "#f4f8ff",
+      eye: "#5ab8ff",
+      w: 26,
+      h: 15,
+      parts: ["ears", "tail", "snout", "mane"],
+      top: 24
+    },
+    bell_golem: {
+      tpl: "biped",
+      body: "#c8904a",
+      belly: "#5a3a1a",
+      eye: "#bfe0ff",
+      w: 30,
+      h: 42,
+      parts: ["armor", "crown"],
+      top: 52
+    },
+    cantor: {
+      tpl: "biped",
+      body: "#dfeaf6",
+      belly: "#6a88b0",
+      eye: "#bfe0ff",
+      w: 14,
+      h: 32,
+      parts: ["hood", "robe", "staff"],
+      top: 38
+    },
+    choir_wraith: {
+      tpl: "floater",
+      body: "#bfe0ff",
+      belly: "#6a88b0",
+      eye: "#ffffff",
+      w: 18,
+      h: 28,
+      parts: ["hood", "robe", "ghost"],
+      top: 34,
+      light: [0.3, 0.45, 0.6]
+    },
+    frost_moth: {
+      tpl: "flyer",
+      body: "#dff0ff",
+      belly: "#8ab8d8",
+      eye: "#1b2a3a",
+      w: 20,
+      h: 8,
+      parts: ["ears"],
+      top: 14
+    },
+    grand_cantor: {
+      tpl: "biped",
+      body: "#e8f4ff",
+      belly: "#3a5a8a",
+      eye: "#bfe0ff",
+      w: 24,
+      h: 46,
+      parts: ["hood", "robe", "staff", "crown"],
+      top: 56,
+      light: [0.35, 0.5, 0.7]
+    },
+    lumen_stag: {
+      tpl: "quad",
+      body: "#dff4ff",
+      belly: "#9ad8ff",
+      eye: "#fff0a0",
+      w: 64,
+      h: 48,
+      parts: ["antlers", "tail", "longlegs", "glow"],
+      top: 90,
+      light: [0.8, 0.85, 1]
+    },
+    ossuary_hydra: {
+      tpl: "crawler",
+      body: "#d8ceb4",
+      belly: "#5a6a4a",
+      eye: "#ff5a3a",
+      w: 96,
+      h: 38,
+      parts: ["claws", "spines", "horns", "bones"],
+      top: 66
+    },
+    engine_saint: {
+      tpl: "biped",
+      body: "#d8a048",
+      belly: "#3a2a12",
+      eye: "#ffe070",
+      w: 50,
+      h: 80,
+      parts: ["armor", "crown", "staff", "embers"],
+      top: 92,
+      light: [0.9, 0.6, 0.25]
+    },
+    mirage_tyrant: {
+      tpl: "floater",
+      body: "#ffb060",
+      belly: "#fff0c0",
+      eye: "#3a1a0a",
+      w: 56,
+      h: 64,
+      parts: ["robe", "crown", "glow"],
+      top: 76,
+      light: [0.9, 0.6, 0.3]
+    },
+    the_hymnal: {
+      tpl: "biped",
+      body: "#c8904a",
+      belly: "#dfeaf6",
+      eye: "#bfe0ff",
+      w: 58,
+      h: 84,
+      parts: ["armor", "crown", "robe"],
+      top: 96,
+      light: [0.5, 0.65, 0.9]
+    }
+  });
   var SKINS = [
     "#d8a47c",
     "#b8805a",
@@ -9726,19 +16650,29 @@
       top: 44
     };
   }
+  var MIRAGE_GUISE = {
+    mirage: "sand_raptor",
+    tyrant_mirage: "mirage_tyrant"
+  };
   function mobArt(g, a) {
     if (a.type === "boss") return bossArt(g);
+    const guise = MIRAGE_GUISE[a.type];
+    if (guise) return MOBS3[guise];
     return MOBS3[a.type] ?? MOBS3.wolf;
   }
   function drawAnimal(c, g, a, x, y, t) {
-    const m = track(a.id, a.x, a.y, a.hp, t), art2 = mobArt(g, a), facing = Math.cos(a.angle) >= 0 ? 1 : -1, hurt = t - m.hurt < 0.16, walks = art2.tpl === "quad" || art2.tpl === "biped" || art2.tpl === "crawler", frame2 = walks ? m.move > 0.3 ? Math.floor(m.walk / 6) % 6 : 0 : Math.floor(t * (art2.tpl === "flyer" ? 10 : 6) + a.phase) % 4, key = a.type === "boss" ? "boss" + g.s.altar.level : a.type;
+    const m = track(a.id, a.x, a.y, a.hp, t), art2 = mobArt(g, a), facing = Math.cos(a.angle) >= 0 ? 1 : -1, hurt = t - m.hurt < 0.16, walks = art2.tpl === "quad" || art2.tpl === "biped" || art2.tpl === "crawler", frame2 = walks ? m.move > 0.3 ? Math.floor(m.walk / 6) % 6 : 0 : Math.floor(t * (art2.tpl === "flyer" ? 10 : 6) + a.phase) % 4, key = a.type === "boss" ? "boss" + g.s.altar.level : MIRAGE_GUISE[a.type] ?? a.type;
     const sy = Math.round(y + (m.sy - a.y) / PX);
+    const mirage = !!MIRAGE_GUISE[a.type];
+    if (mirage)
+      c.globalAlpha = g.equipment.has("shade") ? 0.3 : 0.8 + 0.12 * Math.sin(t * 9 + a.phase);
     const spr = mobSprite(key, art2, frame2);
     if (walks || art2.tpl === "slime") {
       c.fillStyle = "rgba(10,8,6,0.28)";
       c.fillRect(Math.round(x - art2.w * 0.35), Math.round(y), Math.round(art2.w * 0.7), 1);
     }
     blit(c, spr, x + (hurt ? Math.floor(t * 60) % 2 ? 1 : -1 : 0), sy, facing < 0);
+    if (mirage) c.globalAlpha = 1;
     if (hurt) {
       const flash = cached(`flash:${key}:${frame2}`, () => {
         const cv = document.createElement("canvas");
@@ -9956,7 +16890,13 @@
           gravity: -40
         }));
       else if (e.type === "damage")
-        floatText(e.x, e.y, e.kind, e.dir === 1 ? "#ff6a5a" : "#f4ecd8", now);
+        floatText(
+          e.x,
+          e.y,
+          e.kind,
+          ["#f4ecd8", "#ff6a5a", "#ffe070", "#ff9a4a", "#8ad060", "#d05050"][e.dir ?? 0] ?? "#f4ecd8",
+          now
+        );
       else if (e.type === "burst")
         burst(e, now, 14, () => ({
           kind: "spark",
@@ -10129,6 +17069,11 @@
         out.push([s.x, s.y - 30, 1.1, 0.6, 0.25]);
       else if (s.type === "furnace" || s.type === "forge") out.push([s.x, s.y - 20, 1, 0.6, 0.3]);
       else if (s.type === "effergy") out.push([s.x, s.y - 60, 0.85, 0.72, 1]);
+      else if (s.type === "shrine" && s.crop !== "spent") out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
+      else if (s.type === "relic_shelf" && Object.keys(s.store).length)
+        out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
+      else if (s.type === "kiln") out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);
+      else if (s.type === "waystone" && g.s.pocket) out.push([s.x, s.y - 40, 0.45, 0.8, 1]);
       else if (s.type === "rift_gate" || s.type === "portal")
         out.push([s.x, s.y - 50, 0.8, 0.5, 1.1]);
     }
@@ -10140,6 +17085,10 @@
         out.push([n.x, n.y - 12, 0.25, 0.85, 0.8]);
       else if (n.kind.includes("starmetal")) out.push([n.x, n.y - 12, 0.95, 0.85, 0.45]);
       else if (n.kind.includes("voidsteel")) out.push([n.x, n.y - 12, 0.6, 0.3, 0.95]);
+      else if (n.kind === "burrow_amber") out.push([n.x, n.y - 12, 0.8, 0.5, 0.15]);
+      else if (n.kind === "prism_glass") out.push([n.x, n.y - 12, 0.4, 0.7, 0.95]);
+      else if (n.kind === "saltglass") out.push([n.x, n.y - 12, 0.8, 0.5, 0.55]);
+      else if (n.kind === "lumen_moss") out.push([n.x, n.y - 8, 0.6, 0.65, 0.3]);
     }
     for (const a of g.s.animals) {
       if (a.deadUntil) continue;
@@ -10162,9 +17111,10 @@
       };
     const R2 = buf.r, G = buf.g, B = buf.b, S = buf.solid;
     const [sr, sg, sb] = skyLight(g);
-    const layerAmbient = (y) => y >= data_exports.LAYERS[4].top ? [0.3, 0.1, 0.07] : y >= data_exports.LAYERS[3].top ? [0.22, 0.09, 0.07] : y >= data_exports.LAYERS[2].top ? [0.05, 0.055, 0.08] : [0.06, 0.06, 0.07];
+    const realm = data_exports.inPocket(g.s.player.x) ? data_exports.activeRealm() : null, starless = realm?.inst.mods.includes("starless") ? 0.15 : 1, realmAmbient = realm?.tpl.ambient.map((v) => v * starless);
+    const layerAmbient = (y) => realmAmbient ? realmAmbient : y >= data_exports.LAYERS[4].top ? [0.3, 0.1, 0.07] : y >= data_exports.LAYERS[3].top ? [0.22, 0.09, 0.07] : y >= data_exports.LAYERS[2].top ? [0.05, 0.055, 0.08] : [0.06, 0.06, 0.07];
     const dim = data_exports.biomeAt(g.s.player.x, 0).id;
-    const skyFactor = dim === "void" ? 0.22 : dim === "mycelia" ? 0.3 : 1;
+    const skyFactor = realm ? realm.tpl.daylight * starless : dim === "void" ? 0.22 : dim === "mycelia" ? 0.3 : 1;
     for (let j = 0; j < gh; j++)
       for (let i = 0; i < gw; i++) {
         const tx = tx0 + i, ty = ty0 + j, k = j * gw + i, kind = g.tileAt(tx, ty), x = tx * T + T / 2, y = ty * T + T / 2;
@@ -10451,13 +17401,13 @@
   };
   var regionOf = (n) => data_exports.biomeAt(n.x, n.y).id;
   function drawTree(c, n, x, y, t) {
-    const region = regionOf(n), art2 = ART[region] ?? ART.meadow, style = n.kind === "resin" ? "pine" : n.kind === "honey" ? "oak" : art2.tree, variant = Math.floor(hash3(n.id, 7) * 6), tree = cached(
+    const region = regionOf(n), art2 = ART[region] ?? ART.meadow, style = n.kind === "resin" ? "pine" : n.kind === "honey" ? "oak" : art2.tree, variant = Math.floor(hash3(n.id, 7) * 6), tree2 = cached(
       `tree:${region}:${style}:${variant}:${n.kind}`,
       () => treeSprite(style, art2, variant, n.kind)
     );
     const since = n.felledAt === void 0 ? Infinity : t - n.felledAt;
     if (n.hp > 0) {
-      blit(c, tree, x + hitShake(n, t), y, hash3(n.id, 9) > 0.5);
+      blit(c, tree2, x + hitShake(n, t), y, hash3(n.id, 9) > 0.5);
       return;
     }
     blit(c, stumpSprite(art2.bark), x, y);
@@ -10467,7 +17417,7 @@
       c.translate(Math.round(x), Math.round(y) - 5);
       c.rotate(dir * angle);
       c.globalAlpha = after > 0 ? Math.max(0, 1 - after / FADE) : 1;
-      c.drawImage(tree.cv, -tree.ox, -tree.oy + 5);
+      c.drawImage(tree2.cv, -tree2.ox, -tree2.oy + 5);
       c.restore();
       return;
     }
@@ -10487,6 +17437,10 @@
     }
   }
   var PLANT_KINDS = /* @__PURE__ */ new Set([
+    "bog_apple",
+    "cinderflax",
+    "lumen_moss",
+    "frost_lily",
     "berry",
     "herb",
     "fiber",
@@ -10570,6 +17524,40 @@
             p.rect(10, 5, 2, 2, "#e8577a");
           }
           break;
+        case "bog_apple":
+          p.line(9, 15, 9, 7, "#5a4a3a");
+          p.ellipse(9, 7, 7, 5, g[1]);
+          p.ellipse(7, 6, 4, 3, g[2]);
+          if (!bare)
+            for (const [x, y] of [
+              [5, 8],
+              [11, 5],
+              [13, 9],
+              [8, 10]
+            ].slice(0, full ? 4 : 2))
+              p.rect(x, y, 2, 2, "#b8583a");
+          break;
+        case "lumen_moss":
+          for (let x = 3; x < 16; x += 3) {
+            p.ellipse(x, 14, 3, 2, bare ? "#6a7a6a" : "#9ab88a");
+            if (!bare) p.set(x, 12, "#f0f8a0");
+          }
+          break;
+        case "frost_lily":
+          p.line(9, 15, 9, 8, "#5a7a8a");
+          p.ellipse(7, 13, 3, 1, "#6a8a9a");
+          if (!bare) {
+            p.ellipse(9, 6, 4, 3, "#dff0ff");
+            p.rect(8, 5, 3, 2, "#bfe0ff");
+            p.set(9, 5, "#ffffff");
+          }
+          break;
+        case "cinderflax":
+          for (let x = 3; x < 16; x += 2) {
+            p.line(x, 15, x + x % 3 - 1, bare ? 11 : 4, x % 4 ? "#7a6a54" : "#948068");
+            if (!bare) p.set(x + x % 3 - 1, 3 + x % 2, "#ff8a3a");
+          }
+          break;
         case "willow":
           p.line(9, 15, 9, 5, "#6a5440");
           for (let x = 3; x < 16; x += 2)
@@ -10607,6 +17595,16 @@
     ruby: { rock: "#5a5058", crystal: "#e8304a", glow: true },
     sapphire: { rock: "#50566a", crystal: "#3a7ae8", glow: true },
     emerald: { rock: "#4e5a52", crystal: "#2ac870", glow: true },
+    topaz: { rock: "#6a5a4a", crystal: "#f0b040", glow: true },
+    onyx: { rock: "#5a5460", crystal: "#1a161e" },
+    opal: { rock: "#6a7470", crystal: "#e8f0f8", glow: true },
+    kilnstone_ore: { rock: "#6a4a3a", fleck: "#ff8a3a", shine: "#ffc070" },
+    burrow_amber: { rock: "#5a4028", crystal: "#e8a030", glow: true },
+    prism_glass: { rock: "#6a7488", crystal: "#bfe8ff", glow: true },
+    marrow_iron_ore: { rock: "#8a8272", fleck: "#e6dcc6", shine: "#c8bca0" },
+    brass_gear: { rock: "#5a4a34", fleck: "#f0c870", shine: "#fff0a0" },
+    saltglass: { rock: "#c8c0b4", crystal: "#f0c0c8", glow: true },
+    rime_silver_ore: { rock: "#5a6a7a", fleck: "#e8f4ff", shine: "#ffffff" },
     coal: { rock: "#5a5a5e", fleck: "#1c1c20", shine: "#8a8a96" },
     ice: { rock: "#8fb8d0", crystal: "#dff4ff" },
     obsidian: { rock: "#3a3448", crystal: "#2a2433", shine: "#9a8ac0" },
@@ -10720,6 +17718,105 @@
       })
     );
     blit(c, s, x, y);
+  }
+
+  // src/renderer/realm.ts
+  function drawTide(c, g, ax, ay, w, h, t) {
+    const level = g.pocket.waterLevel();
+    if (level === null) return;
+    const x0 = Math.max(0, Math.round(data_exports.POCKET.start / PX - ax)), x1 = Math.min(w, Math.round(data_exports.POCKET.end / PX - ax));
+    if (x1 <= x0) return;
+    const top = Math.round(level / PX - ay);
+    if (top > h) return;
+    const mire = g.pocket.waterKind() === "mire";
+    if (mire) {
+      c.fillStyle = "rgba(104, 112, 44, 0.6)";
+      for (let x = x0; x < x1; x++) {
+        const floor = Math.round(data_exports.surfaceAt((x + ax) * PX) / PX - ay) + 3;
+        if (floor > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor) - Math.max(0, top));
+      }
+    } else {
+      c.fillStyle = "rgba(40, 110, 120, 0.42)";
+      c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
+    }
+    const wet = (x) => !mire || data_exports.surfaceAt((x + ax) * PX) / PX - ay > top + 1;
+    c.fillStyle = mire ? "rgba(160, 170, 80, 0.55)" : "rgba(120, 200, 200, 0.25)";
+    for (let x = x0; x < x1; x++) if (wet(x)) c.fillRect(x, Math.max(0, top), 1, 3);
+    c.fillStyle = mire ? "rgba(214, 210, 140, 0.75)" : "rgba(210, 245, 240, 0.7)";
+    const speed = mire ? 0.3 : 1;
+    for (let x = x0; x < x1; x++) {
+      if (!wet(x)) continue;
+      const wx = x + ax, wave = Math.round(Math.sin(wx / 9 + t * 2.2 * speed) + Math.sin(wx / 23 - t * 1.3 * speed));
+      if ((wx + Math.floor(t * 6 * speed)) % 7 < 5) c.fillRect(x, top + wave - 1, 1, 1);
+    }
+    if (mire)
+      for (let i = 0; i < 24; i++) {
+        const life = (t * 0.5 + hash3(i, 11)) % 1, bx = Math.floor(hash3(i, 12) * (x1 - x0)) + x0;
+        if (life < 0.3 && wet(bx)) c.fillRect(bx, top - Math.round(life * 6), 2, 1);
+      }
+  }
+  function drawRealmAir(c, g, ax, ay, w, h, t) {
+    const ash = g.pocket.ashLevel();
+    if (ash > 0) {
+      const guard = g.equipment.has("ashward") ? 0.35 : 1;
+      c.fillStyle = `rgba(112, 94, 80, ${(ash * 0.62 * guard).toFixed(2)})`;
+      c.fillRect(0, 0, w, h);
+      c.fillStyle = `rgba(200, 180, 160, ${(ash * 0.8).toFixed(2)})`;
+      for (let i = 0; i < 160; i++) {
+        const x = Math.floor(((hash3(i, 1) * w * 3 - t * (60 + hash3(i, 2) * 90)) % w + w) % w), y = Math.floor((hash3(i, 3) * h + Math.sin(t * 2 + i) * 6 + t * 12 * hash3(i, 4)) % h);
+        c.fillRect(x, y, hash3(i, 5) > 0.7 ? 2 : 1, 1);
+      }
+    }
+    if (g.s.pocket?.realm === "barrow" && g.pocket.here())
+      for (const st of g.s.structures) {
+        if (st.type !== "steam_vent" || !data_exports.ventActive(st.x, g.s.elapsed)) continue;
+        const sx = Math.round(st.x / PX - ax), sy = Math.round(st.y / PX - ay);
+        if (sx < -20 || sx > w + 20 || sy < -80 || sy > h + 20) continue;
+        for (let i = 0; i < 30; i++) {
+          const life = (t * 2 + hash3(i, 21)) % 1;
+          c.fillStyle = `rgba(240, 240, 240, ${(0.7 * (1 - life)).toFixed(2)})`;
+          c.fillRect(
+            sx + Math.round((hash3(i, 22) - 0.5) * 14 * (1 + life * 2)),
+            sy - Math.round(life * 60),
+            2,
+            2
+          );
+        }
+      }
+    const sun = g.pocket.sunLevel();
+    if (sun > 0) {
+      const guard = g.equipment.has("shade") ? 0.3 : 1;
+      c.fillStyle = `rgba(255, 246, 220, ${(0.22 * guard * (0.85 + 0.15 * Math.sin(t * 1.3))).toFixed(2)})`;
+      c.fillRect(0, 0, w, h);
+    }
+    const hymn = g.pocket.hymnLevel();
+    if (hymn > 0) {
+      const guard = g.equipment.has("hymnward") || g.pocket.warmed() ? 0.35 : 1;
+      c.fillStyle = `rgba(150, 190, 240, ${(hymn * 0.38 * guard).toFixed(2)})`;
+      c.fillRect(0, 0, w, h);
+      c.fillStyle = `rgba(230, 244, 255, ${(hymn * 0.8).toFixed(2)})`;
+      for (let i = 0; i < 40; i++) {
+        const x = Math.floor((hash3(i, 31) * w + t * 20 * (hash3(i, 32) - 0.5)) % w), y = Math.floor((hash3(i, 33) * h - t * (10 + hash3(i, 34) * 14)) % h + h) % h;
+        c.fillRect(x, y, 1, 3);
+        c.fillRect(x + 1, y, 2, 1);
+      }
+    }
+    const fall = g.pocket.pendingCaveIn();
+    if (fall?.kind === "shards") {
+      const sx = Math.round(fall.x / PX - ax), sy = Math.max(4, Math.round(fall.y / PX - ay));
+      c.fillStyle = "rgba(220, 245, 255, 0.9)";
+      for (let i = 0; i < 18; i++) {
+        if (Math.sin(t * 20 + i * 1.7) < 0.2) continue;
+        c.fillRect(sx + Math.round((hash3(i, 9) - 0.5) * 90), sy + Math.round(hash3(i, 10) * 30), 1, 1);
+      }
+    } else if (fall) {
+      const sx = Math.round(fall.x / PX - ax), sy = Math.round(fall.y / PX - ay);
+      c.fillStyle = "rgba(160, 130, 90, 0.8)";
+      for (let i = 0; i < 26; i++) {
+        const life = (t * 1.4 + hash3(i, 7)) % 1;
+        c.fillRect(sx + Math.round((hash3(i, 8) - 0.5) * 80), sy + Math.round(life * 40), 1, 2);
+      }
+    }
   }
 
   // src/renderer/sky.ts
@@ -10873,7 +17970,7 @@
     });
   }
   function drawSky(c, g, ax, ay, w, h, fx) {
-    const tod = g.timeOfDay(), day = daylight(tod), dusk = clamp2(duskiness(tod)), over = overcastOf(g), night2 = 1 - day, [A, B, k] = blendAt(fx), dim = data_exports.biomeAt(fx, 0).id, alien = dim === "mycelia" || dim === "void";
+    const tod = g.timeOfDay(), day = daylight(tod), dusk = clamp2(duskiness(tod)), over = overcastOf(g), night2 = 1 - day, [A, B, k] = blendAt(fx), dim = data_exports.biomeAt(fx, 0).id, alien = dim === "mycelia" || dim === "void" || !!A.alien;
     const q = (v) => Math.round(v * 24) / 24;
     let top = mix(A.sky[0], B.sky[0], q(k)), bottom = mix(A.sky[1], B.sky[1], q(k));
     if (!alien) {
@@ -10954,13 +18051,13 @@
         } else c.fillRect(sx, y, 1, h - y);
       }
       if (layer >= 1 && !floating) {
-        const tree = k < 0.5 ? A.tree : B.tree, treeCol = shade(col, -0.12);
+        const tree2 = k < 0.5 ? A.tree : B.tree, treeCol = shade(col, -0.12);
         for (let slot = Math.floor((shift - 20) / 14); slot * 14 - shift < w + 20; slot++) {
           if (vnoise(slot * 14, layer, 90, 44) < 0.4 || hash3(slot, layer, 45) < 0.3) continue;
           const wx = slot * 14 + Math.floor(hash3(slot, layer, 46) * 8), y = Math.round(
             base - (skyline(kindA, wx, layer) * (1 - k) + skyline(kindB, wx, layer) * k)
           ), size = 5 + layer * 2 + Math.floor(hash3(slot, layer, 47) * 4);
-          blit(c, silhouetteTree(tree, size, treeCol), wx - shift, y + 1);
+          blit(c, silhouetteTree(tree2, size, treeCol), wx - shift, y + 1);
         }
       }
     }
@@ -11310,6 +18407,135 @@
       p.rect(2, 26, 2, 2, IRON);
     })
   });
+  Object.assign(STATIC, {
+    // Relics set here glow in their niches.
+    relic_shelf: () => sprite(28, 32, 14, 31, (p) => {
+      p.rect(0, 0, 28, 32, "#5a3e26");
+      p.rect(0, 0, 28, 2, "#8a6440");
+      p.rect(2, 2, 24, 28, "#2a1c12");
+      for (const y of [11, 21, 30]) {
+        p.rect(1, y, 26, 2, "#8a6440");
+        p.rect(1, y, 26, 1, "#b08a5a");
+      }
+      for (const [x, y, c] of [
+        [6, 7, "#5ac8c0"],
+        [20, 7, "#ff8a3a"],
+        [13, 17, "#e8a030"]
+      ]) {
+        p.rect(x - 2, y - 2, 5, 4, c);
+        p.set(x - 1, y - 2, "#ffffff");
+      }
+      p.rect(0, 0, 1, 32, "#3a2818");
+      p.rect(27, 0, 1, 32, "#3a2818");
+    }),
+    cool_pit: () => sprite(26, 10, 13, 9, (p) => {
+      stones(p, 0, 2, 26, 8, "#6a6660");
+      p.rect(4, 3, 18, 5, "#1c1814");
+      p.rect(3, 0, 20, 3, "#7a5a3c");
+      p.rect(3, 0, 20, 1, "#9a7a58");
+      for (let x = 6; x < 22; x += 5) p.rect(x, 0, 1, 3, "#5a4230");
+    }),
+    snow_cellar: () => sprite(34, 24, 17, 23, (p) => {
+      p.ellipse(17, 16, 16, 12, "#dfeaf2");
+      p.rect(1, 16, 32, 8, "#dfeaf2");
+      for (let y = 8; y < 24; y += 4) p.line(2, y, 32, y, "#b8c8d4");
+      p.rect(12, 12, 10, 12, "#4a5a68");
+      p.rect(12, 12, 10, 1, "#7a8a98");
+      p.shadeEdges(0.15, -0.2);
+    }),
+    frost_chest: () => sprite(24, 17, 12, 16, (p) => {
+      p.rect(0, 5, 24, 12, "#5a8aa8");
+      p.rect(0, 0, 24, 6, "#8fc0d8");
+      p.rect(0, 0, 24, 1, "#dff6ff");
+      p.rect(0, 5, 24, 1, "#3a5a78");
+      for (const x of [2, 20]) p.rect(x, 0, 2, 17, "#dfe3e6");
+      p.rect(10, 3, 4, 4, "#bfe8f8");
+      p.set(11, 4, "#ffffff");
+    }),
+    rime_vault: () => sprite(30, 28, 15, 27, (p) => {
+      p.rect(2, 4, 26, 24, "#6a7a98");
+      p.rect(2, 4, 26, 2, "#dfeaf8");
+      p.rect(0, 0, 30, 5, "#f8e08a");
+      p.rect(0, 0, 30, 1, "#fff4c0");
+      p.rect(9, 10, 12, 14, "#2a3a58");
+      p.ellipse(15, 17, 4, 4, "#bfe8f8");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    salting_barrel: () => sprite(18, 20, 9, 19, (p) => {
+      p.ellipse(9, 10, 8, 10, "#8a6440");
+      for (let x = 3; x < 16; x += 3) p.line(x, 1, x, 19, "#6a4a2c");
+      for (const y of [4, 15]) p.rect(1, y, 16, 1, "#a8a4a0");
+      p.ellipse(9, 2, 7, 2, "#ece8de");
+    }),
+    kitchen: () => sprite(40, 32, 20, 31, (p) => {
+      stones(p, 0, 8, 40, 24, "#8a7a6a");
+      p.rect(6, 16, 16, 10, "#1c1410");
+      p.rect(26, 12, 12, 3, "#4a4440");
+      p.rect(28, 6, 8, 6, "#6a6460");
+      p.rect(28, 6, 8, 1, "#8a8480");
+      p.rect(14, 0, 8, 8, "#6a5a4a");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    water_filter: () => sprite(18, 26, 9, 25, (p) => {
+      p.rect(2, 0, 14, 16, "#a88458");
+      for (const [y, c] of [
+        [2, "#dcc38e"],
+        [7, "#2c2c30"],
+        [12, "#a8a4a0"]
+      ])
+        p.rect(3, y, 12, 4, c);
+      p.rect(7, 16, 4, 4, "#6a4a2c");
+      p.rect(3, 20, 12, 6, "#8a6440");
+      p.rect(4, 21, 10, 2, "#7ab0c8");
+    })
+  });
+  Object.assign(STATIC, {
+    waystone: () => sprite(26, 48, 13, 47, (p) => {
+      stones(p, 1, 40, 24, 8, "#5a5a62");
+      p.poly(
+        [
+          [6, 41],
+          [9, 4],
+          [13, 0],
+          [17, 4],
+          [20, 41]
+        ],
+        "#6a6a74"
+      );
+      p.line(9, 4, 6, 41, "#8a8a96");
+      for (const [x, y] of [
+        [12, 12],
+        [13, 20],
+        [12, 28]
+      ])
+        p.rect(x, y, 2, 3, "#2a2a34");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    shrine: () => sprite(22, 30, 11, 29, (p) => {
+      stones(p, 0, 24, 22, 6, "#6a6470");
+      p.rect(4, 6, 14, 18, "#7a7484");
+      p.rect(4, 6, 14, 1, "#9a94a4");
+      p.rect(2, 3, 18, 4, "#5a5462");
+      p.rect(8, 12, 6, 7, "#2a2630");
+      p.shadeEdges(0.2, -0.3);
+    }),
+    // A brass grille over a steam pipe (the Clockwork Barrow's traps).
+    steam_vent: () => sprite(30, 6, 15, 5, (p) => {
+      p.rect(0, 1, 30, 5, "#5a4028");
+      p.rect(0, 1, 30, 1, "#d8a048");
+      for (let x = 3; x < 28; x += 4) p.rect(x, 2, 2, 3, "#1c140c");
+      p.rect(0, 5, 30, 1, "#3a2a14");
+    }),
+    kiln: () => sprite(40, 34, 20, 33, (p) => {
+      p.ellipse(20, 22, 18, 14, "#8a5a44");
+      p.rect(2, 22, 36, 12, "#8a5a44");
+      for (let y = 12; y < 34; y += 5)
+        for (let x = (y % 10 ? 0 : 3) + 2; x < 38; x += 7) p.rect(x, y, 5, 1, "#6a4030");
+      p.rect(13, 20, 14, 14, "#1c100c");
+      p.rect(16, 0, 8, 10, "#6a4030");
+      p.shadeEdges(0.25, -0.3);
+    })
+  });
   var staticSprite = (k) => cached("st:" + k, STATIC[k]);
   function chestSprite(kind, open) {
     const trim = {
@@ -11319,7 +18545,12 @@
       citadel: ["#3a2228", "#ff8a3a"],
       mycelia: ["#4a3f5e", "#58e0d0"],
       skyreach: ["#c8c0b0", "#f8e08a"],
-      void: ["#2a1c3a", "#b36cff"]
+      void: ["#2a1c3a", "#b36cff"],
+      glasswood: ["#6a88a8", "#bfe8ff"],
+      marches: ["#6a6454", "#e6dcc6"],
+      barrow: ["#5a4028", "#f0c870"],
+      saltflats: ["#b4a48e", "#f0c0c8"],
+      choir: ["#5a6a7a", "#dfeaf6"]
     };
     const [body, metal] = trim[kind] ?? ["#7a5a3c", "#d8b848"];
     return cached(
@@ -11508,6 +18739,45 @@
         } else flameAt(c, x, y - 10, t, 1, s.id);
         return;
       }
+      case "waystone": {
+        blit(c, staticSprite("waystone"), x, y);
+        const open = !!g.s.pocket, pulse2 = 0.5 + 0.5 * Math.sin(t * 3 + s.id);
+        c.fillStyle = open ? "#9af0ff" : "#6a6a88";
+        c.globalAlpha = open ? 0.6 + pulse2 * 0.4 : 0.5;
+        for (const [rx, ry] of [
+          [0, -35],
+          [1, -27],
+          [0, -19]
+        ])
+          c.fillRect(x + rx - 1, y + ry, 2, 3);
+        if (open) {
+          c.globalAlpha = 0.35 + pulse2 * 0.3;
+          for (let i = 0; i < 14; i++) c.fillRect(x, y - 50 - i * 2 - Math.floor(t * 10 % 2), 1, 1);
+        }
+        c.globalAlpha = 1;
+        return;
+      }
+      case "shrine": {
+        blit(c, staticSprite("shrine"), x, y);
+        if (s.crop !== "spent") {
+          c.fillStyle = "#fff0a0";
+          c.globalAlpha = 0.6 + Math.sin(t * 3 + s.id) * 0.3;
+          c.fillRect(x - 1, y - 16, 2, 3);
+          c.fillRect(x, y - 26 - Math.round(t * 6 % 6), 1, 1);
+          c.globalAlpha = 1;
+        }
+        return;
+      }
+      case "kiln":
+        blit(c, staticSprite("kiln"), x, y);
+        flameAt(c, x, y - 4, t, 2, s.id);
+        smoke(c, x, y - 40, t, s.id, 0.7);
+        return;
+      case "kitchen":
+        blit(c, staticSprite("kitchen"), x, y);
+        flameAt(c, x - 6, y - 7, t, 1, s.id);
+        smoke(c, x - 2, y - 34, t, s.id, 0.6);
+        return;
       case "door":
         blit(c, staticSprite(s.crop === "open" ? "door_open" : "door_closed"), x, y);
         return;
@@ -11946,7 +19216,7 @@
   var chunks = /* @__PURE__ */ new Map();
   var chunkTiles = null;
   function chunkSig(g, cx, cy) {
-    let s = 17;
+    let s = data_exports.inPocket(cx * CH * T2) ? 17 + (data_exports.activeRealm()?.inst.seed ?? 0) : 17;
     for (let ty = cy * CH - 1; ty <= cy * CH + CH; ty++)
       for (let tx = cx * CH - 1; tx <= cx * CH + CH; tx++)
         s = Math.imul(s, 31) + g.tileAt(tx, ty) * 64 + g.wallEditAt(tx, ty) + 3 | 0;
@@ -11998,15 +19268,15 @@
     }
     const visible = [];
     const cx0 = Math.floor(ax / CPX), cx1 = Math.floor((ax + w) / CPX), cy0 = Math.max(0, Math.floor(ay / CPX)), cy1 = Math.floor((ay + h) / CPX);
-    let built = 0;
+    let built2 = 0;
     for (let cy = cy0; cy <= cy1; cy++)
       for (let cx = cx0; cx <= cx1; cx++) {
         if (cx < 0 || cx * CH >= data_exports.TILE_COLS || cy * CH >= data_exports.TILE_ROWS) continue;
         const key = cx + ":" + cy;
         let ch = chunks.get(key);
-        if (!ch || ch.sig !== chunkSig(g, cx, cy) && built < 3) {
+        if (!ch || ch.sig !== chunkSig(g, cx, cy) && built2 < 3) {
           ch = renderChunk(g, cx, cy);
-          built++;
+          built2++;
         }
         chunks.delete(key);
         chunks.set(key, ch);
@@ -12053,7 +19323,7 @@
   // src/renderer/Renderer.ts
   var art = null;
   function drawLadders(c, ax, ay, w, h) {
-    for (const shaft of data_exports.SHAFTS) {
+    for (const shaft of data_exports.allShafts()) {
       const sx = Math.round(shaft.x / PX - ax);
       if (sx < -30 || sx > w + 30) continue;
       const surface = shaft.top < data_exports.surfaceAt(shaft.x) + 20, y1 = Math.round((surface ? data_exports.surfaceAt(shaft.x) - 24 : shaft.top) / PX - ay), y2 = Math.round((shaft.bottom + 40) / PX - ay);
@@ -12218,7 +19488,9 @@
     if (!menu2) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
     drawProjectiles(a, g, ax, ay, w, h);
     drawParticles(a, ax, ay, now);
+    if (!menu2) drawTide(a, g, ax, ay, w, h, now);
     drawLighting(a, g, ax, ay, w, h, gatherLights(g, t, menu2));
+    if (!menu2) drawRealmAir(a, g, ax, ay, w, h, now);
     drawCursor(a, g, ax, ay, cursor);
     drawWeather(a, g, ax, ay, w, h, fx, menu2);
     c.imageSmoothingEnabled = false;
@@ -12234,7 +19506,7 @@
     return (Number(m[3]) + 1) * 12 + LETTERS[m[1]] + acc;
   }
   var midiToHz = (midi) => 440 * 2 ** ((midi - 69) / 12);
-  var QUALITIES = {
+  var QUALITIES2 = {
     "": [0, 4, 7],
     m: [0, 3, 7],
     "5": [0, 7],
@@ -12259,12 +19531,12 @@
   var pitchClass = (letter, acc = "") => (LETTERS[letter.toLowerCase()] + (acc === "#" ? 1 : acc === "b" ? -1 : 0) + 12) % 12;
   function parseChord(symbol) {
     const m = /^([A-G])(#|b)?([^/]*)(?:\/([A-G])(#|b)?)?$/.exec(symbol);
-    if (!m || !(m[3] in QUALITIES)) throw new Error(`Bad chord "${symbol}"`);
+    if (!m || !(m[3] in QUALITIES2)) throw new Error(`Bad chord "${symbol}"`);
     const root = pitchClass(m[1], m[2]);
     return {
       root,
       bass: m[4] ? pitchClass(m[4], m[5]) : root,
-      intervals: QUALITIES[m[3]]
+      intervals: QUALITIES2[m[3]]
     };
   }
   function chordTones(chord, low) {
@@ -13967,7 +21239,7 @@
       this.ctx = ctx2;
       this.out = out;
       const k = kit(ctx2);
-      const bed = (name, build) => {
+      const bed = (name, build9) => {
         const g = ctx2.createGain();
         g.gain.value = 0;
         const n = ctx2.createBufferSource();
@@ -13975,7 +21247,7 @@
         n.loop = true;
         n.playbackRate.value = 0.97 + Object.keys(this.beds).length * 0.013;
         n.start();
-        build(n).connect(g).connect(out);
+        build9(n).connect(g).connect(out);
         this.beds[name] = g;
       };
       bed("rain", (n) => {
@@ -15849,6 +23121,403 @@
     }
   );
 
+  // src/audio/tracks/orchard.ts
+  var orchard = compose(
+    {
+      id: "orchard",
+      title: "Brine and Blossom",
+      mood: "The Drowned Orchard",
+      bpm: 92,
+      bars: 24,
+      parts: {
+        kick: { inst: "kick", vol: 0.55 },
+        rim: { inst: "rim", vol: 0.3, rev: 0.3 },
+        shaker: { inst: "shaker", vol: 0.35, pan: 0.3 },
+        drip: { inst: "drip", vol: 0.35, rev: 0.7, echo: 0.4, pan: -0.4 },
+        bass: { inst: "bass", vol: 0.75, cutoff: 800 },
+        harp: { inst: "harp", vol: 0.7, rev: 0.45, pan: -0.2 },
+        pad: { inst: "pad", vol: 0.55, rev: 0.55 },
+        flute: { inst: "flute", vol: 0.95, rev: 0.45, echo: 0.18 },
+        strings: { inst: "strings", vol: 0.8, rev: 0.5 },
+        marimba: { inst: "marimba", vol: 0.65, rev: 0.3, pan: 0.2 },
+        pizz: { inst: "pizz", vol: 0.55, rev: 0.3, pan: -0.2 }
+      },
+      echoBeats: 1.5,
+      echoFeedback: 0.36
+    },
+    (s) => {
+      const progA = "Em C G D Em C Am B", progB = "Am Em C G Am Em F B";
+      const theme = "e5:4 g5:4 b5:6 a5:2 | g5:4 e5:4 c5:8 | d5:4 g5:4 b5:4 d6:4 | c6:6 b5:2 a5:8 | b5:4 e5:4 g5:6 f#5:2 | e5:4 c5:4 e5:8 | a5:4 c6:4 b5:4 a5:4 | f#5:8 d#5:8";
+      const bed = (bar, prog) => {
+        s.arp("harp", bar, prog, "0 1 2 3 2 1 2 3", 52, 2, { vel: 0.8 });
+        s.bass("bass", bar, prog, "R:6 5:2 8:8", 34);
+        s.pad("pad", bar, prog, 62, { vel: 0.6 });
+        const n = s.progression(bar, prog).length;
+        s.grid("kick", bar, "x.........x.....", n);
+        s.grid("rim", bar, "........x.......", n);
+        s.grid("shaker", bar, "o.o.o.o.o.o.o.o.", n);
+        for (let i = 0; i < n; i += 2) s.at("drip", bar + i + 0.62, i % 4 ? "b6" : "e7", 0.25, 0.7);
+      };
+      s.play("flute", 0, theme);
+      bed(0, progA);
+      s.play(
+        "strings",
+        8,
+        "c6:8 b5:8 | g5:8 e5:8 | e5:6 g5:2 c6:8 | b5:6 a5:2 g5:8 | a5:4 c6:4 e6:8 | e6:4 d6:4 b5:8 | c6:4 a5:4 f5:8 | d#5:8 f#5:8"
+      );
+      bed(8, progB);
+      s.play("marimba", 16, theme);
+      s.play("pizz", 16, theme, { transpose: -12, vel: 0.7 });
+      s.play("flute", 16, "r:16 | r:16 | r:16 | r:16 | b5:16 | c6:16 | a5:16 | b5:16", {
+        vel: 0.5
+      });
+      bed(16, progA);
+    }
+  );
+
+  // src/audio/tracks/steppe.ts
+  var steppe = compose(
+    {
+      id: "steppe",
+      title: "The Kiln Road",
+      mood: "The Ashen Steppe",
+      bpm: 112,
+      bars: 24,
+      parts: {
+        doum: { inst: "doum", vol: 0.85 },
+        tek: { inst: "tek", vol: 0.45, pan: 0.2 },
+        taiko: { inst: "taiko", vol: 0.6, rev: 0.3 },
+        shaker: { inst: "shaker", vol: 0.35, pan: -0.3 },
+        crash: { inst: "crash", vol: 0.4, rev: 0.3 },
+        bass: { inst: "bass", vol: 0.85 },
+        oud: { inst: "oud", vol: 0.65, rev: 0.3, pan: -0.2 },
+        shawm: { inst: "shawm", vol: 0.85, rev: 0.4, echo: 0.15 },
+        brass: { inst: "brass", vol: 0.7, rev: 0.4 },
+        pad: { inst: "pad", vol: 0.45, rev: 0.5 },
+        wind: { inst: "wind", vol: 0.35, rev: 0.4 }
+      }
+    },
+    (s) => {
+      const progA = "Dm Dm C Dm Dm F C Dm", progB = "Bb C Dm Am Bb C Dm Dm";
+      const theme = "d5:4 f5:2 g5:2 a5:8 | g5:2 f5:2 e5:4 d5:8 | c5:4 e5:4 g5:4 e5:4 | d5:12 r:4 | a5:4 c6:2 a5:2 g5:8 | f5:4 a5:4 c6:8 | e5:4 g5:4 f5:2 e5:2 c5:4 | d5:16";
+      const march = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("doum", bar, "x..x..x...x.x...", n);
+        s.grid("tek", bar, "..x..x.x.x..x.xx", n, { vel: 0.8 });
+        s.grid("taiko", bar, "x.......x.......", n);
+        s.grid("shaker", bar, "x.x.x.x.x.x.x.x.", n, { vel: 0.7 });
+        s.arp("oud", bar, prog, "0 2 1 2 0 2 1 2", 50, 2, { vel: 0.8 });
+        s.bass("bass", bar, prog, "R:4 R:2 5:2 8:4 5:4", 38);
+        s.pad("pad", bar, prog, 58, { vel: 0.5 });
+      };
+      s.play("shawm", 0, theme);
+      march(0, progA);
+      s.grid("crash", 8, "x...............");
+      s.play(
+        "brass",
+        8,
+        "f5:8 g5:8 | a5:12 r:4 | d6:8 c6:8 | a5:16 | bb5:8 c6:8 | d6:8 e6:8 | f6:8 e6:4 d6:4 | d6:16",
+        { transpose: -12 }
+      );
+      s.play("wind", 8, "d5:32 | a5:32 | d5:32 | a5:32", { vel: 0.6 });
+      march(8, progB);
+      s.grid("crash", 16, "x...............");
+      s.play("shawm", 16, theme);
+      s.play("brass", 16, theme, { transpose: -12, vel: 0.55 });
+      march(16, progA);
+    }
+  );
+
+  // src/audio/tracks/warren.ts
+  var warren = compose(
+    {
+      id: "warren",
+      title: "Under the Amber",
+      mood: "The Hollow Warren",
+      bpm: 96,
+      bars: 24,
+      parts: {
+        kick: { inst: "kick", vol: 0.6 },
+        rim: { inst: "rim", vol: 0.4, rev: 0.4 },
+        shaker: { inst: "shaker", vol: 0.3, pan: 0.3 },
+        drip: { inst: "drip", vol: 0.4, rev: 0.7, echo: 0.4, pan: 0.4 },
+        sub: { inst: "sub", vol: 0.7 },
+        marimba: { inst: "marimba", vol: 0.75, rev: 0.35, pan: -0.15 },
+        pizz: { inst: "pizz", vol: 0.55, rev: 0.4, pan: 0.2 },
+        musicbox: { inst: "musicbox", vol: 0.55, rev: 0.6, echo: 0.3 },
+        choir: { inst: "choir", vol: 0.45, rev: 0.7 },
+        pad: { inst: "pad", vol: 0.5, rev: 0.6, cutoff: 1800 }
+      },
+      echoBeats: 0.75,
+      echoFeedback: 0.4
+    },
+    (s) => {
+      const progA = "Cm Ab Fm G Cm Ab Bb G", progB = "Ab Bb Cm Cm Ab Bb G G";
+      const claws = "c5:2 eb5:2 g5:2 eb5:2 c5:4 g4:4 | ab4:4 c5:4 eb5:8 | f5:2 ab5:2 f5:2 c5:2 f5:8 | d5:4 g5:4 b4:8 | c5:2 eb5:2 g5:2 c6:2 bb5:4 g5:4 | ab5:4 g5:4 eb5:8 | bb4:4 d5:4 f5:4 d5:4 | g4:16";
+      const dark = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.bass("sub", bar, prog, "R:8 R:4 5:4", 30);
+        s.pad("pad", bar, prog, 55, { vel: 0.6 });
+        s.grid("kick", bar, "x......x..x.....", n);
+        s.grid("rim", bar, "....x.......x..x", n, { vel: 0.7 });
+        s.grid("shaker", bar, "..o...o...o...o.", n);
+        for (let i = 0; i < n; i += 2) s.at("drip", bar + i + 0.4, i % 4 ? "g6" : "c7", 0.25, 0.7);
+      };
+      s.play("marimba", 0, claws);
+      s.play("pizz", 0, claws, { transpose: -12, vel: 0.5 });
+      dark(0, progA);
+      s.play(
+        "musicbox",
+        8,
+        "eb6:8 d6:8 | c6:12 r:4 | ab5:8 bb5:8 | g5:16 | eb6:8 f6:8 | g6:8 f6:4 eb6:4 | d6:16 | b5:16"
+      );
+      s.pad("choir", 8, progB, 60, { vel: 0.7 });
+      dark(8, progB);
+      s.play("marimba", 16, claws);
+      s.play("musicbox", 16, claws, { transpose: 12, vel: 0.4 });
+      dark(16, progA);
+    }
+  );
+
+  // src/audio/tracks/glasswood.ts
+  var glasswood = compose(
+    {
+      id: "glasswood",
+      title: "Prism Canopy",
+      mood: "The Glasswood",
+      bpm: 96,
+      bars: 24,
+      parts: {
+        musicbox: { inst: "musicbox", vol: 0.6, rev: 0.6, echo: 0.3 },
+        crystal: { inst: "crystal", vol: 0.55, rev: 0.6, echo: 0.25, pan: 0.2 },
+        harp: { inst: "harp", vol: 0.6, rev: 0.5, pan: -0.2 },
+        bell: { inst: "bell", vol: 0.35, rev: 0.7 },
+        strings: { inst: "strings", vol: 0.45, rev: 0.6 },
+        pad: { inst: "pad", vol: 0.45, rev: 0.6, cutoff: 2400 },
+        bass: { inst: "bass", vol: 0.6 },
+        shaker: { inst: "shaker", vol: 0.25, pan: 0.3 },
+        drip: { inst: "drip", vol: 0.35, rev: 0.7, echo: 0.4, pan: -0.4 }
+      },
+      echoBeats: 0.75,
+      echoFeedback: 0.35
+    },
+    (s) => {
+      const progA = "E F#/E E F#/E C#m7 F# Bmaj7 F#", progB = "C#m7 B A#m7b5 Emaj7 C#m7 D#m7 F# F#";
+      const theme = "e5:4 g#5:4 a#5:4 b5:4 | d#6:8 b5:8 | c#6:4 b5:4 a#5:4 g#5:4 | f#5:12 r:4 | e5:4 f#5:4 g#5:4 d#6:4 | c#6:8 a#5:8 | b5:4 a#5:4 f#5:4 d#5:4 | e5:16";
+      const shimmer = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.arp("harp", bar, prog, "0 1 2 3 2 1 2 3", 52, 2, { vel: 0.7 });
+        s.bass("bass", bar, prog, "R:8 5:8", 40);
+        s.pad("pad", bar, prog, 64, { vel: 0.5 });
+        s.grid("shaker", bar, "..x...x...x...x.", n, { vel: 0.6 });
+        for (let i = 0; i < n; i += 2) s.at("drip", bar + i + 0.6, i % 4 ? "b6" : "e7", 0.25, 0.6);
+      };
+      s.play("musicbox", 0, theme);
+      shimmer(0, progA);
+      s.play(
+        "crystal",
+        8,
+        "g#5:8 a#5:8 | b5:12 r:4 | c#6:8 b5:4 a#5:4 | g#5:16 | e5:8 f#5:8 | g#5:4 a#5:4 b5:8 | a#5:16 | f#5:16"
+      );
+      s.pad("strings", 8, progB, 60, { vel: 0.6 });
+      for (let b = 8; b < 16; b += 2) s.at("bell", b, b % 4 ? "g#6" : "e6", 4, 0.6);
+      shimmer(8, progB);
+      s.play("crystal", 16, theme);
+      s.play("musicbox", 16, theme, { transpose: 12, vel: 0.45 });
+      shimmer(16, progA);
+    }
+  );
+
+  // src/audio/tracks/marches.ts
+  var marches = compose(
+    {
+      id: "marches",
+      title: "Ossuary Fen",
+      mood: "The Bone Marches",
+      bpm: 76,
+      bars: 18,
+      parts: {
+        toll: { inst: "toll", vol: 0.5, rev: 0.8 },
+        chant: { inst: "chant", vol: 0.6, rev: 0.7 },
+        reed: { inst: "reed", vol: 0.6, rev: 0.6, echo: 0.2, pan: 0.2 },
+        strings: { inst: "strings", vol: 0.5, rev: 0.6, cutoff: 1600 },
+        timpani: { inst: "timpani", vol: 0.6, rev: 0.5 },
+        tom: { inst: "tom", vol: 0.4, rev: 0.4, pan: -0.2 },
+        bass: { inst: "bass", vol: 0.7 },
+        pad: { inst: "pad", vol: 0.4, rev: 0.7, cutoff: 1400 },
+        wind: { inst: "wind", vol: 0.3, rev: 0.5 }
+      }
+    },
+    (s) => {
+      const progA = "Dm Eb Dm Cm Dm Eb Bb A", progB = "Bb C Dm Dm Eb F Gm A";
+      const march = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("timpani", bar, "x.......x.......", n);
+        s.grid("tom", bar, "......x.......x.", n, { vel: 0.6 });
+        s.bass("bass", bar, prog, "R:12 5:4", 38);
+        s.pad("pad", bar, prog, 56, { vel: 0.5 });
+        for (let i = 0; i < n; i += 4) s.at("toll", bar + i, "d4", 8, 0.8);
+      };
+      s.play(
+        "chant",
+        0,
+        "d4:8 eb4:8 | f4:4 eb4:4 d4:8 | c4:8 d4:8 | a3:16 | d4:4 f4:4 g4:4 a4:4 | bb4:8 a4:8 | g4:4 f4:4 eb4:8 | d4:16"
+      );
+      s.play("wind", 0, "d5:32 | a4:32 | d5:32 | a4:32", { vel: 0.5 });
+      march(0, progA);
+      s.play(
+        "reed",
+        8,
+        "a4:4 bb4:4 c5:8 | d5:12 r:4 | f5:8 eb5:4 d5:4 | c5:16 | bb4:8 c5:8 | d5:4 eb5:4 f5:8 | g5:8 f5:4 eb5:4 | c#5:16"
+      );
+      s.pad("strings", 8, progB, 58, { vel: 0.6 });
+      march(8, progB);
+      s.pad("strings", 16, "Dm:2", 58, { vel: 0.5 });
+      s.at("toll", 16, "d4", 8, 0.9);
+      s.bass("bass", 16, "Dm:2", "R:16", 38);
+    }
+  );
+
+  // src/audio/tracks/barrow.ts
+  var barrow = compose(
+    {
+      id: "barrow",
+      title: "The Engine Hymn",
+      mood: "The Clockwork Barrow",
+      bpm: 108,
+      bars: 24,
+      parts: {
+        kick: { inst: "kick", vol: 0.6 },
+        tek: { inst: "tek", vol: 0.4, pan: 0.3 },
+        rim: { inst: "rim", vol: 0.45, rev: 0.3, pan: -0.3 },
+        marimba: { inst: "marimba", vol: 0.7, rev: 0.3 },
+        synthbass: { inst: "synthbass", vol: 0.6 },
+        organ: { inst: "organ", vol: 0.5, rev: 0.6 },
+        brass: { inst: "brass", vol: 0.5, rev: 0.4 },
+        bell: { inst: "bell", vol: 0.4, rev: 0.6, echo: 0.2 },
+        pad: { inst: "pad", vol: 0.35, rev: 0.6, cutoff: 1800 }
+      }
+    },
+    (s) => {
+      const progA = "Am Am F G Am Am E E", progB = "F G Am Am F G E E";
+      const hymn = "a4:8 c5:8 | e5:12 r:4 | d5:8 c5:4 b4:4 | c5:16 | a4:4 b4:4 c5:4 e5:4 | f5:8 e5:8 | d5:4 c5:4 b4:8 | e5:16";
+      const works = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.arp("marimba", bar, prog, "0 2 1 2 3 2 1 2", 57, 2, { vel: 0.8 });
+        s.grid("tek", bar, "x.x.x.x.x.x.x.x.", n, { vel: 0.6 });
+        s.grid("rim", bar, "....x.......x..x", n, { vel: 0.7 });
+        s.grid("kick", bar, "x.....x...x.....", n);
+        s.bass("synthbass", bar, prog, "R:4 R:2 R:2 5:4 R:4", 33);
+        s.pad("pad", bar, prog, 57, { vel: 0.5 });
+      };
+      works(0, progA);
+      s.hits("brass", 4, "Am F G E", "x.......x.....x.", 55, { vel: 0.5 });
+      s.play("organ", 8, hymn);
+      works(8, progB);
+      s.play("organ", 16, hymn, { vel: 0.8 });
+      s.play("bell", 16, hymn, { transpose: 12, vel: 0.5 });
+      works(16, progA);
+      s.hits("brass", 20, "Am F G E", "x.......x.....x.", 55, { vel: 0.6 });
+    }
+  );
+
+  // src/audio/tracks/saltflats.ts
+  var saltflats = compose(
+    {
+      id: "saltflats",
+      title: "White Sun of Oru",
+      mood: "The Salt Flats of Oru",
+      bpm: 100,
+      bars: 24,
+      parts: {
+        doum: { inst: "doum", vol: 0.75 },
+        tek: { inst: "tek", vol: 0.4, pan: 0.25 },
+        zill: { inst: "zill", vol: 0.3, pan: -0.3, rev: 0.4 },
+        oud: { inst: "oud", vol: 0.6, rev: 0.3, pan: -0.2 },
+        reed: { inst: "reed", vol: 0.65, rev: 0.5, echo: 0.2 },
+        strings: { inst: "strings", vol: 0.45, rev: 0.6 },
+        sub: { inst: "sub", vol: 0.55 },
+        pad: { inst: "pad", vol: 0.35, rev: 0.6, cutoff: 2200 },
+        wind: { inst: "wind", vol: 0.3, rev: 0.5 }
+      }
+    },
+    (s) => {
+      const progA = "A A Bb A Gm A Bb A", progB = "Dm Dm Gm A Bb A Gm A";
+      const theme = "a4:4 bb4:4 c#5:4 d5:4 | e5:12 r:4 | f5:4 e5:4 d5:4 c#5:4 | d5:8 bb4:8 | a4:4 c#5:4 e5:4 g5:4 | f5:8 e5:8 | d5:4 c#5:4 bb4:4 c#5:4 | a4:16";
+      const pulse2 = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.grid("doum", bar, "x..x..x.x...x...", n);
+        s.grid("tek", bar, "..x.x..x..x.x.xx", n, { vel: 0.7 });
+        s.grid("zill", bar, "x.......x.......", n, { vel: 0.6 });
+        s.arp("oud", bar, prog, "0 1 2 1 0 1 2 3", 50, 2, { vel: 0.7 });
+        s.bass("sub", bar, prog, "R:16", 33);
+        s.pad("pad", bar, prog, 57, { vel: 0.45 });
+      };
+      s.play("reed", 0, theme);
+      s.play("wind", 0, "a4:32 | e5:32 | a4:32 | e5:32", { vel: 0.5 });
+      pulse2(0, progA);
+      s.play(
+        "strings",
+        8,
+        "d5:8 f5:8 | a5:12 r:4 | g5:8 f5:4 e5:4 | c#5:16 | d5:8 e5:8 | f5:4 e5:4 d5:8 | bb4:8 c#5:8 | a4:16"
+      );
+      pulse2(8, progB);
+      s.play("reed", 16, theme);
+      s.play("oud", 16, theme, { transpose: -12, vel: 0.5 });
+      pulse2(16, progA);
+    }
+  );
+
+  // src/audio/tracks/choir.ts
+  var choir2 = compose(
+    {
+      id: "choir",
+      title: "Frozen Hymnal",
+      mood: "The Frozen Choir",
+      bpm: 66,
+      bars: 16,
+      parts: {
+        choir: { inst: "choir", vol: 0.55, rev: 0.8 },
+        organ: { inst: "organ", vol: 0.4, rev: 0.7 },
+        strings: { inst: "strings", vol: 0.55, rev: 0.7 },
+        bell: { inst: "bell", vol: 0.45, rev: 0.8, echo: 0.3 },
+        toll: { inst: "toll", vol: 0.35, rev: 0.8 },
+        harp: { inst: "harp", vol: 0.45, rev: 0.6, pan: 0.2 },
+        sub: { inst: "sub", vol: 0.55 },
+        timpani: { inst: "timpani", vol: 0.45, rev: 0.6 },
+        wind: { inst: "wind", vol: 0.3, rev: 0.6 }
+      }
+    },
+    (s) => {
+      const progA = "Cm Ab Eb Bb Cm Fm G G", progB = "Ab Bb Cm Cm Ab Bb G G";
+      const nave = (bar, prog) => {
+        const n = s.progression(bar, prog).length;
+        s.pad("choir", bar, prog, 62, { vel: 0.7 });
+        s.pad("organ", bar, prog, 50, { vel: 0.5 });
+        s.arp("harp", bar, prog, "0 1 2 3 4 3 2 1", 55, 2, { vel: 0.5 });
+        s.bass("sub", bar, prog, "R:16", 33);
+        s.grid("timpani", bar, "x...............", n, { vel: 0.6 });
+        for (let i = 0; i < n; i += 4) s.at("toll", bar + i, "c4", 8, 0.6);
+      };
+      s.play(
+        "strings",
+        0,
+        "g4:8 ab4:8 | bb4:4 ab4:4 g4:8 | eb4:8 f4:8 | d4:16 | g4:4 c5:4 d5:4 eb5:4 | f5:8 eb5:8 | d5:4 c5:4 b4:8 | b4:8 d5:8"
+      );
+      s.play("wind", 0, "c5:32 | g4:32", { vel: 0.5 });
+      nave(0, progA);
+      s.play(
+        "bell",
+        8,
+        "eb5:8 d5:8 | c5:12 r:4 | ab4:8 bb4:8 | g4:16 | eb5:8 f5:8 | g5:8 f5:4 eb5:4 | d5:16 | b4:16"
+      );
+      s.play("strings", 8, "c5:16 | d5:16 | eb5:16 | c5:16 | ab4:16 | bb4:16 | b4:16 | b4:16", {
+        vel: 0.5
+      });
+      nave(8, progB);
+    }
+  );
+
   // src/audio/tracks/town.ts
   var town = compose(
     {
@@ -15981,7 +23650,15 @@
     skyreach,
     voidsong,
     finalBoss,
-    town
+    town,
+    orchard,
+    steppe,
+    warren,
+    glasswood,
+    marches,
+    barrow,
+    saltflats,
+    choir2
   ];
   var TRACKS = Object.fromEntries(TRACK_LIST.map((t) => [t.id, t]));
 
@@ -16126,7 +23803,15 @@
     lower_hell: "pandemonium",
     mycelia: "mycelia",
     skyreach: "skyreach",
-    void: "void"
+    void: "void",
+    orchard: "orchard",
+    steppe: "steppe",
+    warren: "warren",
+    glasswood: "glasswood",
+    marches: "marches",
+    barrow: "barrow",
+    saltflats: "saltflats",
+    choir: "choir"
   };
   var DUNGEON_TRACKS = {
     crypt: "dungeon",
@@ -16253,8 +23938,23 @@
     selectedRecipe: "stone_axe",
     farm: null,
     chest: null,
+    /** The cold storage open on the Pack page. */
+    larder: null,
     /** The settler whose wares the Town page shows. */
     shop: null,
+    /** The Atlas page: generated realms (by the selected one), or the Rift Gate. */
+    atlasView: "realms",
+    atlasRealm: "orchard",
+    atlasTier: 1,
+    /** The Gear page: what you wear, or the Armoury's weapon hierarchy (and which weapon). */
+    gearView: "gear",
+    skillTree: "warfare",
+    /** The Beasts page: the Effergy and bestiary, or the Codex (and which page). */
+    beastsView: "beasts",
+    codexPage: "wilds",
+    /** The relic shelf open on the Pack page. */
+    shelf: null,
+    armourySel: "iron_sword",
     camera: { x: 0, y: 0 },
     lastFrame: performance.now(),
     lastUI: 0,
@@ -16461,7 +24161,7 @@
       renderJournal();
     }
   );
-  var TABS = ["pack", "gear", "recipes", "vitals", "notes", "beasts", "rift", "town"];
+  var TABS = ["pack", "gear", "recipes", "vitals", "notes", "beasts", "atlas", "town"];
   function toggleJournal(force) {
     if (!state.playing || game.s.dead) return;
     state.journal = force === void 0 ? !state.journal : force;
@@ -16497,11 +24197,33 @@
       }
       if (result.action === "chest") {
         state.chest = result.structure ?? null;
+        state.larder = null;
         state.tab = "pack";
         toggleJournal(true);
       }
       if (result.action === "rift") {
-        state.tab = "rift";
+        state.tab = "atlas";
+        state.atlasView = "rift";
+        toggleJournal(true);
+      }
+      if (result.action === "shelf") {
+        state.shelf = result.structure ?? null;
+        state.larder = null;
+        state.tab = "pack";
+        sound("open");
+        toggleJournal(true);
+      }
+      if (result.action === "larder") {
+        state.larder = result.structure ?? null;
+        state.chest = null;
+        state.tab = "pack";
+        sound("open");
+        toggleJournal(true);
+      }
+      if (result.action === "atlas") {
+        state.tab = "atlas";
+        state.atlasView = "realms";
+        sound("page");
         toggleJournal(true);
       }
       if (result.action === "shop") {
@@ -16643,7 +24365,7 @@
       vitals: "04",
       notes: "05",
       beasts: "06",
-      rift: "07",
+      atlas: "07",
       town: "08"
     };
     $("page-number").textContent = page[tab];
@@ -16655,9 +24377,19 @@
     if (tab === "recipes") renderRecipes(left, right);
     if (tab === "vitals") renderVitals(left, right);
     if (tab === "notes") renderNotes(left, right);
-    if (tab === "beasts") renderBeasts(left, right);
-    if (tab === "gear") renderGear(left, right);
-    if (tab === "rift") renderRift(left, right);
+    if (tab === "beasts") {
+      if (state.beastsView === "codex") renderCodex(left, right);
+      else renderBeasts(left, right);
+    }
+    if (tab === "gear") {
+      if (state.gearView === "armoury") renderArmoury(left, right);
+      else if (state.gearView === "skills") renderSkills(left, right);
+      else renderGear(left, right);
+    }
+    if (tab === "atlas") {
+      if (state.atlasView === "rift") renderRift(left, right);
+      else renderAtlas(left, right);
+    }
     if (tab === "town") renderTown(left, right);
     pixelate(left);
     pixelate(right);
@@ -16668,6 +24400,27 @@
     if (type === "beast")
       return `<svg class="sketch" viewBox="0 0 440 155" xmlns="http://www.w3.org/2000/svg"><circle cx="211" cy="74" r="63" fill="none" stroke="#afa085" stroke-width="1"/><g fill="none" stroke="#5d5147" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="2.6" d="M91 123q21-29 52-34l23-34 18 14 22-43 17 42 26-20 8 30 37-6 43 28-39 14-14 21-40 11-80-15z"/><path stroke-width="1.7" d="M154 94l-22-11 11-26 20 20m66-15 27-20 14 38m-37 57q23-19 56-21m-117 10 39-11 31 10m57-30 22 7-20 5"/><path stroke-width="1" d="M127 112l31-18m-16 26 28-20m-3 26 27-27m-8 30 30-24m-6 28 30-28m-3 28 25-24m-4 22 23-17m-42-63 26 15m-59-35 24 27m-32-39 17 38m-47-12 22 21m-62 9 22 10m93 5 16-15"/><path stroke-width="1.5" d="M311 102q-8 14-25 19m-91-33q10-5 18-3m-19-3 14-10m33 31 6 17m6-15 8 16"/></g><path d="M278 88q8-6 15 1-9 7-15-1" fill="#954d45"/><circle cx="286" cy="88" r="2" fill="#f0dbc1"/><path d="M327 97l14 4-13 5z" fill="#5d5147"/><text x="19" y="31" fill="#7c624d" font-family="Caveat" font-size="22">the old wolf</text><path d="M90 37q23 15 37 35" fill="none" stroke="#7c624d"/><text x="313" y="142" fill="#7c624d" font-family="Caveat" font-size="18">eyes like embers</text></svg>`;
     return `<svg class="sketch" viewBox="0 0 440 145" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#66694f" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="4" d="M167 121 278 17"/><path stroke-width="2" d="M163 119q-8 7-3 13 7 4 14-5l-7-8m103-99q19-15 42-11l27 24q-19 3-32 18l-37-17z"/><path stroke-width="1" d="M274 21q25 8 33 30m-15-40 19 30m-9-29 19 25m-71 25-11-14m8 18-11-14m7 20-12-13m6 18-11-13m-9 20-13-13m10 21-13-13m8 19-13-12m-23 23 12 12m90-80 20-15m-15 28 29-16m-25 26 30-14M62 120q40-17 86 0m197 4q26-11 58-3"/><path stroke-width="1.5" d="M52 125l-7-18m7 18 10-18m16 17-3-14m275 14-9-16m9 16 11-17"/></g><path d="M270 22l29-9 28 19-18 8z" fill="#a8a88a" opacity=".26"/><text x="35" y="37" fill="#7d624b" font-family="Caveat" font-size="22">stone edge</text><path d="M98 42q36-4 65 24" fill="none" stroke="#7d624b"/><text x="315" y="82" fill="#7d624b" font-family="Caveat" font-size="20">fiber binding</text><path d="M315 84q-27-6-49-15" fill="none" stroke="#7d624b"/></svg>`;
+  }
+  function freshness(e) {
+    if (e.fresh === void 0) return "";
+    const st = game.itemState(e), life = ITEMS[e.id]?.[2] || 1, pct = clamp3(e.fresh / life * 100, 0, 100);
+    return `<small class="${st}">${st.toUpperCase()} \xB7 ${Math.max(0, Math.ceil(e.fresh / 60))} min</small><span class="fresh-bar ${st}"><i style="width:${pct}%"></i></span>`;
+  }
+  function larderPanel(st) {
+    const spec = STORAGE[st.type], larder = game.larder, cold2 = larder.cold(st), left = larder.coldLeft(st), stored = st.larder ?? [];
+    const byId = /* @__PURE__ */ new Map();
+    for (const e of stored) {
+      const b = byId.get(e.id);
+      if (!b) byId.set(e.id, { n: e.qty, worst: e });
+      else {
+        b.n += e.qty;
+        if ((e.fresh ?? 0) < (b.worst.fresh ?? 0)) b.worst = e;
+      }
+    }
+    const gauge = spec.fuel ? `<div class="vital-row ${left < 180 ? "danger" : ""}"><span>Cold</span><span class="mini-track"><i style="width:${clamp3(st.fuel / ((spec.per ?? 900) * 3) * 100, 0, 100)}%"></i></span><b>${left === Infinity ? "\u221E" : Math.round(left / 60) + "m"}</b></div>` : "";
+    return `<h2>${spec.name}</h2><p class="lede">${spec.text}</p>${gauge}<p>${cold2 ? `Cold: food here ages at <strong>\xD7${larder.multiplier(st).toFixed(2)}</strong>` : "<strong>Warm</strong>: food here ages as fast as anywhere"} \xB7 ${stored.length} / ${spec.capacity} stored</p>${spec.fuel ? `<div class="book-actions"><button data-refuel ${game.count(spec.fuel) ? "" : "disabled"}>ADD ${pretty(spec.fuel).toUpperCase()} \xB7 ${game.count(spec.fuel)} CARRIED</button></div>` : ""}<h3>Stored</h3><div class="book-list">${[...byId.entries()].map(
+      ([id, b]) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong>${freshness(b.worst)}</div></div><div><span class="qty">\xD7${b.n}</span><button data-take="${id}">TAKE</button></div></div>`
+    ).join("") || "<p>Empty. Stow food from your pack on the right.</p>"}</div><div class="book-actions"><button class="quiet" data-close-larder>CLOSE</button></div>`;
   }
   function renderPack(left, right) {
     const items = game.s.inventory;
@@ -16691,15 +24444,63 @@
       "block",
       "structure"
     ];
+    const shown = [];
+    for (const e of items) {
+      const same = e.fresh !== void 0 && shown.find((x) => x.id === e.id && x.fresh !== void 0);
+      if (same) {
+        same.qty += e.qty;
+        same.fresh = Math.min(same.fresh, e.fresh);
+      } else shown.push({ ...e });
+    }
     const groups = [...new Set(items.map((e) => ITEMS[e.id][1]))].sort(
       (a, b) => order.indexOf(a) - order.indexOf(b)
     );
     right.innerHTML = `<h2>Contents</h2><p class="lede">${items.reduce((n, e) => n + e.qty, 0)} objects in the field pack.</p>${groups.map(
-      (category) => `<h3>${category}</h3><div class="book-list">${items.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
-        const use = itemUseLabel(e.id), fresh = e.fresh === void 0 ? "" : `<small class="${game.itemState(e)}">${game.itemState(e).toUpperCase()} \xB7 ${Math.max(0, Math.ceil(e.fresh / 60))} min</small>`;
-        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong>${pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
+      (category) => `<h3>${category}</h3><div class="book-list">${shown.filter((e) => ITEMS[e.id][1] === category).sort((a, b) => pretty(a.id).localeCompare(pretty(b.id))).map((e) => {
+        const use = itemUseLabel(e.id), fresh = freshness(e);
+        const weapon = WEAPONS[e.id] && game.armoury.known(e.id), q = weapon ? QUALITIES[game.armoury.entry(e.id).q] : null;
+        const stow = state.larder && ITEMS[e.id]?.[2];
+        return `<div class="book-row"><div class="with-icon">${icon(e.id)}<div><strong ${q && q.id !== "common" ? `style="color:${q.color}"` : ""}>${weapon ? game.armoury.title(e.id) : pretty(e.id)}</strong>${fresh}</div></div><div><span class="qty">\xD7${e.qty}</span>${stow ? `<button data-stow="${e.id}">STOW</button>` : use ? `<button data-use="${e.id}">${use}</button>` : ""}</div></div>`;
       }).join("")}</div>`
     ).join("") || "<p>Only the journal remains. Gather what the meadow offers.</p>"}`;
+    const shelf = state.shelf;
+    if (shelf) {
+      const held = Object.keys(shelf.store).filter((id) => RELIC_EFFECTS[id]), carried = game.s.inventory.filter((e) => RELIC_EFFECTS[e.id]).map((e) => e.id);
+      left.innerHTML = `<h2>Relic shelf</h2><p class="lede">Relics set here lend their gifts wherever you roam. At renown ${game.skills.level()} the shelf holds ${game.skills.shelfSlots()}.</p><h3>On the shelf \xB7 ${Math.min(held.length, game.skills.shelfSlots())} / ${game.skills.shelfSlots()}</h3><div class="book-list">${held.map(
+        (id) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${relicText(id)}</small></div></div><button data-unshelve="${id}">TAKE</button></div>`
+      ).join("") || "<p>Empty.</p>"}</div><h3>Carried relics</h3><div class="book-list">${carried.map(
+        (id) => `<div class="book-row"><div class="with-icon">${icon(id)}<div><strong>${pretty(id)}</strong><small>${relicText(id)}</small></div></div><button data-shelve="${id}">SET</button></div>`
+      ).join("") || "<p>Relics are won from realm bosses; great trophies rest here too.</p>"}</div><div class="book-actions"><button class="quiet" data-close-shelf>CLOSE</button></div>`;
+      const act = (r) => {
+        if (!r.ok) message(r.reason);
+        renderJournal();
+        updateUI(true);
+      };
+      left.querySelectorAll("[data-shelve]").forEach((b) => b.onclick = () => act(game.skills.shelve(shelf, b.dataset.shelve ?? "")));
+      left.querySelectorAll("[data-unshelve]").forEach(
+        (b) => b.onclick = () => act(game.skills.unshelve(shelf, b.dataset.unshelve ?? ""))
+      );
+      left.querySelector("[data-close-shelf]").onclick = () => {
+        state.shelf = null;
+        renderJournal();
+      };
+    }
+    const larder = state.larder;
+    if (larder) {
+      left.innerHTML = larderPanel(larder);
+      const act = (r) => {
+        if (!r.ok) message(r.reason);
+        renderJournal();
+        updateUI(true);
+      };
+      left.querySelector("[data-refuel]")?.addEventListener("click", () => act(game.larder.refuel(larder)));
+      left.querySelectorAll("[data-take]").forEach((b) => b.onclick = () => act(game.larder.take(larder, b.dataset.take ?? "")));
+      left.querySelector("[data-close-larder]").onclick = () => {
+        state.larder = null;
+        renderJournal();
+      };
+      right.querySelectorAll("[data-stow]").forEach((b) => b.onclick = () => act(game.larder.stow(larder, b.dataset.stow ?? "")));
+    }
     right.querySelectorAll("[data-use]").forEach(
       (b) => b.onclick = () => {
         const r = game.use(b.dataset.use ?? "");
@@ -16789,14 +24590,27 @@
       }
     );
   }
+  function ailmentNotes() {
+    const list = game.ailments.list(), t = game.s.elapsed;
+    if (!list.length) return "<p>Nothing ails you.</p>";
+    return list.map((a) => {
+      const d = DISEASES[a.id];
+      if (a.stage === 0)
+        return `<div class="disease-note"><strong>Something is wrong</strong><p>You feel a little off. It has not shown itself yet.</p></div>`;
+      const pips = [1, 2, 3].map((i) => `<i class="${i <= a.stage ? "on" : ""}"></i>`).join("");
+      const left = Math.max(0, Math.round(a.next - t));
+      return `<div class="disease-note stage-${a.stage}"><strong>${d.name} <span class="pips">${pips}</span></strong><p>${STAGE_NAMES[a.stage]}: ${d.symptoms[a.stage - 1]}. Treat with ${d.treat.toLowerCase()}${game.count(d.item) ? ` (you carry ${pretty(d.item).toLowerCase()})` : ""}.${a.stage < 3 ? ` Worsens in about ${left}s untreated.` : " It will not wait long."} Likely cause: ${d.cause.toLowerCase()}.</p></div>`;
+    }).join("");
+  }
   function renderVitals(left, right) {
     const v = game.s.vitals, current2 = game.biome(), symptoms = game.vitalReasons();
-    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p>${sketch("tool")}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${current2.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${BIOMES.some((b) => b.id === current2.id) ? current2.name.toLowerCase() : current2.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
     const labels = [
       ["health", "Health"],
       ["hydration", "Hydration"],
       ["calories", "Calories"],
       ["protein", "Protein"],
+      ["vitamins", "Vitamins"],
       ["stamina", "Stamina"],
       ["fatigue", "Fatigue"],
       ["wetness", "Wetness"],
@@ -16809,9 +24623,7 @@
       const val = Math.round(v[id]);
       const bad = ["fatigue", "wetness", "illness", "infection"].includes(id) ? val > 60 : val < 25;
       return `<div class="vital-row ${bad ? "danger" : ""}"><span>${label}</span><span class="mini-track"><i style="width:${val}%"></i></span><b>${val}</b></div>`;
-    }).join(
-      ""
-    )}<h3>Diagnosis</h3>${game.s.disease ? `<div class="disease-note"><strong>${DISEASES[game.s.disease].name}</strong><p>Likely cause: ${DISEASES[game.s.disease].cause}. Field treatment: ${DISEASES[game.s.disease].treat}.</p></div>` : "<p>No active disease is recorded.</p>"}<small>These are game systems, not real-world medical guidance.</small>`;
+    }).join("")}<small>These are game systems, not real-world medical guidance.</small>`;
     left.querySelector("[data-wash]").onclick = () => {
       const r = game.wash();
       if (!r.ok) message(r.reason);
@@ -16839,6 +24651,7 @@
       $("menu").classList.remove("hidden");
       $("continue-game").disabled = false;
       state.chest = null;
+      state.larder = null;
     };
     drawAtlas();
   }
@@ -16917,7 +24730,11 @@
   }
   function renderBeasts(left, right) {
     const a = game.s.altar, cfg = BOSSES[a.level - 1], owned = game.s.structures.some((st) => st.type === "effergy"), near = !!game.near("effergy", 135);
-    left.innerHTML = `<h2>Beasts</h2><p class="lede">The Effergy binds a hunt to the oldest shapes in the dark.</p>${sketch("beast")}<div class="folio-stamp">${owned ? "FOLIO UNSEALED" : "FOLIO SEALED"}</div><h3>Wolf attunement</h3><p>${owned ? "The wolf sigil is ready. Wolf kills fill the counter after attunement. Return to the altar when the Direwolf appears." : "Craft the Effergy at a forge, then place it to unseal this folio."}</p><div class="note-block">A black-glass weapon, obsidian tier or greater, is required to wound any Direwolf variant.</div><p class="muted">Future attunement capacity: ${a.level} sigil${a.level > 1 ? "s" : ""}. Only wolves are recorded in this volume.</p>`;
+    left.innerHTML = `<h2>Beasts</h2><p class="lede">The Effergy binds a hunt to the oldest shapes in the dark.</p>${sketch("beast")}<div class="folio-stamp">${owned ? "FOLIO UNSEALED" : "FOLIO SEALED"}</div><h3>Wolf attunement</h3><p>${owned ? "The wolf sigil is ready. Wolf kills fill the counter after attunement. Return to the altar when the Direwolf appears." : "Craft the Effergy at a forge, then place it to unseal this folio."}</p><div class="note-block">A black-glass weapon, obsidian tier or greater, is required to wound any Direwolf variant.</div><p class="muted">Future attunement capacity: ${a.level} sigil${a.level > 1 ? "s" : ""}. Only wolves are recorded in this volume.</p><div class="book-actions"><button data-codex>THE CODEX \u203A</button></div>`;
+    left.querySelector("[data-codex]").onclick = () => {
+      state.beastsView = "codex";
+      renderJournal();
+    };
     right.innerHTML = `<h2>The Hunt</h2><p class="lede">Level ${a.level} \xB7 ${cfg.name}</p><div class="book-list"><div class="book-row"><span>Attuned</span><strong>${a.attuned === "wolf" ? "Wolves" : "None"}</strong></div><div class="book-row"><span>Wolf kills</span><strong>${a.kills} / ${cfg.kills}</strong></div><div class="book-row"><span>Effergy XP</span><strong>${a.xp}</strong></div><div class="book-row"><span>Direwolf health</span><strong>${cfg.hp}</strong></div><div class="book-row"><span>Bite damage</span><strong>${cfg.bite}</strong></div></div><h3>Victory spoils</h3><p>${Object.entries(
       cfg.rewards
     ).map(([id, n]) => `${n} ${pretty(id)}`).join(
@@ -16953,7 +24770,17 @@
     const buffs = Object.entries(game.s.buffs).filter(([id]) => id !== "potion_sickness").map(
       ([id, left2]) => `<div>\u2022 ${BUFFS[id]?.name ?? id} \xB7 ${BUFFS[id]?.text ?? ""} (${Math.ceil(left2)}s)</div>`
     ).join("");
-    left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot("Head", p.armor?.head)}${slot("Body", p.armor?.body)}${slot("Legs", p.armor?.legs)}</div><h3>Accessories \xB7 ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot("Accessory", game.s.accessories[i])).join("")}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> \xB7 Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> \xB7 Damage <strong>\xD7${eq.damageBonus().toFixed(2)}</strong> \xB7 Speed <strong>\xD7${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set \xB7 ${setInfo.bonusText}</div>` : ""}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ""}`;
+    left.innerHTML = `<h2>Gear</h2><p class="lede">What you wear decides what you survive.</p><h3>Armour</h3><div class="book-list">${slot("Head", p.armor?.head)}${slot("Body", p.armor?.body)}${slot("Legs", p.armor?.legs)}</div><h3>Accessories \xB7 ${game.s.accessories.length} / 3</h3><div class="book-list">${[0, 1, 2].map((i) => slot("Accessory", game.s.accessories[i])).join("")}</div><h3>Standing</h3><p>Health <strong>${Math.round(game.s.vitals.health)} / ${eq.maxHealth()}</strong> \xB7 Mana <strong>${Math.round(game.s.mana)} / ${eq.maxMana()}</strong><br>Defense <strong>${eq.defense()}</strong> \xB7 Damage <strong>\xD7${eq.damageBonus().toFixed(2)}</strong> \xB7 Speed <strong>\xD7${eq.speedBonus().toFixed(2)}</strong></p>${setInfo ? `<div class="note-block">${setInfo.name} set \xB7 ${setInfo.bonusText}</div>` : ""}${buffs ? `<h3>Effects</h3><div class="note-block">${buffs}</div>` : ""}<div class="book-actions"><button data-armoury>THE ARMOURY \u203A</button><button data-skills>SKILLS \u203A</button></div>`;
+    left.querySelector("[data-skills]").onclick = () => {
+      state.gearView = "skills";
+      renderJournal();
+    };
+    left.querySelector("[data-armoury]").onclick = () => {
+      state.gearView = "armoury";
+      if (WEAPONS[game.s.player.weapon] && game.s.player.weapon !== "fists")
+        state.armourySel = game.s.player.weapon;
+      renderJournal();
+    };
     const wearables = game.s.inventory.filter(
       (e) => ["armor", "accessory"].includes(ITEMS[e.id]?.[1] ?? "")
     );
@@ -16985,12 +24812,16 @@
     left.innerHTML = `<h2>The Rift</h2><p class="lede">Four dungeons keep four sigils. Set them in the Rift Gate and it opens onto other worlds.</p><h3>Sigils</h3><div class="book-list">${["sigil_crypt", "sigil_frost", "sigil_sun", "sigil_cinder"].map(sigil).join("")}</div><h3>Dungeons</h3>${DUNGEONS.map((d) => `<div class="biome-entry"><strong>${d.def.name}</strong><small>${d.def.note} ${game.s.bosses[d.def.boss] ? "\xB7 Its master is slain." : ""}</small></div>`).join("")}`;
     right.innerHTML = `<h2>Destinations</h2><p class="lede">${gate ? near ? "The Gate hums beside you." : "Stand at your Rift Gate to travel." : "Build a Rift Gate at a forge: obsidian, crystal, hellstone, and grave dust from the Crypt."}</p>${DIMENSIONS.map(
       (dim) => {
-        const need = { mycelia: 1, skyreach: 2, void: 4 }[dim.id], open = sigils.length >= need, biome = BIOMES.find((b) => b.id === dim.id);
+        const need = { mycelia: 1, skyreach: 2, void: 4 }[dim.id] ?? 99, open = sigils.length >= need, biome = BIOMES.find((b) => b.id === dim.id);
         return `<div class="recipe-row"><div class="recipe-head"><strong>${dim.name}</strong><button data-travel="${dim.id}" ${open && near ? "" : "disabled"}>TRAVEL</button></div><small>${biome?.note ?? ""}</small><small>${open ? "OPEN" : "NEEDS " + need + " SIGILS"} \xB7 ${game.s.discoveries.includes(dim.id) ? "VISITED" : "UNVISITED"}</small></div>`;
       }
     ).join(
       ""
-    )}<div class="note-block">In each world a portal by the arrival point leads home to the Gate.</div>`;
+    )}<div class="note-block">In each world a portal by the arrival point leads home to the Gate.</div><div class="book-actions"><button class="quiet" data-view-realms>\u2039 THE REALMS</button></div>`;
+    right.querySelector("[data-view-realms]").onclick = () => {
+      state.atlasView = "realms";
+      renderJournal();
+    };
     right.querySelectorAll("[data-travel]").forEach(
       (b) => b.onclick = () => {
         const r = game.realms.travel(b.dataset.travel ?? "");
@@ -17046,6 +24877,181 @@
     right.querySelectorAll("[data-buy]").forEach((b) => b.onclick = () => act(town2.buy(state.shop ?? "", b.dataset.buy ?? "")));
     right.querySelectorAll("[data-sell]").forEach((b) => b.onclick = () => act(town2.sell(b.dataset.sell ?? "")));
   }
+  function renderSkills(left, right) {
+    const sk = game.skills, tree2 = TREES.find((t) => t.id === state.skillTree) ?? TREES[0], spent = sk.spentIn(tree2.id);
+    left.innerHTML = `<h2>Skills</h2><div class="farm-choice">${TREES.map((t) => `<button class="tiny-button ${t.id === tree2.id ? "active" : ""}" data-tree="${t.id}">${t.name.toUpperCase()} ${sk.spentIn(t.id) || ""}</button>`).join("")}</div><p class="lede">${tree2.text}. ${spent} point${spent === 1 ? "" : "s"} spent here.</p>${[
+      1,
+      2,
+      3,
+      4,
+      5
+    ].map((row) => {
+      const open = spent >= ROW_POINTS[row];
+      return `<h3>${row === 5 ? "Keystones" : "Row " + row}${open ? "" : ` \xB7 opens at ${ROW_POINTS[row]} points`}</h3><div class="skill-row">${SKILLS.filter(
+        (n) => n.tree === tree2.id && n.row === row
+      ).map((n) => {
+        const has = sk.has(n.id), why = sk.blocked(n.id);
+        return `<button class="skill ${has ? "learned" : !why ? "ready" : ""} ${n.keystone ? "key" : ""}" data-learn="${n.id}" title="${n.name}: ${n.text}${n.cost > 1 ? " (" + n.cost + " points)" : ""}${why && !has ? " \xB7 " + why : ""}"><strong>${n.name}</strong><small>${n.text}</small></button>`;
+      }).join("")}</div>`;
+    }).join("")}<div class="book-actions"><button class="quiet" data-gear>\u2039 GEAR</button></div>`;
+    const [into, need] = sk.progress();
+    right.innerHTML = `<h2>Renown ${sk.level()}</h2><p class="lede">Everything you do earns renown: slaying, making, finding, clearing realms. Each level is a skill point. Renown never fades.</p><div class="vital-row"><span>Next level</span><span class="mini-track"><i style="width:${clamp3(into / need * 100, 0, 100)}%"></i></span><b>${Math.round(into)}/${need}</b></div><p><strong>${sk.points()}</strong> point${sk.points() === 1 ? "" : "s"} to spend \xB7 relic shelf holds <strong>${sk.shelfSlots()}</strong></p><h3>Weapon mastery</h3><div class="book-list">${FAMILIES.map(
+      (f) => {
+        const lvl = sk.mastery(f.id);
+        return `<div class="book-row"><div><strong>${f.name}</strong><small>${masteryTitle(lvl)}</small></div><span class="qty">${lvl} / ${MAX_MASTERY}</span></div>`;
+      }
+    ).join(
+      ""
+    )}</div><p class="muted">Each mastery level adds 1% damage with that family; 5 steadies a blade's combo, 10 adds 5% critical chance, 15 quickens, and 20 adds another 10%.</p><div class="book-actions"><button class="quiet" data-respec>UNLEARN ALL \xB7 3 FALLEN STARS, 200 MARKS</button></div>`;
+    left.querySelectorAll("[data-tree]").forEach(
+      (b) => b.onclick = () => {
+        state.skillTree = b.dataset.tree ?? "warfare";
+        renderJournal();
+      }
+    );
+    const act = (r) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    left.querySelectorAll("[data-learn]").forEach((b) => b.onclick = () => act(sk.learn(b.dataset.learn ?? "")));
+    left.querySelector("[data-gear]").onclick = () => {
+      state.gearView = "gear";
+      renderJournal();
+    };
+    right.querySelector("[data-respec]").onclick = () => act(sk.respec());
+  }
+  function renderCodex(left, right) {
+    const sk = game.skills, done = CODEX.filter((p2) => sk.pageDone(p2)).length;
+    left.innerHTML = `<h2>The Codex</h2><p class="lede">What the expedition has learned. ${done} of ${CODEX.length} pages complete; each grants a lasting gift.</p>${["Creatures", "Places", "Lore"].map(
+      (group) => `<h3>${group}</h3><div class="book-list">${CODEX.filter((p2) => p2.group === group).map((p2) => {
+        const [a2, b2] = sk.page(p2);
+        return `<div class="book-row ${state.codexPage === p2.id ? "selected" : ""}"><div><strong>${p2.name}</strong><small>${a2 >= b2 ? "\u2713 " : ""}${p2.bonusText}</small></div><div><span class="qty">${a2}/${b2}</span><button data-page="${p2.id}">READ</button></div></div>`;
+      }).join("")}</div>`
+    ).join("")}<div class="book-actions"><button class="quiet" data-beasts>\u2039 BEASTS</button></div>`;
+    const p = CODEX.find((x) => x.id === state.codexPage) ?? CODEX[0], tally = game.s.tutorial.tally, [a, b] = sk.page(p);
+    const entry = (e) => {
+      const found = (tally[p.prefix + e] ?? 0) > 0, mob = p.prefix === "kill:" && MOBS[e], name = mob ? MOBS[e].name : BIOMES.find((x) => x.id === e)?.name ?? DUNGEONS.find((d) => d.def.id === e)?.def.name ?? realmById(e)?.name ?? (ITEMS[e] ? pretty(e) : e[0].toUpperCase() + e.slice(1));
+      const pic = mob ? `<span class="icon-slot portrait"><img src="${found ? mobPortrait(e) : ""}" alt="" ${found ? "" : "hidden"}></span>` : ITEMS[e] ? icon(e) : '<span class="icon-slot"></span>';
+      return `<div class="book-row"><div class="with-icon">${pic}<div><strong>${found ? name : "???"}</strong><small>${found ? "Recorded" : "Not yet"}</small></div></div></div>`;
+    };
+    const counted = p.count ? Object.keys(tally).filter((k) => k.startsWith(p.prefix) && tally[k] > 0).map((k) => k.slice(p.prefix.length)) : [];
+    right.innerHTML = `<h2>${p.name}</h2><p class="lede">${a} of ${b} \xB7 ${a >= b ? "complete: " : "when complete: "}${p.bonusText}.</p><div class="book-list">${p.count ? counted.map(entry).join("") + (a < b ? `<p class="muted">${b - a} more to find.</p>` : "") : p.entries.map(entry).join("")}</div>`;
+    left.querySelectorAll("[data-page]").forEach(
+      (btn) => btn.onclick = () => {
+        state.codexPage = btn.dataset.page ?? "wilds";
+        renderJournal();
+      }
+    );
+    left.querySelector("[data-beasts]").onclick = () => {
+      state.beastsView = "beasts";
+      renderJournal();
+    };
+  }
+  function renderArmoury(left, right) {
+    const arm = game.armoury, owned = (id2) => game.count(id2) > 0;
+    const cell = (id2, tier2) => {
+      const has2 = owned(id2), known = arm.known(id2), craftable = !!RECIPES.find((r) => r.id === id2);
+      return `<button class="armoury-cell ${has2 ? "owned" : known ? "known" : ""} ${state.armourySel === id2 ? "active" : ""}" data-weapon="${id2}" title="${pretty(id2)} \xB7 tier ${tier2}${craftable ? "" : " \xB7 found, not made"}"><img src="${iconURL(id2)}" alt=""></button>`;
+    };
+    const sig = Object.keys(SIGNATURE).filter((id2) => owned(id2) || arm.known(id2));
+    left.innerHTML = `<h2>The Armoury</h2><p class="lede">Ten families by eleven tiers; each weapon climbs to +10.</p><div class="armoury-grid"><span></span>${FAMILIES.map((f) => `<span class="armoury-head" title="${f.name}: ${f.text}">${f.name.slice(0, 4).toUpperCase()}</span>`).join("")}${TIERS.map(
+      (t) => `<span class="armoury-tier" title="${t.name}">${t.tier}</span>${FAMILIES.map((f) => {
+        const w = GRID.find((g) => g.tier === t.tier && g.family === f.id);
+        return cell(w.id, t.tier);
+      }).join("")}`
+    ).join(
+      ""
+    )}</div>${sig.length ? `<h3>Signature weapons</h3><div class="armoury-sig">${sig.map((id2) => cell(id2, SIGNATURE[id2][1])).join("")}</div>` : ""}<div class="book-actions"><button class="quiet" data-gear>\u2039 GEAR</button></div>`;
+    const id = state.armourySel, [family, tier] = arm.classOf(id), fam = familyById(family), e = arm.entry(id), st = arm.stats(id), q = QUALITIES[e.q], has = owned(id), recipe = RECIPES.find((r) => r.id === id), ranged = RANGED[id], stage = arm.pendingEvolution(id), evos = EVOLUTIONS[family];
+    const costText = (cost) => Object.entries(cost).map(([k, n]) => `${n} ${pretty(k).toLowerCase()}`).join(", ");
+    const infusions = INFUSIONS.filter((i) => game.count(i.item) > 0 || game.dev.god), gems = Object.keys(GEMS).filter((g) => game.count(g) > 0 || game.dev.god);
+    right.innerHTML = `<h2 style="color:${has ? q.color : "inherit"}">${has || arm.known(id) ? arm.title(id) : pretty(id)}</h2><p class="lede">${fam.name} \xB7 tier ${tier} (${tierOf(tier).name}) \xB7 ${fam.text}.</p><p>Damage <strong>${Math.round(st.damage)}</strong>${ranged ? ` \xB7 ${ranged.kind === "bow" ? "shots" : "mana " + Math.max(1, Math.round((ranged.mana ?? 5) * st.mana))} every ${(ranged.delay * st.pace).toFixed(2)}s` : ` \xB7 reach ${Math.round(st.reach)} \xB7 swing \xD7${st.pace.toFixed(2)}`} \xB7 crit ${Math.round(st.crit * 100)}%${st.defense ? ` \xB7 +${st.defense} defense` : ""}</p>${has ? `<div class="book-actions"><button data-ready ${game.s.player.weapon === id ? "disabled" : ""}>${game.s.player.weapon === id ? "IN HAND" : "READY IT"}</button></div><p>Quality <strong style="color:${q.color}">${q.name}</strong> (\xD7${q.mult}) \xB7 level <strong>+${e.lvl}</strong> / ${MAX_LEVEL} \xB7 infusion <strong>${e.inf ? infusionById(e.inf)?.name : "none"}</strong> \xB7 sockets <strong>${e.gems.map((g) => GEMS[g].name).join(", ") || "\u2014"}</strong> (${e.gems.length}/${q.sockets})</p>${stage >= 0 ? `<h3>Evolve \xB7 choose a path</h3><div class="book-list">${evos[stage === 1 ? 1 : 0].map(
+      (ev, i) => `<div class="book-row"><div><strong>${ev.name}</strong><small>${ev.text}</small></div><button data-evolve="${i}">CHOOSE</button></div>`
+    ).join("")}</div>` : e.lvl < MAX_LEVEL ? `<div class="book-actions"><button data-upgrade>UPGRADE TO +${e.lvl + 1}</button><button class="quiet" data-reforge>REFORGE</button></div><p class="muted">+${e.lvl + 1}: ${costText(upgradeCost(tier, e.lvl))} at a ${pretty(anvilFor(tier)).toLowerCase()} \xB7 reforge rerolls quality: ${costText(reforgeCost(tier))}.</p>` : `<div class="book-actions"><button class="quiet" data-reforge>REFORGE</button></div>`}${e.evo.length ? `<p class="muted">Evolved: ${e.evo.map((x) => evos.flat().find((v) => v.id === x)?.name).join(" \u2192 ")}.</p>` : `<p class="muted">At +5: ${evos[0].map((v) => v.name).join(" or ")}. At +10: ${evos[1].map((v) => v.name).join(" or ")}.</p>`}${infusions.length ? `<h3>Infuse</h3><div class="farm-choice">${infusions.map((i) => `<button class="tiny-button" data-infuse="${i.id}" title="${i.text}">${i.name.toUpperCase()}</button>`).join("")}</div>` : ""}${gems.length && e.gems.length < q.sockets ? `<h3>Socket a gem</h3><div class="farm-choice">${gems.map((g) => `<button class="tiny-button" data-gem="${g}" title="${GEMS[g].text}">${GEMS[g].name.toUpperCase()}</button>`).join("")}</div>` : ""}` : `<div class="note-block">${recipe ? `Made ${recipe.station ? "at a " + pretty(recipe.station).toLowerCase() : "by hand"} from ${costText(recipe.cost)}.` : "Not made by any hand: it must be found."} Its quality is rolled when it first comes to you.</div>`}`;
+    left.querySelectorAll("[data-weapon]").forEach(
+      (b) => b.onclick = () => {
+        state.armourySel = b.dataset.weapon ?? id;
+        renderJournal();
+      }
+    );
+    left.querySelector("[data-gear]").onclick = () => {
+      state.gearView = "gear";
+      renderJournal();
+    };
+    const act = (r) => {
+      if (!r.ok) message(r.reason);
+      renderJournal();
+      updateUI(true);
+    };
+    const on = (sel, fn) => right.querySelectorAll(sel).forEach((b) => b.onclick = () => act(fn(b)));
+    on("[data-upgrade]", () => arm.upgrade(id));
+    on("[data-reforge]", () => arm.reforge(id));
+    on("[data-evolve]", (b) => arm.evolve(id, Number(b.dataset.evolve)));
+    on("[data-infuse]", (b) => arm.infuse(id, b.dataset.infuse ?? ""));
+    on("[data-gem]", (b) => arm.socket(id, b.dataset.gem ?? ""));
+    on("[data-ready]", () => {
+      game.s.player.weapon = id;
+      sound("equip");
+      return { ok: true };
+    });
+  }
+  function wardText(ward) {
+    const sets = ARMOR_SETS.filter((x) => x.bonus === ward).map((x) => `the ${x.name} set`), charms = Object.entries(ACCESSORIES).filter(([, a]) => a.effects.includes(ward)).map(([id]) => `the ${pretty(id)}`);
+    const all = [...sets, ...charms];
+    return all.length ? ` <em>Ward: ${all.join(" or ")}.</em>` : "";
+  }
+  function renderAtlas(left, right) {
+    const pocket = game.pocket, open = game.s.pocket, stone = pocket.waystoneNear();
+    const tier = (t) => TIER_NAMES[t] ?? String(t);
+    left.innerHTML = `<h2>The Atlas</h2><p class="lede">Each realm lies behind its own key. Turn one in a Waystone and the realm is built anew: its tier sets how hard it bites and how much it gives.</p>${open ? `<div class="note-block">Open now: <strong>${realmById(open.realm)?.name}</strong> \xB7 Tier ${tier(open.tier)}${open.mods.length ? " \xB7 " + open.mods.map((m) => modById(m)?.name).join(", ") : ""}${open.cleared ? " \xB7 its master is slain" : ""}.</div>` : ""}<h3>Realms</h3><div class="book-list">${REALMS.map((r2) => {
+      const rec2 = pocket.record(r2.id);
+      return `<div class="book-row ${state.atlasRealm === r2.id ? "selected" : ""}"><div class="with-icon">${icon(r2.key)}<div><strong>${r2.name}</strong><small>Band ${tier(r2.band)} \xB7 ${rec2.visits ? "best tier " + (rec2.best ? tier(rec2.best) : "\u2014") : "unvisited"}${rec2.relic ? " \xB7 relic found" : ""}</small></div></div><div><span class="qty">\xD7${game.count(r2.key)}</span><button data-realm="${r2.id}">VIEW</button></div></div>`;
+    }).join(
+      ""
+    )}</div><div class="book-actions"><button class="quiet" data-view-rift>THE RIFT GATE \u203A</button></div>`;
+    const r = realmById(state.atlasRealm) ?? REALMS[0], rec = pocket.record(r.id), max = pocket.maxTier(r.id);
+    state.atlasTier = Math.min(Math.max(1, state.atlasTier), max);
+    const keys2 = game.count(r.key), canOpen = (!!stone || game.dev.god) && (keys2 > 0 || game.dev.god);
+    right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> \xB7 ${r.hazard.text}${wardText(r.hazard.ward)}</p><p>Great foe: <strong>${MOBS[r.boss]?.name}</strong> \xB7 relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? " (found)" : ""}<br>Signature: <strong>${pretty(r.material)}</strong> \xB7 Temperature ${r.temp}\xB0C</p><h3>Tier</h3><div class="farm-choice">${[
+      1,
+      2,
+      3,
+      4,
+      5
+    ].map(
+      (t) => `<button class="tiny-button ${t === state.atlasTier ? "active" : ""}" data-tier="${t}" ${t > max ? "disabled" : ""}>${tier(t)}</button>`
+    ).join(
+      ""
+    )}</div><p class="muted">Monsters \xD7${TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, \xD7${TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm \xB7 loot \xD7${TIER_SCALE.loot(state.atlasTier).toFixed(2)} \xB7 ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? "" : "s"}.</p><div class="book-actions"><button data-open-realm ${canOpen ? "" : "disabled"}>OPEN \xB7 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? "" : "disabled"}>RETURN TO ${realmById(open.realm)?.name.toUpperCase()}</button>` : ""}</div><div class="note-block">${stone ? "The Waystone hums beside you." : "Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal."} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a ${RECIPES.find((x) => x.id === r.fragment)?.station ?? "workbench"}${r.band > 1 ? ` from the spoils of Band ${TIER_NAMES[r.band - 1]} realms` : ""}, or found in the realms.</div>${open?.realm === r.id && open.mods.length ? `<h3>This expedition</h3><div class="book-list">${open.mods.map((m) => modById(m)).map(
+      (m) => `<div class="book-row"><div><strong>${m?.name}</strong><small>${m?.text}</small></div><span class="qty">${m?.kind === "boon" ? "BOON" : "BANE"}</span></div>`
+    ).join("")}</div>` : ""}`;
+    left.querySelectorAll("[data-realm]").forEach(
+      (b) => b.onclick = () => {
+        state.atlasRealm = b.dataset.realm ?? "orchard";
+        renderJournal();
+      }
+    );
+    left.querySelector("[data-view-rift]").onclick = () => {
+      state.atlasView = "rift";
+      renderJournal();
+    };
+    right.querySelectorAll("[data-tier]").forEach(
+      (b) => b.onclick = () => {
+        state.atlasTier = Number(b.dataset.tier);
+        renderJournal();
+      }
+    );
+    const go = (r2) => {
+      if (!r2.ok) message(r2.reason);
+      else toggleJournal(false);
+      updateUI(true);
+    };
+    const openBtn = right.querySelector("[data-open-realm]");
+    if (openBtn) openBtn.onclick = () => go(pocket.open(r.id, state.atlasTier));
+    const resume = right.querySelector("[data-resume]");
+    if (resume) resume.onclick = () => go(pocket.resume());
+  }
   function renderHotbar() {
     const s = game.s, sig = s.hotbar.map((id) => id ? id + ":" + game.count(id) : "-").join(",") + "|" + s.hotbarIndex;
     if (sig === state.hotbarSig) return;
@@ -17073,6 +25079,10 @@
     $("mana-bar").style.width = clamp3(game.s.mana / maxMana * 100, 0, 100) + "%";
     $("mana-value").textContent = String(Math.round(game.s.mana));
     $("defense-value").textContent = String(game.equipment.defense());
+    const [into, need] = game.skills.progress();
+    $("renown-value").textContent = String(game.skills.level());
+    $("renown-points").textContent = game.skills.points() > 0 ? `\xB7 ${game.skills.points()} TO SPEND` : "";
+    $("renown-bar").style.width = clamp3(into / need * 100, 0, 100) + "%";
     $("buffs").innerHTML = Object.entries(game.s.buffs).map(
       ([id, left]) => `<span style="color:${BUFFS[id]?.color ?? "#fff"}">${(BUFFS[id]?.name ?? id).toUpperCase()} ${Math.ceil(left)}s</span>`
     ).join(" ");
@@ -17081,7 +25091,12 @@
     $("biome-name").textContent = place ? place.toUpperCase() : layer.id === "surface" ? game.biome().name.toUpperCase() : layer.id === "upper_mines" ? game.biome().name.toUpperCase() + " \xB7 " + layer.name.toUpperCase() : layer.name.toUpperCase();
     $("world-time").textContent = timeText();
     $("condition-line").textContent = game.vitalReasons()[0];
-    $("weapon-name").textContent = pretty(game.s.player.weapon);
+    const chips = game.ailments.showing().map(
+      (a) => `<span class="ail stage-${a.stage}" title="${DISEASES[a.id].name}: ${DISEASES[a.id].symptoms[a.stage - 1]}">${DISEASES[a.id].name.toUpperCase()} ${"\u25CF".repeat(a.stage)}${"\u25CB".repeat(3 - a.stage)}</span>`
+    ).join("");
+    const off = game.ailments.list().some((a) => a.stage === 0) ? '<span class="ail off">FEELING OFF</span>' : "";
+    $("ailments").innerHTML = chips + off;
+    $("weapon-name").textContent = game.s.player.weapon === "fists" ? pretty("fists") : game.armoury.title(game.s.player.weapon);
     const step = TUTORIAL[game.s.tutorial.step] || CHAPTERS[game.s.chapter];
     $("objective-text").textContent = step ? step[0] : "The final folio is complete.";
     $("objective-progress").textContent = step ? `${Math.min(step[2], game.s.tutorial.tally[step[1]] || 0)} / ${step[2]}` : "EXPEDITION COMPLETE";
@@ -17089,13 +25104,15 @@
     let prompt = "";
     const held = game.equipment.held();
     if (game.s.placing) prompt = `<b>CLICK</b> Place ${pretty(game.s.placing)} \xB7 Esc cancels`;
-    else if (near && near.type === "structure" && ["dungeon_chest", "boss_altar", "rift_gate", "portal"].includes(near.object.type))
-      prompt = `<b>E</b> ${near.object.type === "dungeon_chest" ? "Open the chest" : near.object.type === "boss_altar" ? game.bosses.active() ? "The altar burns" : "Call " + MOBS[near.object.kind ?? ""]?.name : near.object.type === "portal" ? "Return home through the portal" : "Open the Rift"}`;
+    else if (near && near.type === "structure" && ["dungeon_chest", "boss_altar", "rift_gate", "portal", "waystone", "shrine"].includes(
+      near.object.type
+    ))
+      prompt = `<b>E</b> ${near.object.type === "dungeon_chest" ? "Open the chest" : near.object.type === "boss_altar" ? game.bosses.active() ? "The altar burns" : "Call " + MOBS[near.object.kind ?? ""]?.name : near.object.type === "portal" ? game.pocket.here(near.object.x) ? "Return to your Waystone" : "Return home through the portal" : near.object.type === "waystone" ? "Open the Atlas" : near.object.type === "shrine" ? near.object.crop === "spent" ? "The shrine is quiet" : "Pray at the shrine" : "Open the Rift"}`;
     else if (near && near.type === "settler") {
       const who = settlerById(near.object.settler ?? "");
       prompt = `<b>E</b> Talk to ${who ? who.name + " " + who.title : "the settler"}`;
     } else if (near) {
-      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "bed" ? "Sleep" : near.object.type === "door" ? near.object.crop === "open" ? "Close the door" : "Open the door" : near.object.type === "chair" || near.object.type === "table" ? "Check the room" : near.object.type === "icebox" ? "Add ice" : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
+      const action = near.type === "node" ? near.object.kind === "water" ? "Collect wild water" : nodeForm(near.object.kind) === "tree" ? `Chop tree (${near.object.hp} more)` : nodeForm(near.object.kind) === "mineral" ? `Mine ${pretty(near.object.kind).toLowerCase()} (${near.object.hp} more)` : "Gather " + pretty(near.object.kind) : near.type === "cache" ? "Open field cache" : near.object.type === "effergy" ? "Open Beasts folio" : near.object.type === "farm_plot" ? "Tend farm plot" : near.object.type === "bedroll" ? "Rest" : near.object.type === "bed" ? "Sleep" : near.object.type === "door" ? near.object.crop === "open" ? "Close the door" : "Open the door" : near.object.type === "chair" || near.object.type === "table" ? "Check the room" : STORAGE[near.object.type] ? "Open the " + STORAGE[near.object.type].name.toLowerCase() : near.object.type === "campfire" ? "Add wood" : "Use " + pretty(near.object.type);
       prompt = `<b>E</b> ${action}`;
     } else
       prompt = held ? `<b>CLICK</b> ${game.hands.describe(cursorWorld())}` : "<b>E</b> Explore and gather";
@@ -17106,6 +25123,12 @@
       $("boss-name").textContent = (boss2.type === "boss" ? BOSSES[game.s.altar.level - 1].name : MOBS[boss2.type].name).toUpperCase();
       $("boss-bar").style.width = clamp3(boss2.hp / boss2.maxHp * 100, 0, 100) + "%";
       $("boss-value").textContent = `${Math.ceil(boss2.hp)} / ${boss2.maxHp}`;
+    }
+    const b = game.pocket.banner, showBanner = !!b && game.s.elapsed - b.at < 5 && game.pocket.here();
+    $("realm-banner").classList.toggle("hidden", !showBanner);
+    if (showBanner && $("realm-banner").dataset.at !== String(b.at)) {
+      $("realm-banner").dataset.at = String(b.at);
+      $("realm-banner").innerHTML = `<small>TIER ${TIER_NAMES[b.tier]}</small><strong>${b.name.toUpperCase()}</strong>${b.mods.length ? `<span>${b.mods.map((m) => modById(m)?.name).join(" \xB7 ")}</span>` : ""}<em>${realmById(game.s.pocket?.realm ?? "")?.hazard.name ?? ""}</em>`;
     }
     const msg = game.messages[0];
     if (msg && msg !== state.seenMessage) {

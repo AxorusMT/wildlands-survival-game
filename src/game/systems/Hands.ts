@@ -66,9 +66,9 @@ export class Hands extends System {
       t = s.elapsed;
     this.aim(target);
     const pace = RANGED[held ?? '']
-      ? RANGED[held!].delay
+      ? RANGED[held!].delay * this.game.armoury.stats(held!).pace
       : held && WEAPONS[held]
-        ? Math.max(0.3, RULES.attackCooldownSeconds * 0.75)
+        ? Math.max(0.3, RULES.attackCooldownSeconds * 0.75 * this.game.armoury.stats(held).pace)
         : (PACE[kind as keyof typeof PACE] ?? 0.3);
     if (
       t <
@@ -97,7 +97,7 @@ export class Hands extends System {
       const r = this.game.combat.fire(held!, target);
       if (r.ok) {
         p.usedAt = t;
-        p.attackAt = t + RANGED[held!].delay;
+        p.attackAt = t + RANGED[held!].delay * this.game.armoury.stats(held!).pace;
       }
       return r;
     }

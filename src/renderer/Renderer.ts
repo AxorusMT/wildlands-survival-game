@@ -8,6 +8,7 @@ import { drawLighting, gatherLights } from './lighting.ts';
 import { drawCache, drawNode, drawTree, TREE_KINDS } from './nature.ts';
 import { PROJECTILES } from '../data/gear.ts';
 import { PX, TA, cached, hash, makeCanvas, ramp, sprite, type PixelView } from './px.ts';
+import { drawRealmAir, drawTide } from './realm.ts';
 import { drawSky } from './sky.ts';
 import { drawStructure } from './structures.ts';
 import { drawGround, drawLava, drawWalls } from './tiles.ts';
@@ -18,7 +19,7 @@ export { pixelView, type PixelView } from './px.ts';
 let art: HTMLCanvasElement | null = null;
 
 function drawLadders(c: CanvasRenderingContext2D, ax: number, ay: number, w: number, h: number) {
-  for (const shaft of D.SHAFTS) {
+  for (const shaft of D.allShafts()) {
     const sx = Math.round(shaft.x / PX - ax);
     if (sx < -30 || sx > w + 30) continue;
     const surface = shaft.top < D.surfaceAt(shaft.x) + 20,
@@ -234,7 +235,9 @@ export function draw(
   if (!menu) drawPlayer(a, g, g.s.player, sx(g.s.player), sy(g.s.player), t);
   drawProjectiles(a, g, ax, ay, w, h);
   drawParticles(a, ax, ay, now);
+  if (!menu) drawTide(a, g, ax, ay, w, h, now);
   drawLighting(a, g, ax, ay, w, h, gatherLights(g, t, menu));
+  if (!menu) drawRealmAir(a, g, ax, ay, w, h, now);
   drawCursor(a, g, ax, ay, cursor);
   drawWeather(a, g, ax, ay, w, h, fx, menu);
   c.imageSmoothingEnabled = false;

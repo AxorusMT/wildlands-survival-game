@@ -1,5 +1,6 @@
 import type { Recipe } from '../core/types.ts';
 import { ARMOR_RECIPES } from './gear.ts';
+import { GEN_RECIPES, INFUSIONS } from './weapons.ts';
 
 // Recipe station means the player must stand near an existing structure of that type.
 export const RECIPES: Recipe[] = (
@@ -162,8 +163,101 @@ export const RECIPES: Recipe[] = (
     ['bucket', { iron_ingot: 3 }, 'workbench', 3],
     ['rope', { fiber: 3 }, null, 1, 10],
     ['grappling_hook', { iron_ingot: 4, rope: 20, hide: 1 }, 'workbench', 3],
+    // ── Keeping food: cold storage, preserves, meals, and clean water ──
+    ['cool_pit', { stone: 10, clay: 6, wood: 4 }, null, 1],
+    ['snow_cellar', { stone: 30, ice: 20, iron_ingot: 4, wood: 10 }, 'workbench', 3],
+    ['frost_chest', { frost_shard: 6, steel_ingot: 6, ice: 10 }, 'forge', 6],
+    ['rime_vault', { starmetal_ingot: 6, frost_shard: 12, crystal: 10 }, 'starforge', 9],
+    ['insulated_satchel', { hide: 4, fiber: 8, resin: 2 }, 'workbench', 2],
+    ['frost_lined_pack', { frost_shard: 4, hide: 4, silk: 4 }, 'workbench', 6],
+    ['rime_lined_pack', { starmetal_ingot: 3, frost_shard: 8, sky_silk: 4 }, 'starforge', 9],
+    ['salting_barrel', { wood: 8, iron_ingot: 2, salt: 4 }, 'workbench', 2],
+    ['salted_meat', { raw_meat: 2, salt: 2 }, 'salting_barrel', 2, 2],
+    ['salted_fish', { raw_fish: 2, salt: 2 }, 'salting_barrel', 2, 2],
+    ['pickled_mushrooms', { mushroom: 3, salt: 1, boiled_water: 1 }, 'salting_barrel', 2, 2],
+    ['berry_preserves', { berry: 4, honey: 1 }, 'campfire', 2, 2],
+    ['kitchen', { stone: 20, clay: 10, iron_ingot: 6, wood: 10 }, 'workbench', 3],
+    ['hearty_stew', { raw_meat: 2, potato: 2, herb: 1, boiled_water: 1 }, 'kitchen', 3],
+    ['fish_chowder', { raw_fish: 2, potato: 1, boiled_water: 1 }, 'kitchen', 3],
+    ['spiced_skewers', { raw_meat: 2, salt: 1, herb: 1 }, 'kitchen', 3],
+    ['honey_cakes', { wheat: 3, honey: 1, berry: 2 }, 'kitchen', 3],
+    ['mushroom_broth', { mushroom: 3, glowcap: 1, boiled_water: 1 }, 'kitchen', 3],
+    ['orchard_pie', { bog_apple: 3, wheat: 2, honey: 1 }, 'kitchen', 4],
+    ['ember_chili', { cactus_fruit: 2, raw_meat: 1, sulfur: 1 }, 'kitchen', 3],
+    ['explorers_feast', { cooked_meat: 2, bread: 1, berry_preserves: 1, honey: 1 }, 'kitchen', 4],
+    ['water_filter', { sand: 10, coal: 6, clay: 6, wood: 4 }, 'workbench', 2],
+    ['filtered_water', { brackish_water: 1, sand: 1 }, 'water_filter', 2],
+    // ── Medicine ──
+    ['rehydration_salts', { salt: 2, honey: 1, boiled_water: 1 }, 'apothecary', 3],
+    ['vermifuge', { herb: 3, venom: 1 }, 'apothecary', 3],
+    ['frost_salve', { honey: 1, herb: 2, resin: 1 }, 'apothecary', 3],
+    ['burn_salve', { resin: 1, honey: 1, herb: 1 }, 'apothecary', 3],
+    ['bandage', { fiber: 4, herb: 1 }, null, 1, 2],
+    ['splint', { wood: 3, fiber: 4 }, null, 1],
+    ['lungwort_tea', { glowcap: 2, herb: 2, boiled_water: 1 }, 'apothecary', 5],
+    ['void_salve', { void_lily: 2, crystal: 1, herb: 1 }, 'apothecary', 8],
+    ['rabies_serum', { antibiotic: 1, grave_dust: 2, herb: 2 }, 'apothecary', 5],
+    ['field_vaccine', { antibiotic: 1, grave_dust: 1, herb: 2 }, 'apothecary', 5],
+    ['iron_gut_brew', { herb: 3, venom: 1, boiled_water: 1 }, 'apothecary', 3],
+    // ── Realms: Waystones, fragments, and keys ──
+    ['waystone', { stone: 40, iron_ingot: 8, crystal: 4 }, 'workbench', 3],
+    ['relic_shelf', { wood: 12, gold_ingot: 4, crystal: 4 }, 'workbench', 4],
+    ['orchard_fragment', { crystal: 1, reeds: 6, raw_fish: 2 }, 'workbench', 3],
+    ['steppe_fragment', { crystal: 1, sulfur: 4, coal: 4 }, 'workbench', 3],
+    ['warren_fragment', { crystal: 1, clay: 6, bone: 4 }, 'workbench', 3],
+    ['orchard_key', { orchard_fragment: 3 }, 'waystone', 3],
+    ['steppe_key', { steppe_fragment: 3 }, 'waystone', 3],
+    ['warren_key', { warren_fragment: 3 }, 'waystone', 3],
+    // Band II keys are made from Band I spoils; Band III keys from Band II.
+    ['glasswood_fragment', { crystal: 2, tide_pearl: 2, burrow_amber: 2 }, 'workbench', 5],
+    ['marches_fragment', { bone: 10, kiln_ingot: 2, crab_shell: 3 }, 'workbench', 5],
+    ['barrow_fragment', { prism_glass: 4, marrow_ingot: 2, gold_ingot: 2 }, 'forge', 7],
+    ['saltflats_fragment', { salt: 10, prism_glass: 3, marrow_ingot: 2 }, 'forge', 7],
+    ['choir_fragment', { frost_shard: 4, marrow_ingot: 2, prism_glass: 3 }, 'forge', 7],
+    ['glasswood_key', { glasswood_fragment: 3 }, 'waystone', 5],
+    ['marches_key', { marches_fragment: 3 }, 'waystone', 5],
+    ['barrow_key', { barrow_fragment: 3 }, 'waystone', 7],
+    ['saltflats_key', { saltflats_fragment: 3 }, 'waystone', 7],
+    ['choir_key', { choir_fragment: 3 }, 'waystone', 7],
+    // The Drowned Orchard.
+    ['tidecaller_spear', { brinewood: 10, tide_pearl: 2, silver_ingot: 4 }, 'workbench', 4],
+    ['brine_wand', { brinewood: 6, tide_pearl: 4, crystal: 2 }, 'workbench', 4],
+    ['brinewood_wall', { brinewood: 1 }, 'workbench', 4, 4],
+    // The Ashen Steppe.
+    ['ashcloth', { cinderflax: 3 }, 'workbench', 3],
+    ['kiln_ingot', { kilnstone_ore: 3, coal: 1 }, 'furnace', 4],
+    ['kiln_greataxe', { kiln_ingot: 8, ash_hide: 2, wood: 3 }, 'workbench', 4],
+    ['ember_sling', { ashcloth: 4, kiln_ingot: 3, sulfur: 4 }, 'workbench', 4],
+    // The Hollow Warren.
+    ['amber_repeater', { burrow_amber: 10, wood: 6, silk: 4 }, 'workbench', 4],
+    ['amber_pick', { burrow_amber: 12, gold_ingot: 2, wood: 3 }, 'workbench', 4],
+    // The Glasswood.
+    ['prism_wand', { prism_glass: 10, crystal: 4, wood: 3 }, 'forge', 6],
+    ['shard_glaive', { prism_glass: 8, hellstone_ingot: 3, wood: 3 }, 'forge', 6],
+    ['lumen_tincture', { lumen_moss: 3, boiled_water: 1 }, 'apothecary', 5],
+    // The Bone Marches.
+    ['marrow_ingot', { marrow_iron_ore: 3, coal: 1 }, 'furnace', 5],
+    ['bonecleaver', { marrow_ingot: 9, bone: 6, hide: 2 }, 'forge', 6],
+    ['vertebra_whip', { bone: 14, marrow_ingot: 4, silk: 3 }, 'forge', 6],
+    ['marrow_purge', { herb: 3, antibiotic: 1, grave_dust: 1 }, 'apothecary', 5],
+    // The Clockwork Barrow.
+    ['brass_ingot', { brass_gear: 3, copper_ingot: 1 }, 'furnace', 7],
+    ['brass_repeater', { brass_ingot: 10, wood: 4, silk: 4 }, 'starforge', 8],
+    ['piston_hammer', { brass_ingot: 12, gold_ingot: 3, coal: 6 }, 'starforge', 8],
+    // The Salt Flats of Oru.
+    ['mirage_blade', { saltglass: 12, gold_ingot: 3, ruby: 1 }, 'starforge', 8],
+    ['saltglass_bow', { saltglass: 10, wood: 4, silk: 4 }, 'starforge', 8],
+    // The Frozen Choir.
+    ['rime_silver', { rime_silver_ore: 3, coal: 1 }, 'furnace', 7],
+    ['choir_stave', { rime_silver: 10, frost_lily: 4, crystal: 4 }, 'starforge', 9],
+    ['bellhammer', { rime_silver: 12, bell_bronze: 4, wood: 3 }, 'starforge', 9],
     // ── Armour ──
     ...ARMOR_RECIPES,
+    // ── The weapon hierarchy, and infusions ──
+    ...GEN_RECIPES,
+    ...INFUSIONS.map(
+      (i) => [i.item, i.recipe, 'workbench', 4] as [string, Record<string, number>, string, number],
+    ),
   ] as [string, Record<string, number>, string | null, number, number?][]
 ).map(([id, cost, station, tier, yieldQty]) => ({
   id,

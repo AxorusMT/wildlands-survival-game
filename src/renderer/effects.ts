@@ -206,7 +206,13 @@ export function spawnEffects(g: RenderGame, events: WorldEvent[], now = performa
         gravity: -40,
       }));
     else if (e.type === 'damage')
-      floatText(e.x, e.y, e.kind, e.dir === 1 ? '#ff6a5a' : '#f4ecd8', now);
+      floatText(
+        e.x,
+        e.y,
+        e.kind,
+        ['#f4ecd8', '#ff6a5a', '#ffe070', '#ff9a4a', '#8ad060', '#d05050'][e.dir ?? 0] ?? '#f4ecd8',
+        now,
+      );
     else if (e.type === 'burst')
       burst(e, now, 14, () => ({
         kind: 'spark',

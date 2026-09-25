@@ -407,6 +407,149 @@ Object.assign(STATIC, {
       p.rect(2, 26, 2, 2, IRON);
     }),
 });
+// Keeping food: the cold-storage ladder, the salting barrel, the kitchen, and the water filter.
+Object.assign(STATIC, {
+  // Relics set here glow in their niches.
+  relic_shelf: () =>
+    sprite(28, 32, 14, 31, (p) => {
+      p.rect(0, 0, 28, 32, '#5a3e26');
+      p.rect(0, 0, 28, 2, '#8a6440');
+      p.rect(2, 2, 24, 28, '#2a1c12');
+      for (const y of [11, 21, 30]) {
+        p.rect(1, y, 26, 2, '#8a6440');
+        p.rect(1, y, 26, 1, '#b08a5a');
+      }
+      for (const [x, y, c] of [
+        [6, 7, '#5ac8c0'],
+        [20, 7, '#ff8a3a'],
+        [13, 17, '#e8a030'],
+      ] as const) {
+        p.rect(x - 2, y - 2, 5, 4, c);
+        p.set(x - 1, y - 2, '#ffffff');
+      }
+      p.rect(0, 0, 1, 32, '#3a2818');
+      p.rect(27, 0, 1, 32, '#3a2818');
+    }),
+  cool_pit: () =>
+    sprite(26, 10, 13, 9, (p) => {
+      stones(p, 0, 2, 26, 8, '#6a6660');
+      p.rect(4, 3, 18, 5, '#1c1814');
+      p.rect(3, 0, 20, 3, '#7a5a3c');
+      p.rect(3, 0, 20, 1, '#9a7a58');
+      for (let x = 6; x < 22; x += 5) p.rect(x, 0, 1, 3, '#5a4230');
+    }),
+  snow_cellar: () =>
+    sprite(34, 24, 17, 23, (p) => {
+      p.ellipse(17, 16, 16, 12, '#dfeaf2');
+      p.rect(1, 16, 32, 8, '#dfeaf2');
+      for (let y = 8; y < 24; y += 4) p.line(2, y, 32, y, '#b8c8d4');
+      p.rect(12, 12, 10, 12, '#4a5a68');
+      p.rect(12, 12, 10, 1, '#7a8a98');
+      p.shadeEdges(0.15, -0.2);
+    }),
+  frost_chest: () =>
+    sprite(24, 17, 12, 16, (p) => {
+      p.rect(0, 5, 24, 12, '#5a8aa8');
+      p.rect(0, 0, 24, 6, '#8fc0d8');
+      p.rect(0, 0, 24, 1, '#dff6ff');
+      p.rect(0, 5, 24, 1, '#3a5a78');
+      for (const x of [2, 20]) p.rect(x, 0, 2, 17, '#dfe3e6');
+      p.rect(10, 3, 4, 4, '#bfe8f8');
+      p.set(11, 4, '#ffffff');
+    }),
+  rime_vault: () =>
+    sprite(30, 28, 15, 27, (p) => {
+      p.rect(2, 4, 26, 24, '#6a7a98');
+      p.rect(2, 4, 26, 2, '#dfeaf8');
+      p.rect(0, 0, 30, 5, '#f8e08a');
+      p.rect(0, 0, 30, 1, '#fff4c0');
+      p.rect(9, 10, 12, 14, '#2a3a58');
+      p.ellipse(15, 17, 4, 4, '#bfe8f8');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  salting_barrel: () =>
+    sprite(18, 20, 9, 19, (p) => {
+      p.ellipse(9, 10, 8, 10, '#8a6440');
+      for (let x = 3; x < 16; x += 3) p.line(x, 1, x, 19, '#6a4a2c');
+      for (const y of [4, 15]) p.rect(1, y, 16, 1, '#a8a4a0');
+      p.ellipse(9, 2, 7, 2, '#ece8de');
+    }),
+  kitchen: () =>
+    sprite(40, 32, 20, 31, (p) => {
+      stones(p, 0, 8, 40, 24, '#8a7a6a');
+      p.rect(6, 16, 16, 10, '#1c1410');
+      p.rect(26, 12, 12, 3, '#4a4440');
+      p.rect(28, 6, 8, 6, '#6a6460');
+      p.rect(28, 6, 8, 1, '#8a8480');
+      p.rect(14, 0, 8, 8, '#6a5a4a');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  water_filter: () =>
+    sprite(18, 26, 9, 25, (p) => {
+      p.rect(2, 0, 14, 16, '#a88458');
+      for (const [y, c] of [
+        [2, '#dcc38e'],
+        [7, '#2c2c30'],
+        [12, '#a8a4a0'],
+      ] as const)
+        p.rect(3, y, 12, 4, c);
+      p.rect(7, 16, 4, 4, '#6a4a2c');
+      p.rect(3, 20, 12, 6, '#8a6440');
+      p.rect(4, 21, 10, 2, '#7ab0c8');
+    }),
+});
+// Realm furnishings.
+Object.assign(STATIC, {
+  waystone: () =>
+    sprite(26, 48, 13, 47, (p) => {
+      stones(p, 1, 40, 24, 8, '#5a5a62');
+      p.poly(
+        [
+          [6, 41],
+          [9, 4],
+          [13, 0],
+          [17, 4],
+          [20, 41],
+        ],
+        '#6a6a74',
+      );
+      p.line(9, 4, 6, 41, '#8a8a96');
+      for (const [x, y] of [
+        [12, 12],
+        [13, 20],
+        [12, 28],
+      ])
+        p.rect(x, y, 2, 3, '#2a2a34');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  shrine: () =>
+    sprite(22, 30, 11, 29, (p) => {
+      stones(p, 0, 24, 22, 6, '#6a6470');
+      p.rect(4, 6, 14, 18, '#7a7484');
+      p.rect(4, 6, 14, 1, '#9a94a4');
+      p.rect(2, 3, 18, 4, '#5a5462');
+      p.rect(8, 12, 6, 7, '#2a2630');
+      p.shadeEdges(0.2, -0.3);
+    }),
+  // A brass grille over a steam pipe (the Clockwork Barrow's traps).
+  steam_vent: () =>
+    sprite(30, 6, 15, 5, (p) => {
+      p.rect(0, 1, 30, 5, '#5a4028');
+      p.rect(0, 1, 30, 1, '#d8a048');
+      for (let x = 3; x < 28; x += 4) p.rect(x, 2, 2, 3, '#1c140c');
+      p.rect(0, 5, 30, 1, '#3a2a14');
+    }),
+  kiln: () =>
+    sprite(40, 34, 20, 33, (p) => {
+      p.ellipse(20, 22, 18, 14, '#8a5a44');
+      p.rect(2, 22, 36, 12, '#8a5a44');
+      for (let y = 12; y < 34; y += 5)
+        for (let x = (y % 10 ? 0 : 3) + 2; x < 38; x += 7) p.rect(x, y, 5, 1, '#6a4030');
+      p.rect(13, 20, 14, 14, '#1c100c');
+      p.rect(16, 0, 8, 10, '#6a4030');
+      p.shadeEdges(0.25, -0.3);
+    }),
+});
 const staticSprite = (k: string) => cached('st:' + k, STATIC[k]);
 
 /** A dungeon chest trimmed to match its halls, open once looted. */
@@ -419,6 +562,11 @@ function chestSprite(kind: string, open: boolean): Sprite {
     mycelia: ['#4a3f5e', '#58e0d0'],
     skyreach: ['#c8c0b0', '#f8e08a'],
     void: ['#2a1c3a', '#b36cff'],
+    glasswood: ['#6a88a8', '#bfe8ff'],
+    marches: ['#6a6454', '#e6dcc6'],
+    barrow: ['#5a4028', '#f0c870'],
+    saltflats: ['#b4a48e', '#f0c0c8'],
+    choir: ['#5a6a7a', '#dfeaf6'],
   };
   const [body, metal] = trim[kind] ?? ['#7a5a3c', '#d8b848'];
   return cached(`dchest:${kind}:${open}`, () =>
@@ -635,6 +783,47 @@ export function drawStructure(
       } else flameAt(c, x, y - 10, t, 1, s.id);
       return;
     }
+    case 'waystone': {
+      blit(c, staticSprite('waystone'), x, y);
+      // Its runes glow while a realm is open, and a thread of light rises from its crown.
+      const open = !!g.s.pocket,
+        pulse = 0.5 + 0.5 * Math.sin(t * 3 + s.id);
+      c.fillStyle = open ? '#9af0ff' : '#6a6a88';
+      c.globalAlpha = open ? 0.6 + pulse * 0.4 : 0.5;
+      for (const [rx, ry] of [
+        [0, -35],
+        [1, -27],
+        [0, -19],
+      ])
+        c.fillRect(x + rx - 1, y + ry, 2, 3);
+      if (open) {
+        c.globalAlpha = 0.35 + pulse * 0.3;
+        for (let i = 0; i < 14; i++) c.fillRect(x, y - 50 - i * 2 - Math.floor((t * 10) % 2), 1, 1);
+      }
+      c.globalAlpha = 1;
+      return;
+    }
+    case 'shrine': {
+      blit(c, staticSprite('shrine'), x, y);
+      if (s.crop !== 'spent') {
+        c.fillStyle = '#fff0a0';
+        c.globalAlpha = 0.6 + Math.sin(t * 3 + s.id) * 0.3;
+        c.fillRect(x - 1, y - 16, 2, 3);
+        c.fillRect(x, y - 26 - Math.round((t * 6) % 6), 1, 1);
+        c.globalAlpha = 1;
+      }
+      return;
+    }
+    case 'kiln':
+      blit(c, staticSprite('kiln'), x, y);
+      flameAt(c, x, y - 4, t, 2, s.id);
+      smoke(c, x, y - 40, t, s.id, 0.7);
+      return;
+    case 'kitchen':
+      blit(c, staticSprite('kitchen'), x, y);
+      flameAt(c, x - 6, y - 7, t, 1, s.id);
+      smoke(c, x - 2, y - 34, t, s.id, 0.6);
+      return;
     case 'door':
       blit(c, staticSprite(s.crop === 'open' ? 'door_open' : 'door_closed'), x, y);
       return;

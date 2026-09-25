@@ -90,8 +90,13 @@
           <b id="mana-value">20</b>
         </div>
         <div class="hud-defense">DEFENSE <b id="defense-value">0</b></div>
+        <div class="hud-renown">
+          RENOWN <b id="renown-value">1</b> <span id="renown-points"></span>
+          <div class="renown-track"><i id="renown-bar"></i></div>
+        </div>
         <div id="buffs" class="hud-buffs"></div>
         <p id="condition-line">Stable · the meadow gives you a little time.</p>
+        <div id="ailments" aria-live="polite"></div>
       </div>
       <div class="hud-right">
         <span class="small-label">CURRENT FIELD TASK</span
@@ -104,6 +109,7 @@
         <small id="boss-value"></small>
       </div>
       <div id="toast" role="status"></div>
+      <div id="realm-banner" class="hidden" aria-live="polite"></div>
       <div id="hotbar-name" class="hud-hotbar-name"></div>
       <div id="hotbar" class="hud-hotbar" aria-label="Quick slots"></div>
       <section id="dev-console" class="hidden" aria-label="Field console">
@@ -158,7 +164,7 @@
           <button data-tab="pack">PACK</button><button data-tab="gear">GEAR</button
           ><button data-tab="recipes">RECIPES</button><button data-tab="vitals">VITALS</button
           ><button data-tab="notes">NOTES</button><button data-tab="beasts">BEASTS</button
-          ><button data-tab="rift">RIFT</button><button data-tab="town">TOWN</button>
+          ><button data-tab="atlas">ATLAS</button><button data-tab="town">TOWN</button>
         </nav>
       </div>
     </section>

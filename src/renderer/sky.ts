@@ -198,7 +198,7 @@ export function drawSky(
     night = 1 - day,
     [A, B, k] = blendAt(fx),
     dim = D.biomeAt(fx, 0).id,
-    alien = dim === 'mycelia' || dim === 'void';
+    alien = dim === 'mycelia' || dim === 'void' || !!A.alien;
   const q = (v: number) => Math.round(v * 24) / 24;
   let top = mix(A.sky[0], B.sky[0], q(k)),
     bottom = mix(A.sky[1], B.sky[1], q(k));

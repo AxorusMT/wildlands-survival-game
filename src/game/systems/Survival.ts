@@ -26,24 +26,20 @@ export class Survival extends System {
     this.game.say('Washed with water. Infection risk eases, but your clothes are damp.', 'good');
     return { ok: true };
   }
+  /** A diagnosis that shows at once (the incubating path is Ailments.contract). */
   contract(disease: string) {
-    this.game.s.disease = disease;
-    if (disease === 'wound')
-      this.game.s.vitals.infection = Math.max(this.game.s.vitals.infection, 22);
-    else this.game.s.vitals.illness = Math.max(this.game.s.vitals.illness, 24);
-    this.game.s.vitals.morale = clamp(this.game.s.vitals.morale - 8, 0, RULES.maxVital);
-    this.game.say(
-      'Diagnosis: ' + DISEASES[disease].name + '. See Field Notes for treatment.',
-      'danger',
-    );
+    if (!DISEASES[disease]) return;
+    this.game.ailments.cure(disease, true);
+    this.game.ailments.contract(disease, true);
+    const v = this.game.s.vitals;
+    if (DISEASES[disease].kind === 'infection') v.infection = Math.max(v.infection, 22);
+    else v.illness = Math.max(v.illness, 24);
   }
   advanceDecay(dt: number) {
-    const icebox = this.game.near('icebox', 135);
-    const cooledFor = icebox ? Math.min(dt, icebox.fuel) : 0;
-    for (const e of this.game.s.inventory)
-      if (e.fresh !== undefined) e.fresh -= cooledFor * RULES.cooledSpoilageRate + (dt - cooledFor);
+    // Food in the pack and in every larder, ice in storage and in the pack.
+    this.game.larder.advance(dt);
     for (const st of this.game.s.structures)
-      if (st.fuel > 0 && ['campfire', 'icebox', 'lantern'].includes(st.type))
+      if (st.fuel > 0 && ['campfire', 'lantern'].includes(st.type))
         st.fuel = Math.max(0, st.fuel - dt);
     for (const n of this.game.s.nodes)
       if (n.hp <= 0 && this.game.s.elapsed >= n.depletedUntil) {
@@ -105,6 +101,7 @@ export class Survival extends System {
       morale: 30,
     });
     this.game.s.disease = null;
+    this.game.s.ailments = [];
     this.game.s.elapsed += 600;
     for (const e of this.game.s.inventory)
       if (ITEMS[e.id]?.[1] === 'material' || ITEMS[e.id]?.[1] === 'ore')
@@ -139,7 +136,18 @@ export class Survival extends System {
   update(dt: number) {
     const v = this.game.s.vitals,
       p = this.game.s.player;
-    const cold = this.game.temperature();
+    // Skills and a wayfarer's clothes shrug off some of the cold and the heat.
+    const air = this.game.temperature(),
+      skills = this.game.skills.stats(),
+      wayfarer = this.game.equipment.has('wayfarer') ? 4 : 0,
+      coldResist =
+        skills.coldResist +
+        (skills.coldBlooded ? 8 : 0) +
+        wayfarer +
+        (this.game.equipment.fullSet() === 'choirsilver' ? 6 : 0),
+      heatResist = skills.heatResist + wayfarer,
+      cold =
+        air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
     const shelter = this.game.sheltered(),
       fire = !!this.game.nearLitFire();
     const rain =
@@ -162,20 +170,23 @@ export class Survival extends System {
       (p.cloak && cold < 15 ? 2.7 : 0) +
       (p.coat && cold < 15 ? 1.4 : 0);
     if (this.game.equipment.has('cold')) target = Math.max(target, 36.8);
+    // A warm meal keeps the cold out for a while.
+    if ((this.game.s.buffs.warm_belly ?? 0) > 0 && cold < 15) target += 2.2;
     target = clamp(target, 30, 41);
     v.bodyTemp += (target - v.bodyTemp) * dt * 0.012;
+    const drain = this.game.pocket.drainScale(),
+      sk = this.game.skills.stats(),
+      thirst = drain * Math.max(0.3, 1 + sk.thirst),
+      hunger = drain * Math.max(0.3, 1 + sk.calories);
     v.hydration = clamp(
       v.hydration -
-        dt *
-          (0.045 +
-            (cold > 26 ? 0.045 : 0) +
-            (cold > 40 ? (p.ward ? 0.05 : 0.14) : 0) +
-            (this.game.s.disease === 'dysentery' ? 0.055 : 0)),
+        dt * thirst * (0.045 + (cold > 26 ? 0.045 : 0) + (cold > 40 ? (p.ward ? 0.05 : 0.14) : 0)),
       0,
       100,
     );
-    v.calories = clamp(v.calories - dt * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
+    v.calories = clamp(v.calories - dt * hunger * (p.moving ? 0.048 : 0.031), 0, RULES.maxVital);
     v.protein = clamp(v.protein - dt * 0.018, 0, RULES.maxVital);
+    v.vitamins = clamp(v.vitamins - dt * hunger * 0.012, 0, RULES.maxVital);
     v.fatigue = clamp(v.fatigue + dt * (p.moving ? 0.029 : 0.014), 0, RULES.maxVital);
     v.hygiene = clamp(
       v.hygiene - dt * (this.game.biome().id === 'marsh' ? 0.025 : 0.011),
@@ -183,20 +194,19 @@ export class Survival extends System {
       RULES.maxVital,
     );
     v.stamina = clamp(
-      v.stamina + dt * (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2),
+      v.stamina +
+        dt *
+          (p.moving ? 0.25 : v.hydration > 10 && v.calories > 10 ? 3.4 : 1.2) *
+          ((this.game.s.buffs.well_fed ?? 0) > 0 || (this.game.s.buffs.feasted ?? 0) > 0
+            ? 1.4
+            : 1) *
+          (1 + sk.staminaRegen + (sk.wanderer ? 0.3 : 0)),
       0,
       100,
     );
-    if (this.game.s.disease && ['dysentery', 'fever', 'poisoning'].includes(this.game.s.disease))
-      v.illness = clamp(
-        v.illness + dt * (this.game.s.disease === 'poisoning' ? 0.07 : 0.025),
-        0,
-        RULES.maxVital,
-      );
-    else v.illness = clamp(v.illness - dt * 0.015, 0, RULES.maxVital);
-    if (this.game.s.disease === 'wound')
-      v.infection = clamp(v.infection + dt * (v.hygiene < 35 ? 0.045 : 0.02), 0, RULES.maxVital);
-    else v.infection = clamp(v.infection - dt * 0.013, 0, RULES.maxVital);
+    // Ailments raise these gauges (see Ailments.ts); they ease when nothing drives them.
+    v.illness = clamp(v.illness - dt * 0.015, 0, RULES.maxVital);
+    v.infection = clamp(v.infection - dt * 0.013, 0, RULES.maxVital);
     if (v.hygiene < 20 && v.infection > 0)
       v.infection = clamp(v.infection + dt * 0.024, 0, RULES.maxVital);
     const threats = this.game.s.animals.some(
@@ -209,6 +219,7 @@ export class Survival extends System {
       100,
     );
     const burning = this.lavaBurn();
+    if (burning && this.game.rng() < dt * 0.08) this.game.ailments.contract('burn', true);
     const harm =
       burning +
       this.heat() +

@@ -1,5 +1,6 @@
 import { clamp } from '../../core/math.ts';
 import { pick } from '../../core/random.ts';
+import { biomeAt, layerAt } from '../../data/world.ts';
 import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
@@ -15,8 +16,13 @@ export class Environment extends System {
     return t < RULES.nightEndsAt || t > RULES.nightStartsAt;
   }
   temperature() {
-    const b = this.game.biome(),
-      layer = this.game.layer();
+    const p = this.game.s.player;
+    return this.temperatureAt(p.x, p.y);
+  }
+  /** Air temperature at a place: the region by day and night, or the rock below ground. */
+  temperatureAt(x: number, y: number) {
+    const b = biomeAt(x, y),
+      layer = layerAt(x, y);
     // Below ground the rock sets the temperature; only the upper mines feel the region above.
     if (layer.id === 'upper_mines') return layer.temp + b.temp * 0.25;
     if (layer.id !== 'surface') return layer.temp;

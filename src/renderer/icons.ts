@@ -12,6 +12,27 @@ export const MATERIAL: Record<string, string> = {
   flint: '#6a7074',
   bone: '#e6dcc6',
   copper: '#d0844a',
+  rift: '#ff6ad5',
+  tidecaller: '#5ac8c0',
+  ashwalker: '#8a7a6a',
+  amberguard: '#e8a030',
+  prismweave: '#a8d8f0',
+  bonewalker: '#d8ceb4',
+  gearwright: '#b8883a',
+  saltwarden: '#ece6da',
+  choirsilver: '#a8c0e0',
+  warden: '#8a9098',
+  bulwark: '#c04a3a',
+  aegis: '#f0e0a0',
+  stalker: '#4a6a3a',
+  farstrider: '#7a9a4a',
+  windrider: '#bfe0d8',
+  acolyte: '#6a4a8a',
+  magus: '#8a4ac8',
+  archon: '#e0a0ff',
+  drifter: '#9a7a58',
+  nomad: '#c8a070',
+  voyager: '#5ac8e8',
   silver: '#dfe4ea',
   gold: '#f0c850',
   ruby: '#e8304a',
@@ -101,7 +122,10 @@ type Tpl =
   | 'door'
   | 'bucket'
   | 'rope'
-  | 'hook';
+  | 'hook'
+  | 'crossbow'
+  | 'tome'
+  | 'whip';
 /** Explicit icons; anything not listed is guessed from its id. */
 export const ICONS: Record<string, [Tpl, string, string?]> = {
   wood: ['log', '#8a6440'],
@@ -216,6 +240,143 @@ export const ICONS: Record<string, [Tpl, string, string?]> = {
   frostbrand: ['sword', '#bfe8f8', '#4a6a8a'],
   hellrazor: ['sword', '#ff6a2a', '#2a0a0a'],
   sunspear: ['spear', '#f0c860'],
+  // Realms.
+  waystone: ['sigil', '#6a6a74'],
+  orchard_fragment: ['scroll', '#5a9a8a'],
+  steppe_fragment: ['scroll', '#b8845a'],
+  warren_fragment: ['scroll', '#c8882a'],
+  orchard_key: ['key', '#5ac8c0'],
+  steppe_key: ['key', '#ff8a3a'],
+  warren_key: ['key', '#e8a030'],
+  brinewood: ['log', '#6a7a6a'],
+  tide_pearl: ['orb', '#e8f4f0'],
+  crab_shell: ['pelt', '#c86a4a'],
+  bog_apple: ['berries', '#b8583a'],
+  brinesoil: ['block', '#5a6a58'],
+  tidecaller_spear: ['spear', '#5ac8c0'],
+  brine_wand: ['wand', '#5ac8c0'],
+  tide_conch: ['core', '#f0d8c8'],
+  mother_heart: ['heart', '#5a8a6a'],
+  cinderflax: ['bundle', '#a08a70'],
+  ashcloth: ['bundle', '#6a5e56'],
+  kilnstone_ore: ['ore', '#ff8a3a', '#6a4a3a'],
+  kiln_ingot: ['ingot', '#c8704a'],
+  ash_hide: ['pelt', '#5a5450'],
+  ash_soil: ['block', '#6a5e56'],
+  kilnrock: ['block', '#8a5a44'],
+  kiln_greataxe: ['axe', '#c8704a', '#3a2018'],
+  ember_sling: ['wand', '#ff8a3a'],
+  kiln_heart: ['core', '#ff8a3a'],
+  kiln_core: ['core', '#ffc070'],
+  burrow_amber: ['gem', '#e8a030'],
+  beetle_carapace: ['pelt', '#8a5a1a'],
+  warren_earth: ['block', '#7a5a36'],
+  amberstone: ['block', '#c8882a'],
+  amber_repeater: ['bow', '#e8a030'],
+  amber_pick: ['pick', '#e8a030'],
+  queens_mandible: ['fang', '#e8a030'],
+  queen_jelly: ['bottle', '#ffe8a0'],
+  topaz: ['gem', '#f0b040'],
+  // Band II and III realms.
+  glasswood_fragment: ['scroll', '#a8d8f0'],
+  marches_fragment: ['scroll', '#d8ceb4'],
+  barrow_fragment: ['scroll', '#b8883a'],
+  saltflats_fragment: ['scroll', '#ece6da'],
+  choir_fragment: ['scroll', '#a8c0e0'],
+  glasswood_key: ['key', '#9ad8ff'],
+  marches_key: ['key', '#d8ceb4'],
+  barrow_key: ['key', '#f0c870'],
+  saltflats_key: ['key', '#f0a0b0'],
+  choir_key: ['key', '#bfe0ff'],
+  steam_vent: ['crate', '#8a6a3a'],
+  prism_glass: ['crystal', '#a8e0ff'],
+  lumen_moss: ['bundle', '#e8f0a0'],
+  glassloam: ['block', '#9aa8b8'],
+  prismrock: ['block', '#a8d8f0'],
+  prism_wand: ['wand', '#9ad8ff'],
+  shard_glaive: ['spear', '#a8e0ff'],
+  lumen_antler: ['fang', '#fff8c0'],
+  stag_heart: ['heart', '#fff0a0'],
+  lumen_tincture: ['bottle', '#e8f0a0'],
+  marrow_iron_ore: ['ore', '#d8ceb4', '#5a5448'],
+  marrow_ingot: ['ingot', '#c8bca0'],
+  marrow_mud: ['block', '#5e5a4a'],
+  bonerock: ['block', '#d8ceb4'],
+  bonecleaver: ['axe', '#d8ceb4', '#4a4438'],
+  vertebra_whip: ['whip', '#e6dcc6'],
+  hydra_tooth: ['fang', '#e6dcc6'],
+  hydra_heart: ['heart', '#8a9a5a'],
+  marrow_purge: ['bottle', '#8a9a5a'],
+  brass_gear: ['ore', '#f0c870', '#5a4a34'],
+  brass_ingot: ['ingot', '#d8a048'],
+  brass_plate: ['block', '#b8883a'],
+  gearstone: ['block', '#6a5a44'],
+  brass_repeater: ['crossbow', '#d8a048'],
+  piston_hammer: ['hammer', '#d8a048', '#3a2a12'],
+  saint_cog: ['ring', '#f0c870'],
+  engine_heart: ['core', '#f0c870'],
+  saltglass: ['crystal', '#f0c0c8'],
+  saltcrust: ['block', '#ece6da'],
+  saltglass_rock: ['block', '#e8c0c8'],
+  mirage_blade: ['sword', '#f0c0c8'],
+  saltglass_bow: ['bow', '#f0c0c8'],
+  tyrant_eye: ['orb', '#ffb060'],
+  mirage_crown: ['star', '#fff0c0'],
+  rime_silver_ore: ['ore', '#e8f4ff', '#5a6a7a'],
+  rime_silver: ['ingot', '#dfeaf6'],
+  frost_lily: ['berries', '#bfe0ff'],
+  bell_bronze: ['lump', '#c8904a'],
+  rimesnow: ['block', '#e4eef6'],
+  choirstone: ['block', '#a8b8cc'],
+  choir_stave: ['staff', '#bfe0ff'],
+  bellhammer: ['hammer', '#c8904a', '#3a3028'],
+  hymnal_bell: ['ring', '#c8904a'],
+  hymnal_core: ['core', '#bfe0ff'],
+  // Keeping food.
+  cool_pit: ['crate', '#6a6660'],
+  relic_shelf: ['crate', '#b8903a'],
+  snow_cellar: ['crate', '#dfeaf2'],
+  frost_chest: ['crate', '#8fc0d8'],
+  rime_vault: ['crate', '#6a7a98'],
+  salting_barrel: ['crate', '#8a6440'],
+  kitchen: ['crate', '#8a7a6a'],
+  water_filter: ['bottle', '#dcc38e'],
+  insulated_satchel: ['pelt', '#a47c55'],
+  frost_lined_pack: ['pelt', '#8fc0d8'],
+  rime_lined_pack: ['pelt', '#f8e08a'],
+  salted_meat: ['meat', '#a8584a'],
+  salted_fish: ['fish', '#a0a8a8'],
+  pickled_mushrooms: ['bottle', '#b89068'],
+  berry_preserves: ['bottle', '#c8324a'],
+  hearty_stew: ['bowl', '#8a5a3a'],
+  fish_chowder: ['bowl', '#e8dcc0'],
+  spiced_skewers: ['meat', '#c8583a'],
+  honey_cakes: ['bread', '#e0b060'],
+  mushroom_broth: ['bowl', '#b89068'],
+  orchard_pie: ['bread', '#b8583a'],
+  ember_chili: ['bowl', '#e04a2a'],
+  explorers_feast: ['bowl', '#f0c860'],
+  brackish_water: ['bottle', '#6a8a70'],
+  filtered_water: ['bottle', '#cfeef8'],
+  rehydration_salts: ['bundle', '#ece8de'],
+  vermifuge: ['potion', '#8a9a4a'],
+  frost_salve: ['bowl', '#bfe8f8'],
+  burn_salve: ['bowl', '#e8b060'],
+  bandage: ['bundle', '#f0ece0'],
+  splint: ['log', '#b89468'],
+  lungwort_tea: ['potion', '#58e0d0'],
+  void_salve: ['bowl', '#b36cff'],
+  rabies_serum: ['potion', '#e8e0c0'],
+  field_vaccine: ['potion', '#9ae8c0'],
+  iron_gut_brew: ['potion', '#8a9a6a'],
+  onyx: ['gem', '#3a3440'],
+  opal: ['gem', '#e8f0f8'],
+  fire_infusion: ['potion', '#ff8a3a'],
+  frost_infusion: ['potion', '#9fd8ec'],
+  venom_infusion: ['potion', '#7bc05a'],
+  void_infusion: ['potion', '#b36cff'],
+  holy_infusion: ['potion', '#fff0a0'],
+  storm_infusion: ['potion', '#bfe4ff'],
   // Homes and trade.
   coin: ['coin', '#dfe4ea'],
   chair: ['chair', '#8a6440'],
@@ -690,6 +851,28 @@ function paint(p: Painter, tpl: Tpl, col: string, col2?: string) {
       p.line(8, 1, 6, 3, l);
       p.rect(9, 3, 3, 3, d);
       break;
+    case 'crossbow':
+      p.line(2, 13, 13, 2, handle);
+      p.line(3, 13, 14, 2, handleD);
+      p.line(3, 5, 11, 13, m);
+      p.line(4, 4, 12, 12, l);
+      p.line(3, 5, 7, 9, '#e8e0d0');
+      break;
+    case 'tome':
+      p.rect(3, 2, 10, 12, m);
+      p.rect(3, 2, 10, 1, l);
+      p.rect(3, 2, 1, 12, d);
+      p.rect(12, 3, 1, 10, '#e8dcb8');
+      p.rect(6, 6, 4, 4, col2 ?? ll);
+      p.set(7, 7, '#ffffff');
+      break;
+    case 'whip':
+      diag(1, 15, 5, handle, 2);
+      p.line(6, 10, 10, 4, m);
+      p.line(10, 4, 14, 3, m);
+      p.line(14, 3, 15, 6, l);
+      p.set(15, 7, l);
+      break;
     case 'crate':
       p.rect(2, 4, 12, 10, m);
       p.rect(2, 4, 12, 1, l);
@@ -791,6 +974,21 @@ function guess(id: string): [Tpl, string, string?] {
     sword: 'sword',
     blade: 'sword',
     broadsword: 'sword',
+    greatsword: 'sword',
+    saber: 'sword',
+    reaver: 'sword',
+    razor: 'sword',
+    brand: 'sword',
+    knife: 'sword',
+    cleaver: 'sword',
+    battleaxe: 'axe',
+    greataxe: 'axe',
+    warhammer: 'hammer',
+    maul: 'hammer',
+    whip: 'whip',
+    crossbow: 'crossbow',
+    tome: 'tome',
+    infusion: 'bottle',
     spear: 'spear',
     bow: 'bow',
     staff: 'staff',
@@ -836,8 +1034,7 @@ function guess(id: string): [Tpl, string, string?] {
     shard: 'gem',
     dust: 'seed',
     blaster: 'gun',
-    repeater: 'bow',
-    tome: 'scroll',
+    repeater: 'crossbow',
     brick: 'block',
     bricks: 'block',
     block: 'block',
@@ -903,7 +1100,7 @@ export function useStyle(id: string): 'swing' | 'thrust' | 'aim' | 'hold' | 'non
   if (!id || id === 'fists') return 'none';
   const [tpl] = guess(id);
   if (tpl === 'spear') return 'thrust';
-  if (tpl === 'bow' || tpl === 'staff' || tpl === 'wand' || tpl === 'gun') return 'aim';
-  if (['axe', 'pick', 'sword', 'hammer'].includes(tpl)) return 'swing';
+  if (['bow', 'staff', 'wand', 'gun', 'crossbow', 'tome'].includes(tpl)) return 'aim';
+  if (['axe', 'pick', 'sword', 'hammer', 'whip'].includes(tpl)) return 'swing';
   return 'hold';
 }

@@ -275,7 +275,7 @@ export class Town extends System {
       offer = who?.stock.find(([id]) => id === item);
     if (!who || !offer) return { ok: false, reason: 'That is not for sale.' };
     if (!this.nearSettler(settlerId)) return { ok: false, reason: `Stand beside ${who.name}.` };
-    const cost = offer[1] * qty;
+    const cost = Math.max(1, Math.round(offer[1] * qty * (1 - this.game.skills.get('haggle'))));
     if (this.game.count('coin') < cost)
       return { ok: false, reason: `That costs ${cost} silver marks.` };
     this.game.remove('coin', cost);
@@ -301,7 +301,7 @@ export class Town extends System {
   sleep(bed: Structure) {
     const s = this.game.s;
     s.spawn = { x: bed.x, y: bed.y };
-    s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45);
+    s.vitals.fatigue = Math.max(0, s.vitals.fatigue - 45 * (1 + this.game.skills.get('rest')));
     s.vitals.stamina = 100;
     if (this.game.isNight()) {
       const now = this.game.timeOfDay(),

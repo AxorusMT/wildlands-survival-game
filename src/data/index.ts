@@ -12,3 +12,8 @@ export * from './mobs.ts';
 export * from './dungeons.ts';
 export * from './dimensions.ts';
 export * from './town.ts';
+export * from './weapons.ts';
+export * from './realms/index.ts';
+export * from './food.ts';
+export * from './skills.ts';
+export * from './codex.ts';

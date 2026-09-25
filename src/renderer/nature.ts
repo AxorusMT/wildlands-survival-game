@@ -316,6 +316,10 @@ export function drawTree(
 // ── Plants ───────────────────────────────────────────────────────────────────────────────────
 
 const PLANT_KINDS = new Set([
+  'bog_apple',
+  'cinderflax',
+  'lumen_moss',
+  'frost_lily',
   'berry',
   'herb',
   'fiber',
@@ -400,6 +404,40 @@ function plantSprite(kind: string, stage: number, art: RegionArt): Sprite {
           p.rect(10, 5, 2, 2, '#e8577a');
         }
         break;
+      case 'bog_apple':
+        p.line(9, 15, 9, 7, '#5a4a3a');
+        p.ellipse(9, 7, 7, 5, g[1]);
+        p.ellipse(7, 6, 4, 3, g[2]);
+        if (!bare)
+          for (const [x, y] of [
+            [5, 8],
+            [11, 5],
+            [13, 9],
+            [8, 10],
+          ].slice(0, full ? 4 : 2))
+            p.rect(x, y, 2, 2, '#b8583a');
+        break;
+      case 'lumen_moss':
+        for (let x = 3; x < 16; x += 3) {
+          p.ellipse(x, 14, 3, 2, bare ? '#6a7a6a' : '#9ab88a');
+          if (!bare) p.set(x, 12, '#f0f8a0');
+        }
+        break;
+      case 'frost_lily':
+        p.line(9, 15, 9, 8, '#5a7a8a');
+        p.ellipse(7, 13, 3, 1, '#6a8a9a');
+        if (!bare) {
+          p.ellipse(9, 6, 4, 3, '#dff0ff');
+          p.rect(8, 5, 3, 2, '#bfe0ff');
+          p.set(9, 5, '#ffffff');
+        }
+        break;
+      case 'cinderflax':
+        for (let x = 3; x < 16; x += 2) {
+          p.line(x, 15, x + (x % 3) - 1, bare ? 11 : 4, x % 4 ? '#7a6a54' : '#948068');
+          if (!bare) p.set(x + (x % 3) - 1, 3 + (x % 2), '#ff8a3a');
+        }
+        break;
       case 'willow':
         p.line(9, 15, 9, 5, '#6a5440');
         for (let x = 3; x < 16; x += 2)
@@ -447,6 +485,16 @@ export const MINERALS: Record<string, Mineral> = {
   ruby: { rock: '#5a5058', crystal: '#e8304a', glow: true },
   sapphire: { rock: '#50566a', crystal: '#3a7ae8', glow: true },
   emerald: { rock: '#4e5a52', crystal: '#2ac870', glow: true },
+  topaz: { rock: '#6a5a4a', crystal: '#f0b040', glow: true },
+  onyx: { rock: '#5a5460', crystal: '#1a161e' },
+  opal: { rock: '#6a7470', crystal: '#e8f0f8', glow: true },
+  kilnstone_ore: { rock: '#6a4a3a', fleck: '#ff8a3a', shine: '#ffc070' },
+  burrow_amber: { rock: '#5a4028', crystal: '#e8a030', glow: true },
+  prism_glass: { rock: '#6a7488', crystal: '#bfe8ff', glow: true },
+  marrow_iron_ore: { rock: '#8a8272', fleck: '#e6dcc6', shine: '#c8bca0' },
+  brass_gear: { rock: '#5a4a34', fleck: '#f0c870', shine: '#fff0a0' },
+  saltglass: { rock: '#c8c0b4', crystal: '#f0c0c8', glow: true },
+  rime_silver_ore: { rock: '#5a6a7a', fleck: '#e8f4ff', shine: '#ffffff' },
   coal: { rock: '#5a5a5e', fleck: '#1c1c20', shine: '#8a8a96' },
   ice: { rock: '#8fb8d0', crystal: '#dff4ff' },
   obsidian: { rock: '#3a3448', crystal: '#2a2433', shine: '#9a8ac0' },

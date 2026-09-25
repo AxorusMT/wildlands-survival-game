@@ -6,6 +6,7 @@ import { System } from './System.ts';
 export class Progress extends System {
   record(key: string, qty = 1) {
     this.game.s.tutorial.tally[key] = (this.game.s.tutorial.tally[key] || 0) + qty;
+    this.game.skills.noted(key, qty);
     this.advanceTutorial();
     this.advanceChapter();
   }

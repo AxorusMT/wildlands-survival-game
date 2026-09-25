@@ -12,9 +12,12 @@ import type {
   Structure,
 } from '../core/types.ts';
 import { RANGED } from '../data/gear.ts';
-import { biomeAt, layerAt, lavaAt } from '../data/world.ts';
+import { setActiveRealm } from '../data/realms/index.ts';
+import { biomeAt, layerAt, lavaAt, syncPocket } from '../data/world.ts';
 import { RULES } from './rules.ts';
 
+import { Ailments } from './systems/Ailments.ts';
+import { Armoury } from './systems/Armoury.ts';
 import { Bosses } from './systems/Bosses.ts';
 import { Combat } from './systems/Combat.ts';
 import { Consumables } from './systems/Consumables.ts';
@@ -27,14 +30,17 @@ import { Equipment, HOTBAR_SLOTS } from './systems/Equipment.ts';
 import { Hands } from './systems/Hands.ts';
 import { Interaction } from './systems/Interaction.ts';
 import { Inventory } from './systems/Inventory.ts';
+import { Larder } from './systems/Larder.ts';
 import { Physics } from './systems/Physics.ts';
+import { Pocket } from './systems/Pocket.ts';
 import { Progress } from './systems/Progress.ts';
 import { Realms } from './systems/Realms.ts';
+import { Skills } from './systems/Skills.ts';
 import { Survival } from './systems/Survival.ts';
 import { Terrain } from './systems/Terrain.ts';
 import { Town } from './systems/Town.ts';
 import { Wildlife } from './systems/Wildlife.ts';
-import { SaveSystem } from './SaveSystem.ts';
+import { LAYOUT, SaveSystem } from './SaveSystem.ts';
 import { WorldGenerator } from './WorldGenerator.ts';
 /**
  * The expedition simulation. Game owns the saved record (`s`), the seeded random source, and
@@ -58,14 +64,19 @@ export class Game {
   readonly interaction = new Interaction(this);
   readonly consumables = new Consumables(this);
   readonly survival = new Survival(this);
+  readonly ailments = new Ailments(this);
+  readonly larder = new Larder(this);
   readonly physics = new Physics(this);
   readonly wildlife = new Wildlife(this);
   readonly effergy = new Effergy(this);
   readonly drops = new Drops(this);
   readonly equipment = new Equipment(this);
   readonly combat = new Combat(this);
+  readonly armoury = new Armoury(this);
+  readonly skills = new Skills(this);
   readonly bosses = new Bosses(this);
   readonly realms = new Realms(this);
+  readonly pocket = new Pocket(this);
   readonly hands = new Hands(this);
   readonly town = new Town(this);
   readonly devtools = new Dev(this);
@@ -79,9 +90,12 @@ export class Game {
   /** Starts a fresh expedition from a seed. */
   newGame(seed: number = RULES.defaultSeed): this {
     this.rng = seededRandom(seed);
+    // A fresh world starts with the pocket strip empty.
+    setActiveRealm(null);
+    syncPocket();
     this.s = {
       version: 3,
-      layout: 4,
+      layout: LAYOUT,
       seed,
       elapsed: 0,
       day: 1,
@@ -115,8 +129,11 @@ export class Game {
         infection: 0,
         hygiene: 80,
         morale: 73,
+        vitamins: 70,
       },
       disease: null,
+      ailments: [],
+      immune: {},
       inventory: [],
       nodes: [],
       animals: [],
@@ -142,6 +159,10 @@ export class Game {
       wallEdits: {},
       spawn: null,
       town: { homes: {} },
+      pocket: null,
+      realms: {},
+      armoury: {},
+      meta: { renown: 0, skills: [], mastery: {} },
       placing: null,
       dead: false,
       lastSave: Date.now(),
@@ -169,7 +190,9 @@ export class Game {
     this.drops.step(dt);
     this.equipment.update(dt);
     this.realms.update(dt);
+    this.pocket.update(dt);
     this.town.update(dt);
+    this.ailments.update(dt);
     this.survival.update(dt);
     this.devtools.sustain();
   }
@@ -206,7 +229,9 @@ export class Game {
     return lavaAt(p.x, p.y - 8);
   }
   near(type: string, radius = 110) {
-    return this.s.structures.find((st) => st.type === type && dist(st, this.s.player) <= radius);
+    // The old kilns of the Ashen Steppe still burn hot enough to smelt.
+    const ok = (t: string) => t === type || (type === 'furnace' && t === 'kiln');
+    return this.s.structures.find((st) => ok(st.type) && dist(st, this.s.player) <= radius);
   }
   nearLitFire() {
     const f = this.near('campfire', 155);
@@ -215,9 +240,12 @@ export class Game {
   sheltered() {
     return !!this.near('shelter', 130);
   }
+  /** Relics set on a shelf at camp (as many as renown allows). */
+  shelvedRelics() {
+    return this.skills.shelved();
+  }
   cooled() {
-    const ice = this.near('icebox', 135);
-    return !!(ice && ice.fuel > 0);
+    return !!this.larder.nearest();
   }
   /** The item in the player's hand: the active quick slot, else the ready weapon. */
   heldItem() {

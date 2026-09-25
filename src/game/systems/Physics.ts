@@ -59,7 +59,7 @@ export class Physics extends System {
       return true;
     }
     const boost = fx.has('jump') || fx.has('speed') ? 1.18 : 1;
-    p.vy = -RULES.jumpVelocity * boost;
+    p.vy = -RULES.jumpVelocity * boost * (1 + this.game.skills.get('jump'));
     p.grounded = false;
     this.airJumps = 1;
     this.game.s.vitals.stamina -= RULES.jumpStamina;
@@ -92,13 +92,16 @@ export class Physics extends System {
       }
     }
     const tired = v.stamina < 12 || v.fatigue > 80;
-    const lava = this.game.inLava();
+    const lava = this.game.inLava(),
+      water = this.game.pocket.submerged();
     if (lava && !this.wasInLava) this.game.sound('sizzle', p.x, p.y, 1.3);
     this.wasInLava = lava;
     const speed =
-      (lava ? 0.45 : 1) *
+      (lava ? 0.45 : water ? 0.6 : 1) *
       (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) *
       (v.illness > 60 ? 0.82 : 1) *
+      this.game.ailments.speedScale() *
+      this.game.pocket.moveScale() *
       (p.boots ? 1.12 : 1) *
       this.game.equipment.speedBonus() *
       this.game.dev.speed;
@@ -107,10 +110,14 @@ export class Physics extends System {
     const shaft = inShaft(p.x, p.y);
     // Molten rock is thick: you sink slowly and can wade or struggle upward.
     if (lava) p.vy = dy < 0 ? -150 : Math.min(p.vy + 240 * dt, 60);
-    else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
+    // Deep water: you sink slowly and can swim up, at the cost of stamina.
+    else if (water) {
+      p.vy = dy < 0 ? Math.max(p.vy - 900 * dt, -170) : Math.min(p.vy + 260 * dt, 90);
+      if (dy < 0) v.stamina = clamp(v.stamina - dt * 3, 0, RULES.maxVital);
+    } else if (dy < 0 && (p.grounded || shaft) && v.stamina > RULES.jumpStamina) {
       if (p.grounded) this.jump();
       else {
-        p.vy = -RULES.climbVelocity;
+        p.vy = -RULES.climbVelocity * (1 + this.game.skills.get('climb'));
         v.stamina = clamp(v.stamina - dt * 5, 0, RULES.maxVital);
       }
     } else if (shaft && dy > 0) p.vy = Math.min(p.vy + 160 * dt, 170);

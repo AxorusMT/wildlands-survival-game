@@ -575,8 +575,71 @@ canvas.icon {
   display: flex;
   gap: 3px;
 }
-.hud-defense {
+.hud-defense,
+.hud-renown {
   font: 400 11px var(--caps);
+}
+.hud-renown span {
+  color: #a8402a;
+}
+.renown-track {
+  width: 96px;
+  height: 4px;
+  margin-top: 2px;
+  background: #2a1c12;
+  border: 1px solid #5a3e26;
+}
+.renown-track i {
+  display: block;
+  height: 100%;
+  background: #c8902a;
+}
+.skill-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.skill {
+  text-align: left;
+  padding: 4px 5px;
+  font: 400 11px/1.2 var(--body, inherit);
+  background: #e8d8b8;
+  border: 2px solid #b8a080;
+  color: #6a5a44;
+  cursor: pointer;
+  min-width: 0;
+}
+.skill strong {
+  display: block;
+  font: 400 10px var(--caps);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.skill small {
+  display: block;
+  font-size: 10px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.skill.ready {
+  border-color: #c8902a;
+  color: #3a2818;
+}
+.skill.learned {
+  background: #3a6a3a;
+  border-color: #6ab86a;
+  color: #f0e8d0;
+}
+.skill.key {
+  border-style: double;
+  border-width: 3px;
+}
+.book-row.selected {
+  outline: 2px solid #c8902a;
 }
 
 @media (max-width: 800px) {
@@ -705,4 +768,193 @@ canvas.icon {
 #dev-input::selection,
 #dev-log ::selection {
   background: #4a6450;
+}
+
+/* ── Realm banner ──────────────────────────────────────────────────────────── */
+#realm-banner {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 14px 28px 12px;
+  background:
+    var(--dither) 0 0 / 6px 6px,
+    #1c2620e0;
+  border: var(--px) solid #0c120e;
+  box-shadow:
+    inset 0 0 0 var(--px) #4a6450,
+    var(--px) var(--px) 0 var(--px) #0007;
+  color: #e8f0d8;
+  text-align: center;
+  animation: banner-in 0.6s steps(6) both;
+}
+#realm-banner.hidden {
+  display: none;
+}
+#realm-banner small {
+  font: 400 11px var(--caps);
+  color: var(--gold);
+  letter-spacing: 0.2em;
+}
+#realm-banner strong {
+  font: 700 30px var(--pixel);
+  text-shadow: var(--px) var(--px) 0 #0c120e;
+}
+#realm-banner span {
+  font: 400 12px var(--caps);
+  color: #ff9a7a;
+}
+#realm-banner em {
+  font: 400 13px var(--pixel);
+  font-style: normal;
+  color: #9fb8a0;
+}
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+}
+.book-row.selected {
+  background: #0000000f;
+}
+.tiny-button.active {
+  background: #b1664c;
+  color: #fff6de;
+}
+
+/* ── Armoury ───────────────────────────────────────────────────────────────── */
+.armoury-grid {
+  display: grid;
+  grid-template-columns: 22px repeat(10, 1fr);
+  grid-auto-rows: 25px;
+  gap: 2px;
+  margin: 6px 0 10px;
+}
+.armoury-head,
+.armoury-tier {
+  font: 400 9px var(--caps);
+  color: #7c624d;
+  text-align: center;
+  align-self: center;
+}
+.armoury-cell {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  height: 25px;
+  padding: 0;
+  background: #0000000d;
+  border: var(--px) solid #0000001a;
+  box-shadow: none;
+  cursor: pointer;
+}
+.armoury-cell img {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+.armoury-cell.known img {
+  opacity: 0.55;
+  filter: grayscale(0.3);
+}
+.armoury-cell.owned {
+  background: #fff4d8;
+  border-color: #b89a6a;
+}
+.armoury-cell.owned img {
+  opacity: 1;
+  filter: none;
+}
+.armoury-cell.active {
+  border-color: #b1664c;
+  background: #f4d8c0;
+}
+.armoury-sig {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+
+#weapon-name {
+  display: block;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Ailments and freshness ────────────────────────────────────────────────── */
+#ailments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+#ailments:empty {
+  display: none;
+}
+.ail {
+  font: 400 9px var(--caps);
+  padding: 2px 5px;
+  color: #fff4e0;
+  background: #8a6a3a;
+  border: var(--px) solid #3a2a1a;
+}
+.ail.stage-2 {
+  background: #b0602a;
+}
+.ail.stage-3 {
+  background: #a02a2a;
+  animation: ail-pulse 1s steps(2) infinite;
+}
+.ail.off {
+  background: #6a6a74;
+}
+@keyframes ail-pulse {
+  50% {
+    background: #d04040;
+  }
+}
+.fresh-bar {
+  display: block;
+  width: 90px;
+  height: 4px;
+  margin-top: 2px;
+  background: #0000001f;
+}
+.fresh-bar i {
+  display: block;
+  height: 100%;
+  background: #6a9a4a;
+}
+.fresh-bar.stale i {
+  background: #c8a040;
+}
+.fresh-bar.spoiled i {
+  background: #c86a2a;
+}
+.fresh-bar.rotten i {
+  background: #8a3a2a;
+}
+small.spoiled {
+  color: #c86a2a;
+}
+.disease-note .pips i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  background: #0000002a;
+}
+.disease-note .pips i.on {
+  background: #a02a2a;
+}
+.disease-note.stage-3 {
+  border-color: #a02a2a;
 }

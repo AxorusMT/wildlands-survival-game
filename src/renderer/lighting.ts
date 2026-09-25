@@ -50,6 +50,11 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
       out.push([s.x, s.y - 30, 1.1, 0.6, 0.25]);
     else if (s.type === 'furnace' || s.type === 'forge') out.push([s.x, s.y - 20, 1.0, 0.6, 0.3]);
     else if (s.type === 'effergy') out.push([s.x, s.y - 60, 0.85, 0.72, 1.0]);
+    else if (s.type === 'shrine' && s.crop !== 'spent') out.push([s.x, s.y - 20, 0.8, 0.75, 0.45]);
+    else if (s.type === 'relic_shelf' && Object.keys(s.store).length)
+      out.push([s.x, s.y - 24, 0.7, 0.55, 0.3]);
+    else if (s.type === 'kiln') out.push([s.x, s.y - 16, 1.15 * f, 0.62 * f, 0.28 * f]);
+    else if (s.type === 'waystone' && g.s.pocket) out.push([s.x, s.y - 40, 0.45, 0.8, 1.0]);
     else if (s.type === 'rift_gate' || s.type === 'portal')
       out.push([s.x, s.y - 50, 0.8, 0.5, 1.1]);
   }
@@ -61,6 +66,10 @@ export function gatherLights(g: RenderGame, t: number, menu = false): Light[] {
       out.push([n.x, n.y - 12, 0.25, 0.85, 0.8]);
     else if (n.kind.includes('starmetal')) out.push([n.x, n.y - 12, 0.95, 0.85, 0.45]);
     else if (n.kind.includes('voidsteel')) out.push([n.x, n.y - 12, 0.6, 0.3, 0.95]);
+    else if (n.kind === 'burrow_amber') out.push([n.x, n.y - 12, 0.8, 0.5, 0.15]);
+    else if (n.kind === 'prism_glass') out.push([n.x, n.y - 12, 0.4, 0.7, 0.95]);
+    else if (n.kind === 'saltglass') out.push([n.x, n.y - 12, 0.8, 0.5, 0.55]);
+    else if (n.kind === 'lumen_moss') out.push([n.x, n.y - 8, 0.6, 0.65, 0.3]);
   }
   for (const a of g.s.animals) {
     if (a.deadUntil) continue;
@@ -107,18 +116,29 @@ export function drawLighting(
     B = buf.b,
     S = buf.solid;
   const [sr, sg, sb] = skyLight(g);
+  const realm = D.inPocket(g.s.player.x) ? D.activeRealm() : null,
+    starless = realm?.inst.mods.includes('starless') ? 0.15 : 1,
+    realmAmbient = realm?.tpl.ambient.map((v) => v * starless) as [number, number, number];
   // Deep layers keep a faint ambient: cold in the mines, a sullen red glow in hell.
   const layerAmbient = (y: number): [number, number, number] =>
-    y >= D.LAYERS[4].top
-      ? [0.3, 0.1, 0.07]
-      : y >= D.LAYERS[3].top
-        ? [0.22, 0.09, 0.07]
-        : y >= D.LAYERS[2].top
-          ? [0.05, 0.055, 0.08]
-          : [0.06, 0.06, 0.07];
+    realmAmbient
+      ? realmAmbient
+      : y >= D.LAYERS[4].top
+        ? [0.3, 0.1, 0.07]
+        : y >= D.LAYERS[3].top
+          ? [0.22, 0.09, 0.07]
+          : y >= D.LAYERS[2].top
+            ? [0.05, 0.055, 0.08]
+            : [0.06, 0.06, 0.07];
   const dim = D.biomeAt(g.s.player.x, 0).id;
   // In the sky dimension open air is always lit; in the void only the stars glimmer.
-  const skyFactor = dim === 'void' ? 0.22 : dim === 'mycelia' ? 0.3 : 1;
+  const skyFactor = realm
+    ? realm.tpl.daylight * starless
+    : dim === 'void'
+      ? 0.22
+      : dim === 'mycelia'
+        ? 0.3
+        : 1;
   for (let j = 0; j < gh; j++)
     for (let i = 0; i < gw; i++) {
       const tx = tx0 + i,

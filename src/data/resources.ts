@@ -1,4 +1,5 @@
 import type { NodeSpec, ToolTier, WeaponSpec } from '../core/types.ts';
+import { GEN_WEAPONS } from './weapons.ts';
 
 // Gatherable resources: yield range, required tool and tier, hit points, and regrowth seconds.
 export const NODES: Record<string, NodeSpec> = {
@@ -33,6 +34,22 @@ export const NODES: Record<string, NodeSpec> = {
   ruby: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
   sapphire: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
   emerald: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
+  // The realms.
+  brinewood: { yield: [2, 4], tool: 'axe', req: 2, hp: 4, regen: 240 },
+  bog_apple: { yield: [1, 3], hp: 2, regen: 200 },
+  cinderflax: { yield: [2, 3], hp: 2, regen: 200 },
+  kilnstone_ore: { yield: [2, 3], tool: 'pick', req: 3, hp: 4, regen: 0 },
+  burrow_amber: { yield: [1, 3], tool: 'pick', req: 3, hp: 4, regen: 0 },
+  prism_glass: { yield: [2, 3], tool: 'pick', req: 5, hp: 5, regen: 0 },
+  lumen_moss: { yield: [1, 3], hp: 2, regen: 220 },
+  marrow_iron_ore: { yield: [2, 3], tool: 'pick', req: 5, hp: 5, regen: 0 },
+  brass_gear: { yield: [2, 3], tool: 'pick', req: 6, hp: 5, regen: 0 },
+  saltglass: { yield: [2, 3], tool: 'pick', req: 6, hp: 5, regen: 0 },
+  rime_silver_ore: { yield: [2, 3], tool: 'pick', req: 6, hp: 5, regen: 0 },
+  frost_lily: { yield: [1, 2], hp: 2, regen: 240 },
+  topaz: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
+  onyx: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
+  opal: { yield: [1, 2], tool: 'pick', req: 3, hp: 3, regen: 0 },
   // The dimensions.
   glowcap: { yield: [1, 3], hp: 2, regen: 200 },
   sunbloom: { yield: [1, 2], hp: 2, regen: 240 },
@@ -52,6 +69,7 @@ export const TREE_NODES = new Set([
   'shroom_wood',
   'sky_wood',
   'void_wood',
+  'brinewood',
 ]);
 
 /** Trees topple and regrow from the stump, minerals crumble away for good, plants are picked. */
@@ -78,6 +96,7 @@ export const TOOL_TIERS: Record<string, ToolTier> = {
   gold_axe: ['axe', 4],
   gold_pick: ['pick', 4],
   wooden_hammer: ['hammer', 1],
+  amber_pick: ['pick', 5],
   iron_hammer: ['hammer', 3],
   hellstone_axe: ['axe', 6],
   hellstone_pick: ['pick', 6],
@@ -100,6 +119,22 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   silver_broadsword: [3, 40, 64],
   gold_broadsword: [4, 52, 66],
   ruby_staff: [3, 24, 0],
+  tidecaller_spear: [4, 46, 96],
+  brine_wand: [4, 30, 0],
+  kiln_greataxe: [5, 62, 70],
+  ember_sling: [4, 30, 0],
+  amber_repeater: [4, 22, 0],
+  amber_pick: [5, 20, 44],
+  prism_wand: [6, 52, 0],
+  shard_glaive: [6, 76, 100],
+  bonecleaver: [7, 112, 64],
+  vertebra_whip: [6, 50, 128],
+  brass_repeater: [8, 118, 0],
+  piston_hammer: [8, 158, 60],
+  mirage_blade: [8, 130, 66],
+  saltglass_bow: [8, 72, 0],
+  choir_stave: [9, 96, 0],
+  bellhammer: [9, 190, 60],
   sapphire_staff: [4, 30, 0],
   emerald_staff: [4, 22, 0],
   frostbrand: [6, 84, 72],
@@ -107,7 +142,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   hellrazor: [7, 114, 76],
   myconite_sword: [8, 128, 74],
   star_saber: [9, 152, 78],
-  void_reaver: [10, 192, 82],
+  void_reaver: [10, 272, 86],
   rift_blade: [11, 245, 92],
   // Bows and staves: damage is per shot (arrows add their own); they strike from afar.
   wooden_bow: [1, 9, 0],
@@ -120,4 +155,6 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   sun_staff: [7, 84, 0],
   spore_staff: [8, 76, 0],
   void_staff: [10, 150, 0],
+  // The rest of the hierarchy, generated from its table.
+  ...GEN_WEAPONS,
 };

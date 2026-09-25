@@ -1,6 +1,7 @@
 import { clamp, dist } from '../../core/math.ts';
 import type { Animal } from '../../core/types.ts';
 import { BOSSES } from '../../data/bosses.ts';
+import { BITE_DISEASES } from '../../data/diseases.ts';
 import { MOBS, VOICES, isAggressive, mobName } from '../../data/mobs.ts';
 import { RANGED } from '../../data/gear.ts';
 import { LAVA_Y, TILE, caveY, regionBounds, underworldFloor } from '../../data/world.ts';
@@ -29,13 +30,15 @@ export class Wildlife extends System {
       const face = Math.cos(p.face) >= 0 ? 1 : -1;
       const r = this.game.combat.fire(p.weapon, { x: p.x + face * 400, y: p.y - 30 });
       if (r.ok) {
-        p.attackAt = this.game.s.elapsed + RANGED[p.weapon].delay;
+        p.attackAt =
+          this.game.s.elapsed + RANGED[p.weapon].delay * this.game.armoury.stats(p.weapon).pace;
         p.usedAt = this.game.s.elapsed;
       }
       return { ...r, hit: false };
     }
     if (v.stamina < RULES.attackStamina) return { ok: false, reason: 'Too exhausted to strike.' };
-    p.attackAt = this.game.s.elapsed + RULES.attackCooldownSeconds;
+    p.attackAt =
+      this.game.s.elapsed + RULES.attackCooldownSeconds * this.game.armoury.stats(p.weapon).pace;
     p.usedAt = this.game.s.elapsed;
     v.stamina -= RULES.attackStamina;
     v.hydration = clamp(v.hydration - 0.25, 0, RULES.maxVital);
@@ -67,9 +70,18 @@ export class Wildlife extends System {
       this.cry(animal, 'hurt');
     }
     const spec = MOBS[animal.type];
+    // A mirage struck down is only light and heat: no body, no loot, no renown.
+    if (spec && spec.damage <= 0 && spec.sight > 0) {
+      animal.deadUntil = this.game.s.elapsed + (animal.minion ? 999999 : spec.respawn);
+      this.game.event('burst', animal.x, animal.y - 20, '#fff4e0');
+      return;
+    }
     animal.deadUntil =
       this.game.s.elapsed +
-      (animal.type === 'boss' || spec?.boss || animal.minion ? 999999 : (spec?.respawn ?? 120));
+      (animal.type === 'boss' || spec?.boss || animal.minion || animal.echo
+        ? 999999
+        : (spec?.respawn ?? 120));
+    this.game.pocket.echo(animal);
     if (animal.type === 'boss') {
       const cfg = BOSSES[this.game.s.altar.level - 1];
       for (const [id, qty] of Object.entries(cfg.rewards)) this.game.add(id, qty);
@@ -85,20 +97,30 @@ export class Wildlife extends System {
       return;
     }
     const at = animal.x === undefined ? this.game.s.player : animal;
+    // War cry: each kill steadies your breath.
+    const breath = this.game.skills.get('killStamina');
+    if (breath) this.game.s.vitals.stamina = clamp(this.game.s.vitals.stamina + breath, 0, 100);
+    const more = this.game.pocket.lootScale(at.x);
     if (spec && !animal.minion && animal.type !== 'deer') {
       // Silver marks, more from tougher foes, many from the great ones.
       const coins = Math.max(
         1,
-        Math.round((spec.hp / 20) * (0.6 + this.game.rng() * 0.8) * (spec.boss ? 3 : 1)),
+        Math.round(
+          (spec.hp / 20) *
+            (0.6 + this.game.rng() * 0.8) *
+            (spec.boss ? 3 : 1) *
+            more *
+            (1 + this.game.skills.get('coins')),
+        ),
       );
       this.game.drops.spawn('coin', coins, at.x, at.y - 20);
     }
     if (spec) {
       for (const [id, min, max, chance] of spec.loot)
-        if (this.game.rng() < chance)
+        if (this.game.rng() < chance * (1 + this.game.skills.get('luck')))
           this.game.drops.spawn(
             id,
-            min + Math.floor(this.game.rng() * (max - min + 1)),
+            Math.max(1, Math.round((min + Math.floor(this.game.rng() * (max - min + 1))) * more)),
             at.x,
             at.y - 20,
           );
@@ -129,6 +151,8 @@ export class Wildlife extends System {
       }
       return;
     }
+    this.afflict(a, dt);
+    if (a.deadUntil) return;
     // Creatures far from the player rest; only nearby life is simulated.
     const p = s.player;
     if (Math.abs(a.x - p.x) > 2600 && !MOBS[a.type]?.boss && a.type !== 'boss') return;
@@ -137,6 +161,40 @@ export class Wildlife extends System {
     this.stepLegacy(a, dt);
   }
 
+  /** Some bites carry worse than a wound: rabies from wolves and rats, spores, void rot. */
+  private bite(a: Animal) {
+    const carried = BITE_DISEASES[a.type];
+    if (carried && this.game.rng() < carried[1] * this.game.pocket.diseaseScale())
+      this.game.ailments.contract(carried[0]);
+  }
+  /** Bleeding, burning, and poison wear a creature down; stuns and slows run out. */
+  private afflict(a: Animal, dt: number) {
+    const fx = a.fx,
+      t = this.game.s.elapsed;
+    if (!fx) return;
+    let harm = 0;
+    for (const k of ['bleed', 'burn', 'poison'] as const) {
+      const d = fx[k];
+      if (!d) continue;
+      if (t >= d[0]) delete fx[k];
+      else harm += d[1] * dt;
+    }
+    if (fx.mark && t >= fx.mark[0]) delete fx.mark;
+    if (!harm) return;
+    a.hp -= harm;
+    a.dotShown = (a.dotShown ?? 0) + harm;
+    if (a.dotShown >= 12) {
+      this.game.event(
+        'damage',
+        a.x,
+        a.y - 44,
+        String(Math.round(a.dotShown)),
+        fx.burn ? 3 : fx.poison ? 4 : 5,
+      );
+      a.dotShown = 0;
+    }
+    if (a.hp <= 0) this.kill(a);
+  }
   /** Surface animals, tunnel bats, hellhounds, and the Direwolf: kept to their floor lines. */
   private stepLegacy(a: Animal, dt: number) {
     const s = this.game.s,
@@ -196,6 +254,7 @@ export class Wildlife extends System {
           (boss ? 'Direwolf' : mobName(a.type)) + ' attack!',
           boss ? ['wound', 0.4] : spec?.disease,
         );
+        this.bite(a);
       }
     }
     if (a.howlCue && s.elapsed >= a.howlCue) {
@@ -288,11 +347,13 @@ export class Wildlife extends System {
       p = s.player,
       spec = MOBS[a.type];
     if (!spec) return;
-    const d = dist(a, p),
+    const t = s.elapsed,
+      d = dist(a, p),
       hunting = spec.sight > 0 && d < spec.sight && !s.dead,
       face = Math.sign(p.x - a.x) || 1,
-      [walk, run] = spec.speed,
-      t = s.elapsed;
+      stunned = (a.fx?.stun ?? 0) > t,
+      pace = this.game.pocket.speedScale(a) * ((a.fx?.slow ?? 0) > t ? 0.6 : 1) * (stunned ? 0 : 1),
+      [walk, run] = [spec.speed[0] * pace, spec.speed[1] * pace];
     a.timers ??= {};
     if (d < 900 && Math.random() < dt * 0.04) this.cry(a, 'call');
     if (spec.move === 'walker' || spec.move === 'hopper') {
@@ -362,7 +423,7 @@ export class Wildlife extends System {
       this.moveBody(a, dt, true);
     }
     if (Math.abs(a.vx ?? 0) > 5) a.angle = (a.vx ?? 0) > 0 ? 0 : Math.PI;
-    if (!hunting) return;
+    if (!hunting || stunned) return;
     // Contact: touching a monster hurts.
     const cy = a.y - 22;
     if (
@@ -371,8 +432,24 @@ export class Wildlife extends System {
       t >= a.attackAt
     ) {
       a.attackAt = t + spec.cooldown * 0.6;
+      // A mirage reaches you and is gone: only heat and light.
+      if (spec.damage <= 0) {
+        a.deadUntil = t + spec.respawn;
+        this.game.event('burst', a.x, a.y - 20, '#fff4e0');
+        if (a.type === 'mirage') this.game.say('It was only a mirage.', 'ink');
+        return;
+      }
       this.cry(a, 'attack');
-      this.game.combat.hurtPlayer(spec.damage, mobName(a.type) + ' attack!', spec.disease);
+      const taken = this.game.combat.hurtPlayer(
+        spec.damage,
+        mobName(a.type) + ' attack!',
+        spec.disease,
+      );
+      // Riposte and a vanguard's plate turn part of the blow back on the biter.
+      const thorns =
+        this.game.skills.get('thorns') + (this.game.equipment.has('vanguard') ? 0.25 : 0);
+      if (taken && thorns) this.game.combat.hurtMob(a, taken * thorns, p);
+      this.bite(a);
     }
     if (spec.ranged && d < spec.ranged.range && t >= (a.timers.shoot ?? 0)) {
       a.timers.shoot = t + spec.cooldown + this.game.rng() * 0.6;

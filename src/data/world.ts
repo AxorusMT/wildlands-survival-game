@@ -12,6 +12,7 @@ import {
   type Dimension,
 } from './dimensions.ts';
 import { DUNGEON_DEFS, NATURAL, buildDungeon, layoutTile, type DungeonLayout } from './dungeons.ts';
+import { activeRealm } from './realms/index.ts';
 
 export const SIDE_ORDER = [
   'coast',
@@ -57,8 +58,44 @@ export const BIOME_CENTERS: Record<string, [number, number]> = Object.fromEntrie
 /** The overworld's width; the dimensions lie in walled strips east of it. */
 export const OVERWORLD_W = BIOME_SPANS[BIOME_SPANS.length - 1].end;
 export const DIMENSIONS: Dimension[] = makeDimensions(OVERWORLD_W);
+/**
+ * The pocket strip east of the dimensions: whichever generated realm is open fills it, rebuilt
+ * from its seed. Its id and name follow the realm; empty, it is solid bedrock.
+ */
+export const POCKET: Dimension = (() => {
+  const last = DIMENSIONS[DIMENSIONS.length - 1],
+    start = last.end + DIM_GAP;
+  return {
+    id: 'pocket',
+    name: 'The Between',
+    start,
+    end: start + (last.end - last.start),
+    arrive: 520,
+    temp: 12,
+  };
+})();
+/** Points the pocket strip at the realm now open (called by Pocket.ts through setActiveRealm). */
+export function syncPocket() {
+  const r = activeRealm();
+  POCKET.id = r ? r.tpl.id : 'pocket';
+  POCKET.name = r ? r.tpl.name : 'The Between';
+  POCKET.arrive = r ? r.geo.arrive : 520;
+  POCKET.temp = r
+    ? r.tpl.temp +
+      (r.inst.mods.includes('frostbound') ? -18 : 0) +
+      (r.inst.mods.includes('scorched') ? 18 : 0)
+    : 12;
+}
+export const inPocket = (x: number) => x >= POCKET.start - DIM_GAP / 2;
+/** Ladders of the open realm, in world coordinates. */
+export function pocketShafts(): Shaft[] {
+  const r = activeRealm();
+  return r
+    ? r.geo.ladders.map((l) => ({ x: POCKET.start + l.x, top: l.top, bottom: l.bottom }))
+    : [];
+}
 export const TILE = 32,
-  WORLD_W = DIMENSIONS[DIMENSIONS.length - 1].end + DIM_GAP,
+  WORLD_W = POCKET.end + DIM_GAP,
   WORLD_H = 4480,
   TILE_COLS = Math.ceil(WORLD_W / TILE),
   TILE_ROWS = Math.ceil(WORLD_H / TILE);
@@ -106,6 +143,23 @@ export const MINE_TIER: Record<number, number> = {
   26: 1,
   27: 99,
   28: 0,
+  29: 0,
+  30: 0,
+  31: 0,
+  32: 4,
+  33: 0,
+  34: 4,
+  35: 0,
+  36: 0,
+  37: 5,
+  38: 0,
+  39: 4,
+  40: 6,
+  41: 6,
+  42: 0,
+  43: 5,
+  44: 0,
+  45: 6,
 };
 /** What each ground kind yields, and an occasional bonus find. */
 export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number] }> = {
@@ -135,12 +189,28 @@ export const TILE_YIELD: Record<number, { item: string; bonus?: [string, number]
   25: { item: 'obsidian_brick' },
   26: { item: 'sandstone_brick' },
   28: { item: 'glowshroom_block' },
+  30: { item: 'brinesoil', bonus: ['clay', 0.15] },
+  31: { item: 'ash_soil', bonus: ['sulfur', 0.1] },
+  32: { item: 'kilnrock', bonus: ['kilnstone_ore', 0.14] },
+  33: { item: 'warren_earth', bonus: ['burrow_amber', 0.05] },
+  34: { item: 'amberstone', bonus: ['burrow_amber', 0.4] },
+  36: { item: 'glassloam', bonus: ['lumen_moss', 0.05] },
+  37: { item: 'prismrock', bonus: ['prism_glass', 0.3] },
+  38: { item: 'marrow_mud', bonus: ['bone', 0.12] },
+  39: { item: 'bonerock', bonus: ['marrow_iron_ore', 0.14] },
+  40: { item: 'brass_plate', bonus: ['brass_gear', 0.1] },
+  41: { item: 'gearstone', bonus: ['brass_gear', 0.2] },
+  42: { item: 'saltcrust', bonus: ['salt', 0.3] },
+  43: { item: 'saltglass_rock', bonus: ['saltglass', 0.25] },
+  44: { item: 'rimesnow', bonus: ['ice', 0.2] },
+  45: { item: 'choirstone', bonus: ['rime_silver_ore', 0.12] },
 };
 
 // ─── Regions ──────────────────────────────────────────────────────────────────
 /** Which strip of the world x lies in: the overworld or a dimension. */
 export function dimensionAt(x: number): Dimension | null {
   if (x < OVERWORLD_W) return null;
+  if (inPocket(x)) return POCKET;
   for (const d of DIMENSIONS) if (x < d.end + DIM_GAP / 2) return d;
   return DIMENSIONS[DIMENSIONS.length - 1];
 }
@@ -175,7 +245,7 @@ export const DIM_LAYERS: Record<string, Layer> = Object.fromEntries(
 );
 export function layerAt(x: number, y: number): Layer {
   const dim = dimensionAt(x);
-  if (dim) return DIM_LAYERS[dim.id];
+  if (dim) return DIM_LAYERS[dim.id] ?? { id: dim.id, name: dim.name, top: 0, temp: dim.temp };
   if (y < surfaceAt(x) + SURFACE_BAND) return LAYERS[0];
   for (let i = LAYERS.length - 1; i > 1; i--) if (y >= LAYERS[i].top) return LAYERS[i];
   return LAYERS[1];
@@ -260,6 +330,10 @@ const SURFACE: Float32Array = (() => {
 export function surfaceAt(x: number): number {
   // The Mycelial Deep is all cavern (walls everywhere); Skyreach and the Void are all sky.
   const dim = dimensionAt(x);
+  if (dim === POCKET) {
+    const r = activeRealm();
+    return r ? r.geo.surface(x - POCKET.start) : 0;
+  }
   if (dim) return dim.id === 'mycelia' ? 0 : WORLD_H;
   const f = Math.max(0, Math.min(OVERWORLD_W, x)) / SURFACE_STEP,
     i = Math.min(SURFACE.length - 2, Math.floor(f)),
@@ -411,10 +485,12 @@ export const SHAFTS: Shaft[] = [
   ),
 ];
 const SHAFT_HALF = 47;
+/** Every ladder in the world, including the open realm's. */
+export const allShafts = () => (activeRealm() ? [...SHAFTS, ...pocketShafts()] : SHAFTS);
 export function inShaft(x: number, y: number, slack = 0) {
-  return SHAFTS.some(
-    (s) => Math.abs(x - s.x) < SHAFT_HALF - 4 + slack && y > s.top - 12 && y < s.bottom + 58,
-  );
+  const near = (s: Shaft) =>
+    Math.abs(x - s.x) < SHAFT_HALF - 4 + slack && y > s.top - 12 && y < s.bottom + 58;
+  return SHAFTS.some(near) || (inPocket(x) && pocketShafts().some(near));
 }
 function inUnderworld(x: number, y: number) {
   const ceil = underworldCeiling(x),
@@ -456,12 +532,25 @@ export function lavaAt(x: number, y: number): boolean {
 }
 
 // ─── Regions and ground ───────────────────────────────────────────────────────
+/** The empty pocket strip, when no realm is open. */
+const BETWEEN: Biome = {
+  id: 'pocket',
+  name: 'The Between',
+  x: 9,
+  y: 0,
+  color: '#2a2230',
+  shade: '#4a3a50',
+  temp: 12,
+  note: 'Nothing is here until a Waystone opens a realm.',
+  resources: [],
+};
 function spanIndex(x: number) {
   for (let i = 0; i < BIOME_SPANS.length; i++) if (x < BIOME_SPANS[i].end) return i;
   return BIOME_SPANS.length - 1;
 }
 export function biomeAt(x: number, y: number): Biome {
   const dim = dimensionAt(x);
+  if (dim === POCKET) return activeRealm()?.tpl.biome ?? BETWEEN;
   if (dim) return BIOMES.find((b) => b.id === dim.id)!;
   const warped = x + 72 * Math.sin(y / 235) + 38 * Math.sin((x + y) / 115);
   const id = BIOME_SPANS[spanIndex(Math.max(0, Math.min(WORLD_W - 1, warped)))].id;
@@ -488,6 +577,11 @@ export function baseTileAt(tx: number, ty: number): number {
     y = ty * TILE + TILE / 2;
   if (x >= OVERWORLD_W) {
     const dim = dimensionAt(x)!;
+    if (dim === POCKET) {
+      const r = activeRealm();
+      if (!r || x < POCKET.start || x >= POCKET.end) return Ground.bedrock;
+      return r.geo.tile(x - POCKET.start, y);
+    }
     // Bedrock fills the gaps between strips.
     if (x < dim.start || x >= dim.end) return Ground.bedrock;
     return dimensionTile(dim.id, x - dim.start, y);
@@ -532,6 +626,7 @@ export function naturalWallKind(tx: number, ty: number): number {
   if (dungeon) return dungeon.def.brick;
   if (y <= surfaceAt(x)) return 0;
   if (regionAt(x) === 'mycelia') return 20;
+  if (inPocket(x)) return activeRealm()?.tpl.wall ?? 0;
   const depth = y - surfaceAt(x),
     biome = biomeAt(x, y).id;
   if (depth < 76)

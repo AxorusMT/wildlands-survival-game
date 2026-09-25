@@ -26,6 +26,14 @@ const LAYER_TRACKS: Record<string, string> = {
   mycelia: 'mycelia',
   skyreach: 'skyreach',
   void: 'void',
+  orchard: 'orchard',
+  steppe: 'steppe',
+  warren: 'warren',
+  glasswood: 'glasswood',
+  marches: 'marches',
+  barrow: 'barrow',
+  saltflats: 'saltflats',
+  choir: 'choir',
 };
 /** Each dungeon's own music; the Citadel keeps the throne-room theme of lower hell. */
 const DUNGEON_TRACKS: Record<string, string> = {
