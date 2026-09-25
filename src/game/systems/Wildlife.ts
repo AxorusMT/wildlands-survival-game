@@ -8,6 +8,9 @@ import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
 
+const aggressiveType = (type: string) =>
+  ['wolf', 'boar', 'scorpion', 'bat', 'boss', 'ember_bat', 'hellhound'].includes(type);
+
 const ANIMAL_NAMES: Record<string, string> = {
   deer: 'Deer',
   wolf: 'Wolf',
@@ -21,6 +24,8 @@ const ANIMAL_NAMES: Record<string, string> = {
 export class Wildlife extends System {
   /** Where an animal stands (or hovers) at x: its tunnel, the underworld floor, or the ground. */
   restY(a: Animal, x: number) {
+    if (a.hoverY !== undefined) return a.hoverY + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
+    if (a.walkY !== undefined) return (a.walkY = this.game.floorNear(x, a.walkY - 20));
     if (a.tunnel) return caveY(x, a.tunnel) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
     if (a.type === 'bat') return caveY(x, 1) + Math.sin(this.game.s.elapsed * 4 + a.phase) * 13;
     if (a.underground) return this.game.floorNear(x, underworldFloor(x) - 20);
@@ -45,6 +50,7 @@ export class Wildlife extends System {
         (a.x - p.x) * Math.cos(p.face) > -15,
     );
     const target = targets.sort((a, b) => dist(a, p) - dist(b, p))[0];
+    this.game.sound('swing');
     if (!target) {
       this.game.say('The strike cuts through empty air.');
       return { ok: true, hit: false };
@@ -67,10 +73,23 @@ export class Wildlife extends System {
         '.',
       'combat',
     );
+    this.game.sound('hit', target.x, target.y - 20);
+    if (target.hp > 0) this.cry(target, 'hurt');
     if (target.hp <= 0) this.kill(target);
     return { ok: true, hit: true, target };
   }
+  /** A creature's voice: its call, attack cry, or hurt cry, at its position. */
+  cry(a: Animal, what: 'call' | 'attack' | 'hurt') {
+    if (a.x === undefined) return;
+    const voice = a.type === 'boss' ? 'wolf' : a.type;
+    if (a.type === 'boss' && what === 'call') this.game.sound('boss', a.x, a.y - 30);
+    else this.game.sound(voice + '_' + what, a.x, a.y - 20, a.type === 'boss' ? 1.6 : 1);
+  }
   kill(animal: Animal) {
+    if (animal.x !== undefined) {
+      this.game.sound('die', animal.x, animal.y - 20);
+      this.cry(animal, 'hurt');
+    }
     animal.deadUntil =
       this.game.s.elapsed + (animal.type === 'boss' ? 999999 : animal.type === 'wolf' ? 150 : 120);
     if (animal.type === 'boss') {
@@ -142,12 +161,23 @@ export class Wildlife extends System {
     ].includes(a.type);
     const range = boss ? 350 : a.type === 'bat' ? 145 : a.type === 'hellhound' ? 300 : 210;
     let vx = 0;
-    if (a.type === 'deer' && d < 175) vx = Math.sign(a.x - p.x);
+    // Deer bolt when you come close and keep running until well clear, so they never dither
+    // (and flip back and forth) at the edge of their flight distance.
+    const wasFleeing = !!a.fleeing;
+    a.fleeing =
+      a.type === 'deer' &&
+      (d < RULES.deerFlightDistance || (wasFleeing && d < RULES.deerSafeDistance));
+    if (a.fleeing && !wasFleeing) this.cry(a, 'call');
+    // Now and then a creature near the player calls out, so you hear the wilds before you see them.
+    if (d < 900 && Math.random() < dt * (aggressiveType(a.type) ? 0.05 : 0.025))
+      this.cry(a, 'call');
+    if (a.fleeing) vx = Math.sign(a.x - p.x) || 1;
     else if (aggressive && d < range && !this.game.s.dead) {
       vx = Math.sign(p.x - a.x);
       if (Math.abs(a.x - p.x) < (boss ? 75 : 30)) vx = 0;
       if (d < (boss ? 94 : 45) && this.game.s.elapsed >= a.attackAt) {
         a.warning = boss ? 1.15 : 0.55;
+        this.cry(a, 'attack');
         a.attackAt = this.game.s.elapsed + (boss ? 2.3 : 1.7);
         a.hitAt = this.game.s.elapsed + (boss ? 0.65 : 0.35);
       }
@@ -159,14 +189,26 @@ export class Wildlife extends System {
       }
     } else {
       if (this.game.s.elapsed >= a.wanderAt) {
-        a.angle = this.game.rng() > 0.5 ? 0 : Math.PI;
+        a.angle =
+          a.type === 'deer' && d < RULES.deerSafeDistance
+            ? a.x >= p.x
+              ? 0
+              : Math.PI
+            : this.game.rng() > 0.5
+              ? 0
+              : Math.PI;
         a.wanderAt = this.game.s.elapsed + 2 + this.game.rng() * 4;
       }
       vx = Math.cos(a.angle) * 0.4;
     }
     if (a.hitAt && this.game.s.elapsed >= a.hitAt) {
       a.hitAt = 0;
-      if (dist(a, p) < (boss ? 108 : 55) && p.invuln <= 0 && !this.game.s.dead) {
+      if (
+        dist(a, p) < (boss ? 108 : 55) &&
+        p.invuln <= 0 &&
+        !this.game.s.dead &&
+        !this.game.dev.god
+      ) {
         const damage = boss
           ? BOSSES[this.game.s.altar.level - 1].bite
           : a.type === 'hellhound'
@@ -185,6 +227,7 @@ export class Wildlife extends System {
           RULES.maxVital,
         );
         p.invuln = 0.75;
+        this.game.sound('hurt');
         if (a.type === 'scorpion' && this.game.rng() < 0.42) this.game.contract('poisoning');
         else if (
           this.game.rng() <
@@ -211,7 +254,7 @@ export class Wildlife extends System {
     a.warning = Math.max(0, a.warning - dt);
     const speed =
       a.type === 'deer'
-        ? d < 175
+        ? a.fleeing
           ? 160
           : 32
         : boss

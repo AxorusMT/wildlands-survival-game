@@ -4,7 +4,31 @@ import { RULES } from '../rules.ts';
 
 import { System } from './System.ts';
 
+const STEP_SOUNDS: Record<number, string> = {
+  1: 'step_soil',
+  2: 'step_stone',
+  3: 'step_sand',
+  4: 'step_mud',
+  5: 'step_snow',
+  6: 'step_stone',
+  8: 'step_stone',
+  9: 'step_ash',
+  10: 'step_stone',
+};
+
 export class Physics extends System {
+  private stride = 0;
+  private wasInLava = false;
+  /** Footstep sound for the ground underfoot; grass tops the soil at the surface. */
+  stepSound() {
+    const p = this.game.s.player,
+      tx = Math.floor(p.x / TILE),
+      ty = Math.floor((p.y + 4) / TILE),
+      kind = this.game.tileAt(tx, ty);
+    if (kind === 1 && !this.game.tileAt(tx, ty - 1) && this.game.layer().id === 'surface')
+      return 'step_grass';
+    return STEP_SOUNDS[kind] ?? 'step_stone';
+  }
   collides(x: number, y: number) {
     for (
       let tx = Math.floor((x - RULES.playerHalfWidth) / TILE);
@@ -25,20 +49,43 @@ export class Physics extends System {
     p.vy = -RULES.jumpVelocity;
     p.grounded = false;
     this.game.s.vitals.stamina -= RULES.jumpStamina;
+    this.game.sound('jump');
     return true;
   }
   move(dx: number, dy: number, dt: number) {
     if (this.game.s.dead) return;
     const p = this.game.s.player,
       v = this.game.s.vitals;
+    if (this.game.dev.noclip) {
+      // Free flight for the field console: no gravity, no collisions.
+      const fly = 520 * this.game.dev.speed;
+      p.moving = Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
+      if (dx) p.face = dx > 0 ? 0 : Math.PI;
+      p.x = clamp(p.x + dx * fly * dt, 15, WORLD_W - 15);
+      p.y = clamp(p.y + dy * fly * dt, 40, WORLD_H - 15);
+      p.vx = 0;
+      p.vy = 0;
+      p.grounded = true;
+      return;
+    }
     p.moving = Math.abs(dx) > 0.1;
+    if (p.moving && p.grounded) {
+      this.stride += Math.abs(p.vx || 0) * dt;
+      if (this.stride > RULES.strideLength) {
+        this.stride = 0;
+        this.game.sound(this.stepSound(), p.x, p.y, 0.8);
+      }
+    }
     const tired = v.stamina < 12 || v.fatigue > 80;
     const lava = this.game.inLava();
+    if (lava && !this.wasInLava) this.game.sound('sizzle', p.x, p.y, 1.3);
+    this.wasInLava = lava;
     const speed =
       (lava ? 0.45 : 1) *
       (tired ? RULES.tiredMoveSpeed : RULES.standardMoveSpeed) *
       (v.illness > 60 ? 0.82 : 1) *
-      (p.boots ? 1.12 : 1);
+      (p.boots ? 1.12 : 1) *
+      this.game.dev.speed;
     if (dx) p.face = dx > 0 ? 0 : Math.PI;
     p.vx = dx * speed;
     const shaft = inShaft(p.x, p.y);
@@ -81,8 +128,10 @@ export class Physics extends System {
         p.grounded = false;
       } else {
         if (p.vy > 0) {
+          if (!p.grounded && p.vy > 200)
+            this.game.sound('land', p.x, p.y, Math.min(1.4, p.vy / 450));
           p.grounded = true;
-          if (p.vy > RULES.fallDamageVelocity)
+          if (p.vy > RULES.fallDamageVelocity && !this.game.dev.god)
             v.health = clamp(
               v.health - (p.vy - RULES.fallDamageVelocity) * 0.07,
               0,

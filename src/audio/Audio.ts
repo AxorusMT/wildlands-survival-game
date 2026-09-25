@@ -1,4 +1,5 @@
 import { createMusicChain, MusicPlayer, type Deck } from './engine.ts';
+import { Ambience, playSfx, type AmbienceLevels } from './sfx.ts';
 import { TRACKS } from './tracks/index.ts';
 
 const saved: Partial<{ music: number; sfx: number }> = (() => {
@@ -23,6 +24,7 @@ let master: GainNode | undefined;
 let musicGain: GainNode | undefined;
 let muffle: BiquadFilterNode | undefined;
 let sfxBus: GainNode | undefined;
+let ambience: Ambience | undefined;
 let player: MusicPlayer | undefined;
 let deck: Deck | undefined;
 let current: string | undefined;
@@ -54,6 +56,7 @@ function init() {
   sfxBus = ac.createGain();
   sfxBus.gain.value = settings.sfx * 0.8;
   sfxBus.connect(master);
+  ambience = new Ambience(ac, sfxBus);
   setInterval(tick, 100);
 }
 function start() {
@@ -77,26 +80,6 @@ function tick() {
   }
   player.schedule(now + LOOKAHEAD, now);
 }
-function tone(
-  freq: number,
-  when: number,
-  duration: number,
-  type: OscillatorType = 'sine',
-  vol = 0.1,
-  bus = sfxBus,
-) {
-  if (!ac || !bus) return;
-  const osc = ac.createOscillator(),
-    gain = ac.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(Math.max(30, freq), when);
-  gain.gain.setValueAtTime(0.0001, when);
-  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), when + 0.035);
-  gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
-  osc.connect(gain).connect(bus);
-  osc.start(when);
-  osc.stop(when + duration + 0.02);
-}
 /** Chooses the track for the current scene; see `musicScene`. */
 function setScene(v: string) {
   if (v === desired) return;
@@ -109,37 +92,48 @@ function setMuffled(on: boolean) {
   muffled = on;
   muffle.frequency.setTargetAtTime(on ? 900 : 20000, ac.currentTime, 0.12);
 }
-function effect(kind: string) {
+/** Where the listener stands in the world, for panning and distance. */
+const listener = { x: 0, y: 0 };
+const lastPlayed = new Map<string, number>();
+/** Sounds that come in bursts (pickups, steps) are thinned so they never pile up. */
+const MIN_GAP: Record<string, number> = { pickup: 0.06, click: 0.04, hit: 0.05 };
+function setListener(x: number, y: number) {
+  listener.x = x;
+  listener.y = y;
+}
+/**
+ * Plays a named sound effect (see sfx.ts). With a world position it is panned toward its side
+ * and fades with distance; sounds far off screen are skipped.
+ */
+function effect(kind: string, at?: { x: number; y: number }, strength = 1) {
   start();
-  const audio = ac;
-  if (!audio) return;
-  const pitches: Record<string, number[]> = {
-    gather: [280, 420],
-    craft: [330, 495, 660],
-    hit: [155, 105],
-    hurt: [105, 72],
-    page: [380, 290],
-    boss: [110, 82, 61],
-    victory: [330, 440, 550, 770],
-    mine: [170, 120],
-    jump: [260, 370],
-    fish: [315, 420],
-    fell: [130, 92, 70, 58],
-    crumble: [210, 150, 110],
-    pickup: [660, 880],
-    sizzle: [900, 700],
-  };
-  const seq = pitches[kind] || pitches.page;
-  seq.forEach((f, i) =>
-    tone(
-      f,
-      audio.currentTime + i * 0.075,
-      kind === 'fell' ? 0.3 : kind === 'pickup' ? 0.09 : 0.16,
-      kind === 'hurt' || kind === 'boss' || kind === 'sizzle' ? 'sawtooth' : 'triangle',
-      kind === 'pickup' ? 0.07 : kind === 'fell' ? 0.22 : 0.17,
-      sfxBus,
-    ),
-  );
+  if (!ac || !sfxBus) return;
+  const now = ac.currentTime,
+    gap = MIN_GAP[kind] ?? (kind.startsWith('step') ? 0.12 : 0.03);
+  if (now - (lastPlayed.get(kind) ?? -1) < gap) return;
+  let pan = 0,
+    level = strength;
+  if (at) {
+    const dx = at.x - listener.x,
+      d = Math.hypot(dx, (at.y - listener.y) * 1.4);
+    if (d > 1100) return;
+    pan = Math.max(-0.85, Math.min(0.85, dx / 650));
+    level *= 1 / (1 + (d / 420) ** 2);
+  }
+  lastPlayed.set(kind, now);
+  const g = ac.createGain(),
+    p = ac.createStereoPanner();
+  g.gain.value = level;
+  p.pan.value = pan;
+  g.connect(p).connect(sfxBus);
+  if (!playSfx(ac, g, kind, 1, now + 0.005)) playSfx(ac, g, 'click', 1, now + 0.005);
+  // Let the little graph go once the sound has rung out.
+  setTimeout(() => g.disconnect(), 4000);
+}
+/** Sets the weather, fire, lava, cave, and wildlife beds (each 0–1). */
+function setAmbience(levels: AmbienceLevels) {
+  if (!ac || !ambience || ac.state !== 'running') return;
+  ambience.update(levels);
 }
 function setVolumes(m: number, s: number) {
   settings.music = Math.max(0, Math.min(1, m));
@@ -152,4 +146,14 @@ function setVolumes(m: number, s: number) {
 function nowPlaying() {
   return current ? TRACKS[current]?.title : undefined;
 }
-export const Audio = { start, effect, setScene, setMuffled, setVolumes, nowPlaying, settings };
+export const Audio = {
+  start,
+  effect,
+  setListener,
+  setAmbience,
+  setScene,
+  setMuffled,
+  setVolumes,
+  nowPlaying,
+  settings,
+};

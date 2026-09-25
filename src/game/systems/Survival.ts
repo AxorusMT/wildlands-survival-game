@@ -103,6 +103,7 @@ export class Survival extends System {
         e.qty = Math.ceil(e.qty * 0.75);
     this.game.say('You woke in the meadow. Some loose supplies were lost.', 'good');
   }
+  private burnTimer = 0;
   /** Health lost per second to the heat of the hell layers. */
   heat() {
     const layer = this.game.layer().id,
@@ -207,8 +208,16 @@ export class Survival extends System {
       !threats
     )
       v.health = clamp(v.health + dt * 0.018, 0, RULES.maxVital);
-    if (v.health <= 0) {
+    if (burning || this.heat() > 0.5) {
+      this.burnTimer -= dt;
+      if (this.burnTimer <= 0) {
+        this.burnTimer = 0.9;
+        this.game.sound('burn', p.x, p.y - 20, burning ? 1.2 : 0.6);
+      }
+    }
+    if (v.health <= 0 && !this.game.dev.god) {
       this.game.s.dead = true;
+      this.game.sound('death');
       this.game.say(
         burning
           ? 'The lava took you. Your field record survives.'

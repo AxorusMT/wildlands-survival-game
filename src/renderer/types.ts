@@ -20,6 +20,10 @@ export interface ArtStyle {
 export interface Motion {
   x: number;
   y: number;
+  /** Smoothed drawing height. */
+  sy: number;
+  /** Game time of the last update. */
+  t: number;
   walk: number;
   move: number;
   hp: number;

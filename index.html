@@ -96,6 +96,19 @@
         <small id="boss-value"></small>
       </div>
       <div id="toast" role="status"></div>
+      <section id="dev-console" class="hidden" aria-label="Field console">
+        <header>FIELD CONSOLE <span>` to close · help for commands</span></header>
+        <div id="dev-log" role="log" aria-live="polite"></div>
+        <label class="dev-prompt"
+          ><span>›</span
+          ><input
+            id="dev-input"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Console command"
+        /></label>
+      </section>
       <footer class="hud-footer">
         <div id="interaction-prompt"></div>
         <div class="footer-controls">
