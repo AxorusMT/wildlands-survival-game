@@ -23,14 +23,25 @@ export function drawTide(
   const top = Math.round(level / PX - ay);
   if (top > h) return;
   const mire = g.pocket.waterKind() === 'mire';
-  c.fillStyle = mire ? 'rgba(74, 80, 52, 0.62)' : 'rgba(40, 110, 120, 0.42)';
-  c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
+  if (mire) {
+    // Mud pools only in the surface basins: fill each column down to the ground.
+    c.fillStyle = 'rgba(104, 112, 44, 0.6)';
+    for (let x = x0; x < x1; x++) {
+      const floor = Math.round(D.surfaceAt((x + ax) * PX) / PX - ay) + 3;
+      if (floor > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor) - Math.max(0, top));
+    }
+  } else {
+    c.fillStyle = 'rgba(40, 110, 120, 0.42)';
+    c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
+  }
   // A lighter band just under the surface, and a rippling (or sluggish, bubbling) crest line.
-  c.fillStyle = mire ? 'rgba(130, 140, 90, 0.35)' : 'rgba(120, 200, 200, 0.25)';
-  c.fillRect(x0, Math.max(0, top), x1 - x0, 3);
-  c.fillStyle = mire ? 'rgba(200, 196, 150, 0.6)' : 'rgba(210, 245, 240, 0.7)';
+  const wet = (x: number) => !mire || D.surfaceAt((x + ax) * PX) / PX - ay > top + 1;
+  c.fillStyle = mire ? 'rgba(160, 170, 80, 0.55)' : 'rgba(120, 200, 200, 0.25)';
+  for (let x = x0; x < x1; x++) if (wet(x)) c.fillRect(x, Math.max(0, top), 1, 3);
+  c.fillStyle = mire ? 'rgba(214, 210, 140, 0.75)' : 'rgba(210, 245, 240, 0.7)';
   const speed = mire ? 0.3 : 1;
   for (let x = x0; x < x1; x++) {
+    if (!wet(x)) continue;
     const wx = x + ax,
       wave = Math.round(Math.sin(wx / 9 + t * 2.2 * speed) + Math.sin(wx / 23 - t * 1.3 * speed));
     if ((wx + Math.floor(t * 6 * speed)) % 7 < 5) c.fillRect(x, top + wave - 1, 1, 1);
@@ -39,7 +50,7 @@ export function drawTide(
     for (let i = 0; i < 24; i++) {
       const life = (t * 0.5 + hash(i, 11)) % 1,
         bx = Math.floor(hash(i, 12) * (x1 - x0)) + x0;
-      if (life < 0.3) c.fillRect(bx, top - Math.round(life * 6), 1, 1);
+      if (life < 0.3 && wet(bx)) c.fillRect(bx, top - Math.round(life * 6), 2, 1);
     }
 }
 
@@ -94,7 +105,7 @@ export function drawRealmAir(
   const hymn = g.pocket.hymnLevel();
   if (hymn > 0) {
     const guard = g.equipment.has('hymnward') || g.pocket.warmed() ? 0.35 : 1;
-    c.fillStyle = `rgba(150, 190, 240, ${(hymn * 0.3 * guard).toFixed(2)})`;
+    c.fillStyle = `rgba(150, 190, 240, ${(hymn * 0.38 * guard).toFixed(2)})`;
     c.fillRect(0, 0, w, h);
     c.fillStyle = `rgba(230, 244, 255, ${(hymn * 0.8).toFixed(2)})`;
     for (let i = 0; i < 40; i++) {

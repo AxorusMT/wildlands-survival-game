@@ -4204,7 +4204,8 @@
       if (y > d - 130 - 20 * Math.sin(x / 90) && y < d && x > 300 && x < RW - 300) return 0;
       if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < d) return 0;
       if (y < g + 40) return SALTCRUST;
-      return fbm2(x / 150, y / 120, s(5)) > 0.62 || y < g + 160 - (1450 - g) * 0.3 ? SALTGLASS_ROCK : SALTCRUST;
+      const ridge = y < 1450 - 20;
+      return ridge || fbm2(x / 150, y / 120, s(5)) > 0.7 ? SALTGLASS_ROCK : SALTCRUST;
     };
     return {
       tile,
@@ -7748,9 +7749,9 @@
       return out;
     }
     stats(id) {
-      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet(), fx = this.game.equipment.effects();
+      const e = this.entry(id), [family, tier] = this.classOf(id), f = familyById(family), m = this.mods(id), base = WEAPONS[id] ?? WEAPONS.fists, sk = this.game.skills.stats(), mastery = id === "fists" ? 0 : this.game.skills.mastery(family), set = this.game.equipment.fullSet();
       const melee = !f.ranged, heavy = family === "greatsword" || family === "battleaxe" || family === "warhammer", shooter = family === "bow" || family === "crossbow", magic = f.ranged === "magic";
-      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (fx.has("trapsense") ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (fx.has("shardward") ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
+      const lift = 1 + (melee ? sk.meleeDmg : 0) + (heavy ? sk.heavyDmg : 0) + (shooter ? sk.rangedDmg + (set === "gearwright" ? 0.1 : 0) : 0) + (magic ? sk.magicDmg + (sk.elementalist ? 0.15 : 0) + (set === "prismweave" ? 0.1 : 0) : 0) + mastery * 0.01 + (mastery >= 20 ? 0.1 : 0);
       const quick = 1 + (melee ? sk.meleeSpeed : shooter ? sk.rangedSpeed : sk.castSpeed);
       const damage = base[1] * QUALITIES[e.q].mult * (1 + LEVEL_DAMAGE * e.lvl) * (1 + (m.dmg ?? 0)) * lift;
       return {
@@ -9963,7 +9964,8 @@
       if (fx.has("buff:ironskin")) d += 8;
       const sk = this.game.skills.stats();
       d += sk.defense + (sk.juggernaut ? 15 : 0) + (fx.has("vanguard") ? 3 : 0);
-      if (fx.has("mirewalk")) d += 3;
+      if (this.fullSet() === "bonewalker") d += 3;
+      if (this.fullSet() === "amberguard") d += 2;
       d += this.game.armoury.stats(this.game.s.player.weapon).defense;
       return d;
     }
@@ -9980,7 +9982,7 @@
     }
     speedBonus() {
       const fx = this.effects();
-      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + (fx.has("shade") ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
+      return 1 + (fx.has("buff:swiftness") ? 0.25 : 0) + (fx.has("speed20") ? 0.2 : 0) + (fx.has("speed10") ? 0.1 : 0) + (fx.has("speed") ? 0.2 : 0) + (fx.has("cold") ? 0.1 : 0) + (fx.has("buff:sweet") ? 0.1 : 0) + (this.fullSet() === "saltwarden" || this.fullSet() === "ashwalker" ? 0.1 : 0) + this.game.skills.get("speed") - (this.game.skills.flag("juggernaut") ? 0.1 : 0) + (this.game.skills.flag("wanderer") ? 0.15 : 0);
     }
     // ─── Health, mana, buffs ───────────────────────────────────────────────────
     /** Health from crystals and fruit alone; skills add to it. */
@@ -11246,7 +11248,8 @@
     /** Whether a point in the realm is under water. */
     underwater(x, y) {
       const level = this.waterLevel();
-      return level !== null && inPocket(x) && y > level;
+      if (level === null || !inPocket(x) || y <= level) return false;
+      return this.waterKind() !== "mire" || y < surfaceAt(x) + 40;
     }
     /** Whether the player wades below the tide and it hinders them. */
     submerged() {
@@ -12058,7 +12061,7 @@
     // Exposure, hunger, illness, morale, and health drift for one tick.
     update(dt) {
       const v = this.game.s.vitals, p = this.game.s.player;
-      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.has("hymnward") ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
+      const air = this.game.temperature(), skills = this.game.skills.stats(), wayfarer = this.game.equipment.has("wayfarer") ? 4 : 0, coldResist = skills.coldResist + (skills.coldBlooded ? 8 : 0) + wayfarer + (this.game.equipment.fullSet() === "choirsilver" ? 6 : 0), heatResist = skills.heatResist + wayfarer, cold2 = air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
       const shelter = this.game.sheltered(), fire = !!this.game.nearLitFire();
       const rain = (this.game.s.weather === "rain" || this.game.s.weather === "storm") && !dimensionAt(p.x);
       const underground = p.y > surfaceAt(p.x) + 80;
@@ -12548,6 +12551,11 @@
         this.cry(animal, "hurt");
       }
       const spec = MOBS[animal.type];
+      if (spec && spec.damage <= 0 && spec.sight > 0) {
+        animal.deadUntil = this.game.s.elapsed + (animal.minion ? 999999 : spec.respawn);
+        this.game.event("burst", animal.x, animal.y - 20, "#fff4e0");
+        return;
+      }
       animal.deadUntil = this.game.s.elapsed + (animal.type === "boss" || spec?.boss || animal.minion || animal.echo ? 999999 : spec?.respawn ?? 120);
       this.game.pocket.echo(animal);
       if (animal.type === "boss") {
@@ -13965,8 +13973,8 @@
     39: { base: "#d8ceb4", pattern: "strata", accent: "#b0a484", wall: "#4a4436" },
     40: { base: "#b8883a", pattern: "bigbrick", accent: "#f0c870", wall: "#3a2a12" },
     41: { base: "#6a5a44", pattern: "slate", accent: "#c8a060", wall: "#241c12" },
-    42: { base: "#ece6da", pattern: "sand", cap: "region", wall: "#8a8274" },
-    43: { base: "#e8c0c8", pattern: "crystal", accent: "#fff4f6", glow: "#f0a0b0", wall: "#6a4a50" },
+    42: { base: "#e2dccf", pattern: "sand", cap: "region", wall: "#7a7266" },
+    43: { base: "#d8b8b8", pattern: "crystal", accent: "#fff4f6", glow: "#e8a0a8", wall: "#5a4448" },
     44: { base: "#e4eef6", pattern: "ice", cap: "snow", wall: "#4a5a6a" },
     45: { base: "#a8b8cc", pattern: "bigbrick", accent: "#e8f4ff", wall: "#2a3444" }
   };
@@ -17721,20 +17729,30 @@
     const top = Math.round(level / PX - ay);
     if (top > h) return;
     const mire = g.pocket.waterKind() === "mire";
-    c.fillStyle = mire ? "rgba(74, 80, 52, 0.62)" : "rgba(40, 110, 120, 0.42)";
-    c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
-    c.fillStyle = mire ? "rgba(130, 140, 90, 0.35)" : "rgba(120, 200, 200, 0.25)";
-    c.fillRect(x0, Math.max(0, top), x1 - x0, 3);
-    c.fillStyle = mire ? "rgba(200, 196, 150, 0.6)" : "rgba(210, 245, 240, 0.7)";
+    if (mire) {
+      c.fillStyle = "rgba(104, 112, 44, 0.6)";
+      for (let x = x0; x < x1; x++) {
+        const floor = Math.round(data_exports.surfaceAt((x + ax) * PX) / PX - ay) + 3;
+        if (floor > top) c.fillRect(x, Math.max(0, top), 1, Math.min(h, floor) - Math.max(0, top));
+      }
+    } else {
+      c.fillStyle = "rgba(40, 110, 120, 0.42)";
+      c.fillRect(x0, Math.max(0, top), x1 - x0, h - Math.max(0, top));
+    }
+    const wet = (x) => !mire || data_exports.surfaceAt((x + ax) * PX) / PX - ay > top + 1;
+    c.fillStyle = mire ? "rgba(160, 170, 80, 0.55)" : "rgba(120, 200, 200, 0.25)";
+    for (let x = x0; x < x1; x++) if (wet(x)) c.fillRect(x, Math.max(0, top), 1, 3);
+    c.fillStyle = mire ? "rgba(214, 210, 140, 0.75)" : "rgba(210, 245, 240, 0.7)";
     const speed = mire ? 0.3 : 1;
     for (let x = x0; x < x1; x++) {
+      if (!wet(x)) continue;
       const wx = x + ax, wave = Math.round(Math.sin(wx / 9 + t * 2.2 * speed) + Math.sin(wx / 23 - t * 1.3 * speed));
       if ((wx + Math.floor(t * 6 * speed)) % 7 < 5) c.fillRect(x, top + wave - 1, 1, 1);
     }
     if (mire)
       for (let i = 0; i < 24; i++) {
         const life = (t * 0.5 + hash3(i, 11)) % 1, bx = Math.floor(hash3(i, 12) * (x1 - x0)) + x0;
-        if (life < 0.3) c.fillRect(bx, top - Math.round(life * 6), 1, 1);
+        if (life < 0.3 && wet(bx)) c.fillRect(bx, top - Math.round(life * 6), 2, 1);
       }
   }
   function drawRealmAir(c, g, ax, ay, w, h, t) {
@@ -17774,7 +17792,7 @@
     const hymn = g.pocket.hymnLevel();
     if (hymn > 0) {
       const guard = g.equipment.has("hymnward") || g.pocket.warmed() ? 0.35 : 1;
-      c.fillStyle = `rgba(150, 190, 240, ${(hymn * 0.3 * guard).toFixed(2)})`;
+      c.fillStyle = `rgba(150, 190, 240, ${(hymn * 0.38 * guard).toFixed(2)})`;
       c.fillRect(0, 0, w, h);
       c.fillStyle = `rgba(230, 244, 255, ${(hymn * 0.8).toFixed(2)})`;
       for (let i = 0; i < 40; i++) {
@@ -24586,7 +24604,7 @@
   }
   function renderVitals(left, right) {
     const v = game.s.vitals, current2 = game.biome(), symptoms = game.vitalReasons();
-    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${current2.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+    left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}\xB0C</strong> in the ${BIOMES.some((b) => b.id === current2.id) ? current2.name.toLowerCase() : current2.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}\xB0C</strong><br>Weather: <strong>${game.s.weather}</strong> \xB7 ${game.isNight() ? "night" : "day"}</p><div class="note-block">${symptoms.map((s) => `<div>\u2022 ${s}</div>`).join("")}</div><div class="book-actions"><button data-wash ${game.count("wild_water") + game.count("boiled_water") ? "" : "disabled"}>WASH \xB7 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
     const labels = [
       ["health", "Health"],
       ["hydration", "Hydration"],
@@ -24978,6 +24996,11 @@
       return { ok: true };
     });
   }
+  function wardText(ward) {
+    const sets = ARMOR_SETS.filter((x) => x.bonus === ward).map((x) => `the ${x.name} set`), charms = Object.entries(ACCESSORIES).filter(([, a]) => a.effects.includes(ward)).map(([id]) => `the ${pretty(id)}`);
+    const all = [...sets, ...charms];
+    return all.length ? ` <em>Ward: ${all.join(" or ")}.</em>` : "";
+  }
   function renderAtlas(left, right) {
     const pocket = game.pocket, open = game.s.pocket, stone = pocket.waystoneNear();
     const tier = (t) => TIER_NAMES[t] ?? String(t);
@@ -24990,7 +25013,7 @@
     const r = realmById(state.atlasRealm) ?? REALMS[0], rec = pocket.record(r.id), max = pocket.maxTier(r.id);
     state.atlasTier = Math.min(Math.max(1, state.atlasTier), max);
     const keys2 = game.count(r.key), canOpen = (!!stone || game.dev.god) && (keys2 > 0 || game.dev.god);
-    right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> \xB7 ${r.hazard.text}</p><p>Great foe: <strong>${MOBS[r.boss]?.name}</strong> \xB7 relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? " (found)" : ""}<br>Signature: <strong>${pretty(r.material)}</strong> \xB7 Temperature ${r.temp}\xB0C</p><h3>Tier</h3><div class="farm-choice">${[
+    right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> \xB7 ${r.hazard.text}${wardText(r.hazard.ward)}</p><p>Great foe: <strong>${MOBS[r.boss]?.name}</strong> \xB7 relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? " (found)" : ""}<br>Signature: <strong>${pretty(r.material)}</strong> \xB7 Temperature ${r.temp}\xB0C</p><h3>Tier</h3><div class="farm-choice">${[
       1,
       2,
       3,
@@ -25000,7 +25023,7 @@
       (t) => `<button class="tiny-button ${t === state.atlasTier ? "active" : ""}" data-tier="${t}" ${t > max ? "disabled" : ""}>${tier(t)}</button>`
     ).join(
       ""
-    )}</div><p class="muted">Monsters \xD7${TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, \xD7${TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm \xB7 loot \xD7${TIER_SCALE.loot(state.atlasTier).toFixed(2)} \xB7 ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? "" : "s"}.</p><div class="book-actions"><button data-open-realm ${canOpen ? "" : "disabled"}>OPEN \xB7 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? "" : "disabled"}>RETURN TO ${realmById(open.realm)?.name.toUpperCase()}</button>` : ""}</div><div class="note-block">${stone ? "The Waystone hums beside you." : "Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal."} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a workbench or found in the realms.</div>${open?.realm === r.id && open.mods.length ? `<h3>This expedition</h3><div class="book-list">${open.mods.map((m) => modById(m)).map(
+    )}</div><p class="muted">Monsters \xD7${TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, \xD7${TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm \xB7 loot \xD7${TIER_SCALE.loot(state.atlasTier).toFixed(2)} \xB7 ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? "" : "s"}.</p><div class="book-actions"><button data-open-realm ${canOpen ? "" : "disabled"}>OPEN \xB7 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? "" : "disabled"}>RETURN TO ${realmById(open.realm)?.name.toUpperCase()}</button>` : ""}</div><div class="note-block">${stone ? "The Waystone hums beside you." : "Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal."} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a ${RECIPES.find((x) => x.id === r.fragment)?.station ?? "workbench"}${r.band > 1 ? ` from the spoils of Band ${TIER_NAMES[r.band - 1]} realms` : ""}, or found in the realms.</div>${open?.realm === r.id && open.mods.length ? `<h3>This expedition</h3><div class="book-list">${open.mods.map((m) => modById(m)).map(
       (m) => `<div class="book-row"><div><strong>${m?.name}</strong><small>${m?.text}</small></div><span class="qty">${m?.kind === "boon" ? "BOON" : "BANE"}</span></div>`
     ).join("")}</div>` : ""}`;
     left.querySelectorAll("[data-realm]").forEach(

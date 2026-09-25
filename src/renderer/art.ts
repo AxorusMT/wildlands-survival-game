@@ -361,8 +361,8 @@ export const GROUND: Record<number, GroundStyle> = {
   39: { base: '#d8ceb4', pattern: 'strata', accent: '#b0a484', wall: '#4a4436' },
   40: { base: '#b8883a', pattern: 'bigbrick', accent: '#f0c870', wall: '#3a2a12' },
   41: { base: '#6a5a44', pattern: 'slate', accent: '#c8a060', wall: '#241c12' },
-  42: { base: '#ece6da', pattern: 'sand', cap: 'region', wall: '#8a8274' },
-  43: { base: '#e8c0c8', pattern: 'crystal', accent: '#fff4f6', glow: '#f0a0b0', wall: '#6a4a50' },
+  42: { base: '#e2dccf', pattern: 'sand', cap: 'region', wall: '#7a7266' },
+  43: { base: '#d8b8b8', pattern: 'crystal', accent: '#fff4f6', glow: '#e8a0a8', wall: '#5a4448' },
   44: { base: '#e4eef6', pattern: 'ice', cap: 'snow', wall: '#4a5a6a' },
   45: { base: '#a8b8cc', pattern: 'bigbrick', accent: '#e8f4ff', wall: '#2a3444' },
 };

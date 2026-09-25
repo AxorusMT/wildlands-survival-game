@@ -803,7 +803,7 @@ function renderVitals(left: HTMLElement, right: HTMLElement) {
   const v = game.s.vitals,
     current = game.biome(),
     symptoms = game.vitalReasons();
-  left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}°C</strong> in the ${current.name.toLowerCase()}<br>Body: <strong>${v.bodyTemp.toFixed(1)}°C</strong><br>Weather: <strong>${game.s.weather}</strong> · ${game.isNight() ? 'night' : 'day'}</p><div class="note-block">${symptoms.map((s) => `<div>• ${s}</div>`).join('')}</div><div class="book-actions"><button data-wash ${game.count('wild_water') + game.count('boiled_water') ? '' : 'disabled'}>WASH · 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
+  left.innerHTML = `<h2>The Body</h2><p class="lede">Warmth, food, water, and rest pull each other out of balance.</p><h3>Ailments</h3>${ailmentNotes()}<h3>Exposure</h3><p>Air: <strong>${game.temperature().toFixed(0)}°C</strong> in the ${D.BIOMES.some((b) => b.id === current.id) ? current.name.toLowerCase() : current.name}<br>Body: <strong>${v.bodyTemp.toFixed(1)}°C</strong><br>Weather: <strong>${game.s.weather}</strong> · ${game.isNight() ? 'night' : 'day'}</p><div class="note-block">${symptoms.map((s) => `<div>• ${s}</div>`).join('')}</div><div class="book-actions"><button data-wash ${game.count('wild_water') + game.count('boiled_water') ? '' : 'disabled'}>WASH · 1 WATER</button></div><h3>Recovery</h3><p>Good food, safe water, warmth, and rest slowly restore health. A bedroll sharply reduces fatigue. Shelter keeps off rain; a lit fire helps dry and warm you.</p>`;
   const labels: [keyof Vitals, string][] = [
     ['health', 'Health'],
     ['hydration', 'Hydration'],
@@ -1370,6 +1370,15 @@ function renderArmoury(left: HTMLElement, right: HTMLElement) {
     return { ok: true };
   });
 }
+/** What protects against a realm's hazard: its armour set and any charm that carries the ward. */
+function wardText(ward: string) {
+  const sets = D.ARMOR_SETS.filter((x) => x.bonus === ward).map((x) => `the ${x.name} set`),
+    charms = Object.entries(D.ACCESSORIES)
+      .filter(([, a]) => a.effects.includes(ward))
+      .map(([id]) => `the ${pretty(id)}`);
+  const all = [...sets, ...charms];
+  return all.length ? ` <em>Ward: ${all.join(' or ')}.</em>` : '';
+}
 function renderAtlas(left: HTMLElement, right: HTMLElement) {
   const pocket = game.pocket,
     open = game.s.pocket,
@@ -1391,7 +1400,7 @@ function renderAtlas(left: HTMLElement, right: HTMLElement) {
   state.atlasTier = Math.min(Math.max(1, state.atlasTier), max);
   const keys = game.count(r.key),
     canOpen = (!!stone || game.dev.god) && (keys > 0 || game.dev.god);
-  right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> · ${r.hazard.text}</p><p>Great foe: <strong>${D.MOBS[r.boss]?.name}</strong> · relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? ' (found)' : ''}<br>Signature: <strong>${pretty(r.material)}</strong> · Temperature ${r.temp}°C</p><h3>Tier</h3><div class="farm-choice">${[
+  right.innerHTML = `<h2>${r.name}</h2><p class="lede">${r.note}</p><p>Hazard: <strong>${r.hazard.name}</strong> · ${r.hazard.text}${wardText(r.hazard.ward)}</p><p>Great foe: <strong>${D.MOBS[r.boss]?.name}</strong> · relic: <strong>${pretty(r.relic)}</strong>${rec.relic ? ' (found)' : ''}<br>Signature: <strong>${pretty(r.material)}</strong> · Temperature ${r.temp}°C</p><h3>Tier</h3><div class="farm-choice">${[
     1, 2, 3, 4, 5,
   ]
     .map(
@@ -1400,7 +1409,7 @@ function renderAtlas(left: HTMLElement, right: HTMLElement) {
     )
     .join(
       '',
-    )}</div><p class="muted">Monsters ×${D.TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, ×${D.TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm · loot ×${D.TIER_SCALE.loot(state.atlasTier).toFixed(2)} · ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? '' : 's'}.</p><div class="book-actions"><button data-open-realm ${canOpen ? '' : 'disabled'}>OPEN · 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? '' : 'disabled'}>RETURN TO ${D.realmById(open.realm)?.name.toUpperCase()}</button>` : ''}</div><div class="note-block">${stone ? 'The Waystone hums beside you.' : 'Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal.'} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a workbench or found in the realms.</div>${
+    )}</div><p class="muted">Monsters ×${D.TIER_SCALE.hp(state.atlasTier).toFixed(2)} health, ×${D.TIER_SCALE.damage(state.atlasTier).toFixed(2)} harm · loot ×${D.TIER_SCALE.loot(state.atlasTier).toFixed(2)} · ${state.atlasTier - 1} modifier${state.atlasTier === 2 ? '' : 's'}.</p><div class="book-actions"><button data-open-realm ${canOpen ? '' : 'disabled'}>OPEN · 1 KEY</button>${open ? `<button data-resume ${stone || game.dev.god ? '' : 'disabled'}>RETURN TO ${D.realmById(open.realm)?.name.toUpperCase()}</button>` : ''}</div><div class="note-block">${stone ? 'The Waystone hums beside you.' : 'Stand at a Waystone to open a realm. Build one at a workbench: stone, iron ingots, and crystal.'} Keys: three ${pretty(r.fragment).toLowerCase()}s at a Waystone. Fragments are made at a ${D.RECIPES.find((x) => x.id === r.fragment)?.station ?? 'workbench'}${r.band > 1 ? ` from the spoils of Band ${D.TIER_NAMES[r.band - 1]} realms` : ''}, or found in the realms.</div>${
     open?.realm === r.id && open.mods.length
       ? `<h3>This expedition</h3><div class="book-list">${open.mods
           .map((m) => D.modById(m))

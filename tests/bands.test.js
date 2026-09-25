@@ -96,8 +96,13 @@ test('Glasswood shardfall glints, then cuts, unless you wear prismweave', () => 
 test('the marrow mire slows, soaks, and festers; bonewalkers stride through', () => {
   const g = fresh();
   g.command('realm marches 1');
-  const p = g.s.player;
-  p.y = g.pocket.waterLevel() + 100;
+  const p = g.s.player,
+    level = g.pocket.waterLevel();
+  // Find a basin whose floor lies below the mire, and wade into it.
+  let x = p.x;
+  while (D.surfaceAt(x) < level + 60) x += 32;
+  p.x = x;
+  p.y = level + 50;
   assert.ok(g.pocket.inMire());
   assert.equal(g.pocket.submerged(), false, 'mire is not deep water');
   assert.ok(g.pocket.moveScale() < 0.6);
@@ -177,4 +182,39 @@ test('the Frozen Choir keeps food, and its hymn chills and holds you unless warm
   assert.ok(g.s.vitals.bodyTemp < temp);
   wear(g, 'choirsilver');
   assert.equal(g.pocket.moveScale(), 1);
+});
+
+test('polish: the catacombs under the mire are dry, and mirages leave nothing behind', () => {
+  const g = fresh();
+  g.command('realm marches 1');
+  const p = g.s.player;
+  p.y = D.surfaceAt(p.x) + 500;
+  assert.equal(g.pocket.inMire(), false, 'the catacomb is not mire');
+  const s = fresh();
+  s.command('realm saltflats 1');
+  const m = s.s.animals.find((a) => a.type === 'mirage' && inside(a));
+  const drops = s.s.drops.length,
+    renown = s.skills.renown();
+  s.wildlife.kill(m);
+  assert.ok(m.deadUntil);
+  assert.equal(s.s.drops.length, drops, 'no coins or loot');
+  assert.equal(s.skills.renown(), renown, 'no renown');
+});
+
+test('polish: realm set extras come from the full set, not the relic that shares its ward', () => {
+  const base = fresh(),
+    relic = fresh(),
+    plate = fresh();
+  relic.add('hydra_tooth');
+  relic.equipment.wear('hydra_tooth');
+  wear(plate, 'bonewalker');
+  assert.ok(relic.equipment.has('mirewalk') && plate.equipment.has('mirewalk'));
+  assert.equal(relic.equipment.defense(), base.equipment.defense());
+  const amber = fresh(),
+    ash = fresh();
+  wear(amber, 'amberguard');
+  wear(ash, 'ashwalker');
+  const armour = (g) => g.equipment.worn().armor.reduce((n, id) => n + D.ARMOR[id].defense, 0);
+  assert.equal(amber.equipment.defense(), base.equipment.defense() + armour(amber) + 2);
+  assert.ok(ash.equipment.speedBonus() > base.equipment.speedBonus() + 0.09);
 });

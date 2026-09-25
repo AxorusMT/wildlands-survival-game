@@ -461,7 +461,9 @@ export class Pocket extends System {
   /** Whether a point in the realm is under water. */
   underwater(x: number, y: number) {
     const level = this.waterLevel();
-    return level !== null && inPocket(x) && y > level;
+    if (level === null || !inPocket(x) || y <= level) return false;
+    // The mire lies only in the basins on the surface; the catacombs beneath are dry.
+    return this.waterKind() !== 'mire' || y < surfaceAt(x) + 40;
   }
   /** Whether the player wades below the tide and it hinders them. */
   submerged() {

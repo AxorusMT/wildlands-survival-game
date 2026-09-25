@@ -70,6 +70,12 @@ export class Wildlife extends System {
       this.cry(animal, 'hurt');
     }
     const spec = MOBS[animal.type];
+    // A mirage struck down is only light and heat: no body, no loot, no renown.
+    if (spec && spec.damage <= 0 && spec.sight > 0) {
+      animal.deadUntil = this.game.s.elapsed + (animal.minion ? 999999 : spec.respawn);
+      this.game.event('burst', animal.x, animal.y - 20, '#fff4e0');
+      return;
+    }
     animal.deadUntil =
       this.game.s.elapsed +
       (animal.type === 'boss' || spec?.boss || animal.minion || animal.echo

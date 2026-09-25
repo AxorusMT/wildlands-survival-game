@@ -109,9 +109,3 @@ Each new realm follows the Band I–III pattern. It needs:
 - The missing modifiers: Toxic air (needs a respirator) and Silent (no music, and mobs hear you).
 - More mob behaviours: burrow, split, tether, mirror, swarm and ranged kite. Band II–III mobs reuse the walker, flier and floater movement.
 - Atlas completion percentages.
-
-## Known rough edges from M5
-
-- The Bone Marches mire tint is subtle in dark scenes, and could be made clearer.
-- Saltglass rock dominates the underground of the Salt Flats, and could be thinned.
-- Mirages give a little renown when killed. Consider excluding `mirage` and `tyrant_mirage` from kill records.

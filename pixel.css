@@ -773,7 +773,7 @@ canvas.icon {
 /* ── Realm banner ──────────────────────────────────────────────────────────── */
 #realm-banner {
   position: absolute;
-  top: 22%;
+  top: 12%;
   left: 50%;
   transform: translateX(-50%);
   display: grid;

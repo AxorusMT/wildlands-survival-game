@@ -33,9 +33,9 @@ function build(seed: number): RealmGeometry {
     if (y > d - 130 - 20 * Math.sin(x / 90) && y < d && x > 300 && x < RW - 300) return 0;
     if (ladderXs.some((lx) => Math.abs(x - lx) < 44) && y < d) return 0;
     if (y < g + 40) return SALTCRUST;
-    return fbm2(x / 150, y / 120, s(5)) > 0.62 || y < g + 160 - (1450 - g) * 0.3
-      ? SALTGLASS_ROCK
-      : SALTCRUST;
+    // Ridges are saltglass through and through; below, it runs in thin veins.
+    const ridge = y < 1450 - 20;
+    return ridge || fbm2(x / 150, y / 120, s(5)) > 0.7 ? SALTGLASS_ROCK : SALTCRUST;
   };
   return {
     tile,

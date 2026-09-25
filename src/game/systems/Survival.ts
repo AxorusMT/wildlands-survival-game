@@ -144,7 +144,7 @@ export class Survival extends System {
         skills.coldResist +
         (skills.coldBlooded ? 8 : 0) +
         wayfarer +
-        (this.game.equipment.has('hymnward') ? 6 : 0),
+        (this.game.equipment.fullSet() === 'choirsilver' ? 6 : 0),
       heatResist = skills.heatResist + wayfarer,
       cold =
         air < 15 ? Math.min(15, air + coldResist) : air > 26 ? Math.max(26, air - heatResist) : air;
